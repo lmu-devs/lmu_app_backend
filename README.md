@@ -1,30 +1,30 @@
-
 # LMU App Backend
 
-Brief description of your project. Explain what it does and why it's useful.
+This is the backend service for the LMU App. It provides the necessary API endpoints and data processing for the LMU application.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+  - [Using Python Virtual Environment](#using-python-virtual-environment)
+  - [Using Docker Compose](#using-docker-compose)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
-* You have installed the latest version of [Python](https://www.python.org/downloads/) (3.x recommended)
+* You have installed the latest version of [Python](https://www.python.org/downloads/) (3.12 recommended)
+* (Optional) You have installed [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/)
 * You have a Windows/Linux/Mac machine.
-* You have read [project documentation or related docs, if any].
+* You have read the LMU App documentation (if available).
 
 ## Installation
 
-To install Your Project Name, follow these steps:
+### Using Python Virtual Environment
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/your-project-name.git
-   cd your-project-name
+   git clone https://github.com/lmu-devs/lmu_app_backend.git
+   cd lmu-app-backend
    ```
 
 2. Create a virtual environment:
@@ -47,14 +47,42 @@ To install Your Project Name, follow these steps:
    pip install -r requirements.txt
    ```
 
+5. Run docker compose:
+   ```
+   docker-compose build
+   docker-compose up -d
+   ```
+
+### Using Docker Compose
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/lmu-devs/lmu_app_backend.git
+   cd lmu-app-backend
+   ```
+
+2. Build and run the Docker containers:
+   ```
+   docker-compose up --build
+   ```
+
+   This command will build the Docker image and start the containers defined in your `docker-compose.yml` file.
+
 ## Usage
 
-To use Your Project Name, follow these steps:
+To run the LMU App Backend, follow these steps:
 
-1. Make sure your virtual environment is activated.
-2. Run the main script:
+1. If using virtual environment, make sure it's activated.
+2. Run the main application:
    ```
-   python main.py
+   python app.py
    ```
-3. [Add any additional steps or usage instructions specific to your project]
 
+If using Docker Compose:
+```
+docker-compose up
+```
+
+The backend server should now be running and accessible at `http://localhost:5432` (or the port specified in your configuration).
+
+[Add any additional steps, API documentation, or usage instructions specific to the LMU App Backend]

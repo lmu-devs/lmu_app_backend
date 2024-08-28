@@ -37,13 +37,31 @@ services:
 
 
   api:
-    build: .
-    container_name: fastapi
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: api
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
-      - ./app:/code/app
+      - ./api:/app/api
     ports:
       - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+
+  data_fetcher:
+    build:
+      context: .
+      dockerfile: Dockerfile.data_fetcher
+    container_name: data_fetcher
+    command: python data_fetcher/main.py
+    volumes:
+      - ./data_fetcher:/app/data_fetcher
+    environment:
+      - PYTHONUNBUFFERED=1
     depends_on:
       db:
         condition: service_healthy
