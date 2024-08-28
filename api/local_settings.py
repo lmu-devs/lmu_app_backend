@@ -1,5 +1,5 @@
 postgresql = {
-    'user':'user',
+    'user':'postgres',
     'password':'password',
     'host':'db',
     'port':'5432',

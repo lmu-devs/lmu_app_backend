@@ -14,8 +14,15 @@ def get_engine(user, password, host, port, db):
     return engine
 
 engine = get_engine('postgres', 'password', 'db', '5432', 'database')
-# engine with .env variables
-# engine = get_engine(os.getenv('POSTGRES_USER'), os.getenv('POSTGRES_PASSWORD'), os.getenv('POSTGRES_HOST'), os.getenv('POSTGRES_PORT'), os.getenv('POSTGRES_DB'))
+# TODO: Replace the hardcoded values with the commented code below to create the engine with .env variables
+# DB_USER = os.environ.get('POSTGRES_USER')
+# DB_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+# DB_HOST = os.environ.get('POSTGRES_HOST')
+# DB_PORT = os.environ.get('POSTGRES_PORT', '5432')
+# DB_NAME = os.environ.get('POSTGRES_DB')
+
+# # Create the engine
+# engine = get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
 print(engine.url)
 
 
@@ -29,7 +36,7 @@ print(engine.url)
 
 
 def get_session():
-    engine = get_engine('user', 'password', 'db', '5432', 'database')
+    engine = get_engine('postgres', 'password', 'db', '5432', 'database')
     session = sessionmaker(autocommit=False, autoflush=False, bind=engine)()
     return session
 
