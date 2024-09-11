@@ -1,7 +1,7 @@
 import enum
 from typing import List
 from pydantic import BaseModel, RootModel
-from sqlalchemy import ARRAY, Column, Date, Float, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, UUID, Column, Date, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from datetime import date
 
@@ -21,6 +21,7 @@ class DishDto(BaseModel):
     dish_type: str
     labels: List[str]
     prices: List[DishPriceDto]
+    # likes: int
     
     
 
@@ -41,21 +42,22 @@ class DishTable(Base):
     __tablename__ = "dishes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, nullable=False) # should only save 1 entry per name
     dish_type = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
-
-    # Foreign key
-    menu_day_date = Column(Date, ForeignKey('menu_days.date'))
+    price_simple = Column(Integer, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
 
     # Relationship
-    menu_day = relationship("MenuDayTable", back_populates="dishes")
+    menu_associations = relationship("MenuDishAssociation", back_populates="dish")
     prices = relationship("DishPriceTable", back_populates="dish", cascade="all, delete-orphan")
-    # users - liked by?
+    likes = relationship("DishLikeTable", back_populates="dish", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Dish(id='{self.id}', name='{self.name}', type='{self.dish_type}')>"
     
+    @property
+    def like_count(self):
+        return len(self.likes)
 
 class PriceCategory(enum.Enum):
     STUDENT = "students"
@@ -77,4 +79,20 @@ class DishPriceTable(Base):
 
     def __repr__(self):
         return f"<Price(id='{self.id}', category='{self.category}', base_price='{self.base_price}', price_per_unit='{self.price_per_unit}', unit='{self.unit}')>"
+
+
+# table to represent the many-to-many relationship between dishes and users
+class DishLikeTable(Base):
+    __tablename__ = "dish_likes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    dish_id = Column(Integer, ForeignKey('dishes.id'), nullable=False)
+    user_id = Column(UUID(as_uuid=True),  ForeignKey('users.id'), nullable=False)
+
+    # Relationships
+    dish = relationship("DishTable", back_populates="likes")
+    user = relationship("UserTable", back_populates="liked_dishes")
+
+    def __repr__(self):
+        return f"<DishLike(dish_id='{self.dish_id}', user_id='{self.user_id}')>"
 

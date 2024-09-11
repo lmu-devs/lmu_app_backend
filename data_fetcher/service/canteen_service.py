@@ -1,8 +1,8 @@
 import requests
 from sqlalchemy.orm import Session
-from api.database import get_session, engine
 from api.models.canteen_model import CanteenTable, LocationTable, OpeningHoursTable, Base
 from datetime import datetime
+from api.database import get_db
 
 def fetch_canteen_data():
     url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
@@ -64,9 +64,8 @@ def store_canteen_data(data: list, db: Session):
 
 def update_canteen_database():
     print("Updating canteen data...")
-    Base.metadata.create_all(bind=engine)
-    db = get_session()
     try:
+        db = next(get_db())
         canteen_data = fetch_canteen_data()
         store_canteen_data(canteen_data, db)
         print("canteen data updated successfully!")

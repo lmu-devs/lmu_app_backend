@@ -1,10 +1,12 @@
 import requests
 from sqlalchemy.orm import Session
-from api.database import Base, get_session, engine
+from sqlalchemy.exc import IntegrityError
+from api.database import get_db
 from datetime import datetime
 
 from api.models.dish_model import DishPriceTable, DishTable
-from api.models.menu_model import MenuDayTable, MenuWeekTable
+from api.models.menu_model import MenuDayTable, MenuDishAssociation, MenuWeekTable
+from data_fetcher.enums.mensa_enums import CanteenID
 
 
 def fetch_menu_data(canteen_id: str, week: str, year: int):
@@ -14,167 +16,114 @@ def fetch_menu_data(canteen_id: str, week: str, year: int):
     print("Response tum-dev eat-api: ", response.status_code)
     return response.json()
 
-def fetch_all_menu_data():
-    url = "https://tum-dev.github.io/eat-api/all.json"
-    response = requests.get(url)
-    response.raise_for_status()
-    print("Response tum-dev eat-api: ", response.status_code)
-    return response.json()
 
 def store_menu_data(data: dict, db: Session, canteen_id: str):
     print("Storing menu data...")
-    week = data['number']
-    year = data['year']
     
-    print(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
-    
-    # Try to get existing MenuWeekTable or create a new one
-    menu_week_obj = db.query(MenuWeekTable).filter(
-        MenuWeekTable.canteen_id == canteen_id,
-        MenuWeekTable.year == year,
-        MenuWeekTable.week == week
-    ).first()
-    
-    if not menu_week_obj:
-        menu_week_obj = MenuWeekTable(canteen_id=canteen_id, year=year, week=week)
-        db.add(menu_week_obj)
-    
-    days = data['days']
-    for day in days:
-        date = datetime.strptime(day['date'], '%Y-%m-%d').date()
+    try:
+        week = data.get('number')
+        year = data.get('year')
         
-        # Try to get existing MenuDayTable or create a new one
-        menu_day_obj = db.query(MenuDayTable).filter(
-            MenuDayTable.date == date,
-            MenuDayTable.menu_week_week == week,
-            MenuDayTable.menu_week_year == year
-        ).first()
+        if not week or not year:
+            raise ValueError("Week or year data is missing")
         
-        if not menu_day_obj:
-            menu_day_obj = MenuDayTable(
+        print(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
+        
+        # Use merge to either insert or update the MenuWeekTable entry
+        menu_week_obj = db.merge(MenuWeekTable(canteen_id=canteen_id, year=year, week=week))
+        
+        days = data.get('days', [])
+        for day in days:
+            date_str = day.get('date')
+            if not date_str:
+                print(f"Skipping day with missing date")
+                continue
+            
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            
+            # Use merge for MenuDayTable
+            menu_day_obj = db.merge(MenuDayTable(
                 date=date,
                 menu_week_week=week,
-                menu_week_year=year
-            )
-            menu_week_obj.menu_days.append(menu_day_obj)
-        
-        # Clear existing dishes for this day
-        menu_day_obj.dishes = []
-        
-        
-        # Add dishes to menu day
-        dishes = day['dishes']
-        for dish in dishes:
-            dish_obj = DishTable(
-                name=dish['name'],
-                dish_type=dish['dish_type'],
-                labels=dish['labels']
-            )
-            menu_day_obj.dishes.append(dish_obj)
+                menu_week_year=year,
+                menu_week_canteen_id=canteen_id
+            ))
             
-            # Add prices to dish
-            prices = dish["prices"]
+            # Process dishes for this day
+            dishes = day.get('dishes', [])
+            for dish_data in dishes:
+                # Get or create the dish
+                dish_name = dish_data.get('name', '')
+                dish_obj = db.query(DishTable).filter_by(name=dish_name).first()
+                if not dish_obj:
+                    dish_obj = DishTable(
+                        name=dish_name,
+                        dish_type=dish_data.get('dish_type', ''),
+                        labels=dish_data.get('labels', [])
+                    )
+                    db.add(dish_obj)
+                    db.flush()  # This will assign an ID to the new dish
+                
+                # Create or update the MenuDishAssociation
+                association = db.query(MenuDishAssociation).filter_by(
+                    dish_id=dish_obj.id,
+                    menu_day_date=date,
+                    menu_day_canteen_id=canteen_id
+                ).first()
+                
+                if not association:
+                    association = MenuDishAssociation(
+                        dish_id=dish_obj.id,
+                        menu_day_date=date,
+                        menu_day_canteen_id=canteen_id
+                    )
+                    db.add(association)
+                
+                # Update prices
+                prices = dish_data.get("prices", {})
+                if prices:
+                    for category, price_data in prices.items():
+                        if isinstance(price_data, dict):
+                            price_obj = db.query(DishPriceTable).filter_by(
+                                dish_id=dish_obj.id,
+                                category=category
+                            ).first()
+                            
+                            if not price_obj:
+                                price_obj = DishPriceTable(
+                                    dish_id=dish_obj.id,
+                                    category=category
+                                )
+                                db.add(price_obj)
+                            
+                            price_obj.base_price = price_data.get('base_price')
+                            price_obj.price_per_unit = price_data.get('price_per_unit')
+                            price_obj.unit = price_data.get('unit')
+                        else:
+                            print(f"Skipping invalid price data for category {category}")
+        
+        db.commit()
+        print("Menu data stored successfully.")
+    except IntegrityError as e:
+        db.rollback()
+        print(f"Error while updating menu database: {str(e)}")
+    except Exception as e:
+        db.rollback()
+        print(f"Unexpected error while updating menu database: {str(e)}")
+        print(f"Error details: {type(e).__name__}, {str(e)}")
 
-            for category, price_data in prices.items():
-                price_obj = DishPriceTable(
-                    category=category,
-                    base_price=price_data['base_price'],
-                    price_per_unit=price_data['price_per_unit'],
-                    unit=price_data['unit']
-                )
-                dish_obj.prices.append(price_obj)
-            
-            
-            
-            
-    
-    db.add(menu_week_obj)
-    db.commit()
-    print("Menu data stored successfully.")
-    
-    
-def store_all_menu_data(data: dict, db: Session):
-    print("Storing menu data...")
-    canteen_id = data['canteen_id'] # is this right?
-    week = data['number']
-    year = data['year']
-    
-    print(f"Storing all menu data for week all coming weeks")
-    
-    # Try to get existing MenuWeekTable or create a new one
-    menu_week_obj = db.query(MenuWeekTable).filter(
-        MenuWeekTable.canteen_id == canteen_id,
-        MenuWeekTable.year == year,
-        MenuWeekTable.week == week
-    ).first()
-    
-    if not menu_week_obj:
-        menu_week_obj = MenuWeekTable(canteen_id=canteen_id, year=year, week=week)
-        db.add(menu_week_obj)
-    
-    days = data['days']
-    for day in days:
-        date = datetime.strptime(day['date'], '%Y-%m-%d').date()
-        
-        # Try to get existing MenuDayTable or create a new one
-        menu_day_obj = db.query(MenuDayTable).filter(
-            MenuDayTable.date == date,
-            MenuDayTable.menu_week_week == week,
-            MenuDayTable.menu_week_year == year
-        ).first()
-        
-        if not menu_day_obj:
-            menu_day_obj = MenuDayTable(
-                date=date,
-                menu_week_week=week,
-                menu_week_year=year
-            )
-            menu_week_obj.menu_days.append(menu_day_obj)
-        
-        # Clear existing dishes for this day
-        menu_day_obj.dishes = []
-        
-        
-        # Add dishes to menu day
-        dishes = day['dishes']
-        for dish in dishes:
-            dish_obj = DishTable(
-                name=dish['name'],
-                dish_type=dish['dish_type'],
-                labels=dish['labels']
-            )
-            menu_day_obj.dishes.append(dish_obj)
-            
-            # Add prices to dish
-            prices = dish["prices"]
 
-            for category, price_data in prices.items():
-                price_obj = DishPriceTable(
-                    category=category,
-                    base_price=price_data['base_price'],
-                    price_per_unit=price_data['price_per_unit'],
-                    unit=price_data['unit']
-                )
-                dish_obj.prices.append(price_obj)
-            
-            
-            
-            
-    
-    db.add(menu_week_obj)
-    db.commit()
-    print("Menu data stored successfully.")
     
     
+
 
 
 def update_menu_database(canteen_id: str, year: int, week: str, ):
     assert len(week) == 2, "Week must be a two-digit number"
     print("Updating menu data...")
-    Base.metadata.create_all(bind=engine)
-    db = get_session()
     
     try:
+        db = next(get_db())
         menu_data = fetch_menu_data(canteen_id, week, year)
         store_menu_data(menu_data, db, canteen_id)
         print(menu_data)
@@ -185,15 +134,27 @@ def update_menu_database(canteen_id: str, year: int, week: str, ):
         db.close()
         
         
-        
-        
-        
-def update_all_menu_items():
-    # 1. get all canteen_id from database
+def update_date_range_menu_database(start_year: int, start_week: str, end_year: int, end_week: str):
+    assert len(start_week) == 2, "Week must be a two-digit number"
+    assert len(end_week) == 2, "Week must be a two-digit number"
+    print(f"Updating menu data range from week {start_week} of year {start_year} to week {end_week} of year {end_year}...")
     
-    # 2. for each canteen_id, get the menu data
-    
-    pass
+    try:
+        db = next(get_db())
+        for canteens in CanteenID:
+            print(f"Updating menu data for canteen {canteens.value} ...")
+            menu_data = fetch_menu_data(canteens.value, start_week, start_year)
+            store_menu_data(menu_data, db, canteens.value)
+            print(menu_data)
+            
+        print("Menu data updated successfully for all canteens!")
+    except Exception as e:
+        print(f"Error while updating menu database: {str(e)}")
+    finally:
+        db.close()
+        
+        
+
     
 
 if __name__ == "__main__":
