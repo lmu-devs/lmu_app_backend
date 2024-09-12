@@ -40,6 +40,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+    env_file:
+      - .env
     container_name: api
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
@@ -58,6 +60,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.data_fetcher
+    env_file:
+      - .env
     container_name: data_fetcher
     command: python data_fetcher/main.py
     volumes:

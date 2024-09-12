@@ -1,7 +1,7 @@
 import enum
 from typing import List
-from pydantic import BaseModel, RootModel
-from sqlalchemy import ARRAY, UUID, Column, Date, Float, ForeignKey, Integer, String
+from pydantic import BaseModel
+from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from datetime import date
 
@@ -22,7 +22,6 @@ class DishDto(BaseModel):
     labels: List[str]
     prices: List[DishPriceDto]
     # likes: int
-    
     
 
 class DishDateDto(BaseModel):
@@ -81,7 +80,7 @@ class DishPriceTable(Base):
         return f"<Price(id='{self.id}', category='{self.category}', base_price='{self.base_price}', price_per_unit='{self.price_per_unit}', unit='{self.unit}')>"
 
 
-# table to represent the many-to-many relationship between dishes and users
+# Table to represent the many-to-many relationship between dishes and users
 class DishLikeTable(Base):
     __tablename__ = "dish_likes"
 

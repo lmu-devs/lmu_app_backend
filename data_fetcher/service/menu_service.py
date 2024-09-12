@@ -142,7 +142,6 @@ def update_date_range_menu_database(start_year: int, start_week: str, end_year: 
     try:
         db = next(get_db())
         for canteens in CanteenID:
-            print(f"Updating menu data for canteen {canteens.value} ...")
             menu_data = fetch_menu_data(canteens.value, start_week, start_year)
             store_menu_data(menu_data, db, canteens.value)
             print(menu_data)

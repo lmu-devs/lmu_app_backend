@@ -18,3 +18,4 @@ starlette==0.38.2
 typing_extensions==4.12.2
 urllib3==2.2.2
 uvicorn==0.29.0
+python-dotenv==1.0.1

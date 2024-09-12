@@ -4,9 +4,11 @@ from api.routers.fastapi import menu_router
 from api.routers.fastapi import dish_router
 
 from api.database import init_db
+from dotenv import load_dotenv
 
 
 def create_app():
+    load_dotenv()
     app = FastAPI(title="lmu-eat-api", description="API for canteen and menu data from munich.", version="0.1.0")
     
     # Include routers

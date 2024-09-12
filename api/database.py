@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base 
@@ -14,29 +15,19 @@ def get_engine(user, password, host, port, db):
     engine = create_engine(url)
     return engine
 
-# TODO: Replace the hardcoded values with the commented code below to create the engine with .env variables
-# DB_USER = os.environ.get('POSTGRES_USER')
-# DB_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-# DB_HOST = os.environ.get('POSTGRES_HOST')
-# DB_PORT = os.environ.get('POSTGRES_PORT', '5432')
-# DB_NAME = os.environ.get('POSTGRES_DB')
 
-# # Create the engine
-# engine = get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+DB_USER = os.environ.get('POSTGRES_USER')
+DB_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+DB_HOST = os.environ.get('POSTGRES_HOST')
+DB_PORT = os.environ.get('POSTGRES_PORT', '5432')
+DB_NAME = os.environ.get('POSTGRES_DB')
 
 
-# def get_engine_from_settings():
-#     keys = ['user', 'password', 'host', 'port', 'database']
-#     if not all(key in keys for key in settings.keys()):
-#         raise Exception('Bad Config File')
-    
-#     return get_engine(**settings)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine('postgres', 'password', 'db', '5432', 'database'))
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME))
 
 def init_db():
     # Create an engine
-    engine = get_engine('postgres', 'password', 'db', '5432', 'database')
+    engine = get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
     
     # Create all Tables
     Base.metadata.create_all(bind=engine)
