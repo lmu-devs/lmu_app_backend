@@ -19,6 +19,7 @@ class DishPriceDto(BaseModel):
 class DishDto(BaseModel):
     name: str
     dish_type: str
+    price_simple: str | None
     labels: List[str]
     prices: List[DishPriceDto]
     # likes: int
@@ -44,7 +45,7 @@ class DishTable(Base):
     name = Column(String, unique=True, nullable=False) # should only save 1 entry per name
     dish_type = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
-    price_simple = Column(Integer, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
+    price_simple = Column(String, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
 
     # Relationship
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")

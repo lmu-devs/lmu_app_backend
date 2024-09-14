@@ -3,8 +3,8 @@ from enum import Enum
 class CanteenID(Enum):
     MENSA_ARCISSTR = "mensa-arcisstr"
     MENSA_GARCHING = "mensa-garching"
-    MENSA_LEOPOLDSTR = "mensa-leopoldstr"
-    MENSA_LOTHSTR = "mensa-lothstr"
+    # MENSA_LEOPOLDSTR = "mensa-leopoldstr"
+    # MENSA_LOTHSTR = "mensa-lothstr"
     # MENSA_MARTINSRIED = "mensa-martinsried"
     # MENSA_PASING = "mensa-pasing"
     # MENSA_WEIHENSTEPHAN = "mensa-weihenstephan"

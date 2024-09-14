@@ -35,12 +35,30 @@ def fetch_data_from_api():
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)
         
+def fetch_scheduled_data_from_api():
+    """
+    Fetches data from the eat-api for the current month
+    """
+    print("Attempting to fetch data...")
+    # TODO: Implement fetching data for the current month
+    date = time.localtime()
+    year = date.tm_year
+    week = time.strftime("%V")
+    
+    try:
+        service.canteen_service.update_canteen_database()
+        service.menu_service.update_date_range_menu_database(start_year=2024, start_week="10", end_year=2024, end_week="15")
+        
+    except requests.exceptions.RequestException as e:
+        print("Error fetching data:", e)
+    
+        
 def fetch_data_date_range_from_api():
     print("Attempting to fetch data range...")
     
     try:
         service.canteen_service.update_canteen_database()
-        service.menu_service.update_date_range_menu_database(start_year=2024, start_week="23", end_year=2024, end_week="24")
+        service.menu_service.update_date_range_menu_database(start_year=2024, start_week="20", end_year=2024, end_week="22")
         
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)

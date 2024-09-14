@@ -81,7 +81,6 @@ class MenuDayTable(Base):
             ['menu_week_week', 'menu_week_year', 'menu_week_canteen_id'],
             ['menu_weeks.week', 'menu_weeks.year', 'menu_weeks.canteen_id']
         ),
-        # UniqueConstraint('date', 'menu_week_canteen_id', name='uq_menu_day_date_canteen'),
     )
 
     # Relationships

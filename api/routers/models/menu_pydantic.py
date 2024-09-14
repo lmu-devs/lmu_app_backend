@@ -7,7 +7,8 @@ def menu_week_to_pydantic(menu_week: MenuWeekTable) -> MenuWeekDto:
     menu_days = []
     for menu_day in menu_week.menu_days:
         dishes = []
-        for dish in menu_day.dishes:
+        for association in menu_day.dish_associations:
+            dish = association.dish
             prices = [
                 DishPriceDto(
                     category=price.category,
@@ -21,6 +22,7 @@ def menu_week_to_pydantic(menu_week: MenuWeekTable) -> MenuWeekDto:
                 name=dish.name,
                 dish_type=dish.dish_type,
                 labels=dish.labels,
+                price_simple=dish.price_simple,
                 prices=prices
             ))
         menu_days.append(MenuDayDto(

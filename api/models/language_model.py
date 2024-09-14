@@ -14,7 +14,7 @@ class LanguageDto(BaseModel):
 
 
 class Language(Base):
-    __tablename__ = "language"
+    __tablename__ = "languages"
     
     country_code = Column(String, nullable=False)
     flag_emoji = Column(String, nullable=False)

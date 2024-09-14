@@ -63,6 +63,7 @@ def store_canteen_data(data: list, db: Session):
 
 
 def update_canteen_database():
+    print("\n==============================================================")
     print("Updating canteen data...")
     try:
         db = next(get_db())

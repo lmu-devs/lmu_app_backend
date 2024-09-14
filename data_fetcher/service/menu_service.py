@@ -2,11 +2,12 @@ import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from api.database import get_db
-from datetime import datetime
+from datetime import datetime, date
 
 from api.models.dish_model import DishPriceTable, DishTable
 from api.models.menu_model import MenuDayTable, MenuDishAssociation, MenuWeekTable
 from data_fetcher.enums.mensa_enums import CanteenID
+from data_fetcher.service.price_service import calculate_simple_price
 
 
 def fetch_menu_data(canteen_id: str, week: str, year: int):
@@ -56,10 +57,12 @@ def store_menu_data(data: dict, db: Session, canteen_id: str):
                 dish_name = dish_data.get('name', '')
                 dish_obj = db.query(DishTable).filter_by(name=dish_name).first()
                 if not dish_obj:
+                    
                     dish_obj = DishTable(
                         name=dish_name,
                         dish_type=dish_data.get('dish_type', ''),
-                        labels=dish_data.get('labels', [])
+                        labels=dish_data.get('labels', []),
+                        price_simple=calculate_simple_price(dish_data.get("prices", {}).get("students", {}))
                     )
                     db.add(dish_obj)
                     db.flush()  # This will assign an ID to the new dish
@@ -134,23 +137,47 @@ def update_menu_database(canteen_id: str, year: int, week: str, ):
         db.close()
         
         
+
+
 def update_date_range_menu_database(start_year: int, start_week: str, end_year: int, end_week: str):
+    """
+    Fills the eat database with menu data for a specified date range.
+    
+    :param start_year: The starting year as an integer
+    :param start_week: The starting week as a string (2 digits)
+    :param end_year: The ending year as an integer
+    :param end_week: The ending week as a string (2 digits)
+    """
     assert len(start_week) == 2, "Week must be a two-digit number"
     assert len(end_week) == 2, "Week must be a two-digit number"
     print(f"Updating menu data range from week {start_week} of year {start_year} to week {end_week} of year {end_year}...")
     
     try:
         db = next(get_db())
-        for canteens in CanteenID:
-            menu_data = fetch_menu_data(canteens.value, start_week, start_year)
-            store_menu_data(menu_data, db, canteens.value)
-            print(menu_data)
+        
+        for year in range(start_year, end_year + 1):
+            start_week_num = int(start_week) if year == start_year else 1
+            end_week_num = int(end_week) if year == end_year else get_last_week_of_year(year)
             
-        print("Menu data updated successfully for all canteens!")
+            for week in range(start_week_num, end_week_num + 1):
+                week_str = f"{week:02d}"
+                
+                for canteen in CanteenID:
+                    menu_data = fetch_menu_data(canteen.value, week_str, year)
+                    store_menu_data(menu_data, db, canteen.value)
+                    print(f"Updated menu data for {canteen.name} - Year: {year}, Week: {week_str} \n")
+        
+        print("Menu data updated successfully for all canteens within the specified date range! ")
+        print("==============================================================\n")
     except Exception as e:
         print(f"Error while updating menu database: {str(e)}")
     finally:
         db.close()
+
+def get_last_week_of_year(year):
+    last_day = date(year, 12, 31)
+    return last_day.isocalendar()[1]
+
         
         
 
