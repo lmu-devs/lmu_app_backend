@@ -12,9 +12,9 @@ def create_app():
     app = FastAPI(title="lmu-eat-api", description="API for canteen and menu data from munich.", version="0.1.0")
     
     # Include routers
-    app.include_router(canteen_router.router,   prefix="/eat-api/v1", tags=["canteen"])
-    app.include_router(menu_router.router,      prefix="/eat-api/v1", tags=["menu"])
-    app.include_router(dish_router.router,      prefix="/eat-api/v1", tags=["dish"])
+    app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])
+    app.include_router(menu_router.router,      prefix="/eat/v1", tags=["menu"])
+    app.include_router(dish_router.router,      prefix="/eat/v1", tags=["dish"])
 
     @app.get("/")
     async def root():
