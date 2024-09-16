@@ -40,6 +40,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
+    image: raffisdocker/data_fetcher:v1.0
     env_file:
       - .env
     container_name: api
@@ -60,6 +61,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.data_fetcher
+    image: raffisdocker/data_fetcher:v1.0
     env_file:
       - .env
     container_name: data_fetcher
