@@ -6,8 +6,9 @@ from sqlalchemy.orm import relationship
 from datetime import date
 import uuid
 
-class User(BaseModel):
+class UserDto(BaseModel):
     id: uuid.UUID
+    device_id: str
     name: str
     email: str
     password: str
@@ -20,6 +21,7 @@ class UserTable(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    device_id = Column(String, nullable=False)
     name = Column(String, nullable=True)
     email = Column(String, nullable=True)
     password = Column(String, nullable=True)
