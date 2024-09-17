@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.security.api_key import APIKey
 
+from api.api_key import get_api_key
 from api.database import get_db
 from api.models.canteen_model import CanteenTable, CanteenDto, CanteensDto
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 from data_fetcher.service.canteen_service import update_canteen_database
 
+
+
 router = APIRouter()
 
-@router.get("/canteen/trigger-update", response_model=dict)
-async def trigger_canteen_update(background_tasks: BackgroundTasks):
+@router.put("/canteens/update", response_model=dict)
+async def trigger_canteen_update(api_key: APIKey = Depends(get_api_key)):
     print("Triggering canteen update process...")
     try:
         update_canteen_database()
@@ -19,12 +23,13 @@ async def trigger_canteen_update(background_tasks: BackgroundTasks):
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
+
 @router.get("/canteens/", response_model=CanteensDto)
 async def read_canteens(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     canteens = db.query(CanteenTable).offset(skip).limit(limit).all()
     return CanteensDto([canteen_to_pydantic(canteen) for canteen in canteens])
 
-@router.get("/canteen/{canteen_id}", response_model=CanteenDto)
+@router.get("/canteens/{canteen_id}", response_model=CanteenDto)
 async def read_canteen(canteen_id: str, db: Session = Depends(get_db)):
     canteen = db.query(CanteenTable).filter(CanteenTable.canteen_id == canteen_id).first()
     if canteen is None:
