@@ -1,9 +1,11 @@
 services:
   db:
-    image: postgres:15
+    image: postgres:16.4-bookworm
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     hostname: database
+    networks:
+      - backend
     ports:
       - 5432:5432
     expose:
@@ -45,6 +47,9 @@ services:
       - .env
     container_name: api
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - backend
+      - frontend
     volumes:
       - .:/app
     ports:
@@ -80,3 +85,8 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  backend:
+    internal: true
+  frontend:
