@@ -21,19 +21,19 @@ services:
       timeout: 2s
       retries: 5
 
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    volumes:
-      - ./pgadmin4:/lib/pgadmin/
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - 5050:80
-    depends_on:
-      - db
+  # pgadmin:
+  #   container_name: pgadmin_container
+  #   image: dpage/pgadmin4
+  #   volumes:
+  #     - ./pgadmin4:/lib/pgadmin/
+  #   restart: always
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+  #   ports:
+  #     - 5050:80
+  #   depends_on:
+  #     - db
 
 
   api:

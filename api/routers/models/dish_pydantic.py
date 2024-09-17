@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from api.models.dish_model import DishDatesDto, DishDateDto
+from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
 from api.models.canteen_model import CanteenTable, Weekday
 from api.models.menu_model import MenuDayTable, MenuDishAssociation
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
@@ -38,3 +38,29 @@ def dish_dates_to_pydantic(db: Session, dish_id: int) -> DishDatesDto:
     ]
 
     return DishDatesDto(dates=dish_dates)
+
+
+def dish_to_pydantic(db: Session, dish_id: int) -> DishDto:
+    dish = db.query(DishTable).filter(DishTable.id == dish_id).first()
+    if dish is None:
+        return None
+
+    prices = [
+        DishPriceDto(
+            category=price.category,
+            base_price=price.base_price,
+            price_per_unit=price.price_per_unit,
+            unit=price.unit
+        )
+        for price in dish.prices
+    ]
+
+    return DishDto(
+        name=dish.name,
+        dish_type=dish.dish_type,
+        labels=dish.labels,
+        price_simple=dish.price_simple,
+        prices=prices
+    )
+    
+    
