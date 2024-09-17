@@ -71,6 +71,7 @@ services:
       - .env
     container_name: data_fetcher
     networks:
+      - frontend
       - backend
     command: python data_fetcher/main.py
     volumes:
