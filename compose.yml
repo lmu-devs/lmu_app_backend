@@ -3,7 +3,6 @@ services:
     image: postgres:16.4-bookworm
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    # hostname: database
     networks:
       - backend
     ports:
