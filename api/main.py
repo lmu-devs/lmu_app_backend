@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from api.routers.fastapi import canteen_router
 from api.routers.fastapi import menu_router
 from api.routers.fastapi import dish_router
+from api.routers.fastapi import user_router
 
 from api.database import init_db
 from dotenv import load_dotenv
@@ -15,6 +16,7 @@ def create_app():
     app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])
     app.include_router(menu_router.router,      prefix="/eat/v1", tags=["menu"])
     app.include_router(dish_router.router,      prefix="/eat/v1", tags=["dish"])
+    app.include_router(user_router.router,      prefix="/eat/v1", tags=["user"])
 
     @app.get("/")
     async def root():

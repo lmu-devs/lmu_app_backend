@@ -23,7 +23,8 @@ def menu_week_to_pydantic(menu_week: MenuWeekTable) -> MenuWeekDto:
                 dish_type=dish.dish_type,
                 labels=dish.labels,
                 price_simple=dish.price_simple,
-                prices=prices
+                prices=prices,
+                like_count=dish.like_count
             ))
         menu_days.append(MenuDayDto(
             date=menu_day.date,

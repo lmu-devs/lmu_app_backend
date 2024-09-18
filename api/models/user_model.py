@@ -1,18 +1,18 @@
 from pydantic import BaseModel
 from typing import List
 from api.database import Base
-from sqlalchemy import Column, String, Date, UUID
+from sqlalchemy import Column, String, DateTime, UUID
 from sqlalchemy.orm import relationship
-from datetime import date
+from datetime import datetime
 import uuid
 
 class UserDto(BaseModel):
     id: uuid.UUID
     device_id: str
-    name: str
-    email: str
-    password: str
-    creation_date: date
+    name: str | None
+    email: str | None
+    password: str | None
+    creation_date: datetime
     
 
 # Tables
@@ -25,7 +25,7 @@ class UserTable(Base):
     name = Column(String, nullable=True)
     email = Column(String, nullable=True)
     password = Column(String, nullable=True)
-    creation_date = Column(Date, nullable=True)
+    creation_date = Column(DateTime, nullable=False)
     
     liked_dishes = relationship("DishLikeTable", back_populates="user")
 

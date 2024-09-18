@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from uuid import uuid4
 from fastapi.security.api_key import APIKey
 
 from api.api_key import get_api_key

@@ -60,7 +60,8 @@ def dish_to_pydantic(db: Session, dish_id: int) -> DishDto:
         dish_type=dish.dish_type,
         labels=dish.labels,
         price_simple=dish.price_simple,
-        prices=prices
+        prices=prices,
+        like_count=dish.like_count
     )
     
     
