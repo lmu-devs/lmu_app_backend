@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from api.routers.fastapi import canteen_router
 from api.routers.fastapi import menu_router
 from api.routers.fastapi import dish_router
@@ -17,10 +17,17 @@ def create_app():
     app.include_router(menu_router.router,      prefix="/eat/v1", tags=["menu"])
     app.include_router(dish_router.router,      prefix="/eat/v1", tags=["dish"])
     app.include_router(user_router.router,      prefix="/eat/v1", tags=["user"])
+    
+    @app.middleware("http")
+    async def add_charset_middleware(request: Request, call_next):
+        response = await call_next(request)
+        if response.headers.get("content-type") == "application/json":
+            response.headers["content-type"] = "application/json; charset=utf-8"
+        return response
 
     @app.get("/")
     async def root():
-        return {"message": "Hello World"}
+        return {"message": "Hello Wörld"}
     
     # Initialize the database
     session = init_db()

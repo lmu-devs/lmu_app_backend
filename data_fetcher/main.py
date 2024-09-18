@@ -4,10 +4,10 @@ import time
 import signal
 import sys
 
-import service.canteen_service
-import service.menu_service
 
 from api.database import init_db
+from data_fetcher.service.canteen_service import update_canteen_database
+from data_fetcher.service.menu_service import update_date_range_menu_database
 
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
@@ -25,66 +25,83 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 
-def fetch_data_from_api():
-    print("Attempting to fetch data...")
-    
-    try:
-        service.canteen_service.update_canteen_database()
-        service.menu_service.update_menu_database(canteen_id="mensa-garching", year=2024, week="22")
         
-    except requests.exceptions.RequestException as e:
-        print("Error fetching data:", e)
-        
-def fetch_scheduled_data_from_api():
+def fetch_scheduled_data():
     """
     Fetches data from the eat-api for the current month
     """
-    print("Attempting to fetch data...")
-    # TODO: Implement fetching data for the current month
+    print("Attempting to fetch data for next 4 weeks...")
+    
+    # Get the current date
     date = time.localtime()
     year = date.tm_year
-    week = time.strftime("%V")
+    current_week = int(time.strftime("%V"))
+    
+    # Calculate the week 4 weeks in the future
+    future_week = current_week + 4
+    
+    # Adjust for year wrap-around
+    if future_week > 52:
+        future_week = future_week - 52
+        future_year = year + 1
+    else:
+        future_year = year
     
     try:
-        service.canteen_service.update_canteen_database()
-        service.menu_service.update_date_range_menu_database(start_year=2024, start_week="10", end_year=2024, end_week="15")
+        update_canteen_database()
+        update_date_range_menu_database(
+            start_year=year, 
+            start_week=str(current_week), 
+            end_year=future_year, 
+            end_week=str(future_week)
+        )
         
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)
     
         
-def fetch_data_date_range_from_api():
-    print("Attempting to fetch data range...")
+        
+def fetch_data_current_year():
+    
+    date = time.localtime()
+    year = date.tm_year
+    current_week = int(time.strftime("%V"))
+    
+    print(f"Attempting to fetch data for year {year}...")
     
     try:
-        service.canteen_service.update_canteen_database()
-        service.menu_service.update_date_range_menu_database(start_year=2024, start_week="20", end_year=2024, end_week="22")
+        update_canteen_database()
+        update_date_range_menu_database(start_year=year, start_week="02", end_year=year, end_week=str(current_week))
         
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)
         
-def test_fetch_data_from_api():
-    print("Running test for every 2 seconds...")
-    # fetch_data_from_api()
+
+
+
+
 
 def create_data_fetcher():
     print("Setting up schedule...")
-    schedule.every(2).seconds.do(test_fetch_data_from_api)
     
-    # fetch_data_from_api()
-    fetch_data_date_range_from_api()
+    fetch_data_current_year()
+    schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
-    print("Entering main loop...")
+    print("Entering data_fecther loop...")
     while running:
         schedule.run_pending()
         time.sleep(1)
     
     print("Exiting main loop...")
 
+
 if __name__ == "__main__":
     print("Script started")
     try:
+        # Initialize the database
         init_db()
+        
+        # Start the main loop
         create_data_fetcher()
     except Exception as e:
         print(f"An error occurred: {e}")

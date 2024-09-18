@@ -160,6 +160,9 @@ def update_date_range_menu_database(start_year: int, start_week: str, end_year: 
             end_week_num = int(end_week) if year == end_year else get_last_week_of_year(year)
             
             for week in range(start_week_num, end_week_num + 1):
+                # skip week 1 because it doesnt exist in tum api
+                if week == 1:
+                    continue
                 week_str = f"{week:02d}"
                 
                 for canteen in CanteenID:

@@ -7,6 +7,7 @@ from api.api_key import get_system_api_key_header
 from api.database import get_db
 from api.models.menu_model import MenuWeekDto, MenuWeekTable, MenusDto
 from api.routers.models.menu_pydantic import menu_week_to_pydantic
+from data_fetcher.main import fetch_data_current_year
 from data_fetcher.service.menu_service import update_menu_database
 
 router = APIRouter()
@@ -14,7 +15,7 @@ router = APIRouter()
 @router.put("/menus/update-all", )
 async def update_all_menus(api_key: APIKey = Depends(get_system_api_key_header)):
     try:
-        update_menu_database()
+        fetch_data_current_year()
         return {"message": "Menu items for all canteens updated successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating menu items: {str(e)}")
