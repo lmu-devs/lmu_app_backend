@@ -1,4 +1,5 @@
 import requests
+from requests.exceptions import HTTPError, RequestException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from api.database import get_db
@@ -12,10 +13,20 @@ from data_fetcher.service.price_service import calculate_simple_price
 
 def fetch_menu_data(canteen_id: str, week: str, year: int):
     url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
-    response = requests.get(url)
-    response.raise_for_status()
-    print("Response tum-dev eat-api: ", response.status_code)
-    return response.json()
+    
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        print("Response tum-dev eat-api: ", response.status_code)
+        return response.json()
+    except HTTPError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+    except RequestException as req_err:
+        print(f"Request error occurred: {req_err}")
+    except Exception as err:
+        print(f"An error occurred: {err}")
+    return None
+
 
 
 def store_menu_data(data: dict, db: Session, canteen_id: str):
@@ -167,6 +178,8 @@ def update_date_range_menu_database(start_year: int, start_week: str, end_year: 
                 
                 for canteen in CanteenID:
                     menu_data = fetch_menu_data(canteen.value, week_str, year)
+                    if not menu_data:
+                        continue
                     store_menu_data(menu_data, db, canteen.value)
                     print(f"Updated menu data for {canteen.name} - Year: {year}, Week: {week_str} \n")
         
