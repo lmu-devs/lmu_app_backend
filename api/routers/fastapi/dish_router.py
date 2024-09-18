@@ -2,7 +2,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from api.api_key import get_api_key
+from api.api_key import get_system_api_key_header, get_user_api_key_header
 from api.database import get_db
 from api.models.dish_model import DishDatesDto, DishDto, DishTable
 from api.routers.models.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
@@ -31,7 +31,7 @@ async def read_dish_dates(dish_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/dishes/toggle-like", response_model=bool)
-def toggle_like(dish_id: int, user_id: uuid.UUID, db: Session = Depends(get_db), api_key: str = Depends(get_api_key)):
+def toggle_like(dish_id: int, user_id: uuid.UUID, db: Session = Depends(get_db), api_key: str = Depends(get_user_api_key_header)):
     try:
         result = toggle_dish_like(dish_id, user_id, db)
         return result

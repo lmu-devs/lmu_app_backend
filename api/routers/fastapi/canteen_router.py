@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey
 
-from api.api_key import get_api_key
+from api.api_key import get_system_api_key_header
 from api.database import get_db
 from api.models.canteen_model import CanteenTable, CanteenDto, CanteensDto
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
@@ -13,7 +13,7 @@ from data_fetcher.service.canteen_service import update_canteen_database
 router = APIRouter()
 
 @router.put("/canteens/update", response_model=dict)
-async def trigger_canteen_update(api_key: APIKey = Depends(get_api_key)):
+async def trigger_canteen_update(api_key: APIKey = Depends(get_system_api_key_header)):
     print("Triggering canteen update process...")
     try:
         update_canteen_database()

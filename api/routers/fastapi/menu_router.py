@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from fastapi.security.api_key import APIKey
 
-from api.api_key import get_api_key
+from api.api_key import get_system_api_key_header
 from api.database import get_db
 from api.models.menu_model import MenuWeekDto, MenuWeekTable, MenusDto
 from api.routers.models.menu_pydantic import menu_week_to_pydantic
@@ -12,7 +12,7 @@ from data_fetcher.service.menu_service import update_menu_database
 router = APIRouter()
 
 @router.put("/menus/update-all", )
-async def update_all_menus(api_key: APIKey = Depends(get_api_key)):
+async def update_all_menus(api_key: APIKey = Depends(get_system_api_key_header)):
     try:
         update_menu_database()
         return {"message": "Menu items for all canteens updated successfully"}
@@ -20,7 +20,7 @@ async def update_all_menus(api_key: APIKey = Depends(get_api_key)):
         raise HTTPException(status_code=500, detail=f"Error updating menu items: {str(e)}")
 
 @router.put("/menus/{canteen_id}/{year}/{week}")
-async def update_menu(canteen_id: str, year: int, week: str, api_key: APIKey = Depends(get_api_key)):
+async def update_menu(canteen_id: str, year: int, week: str, api_key: APIKey = Depends(get_system_api_key_header)):
     try:
         update_menu_database(canteen_id=canteen_id, year=year, week=week)
         return {"message": f"Menu items for canteen {canteen_id}, year {year}, week {week} updated successfully"}

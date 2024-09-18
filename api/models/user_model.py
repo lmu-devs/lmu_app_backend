@@ -12,6 +12,7 @@ class UserDto(BaseModel):
     name: str | None
     email: str | None
     password: str | None
+    api_key: str
     creation_date: datetime
     
 
@@ -25,6 +26,7 @@ class UserTable(Base):
     name = Column(String, nullable=True)
     email = Column(String, nullable=True)
     password = Column(String, nullable=True)
+    api_key = Column(String, nullable=False) 
     creation_date = Column(DateTime, nullable=False)
     
     liked_dishes = relationship("DishLikeTable", back_populates="user")
