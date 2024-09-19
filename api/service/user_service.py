@@ -10,7 +10,6 @@ def store_user_data(user_data, db: Session):
         # name=user_data.get('name'),
         # email=user_data.get('email'),
         # password=user_data.get('password'),
-        creation_date=datetime.now(),
         api_key=generate_user_api_key()
     )
     db.add(new_user)

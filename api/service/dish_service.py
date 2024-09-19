@@ -22,11 +22,13 @@ def toggle_dish_like(dish_id: int, user_id: uuid.UUID, db: Session) -> bool:
 
     if existing_like:
         # If the user already liked the dish, remove the like
+        dish.like_count -= 1
         db.delete(existing_like)
         db.commit()
         return False
     else:
         # If the user has not liked the dish yet, add a new like
+        dish.like_count += 1
         new_like = DishLikeTable(dish_id=dish_id, user_id=user_id)
         db.add(new_like)
         db.commit()

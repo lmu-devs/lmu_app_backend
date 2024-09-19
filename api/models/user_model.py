@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 from api.database import Base
-from sqlalchemy import Column, String, DateTime, UUID
+from sqlalchemy import Column, String, DateTime, UUID, func
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
@@ -27,9 +27,10 @@ class UserTable(Base):
     email = Column(String, nullable=True)
     password = Column(String, nullable=True)
     api_key = Column(String, nullable=False) 
-    creation_date = Column(DateTime, nullable=False)
+    creation_date = Column(DateTime, default=func.now())
     
     liked_dishes = relationship("DishLikeTable", back_populates="user")
+    liked_canteens = relationship("CanteenLikeTable", back_populates="user")
 
     def __repr__(self):
         return f"<User(id='{self.id}', username='{self.username}')>"

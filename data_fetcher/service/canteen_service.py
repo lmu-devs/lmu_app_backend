@@ -12,31 +12,31 @@ def fetch_canteen_data():
     return response.json()
     
 
-def store_canteen_data(data: list, db: Session):
+def store_canteen_data(canteens: list, db: Session):
     print("Storing canteen data...")
-    for item in data:
+    for canteen in canteens:
         # Update Canteen
-        canteen_id = item['canteen_id']
+        canteen_id = canteen['canteen_id']
         
-        canteen_obj = db.query(CanteenTable).filter(CanteenTable.canteen_id == canteen_id).first()
+        canteen_obj = db.query(CanteenTable).filter(CanteenTable.id == canteen_id).first()
         if not canteen_obj:
-            canteen_obj = CanteenTable(canteen_id=canteen_id)
+            canteen_obj = CanteenTable(id=canteen_id)
         
         # Update Name
-        name = item['name']
+        name = canteen['name']
         
         canteen_obj.name = name
 
         # Update Location
-        location = item['location']
+        location = canteen['location']
         address = location['address']
         latitude = location['latitude']
         longitude = location['longitude']
         
-        canteen_obj.location = LocationTable(canteen_id=canteen_obj.canteen_id, address=address, latitude=latitude, longitude=longitude)
+        canteen_obj.location = LocationTable(canteen_id=canteen_obj.id, address=address, latitude=latitude, longitude=longitude)
 
         # Update Opening Hours
-        open_hours = item['open_hours']
+        open_hours = canteen['open_hours']
         
         opening_hours = []
         for day, hours in open_hours.items():

@@ -46,7 +46,7 @@ class DishTable(Base):
     dish_type = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
     price_simple = Column(String, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
-    like_count: int = 0
+    like_count = Column(Integer, default=0)
 
     # Relationship
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")

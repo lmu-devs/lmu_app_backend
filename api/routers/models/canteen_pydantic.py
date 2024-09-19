@@ -1,3 +1,4 @@
+from api.humanizer_service import abbreviate_number
 from api.models.canteen_model import CanteenDto, CanteenTable, LocationDto, OpeningHoursDto, Weekday
 
 
@@ -27,10 +28,15 @@ def canteen_to_pydantic(canteen: CanteenTable) -> CanteenDto:
                 start_time=oh.start_time,
                 end_time=oh.end_time
             ))
+    
+    like_count_value = canteen.like_count
+    like_string = abbreviate_number(like_count_value)
 
     return CanteenDto(
-        canteen_id=canteen.canteen_id,
+        id=canteen.id,
         name=canteen.name,
+        like_count=like_count_value,
+        like_abbreviate=like_string,
         location=location,
-        opening_hours=opening_hours 
+        opening_hours=opening_hours
     )

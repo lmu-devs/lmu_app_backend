@@ -56,7 +56,7 @@ class MenuWeekTable(Base):
 
     week = Column(Integer, primary_key=True)
     year = Column(Integer, primary_key=True)
-    canteen_id = Column(String, ForeignKey('canteens.canteen_id'), primary_key=True)
+    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
 
     # Relationships
     canteen = relationship("CanteenTable", back_populates="menu_weeks")

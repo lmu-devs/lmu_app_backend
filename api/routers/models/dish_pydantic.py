@@ -16,7 +16,7 @@ def dish_dates_to_pydantic(db: Session, dish_id: int) -> DishDatesDto:
             CanteenTable
         )
         .join(MenuDayTable, MenuDishAssociation.menu_day_date == MenuDayTable.date)
-        .join(CanteenTable, MenuDayTable.menu_week_canteen_id == CanteenTable.canteen_id)
+        .join(CanteenTable, MenuDayTable.menu_week_canteen_id == CanteenTable.id)
         .filter(MenuDishAssociation.dish_id == dish_id)
         .order_by(MenuDishAssociation.menu_day_date)
     )
