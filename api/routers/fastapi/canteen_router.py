@@ -33,7 +33,6 @@ async def read_canteens(
         canteens = db.query(CanteenTable).all()
         if current_user:
             likes_canteens = get_user_liked_canteens(current_user, canteens, db)
-            print(likes_canteens)
             return CanteensDto([
                 canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
                 for canteen in canteens

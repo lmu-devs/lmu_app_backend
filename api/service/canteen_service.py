@@ -1,4 +1,5 @@
 from typing import Dict, List
+from fastapi import HTTPException
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 from api.models.canteen_model import CanteenLikeTable, CanteenTable
@@ -9,10 +10,13 @@ from api.service.user_service import get_user_from_db
 
 # Check if the canteen exists
 def get_canteen_from_db(canteen_id: str, db: Session) -> CanteenTable | None:
-    canteen = db.query(CanteenTable).filter(CanteenTable.id == canteen_id).first()
-    if not canteen:
-        raise Exception("Canteen not found")
-    return canteen
+    try:
+        canteen = db.query(CanteenTable).filter(CanteenTable.id == canteen_id).first()
+        if canteen is None:
+            raise Exception("Canteen not found")
+        return canteen
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 

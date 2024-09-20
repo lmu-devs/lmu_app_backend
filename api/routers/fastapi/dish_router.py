@@ -53,9 +53,7 @@ async def read_dish_dates(
     ):
     
     dish = get_dish_from_db(dish_id, db)
-    print("Getting dates")
     result = get_dish_dates_from_db(db, dish.id)
-    print(result)
     user_likes_canteen = None
     
     if current_user:
