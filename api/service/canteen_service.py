@@ -15,6 +15,7 @@ def get_canteen_from_db(canteen_id: str, db: Session) -> CanteenTable | None:
     return canteen
 
 
+
 def toggle_canteen_like(canteen_id: str, user_id: uuid.UUID, db: Session) -> bool:
 
     # Check if the user & canteen exists
@@ -29,14 +30,12 @@ def toggle_canteen_like(canteen_id: str, user_id: uuid.UUID, db: Session) -> boo
 
     if existing_like:
         # If the user already liked the canteen, remove the like
-        canteen.like_count -= 1
         db.delete(existing_like)
         db.commit()
         return False
     else:
         # If the user has not liked the canteen yet, add a new like
         new_like = CanteenLikeTable(canteen_id=canteen_id, user_id=user_id)
-        canteen.like_count += 1
         db.add(new_like)
         db.commit()
         return True

@@ -60,6 +60,10 @@ class CanteenTable(Base):
 
     def __repr__(self):
         return f"<Canteen(id='{self.id}', name='{self.name}')>"
+    
+    @property
+    def like_count(self):
+        return len(self.likes)
 
 class LocationTable(Base):
     __tablename__ = "locations"

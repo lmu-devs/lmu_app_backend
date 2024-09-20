@@ -1,28 +1,11 @@
+from typing import Dict
 from sqlalchemy.orm import Session
 
 from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
-from api.models.canteen_model import CanteenTable
-from api.models.menu_model import MenuDayTable, MenuDishAssociation
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 
 
-def dish_dates_to_pydantic(db: Session, dish: DishTable) -> DishDatesDto:
-    # Query to get all dates and canteens where the dish was available
-    
-    query = (
-        db.query(
-            MenuDishAssociation.menu_day_date,
-            MenuDayTable.menu_week_canteen_id,
-            CanteenTable
-        )
-        .join(MenuDayTable, MenuDishAssociation.menu_day_date == MenuDayTable.date)
-        .join(CanteenTable, MenuDayTable.menu_week_canteen_id == CanteenTable.id)
-        .filter(MenuDishAssociation.dish_id == dish.id)
-        .order_by(MenuDishAssociation.menu_day_date)
-    )
-
-    results = query.all()
-
+def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDatesDto:
     date_canteen_map = {}
     for date, canteen_id, canteen in results:
         if date not in date_canteen_map:
@@ -32,7 +15,12 @@ def dish_dates_to_pydantic(db: Session, dish: DishTable) -> DishDatesDto:
     dish_dates = [
         DishDateDto(
             date=date,
-            canteens=[canteen_to_pydantic(canteen) for canteen in canteens]
+            canteens=[
+                canteen_to_pydantic(
+                    canteen,
+                    user_likes_canteen=user_liked_canteens.get(canteen.id) if user_liked_canteens else None
+                ) for canteen in canteens
+            ]
         )
         for date, canteens in date_canteen_map.items()
     ]

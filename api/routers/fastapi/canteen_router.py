@@ -1,12 +1,11 @@
 from typing import Optional
-import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey
 
 from api.api_key import get_system_api_key_header, get_user_from_api_key, get_user_from_api_key_soft
 from api.database import get_db
-from api.models.canteen_model import CanteenTable, CanteenDto, CanteensDto
+from api.models.canteen_model import CanteenTable, CanteensDto
 from api.models.user_model import UserTable
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 from api.service.canteen_service import check_user_likes_canteen, get_canteen_from_db, get_user_liked_canteens, toggle_canteen_like
@@ -15,9 +14,6 @@ from data_fetcher.service.canteen_service import update_canteen_database
 
 
 router = APIRouter()
-
-
-
 
 
 @router.get("/canteens", response_model=CanteensDto)
@@ -34,7 +30,7 @@ async def read_canteens(
     
     # Fetch all canteens
     else:
-        canteens = db.query(CanteenTable).order_by(CanteenTable.like_count.desc()).all()
+        canteens = db.query(CanteenTable).all()
         if current_user:
             likes_canteens = get_user_liked_canteens(current_user, canteens, db)
             print(likes_canteens)
