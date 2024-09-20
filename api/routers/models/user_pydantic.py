@@ -1,6 +1,4 @@
 
-
-
 from api.models.user_model import UserDto, UserTable
 
 

@@ -85,7 +85,7 @@ def create_data_fetcher():
     print("Setting up schedule...")
     
     # fetch_data_current_year()
-    fetch_scheduled_data()
+    # fetch_scheduled_data()
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
     print("Entering data_fecther loop...")

@@ -2,7 +2,7 @@ from api.humanizer_service import abbreviate_number
 from api.models.canteen_model import CanteenDto, CanteenTable, LocationDto, OpeningHoursDto, Weekday
 
 
-def canteen_to_pydantic(canteen: CanteenTable) -> CanteenDto:
+def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenDto:
     location = LocationDto(
         address=canteen.location.address,
         latitude=float(canteen.location.latitude),
@@ -35,6 +35,7 @@ def canteen_to_pydantic(canteen: CanteenTable) -> CanteenDto:
     return CanteenDto(
         id=canteen.id,
         name=canteen.name,
+        is_liked=user_likes_canteen,
         like_count=like_count_value,
         like_abbreviate=like_string,
         location=location,

@@ -3,6 +3,13 @@ from api.api_key import generate_user_api_key
 from api.models.user_model import UserTable
 from datetime import datetime
 
+# Check if the user exists
+def get_user_from_db(user_id: int, db: Session) -> UserTable | None:    
+    user = db.query(UserTable).filter(UserTable.id == user_id).first()
+    if not user:
+        raise Exception("User not found")
+    return user
+
 def store_user_data(user_data, db: Session):
     print("Storing user data of one user...")
     new_user = UserTable(

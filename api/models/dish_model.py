@@ -1,5 +1,5 @@
 import enum
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -20,7 +20,8 @@ class DishDto(BaseModel):
     name: str
     dish_type: str
     like_count: int
-    price_simple: str | None
+    is_liked: Optional[bool] = None
+    price_simple: Optional[str] = None
     labels: List[str]
     prices: List[DishPriceDto]
     

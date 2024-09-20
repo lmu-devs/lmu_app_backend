@@ -1,12 +1,12 @@
 from sqlalchemy.orm import Session
 
 from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
-from api.models.canteen_model import CanteenTable, Weekday
+from api.models.canteen_model import CanteenTable
 from api.models.menu_model import MenuDayTable, MenuDishAssociation
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 
 
-def dish_dates_to_pydantic(db: Session, dish_id: int) -> DishDatesDto:
+def dish_dates_to_pydantic(db: Session, dish: DishTable) -> DishDatesDto:
     # Query to get all dates and canteens where the dish was available
     
     query = (
@@ -17,7 +17,7 @@ def dish_dates_to_pydantic(db: Session, dish_id: int) -> DishDatesDto:
         )
         .join(MenuDayTable, MenuDishAssociation.menu_day_date == MenuDayTable.date)
         .join(CanteenTable, MenuDayTable.menu_week_canteen_id == CanteenTable.id)
-        .filter(MenuDishAssociation.dish_id == dish_id)
+        .filter(MenuDishAssociation.dish_id == dish.id)
         .order_by(MenuDishAssociation.menu_day_date)
     )
 
@@ -40,10 +40,8 @@ def dish_dates_to_pydantic(db: Session, dish_id: int) -> DishDatesDto:
     return DishDatesDto(dates=dish_dates)
 
 
-def dish_to_pydantic(db: Session, dish_id: int) -> DishDto:
-    dish = db.query(DishTable).filter(DishTable.id == dish_id).first()
-    if dish is None:
-        return None
+
+def dish_to_pydantic(dish: DishTable, user_likes_dish: bool = None) -> DishDto:
 
     prices = [
         DishPriceDto(
@@ -59,6 +57,7 @@ def dish_to_pydantic(db: Session, dish_id: int) -> DishDto:
         name=dish.name,
         dish_type=dish.dish_type,
         labels=dish.labels,
+        is_liked=user_likes_dish,
         price_simple=dish.price_simple,
         prices=prices,
         like_count=dish.like_count

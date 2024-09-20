@@ -31,6 +31,7 @@ class CanteenDto(BaseModel):
     id: str
     name: str
     location: LocationDto
+    is_liked: Optional[bool] = None
     like_count: int
     like_abbreviate: str
     opening_hours: List[OpeningHoursDto]
