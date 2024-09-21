@@ -21,7 +21,7 @@ router = APIRouter()
 async def get_menu(
     year: int, 
     week: str, 
-    canteen_id: str = Query(None, description="Filter by canteen_id"), 
+    canteen_id: str = Query(None, description="Filter by canteen_id, if not provided, all canteens will be fetched"), 
     current_user: UserTable = Depends(get_user_from_api_key_soft),
     only_liked_canteens: bool = Query(None, description="Filter menus by liked canteens"),
     db: Session = Depends(get_db)
