@@ -1,4 +1,4 @@
-from typing import Annotated, List, Optional
+from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -18,14 +18,15 @@ router = APIRouter()
 # Gets dish data
 @router.get("/dishes", response_model=DishesDto)
 async def get_dish(
-    dish_id: Annotated[Optional[int], Query(
+    dish_id: Annotated[int, Query(
+        None,
         description="Specific dish ID to fetch",
         gt=0,
         example=11,
         title="Dish ID"
     )] = None,
-    only_liked_dishes: Optional[bool] = Query(None, description="Filter dishes by liked status"),
-    current_user: Optional[UserTable] = Depends(get_user_from_api_key_soft),
+    only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
+    current_user: UserTable = Depends(get_user_from_api_key_soft),
     db: Session = Depends(get_db)
     ):
     
@@ -70,7 +71,7 @@ async def read_dish_dates(
         title="Dish ID"
     )],
     db: Session = Depends(get_db),
-    current_user: Optional[UserTable] = Depends(get_user_from_api_key_soft)
+    current_user: UserTable = Depends(get_user_from_api_key_soft)
     ):
     
     dish_dates = get_dish_dates_from_db(db, dish_id)
