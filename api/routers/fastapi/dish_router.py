@@ -19,7 +19,6 @@ router = APIRouter()
 @router.get("/dishes", response_model=DishesDto)
 async def get_dish(
     dish_id: Annotated[int, Query(
-        None,
         description="Specific dish ID to fetch",
         gt=0,
         example=11,
