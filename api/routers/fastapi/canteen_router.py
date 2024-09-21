@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey
 
@@ -25,14 +25,14 @@ async def read_canteens(
     # Fetch a specific canteen
     if canteen_id:
         canteen = get_canteen_from_db(canteen_id, db)
-        likes_canteen = check_user_likes_canteen(current_user, canteen, db) if current_user else None
+        likes_canteen = check_user_likes_canteen(canteen.id, current_user.id, db) if current_user else None
         return CanteensDto([canteen_to_pydantic(canteen, likes_canteen)])
     
     # Fetch all canteens
     else:
         canteens = db.query(CanteenTable).all()
         if current_user:
-            likes_canteens = get_user_liked_canteens(current_user, canteens, db)
+            likes_canteens = get_user_liked_canteens(current_user.id, canteens, db)
             return CanteensDto([
                 canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
                 for canteen in canteens
@@ -45,13 +45,9 @@ async def read_canteens(
 
 @router.put("/canteens/update", response_model=dict)
 async def trigger_canteen_update(api_key: APIKey = Depends(get_system_api_key_header)):
-    print("Triggering canteen update process...")
-    try:
-        update_canteen_database()
-        return {"message": "canteen update process has been triggered"}
-    except Exception as e:
-        print(f"Error triggering canteen update: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+    update_canteen_database()
+    return {"message": "All canteens updated successfully"}
+
 
 
 
@@ -59,9 +55,7 @@ async def trigger_canteen_update(api_key: APIKey = Depends(get_system_api_key_he
 def toggle_like(
     canteen_id: str,
     db: Session = Depends(get_db), 
-    current_user: UserTable = Depends(get_user_from_api_key)):
-    try:
-        result = toggle_canteen_like(canteen_id, current_user.id, db)
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    current_user: UserTable = Depends(get_user_from_api_key)) -> bool:
+
+    like_status = toggle_canteen_like(canteen_id, current_user.id, db)
+    return like_status

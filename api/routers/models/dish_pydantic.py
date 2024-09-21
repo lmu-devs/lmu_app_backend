@@ -1,5 +1,4 @@
 from typing import Dict
-from sqlalchemy.orm import Session
 
 from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
@@ -50,5 +49,7 @@ def dish_to_pydantic(dish: DishTable, user_likes_dish: bool = None) -> DishDto:
         prices=prices,
         like_count=dish.like_count
     )
+    
+
     
     

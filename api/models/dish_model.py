@@ -25,6 +25,9 @@ class DishDto(BaseModel):
     labels: List[str]
     prices: List[DishPriceDto]
     
+class DishesDto(BaseModel):
+    dishes: List[DishDto]
+    
 
 class DishDateDto(BaseModel):
     date: date

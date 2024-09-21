@@ -71,7 +71,7 @@ def fetch_data_current_year():
     
     try:
         update_canteen_database()
-        update_date_range_menu_database(start_year=year, start_week="02", end_year=year, end_week=str(current_week))
+        update_date_range_menu_database(start_year=year, start_week="01", end_year=year, end_week=str(current_week))
         
     except requests.exceptions.RequestException as e:
         print("Error fetching data:", e)
