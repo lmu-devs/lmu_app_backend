@@ -1,44 +1,47 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey
 
 from api.api_key import get_system_api_key_header, get_user_from_api_key_soft
 from api.database import get_db
 from api.models.dish_model import DishTable
-from api.models.menu_model import MenuWeekDto
+from api.models.menu_model import MenusDto
 from api.models.user_model import UserTable
 from api.routers.models.menu_pydantic import menu_week_to_pydantic
 from api.service.dish_service import get_user_liked_dishes_dict
-from api.service.menu_service import get_menu_week_from_db
+from api.service.menu_service import get_menu_weeks_from_db
 from data_fetcher.main import fetch_data_current_year
 from data_fetcher.service.menu_service import update_menu_database
 
 router = APIRouter()
 
 
-@router.get("/menus", response_model=MenuWeekDto)
+@router.get("/menus", response_model=MenusDto)
 async def get_menu(
-    canteen_id: str, 
     year: int, 
     week: str, 
-    db: Session = Depends(get_db),
-    current_user: Optional[UserTable] = Depends(get_user_from_api_key_soft)
+    canteen_id: str = Query(None, description="Filter by canteen_id"), 
+    current_user: UserTable = Depends(get_user_from_api_key_soft),
+    only_liked_canteens: bool = Query(None, description="Filter menus by liked canteens"),
+    db: Session = Depends(get_db)
     ):
     
-    menu_week_obj = get_menu_week_from_db(db, canteen_id, year, week)
+    
+    menu_weeks = get_menu_weeks_from_db(db, canteen_id, year, week, current_user, only_liked_canteens)
     
     if current_user:
-        dishes_table: List[DishTable] = []
-        for menu_day in menu_week_obj.menu_days:
-            for association in menu_day.dish_associations:
-                dish = association.dish
-                dishes_table.append(dish)
+        for menu_week_obj in menu_weeks:
+            dishes_table: List[DishTable] = []
+            for menu_day in menu_week_obj.menu_days:
+                for association in menu_day.dish_associations:
+                    dish = association.dish
+                    dishes_table.append(dish)
         
         liked_dishes = get_user_liked_dishes_dict(current_user.id, dishes_table, db)
-        return menu_week_to_pydantic(menu_week_obj, liked_dishes)
+        return MenusDto(root = [menu_week_to_pydantic(menu_week, liked_dishes) for menu_week in menu_weeks])
     
-    return menu_week_to_pydantic(menu_week_obj)
+    return MenusDto(root = [menu_week_to_pydantic(menu_week) for menu_week in menu_weeks])
 
 
 

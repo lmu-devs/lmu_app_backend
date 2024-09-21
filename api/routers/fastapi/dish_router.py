@@ -24,7 +24,7 @@ async def get_dish(
         example=11,
         title="Dish ID"
     )] = None,
-    only_liked: Optional[bool] = Query(None, description="Filter dishes by liked status"),
+    only_liked_dishes: Optional[bool] = Query(None, description="Filter dishes by liked status"),
     current_user: Optional[UserTable] = Depends(get_user_from_api_key_soft),
     db: Session = Depends(get_db)
     ):
@@ -38,7 +38,7 @@ async def get_dish(
         return DishesDto(dishes=[dish_to_pydantic(dish, user_liked_dishes)])
 
     else:
-        if only_liked and current_user:
+        if only_liked_dishes and current_user:
             liked_dishes = get_liked_dishes_from_db(current_user.id, db)
             return DishesDto(dishes=[dish_to_pydantic(dish, True) for dish in liked_dishes])
         
