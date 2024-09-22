@@ -35,7 +35,7 @@ def fetch_scheduled_data():
     # Get the current date
     date = time.localtime()
     year = date.tm_year
-    current_week = int(time.strftime("%V"))
+    current_week = int(time.strftime("%V")) - 25
     
     # Calculate the week 4 weeks in the future
     future_week = current_week + 4
@@ -85,7 +85,7 @@ def create_data_fetcher():
     print("Setting up schedule...")
     
     # fetch_data_current_year()
-    # fetch_scheduled_data()
+    fetch_scheduled_data()
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
     print("Entering data_fecther loop...")
