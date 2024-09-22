@@ -9,7 +9,7 @@ from api.api_key import get_user_from_api_key_soft, get_user_from_api_key
 from api.database import get_db
 from api.routers.models.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
 from api.service.canteen_service import get_user_liked_canteens
-from api.service.dish_service import check_user_likes_dish, get_all_dishes_from_db, get_dish_dates_from_db, get_dish_from_db, get_liked_dishes_from_db, get_user_liked_dishes_dict, toggle_dish_like
+from api.service.dish_service import get_dish_dates_from_db, get_dishes_from_db, toggle_dish_like
 
 
 router = APIRouter()
@@ -29,33 +29,10 @@ async def get_dish(
     db: Session = Depends(get_db)
     ):
     
-    user_liked_dishes = None
-    if dish_id:
-        dish = get_dish_from_db(dish_id, db)
-        if current_user:
-            user_liked_dishes = check_user_likes_dish(dish.id, current_user.id, db)
-            
-        return DishesDto(dishes=[dish_to_pydantic(dish, user_liked_dishes)])
-
-    else:
-        if only_liked_dishes and current_user:
-            liked_dishes = get_liked_dishes_from_db(current_user.id, db)
-            return DishesDto(dishes=[dish_to_pydantic(dish, True) for dish in liked_dishes])
-        
-        dishes = get_all_dishes_from_db(db)
-        if current_user:
-            user_liked_dishes = get_user_liked_dishes_dict(current_user.id, dishes, db)
-            dishes_dto: DishesDto = DishesDto(dishes=[
-                dish_to_pydantic(
-                    dish,
-                    user_likes_dish=user_liked_dishes.get(dish.id, False) if user_liked_dishes else None
-                )
-                for dish in dishes
-            ])
-            return dishes_dto
-
-        else:
-            return DishesDto(dishes=[dish_to_pydantic(dish, user_liked_dishes) for dish in dishes])
+    user_id = current_user.id if current_user else None
+    dishes = get_dishes_from_db(db, dish_id, user_id, only_liked_dishes)
+    
+    return DishesDto(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 
 
 

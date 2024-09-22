@@ -9,7 +9,6 @@ from api.models.dish_model import DishTable
 from api.models.menu_model import MenusDto
 from api.models.user_model import UserTable
 from api.routers.models.menu_pydantic import menu_week_to_pydantic
-from api.service.dish_service import get_user_liked_dishes_dict
 from api.service.menu_service import get_menu_weeks_from_db
 from data_fetcher.main import fetch_data_current_year
 from data_fetcher.service.menu_service import update_menu_database
@@ -27,7 +26,7 @@ async def get_menu(
     db: Session = Depends(get_db)
     ):
     
-    
+    user_id = current_user.id if current_user else None
     menu_weeks = get_menu_weeks_from_db(db, canteen_id, year, week, current_user, only_liked_canteens)
     
     if current_user:
@@ -37,11 +36,8 @@ async def get_menu(
                 for association in menu_day.dish_associations:
                     dish = association.dish
                     dishes_table.append(dish)
-        
-        liked_dishes = get_user_liked_dishes_dict(current_user.id, dishes_table, db)
-        return MenusDto(root = [menu_week_to_pydantic(menu_week, liked_dishes) for menu_week in menu_weeks])
     
-    return MenusDto(root = [menu_week_to_pydantic(menu_week) for menu_week in menu_weeks])
+    return MenusDto(root = [menu_week_to_pydantic(menu_week, user_id) for menu_week in menu_weeks])
 
 
 

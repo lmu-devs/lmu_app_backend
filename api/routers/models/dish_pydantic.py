@@ -1,4 +1,5 @@
 from typing import Dict
+import uuid
 
 from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
@@ -28,7 +29,13 @@ def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None)
 
 
 
-def dish_to_pydantic(dish: DishTable, user_likes_dish: bool = None) -> DishDto:
+def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> DishDto:
+
+
+    user_likes_dish = None
+    if user_id:
+        user_likes_dish = any(like.user_id == user_id for like in dish.likes)
+    
 
     prices = [
         DishPriceDto(

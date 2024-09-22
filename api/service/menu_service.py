@@ -1,30 +1,27 @@
 from typing import List
 from fastapi import HTTPException
-from sqlalchemy import and_
-from sqlalchemy.orm import Session
+from sqlalchemy import and_, select
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
 from api.models.canteen_model import CanteenLikeTable
 from api.models.menu_model import MenuDayTable, MenuDishAssociation, MenuWeekTable
-
-from sqlalchemy.orm import joinedload
-
 from api.models.user_model import UserTable
 
 
 def get_menu_weeks_from_db(db: Session, canteen_id: str, year: int, week: str, current_user: UserTable, only_liked_canteens: bool) -> List[MenuWeekTable]:
     """Get menu weeks from the database"""
     try:
-    # Base query
-        query = (
-            db.query(MenuWeekTable)
+        # Base query
+        stmt = (
+            select(MenuWeekTable)
             .options(
                 joinedload(MenuWeekTable.canteen),
                 joinedload(MenuWeekTable.menu_days)
                 .joinedload(MenuDayTable.dish_associations)
                 .joinedload(MenuDishAssociation.dish)
             )
-            .filter(
+            .where(
                 MenuWeekTable.year == year,
                 MenuWeekTable.week == week
             )
@@ -32,9 +29,9 @@ def get_menu_weeks_from_db(db: Session, canteen_id: str, year: int, week: str, c
 
         # Apply filters based on parameters
         if canteen_id:
-            query = query.filter(MenuWeekTable.canteen_id == canteen_id)
+            stmt = stmt.where(MenuWeekTable.canteen_id == canteen_id)
         elif only_liked_canteens and current_user:
-            query = query.join(
+            stmt = stmt.join(
                 CanteenLikeTable,
                 and_(
                     CanteenLikeTable.canteen_id == MenuWeekTable.canteen_id,
@@ -43,7 +40,8 @@ def get_menu_weeks_from_db(db: Session, canteen_id: str, year: int, week: str, c
             )
             
         # Execute query
-        menu_weeks = query.all()
+        result = db.execute(stmt)
+        menu_weeks = result.unique().scalars().all()
         
         if not menu_weeks:
             raise HTTPException(status_code=404, detail="Menu week not found")
@@ -60,4 +58,3 @@ def get_menu_weeks_from_db(db: Session, canteen_id: str, year: int, week: str, c
     except Exception as e:
         print(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
-    
