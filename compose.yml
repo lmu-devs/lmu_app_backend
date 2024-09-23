@@ -20,26 +20,11 @@ services:
       timeout: 2s
       retries: 5
 
-  # pgadmin:
-  #   container_name: pgadmin_container
-  #   image: dpage/pgadmin4
-  #   volumes:
-  #     - ./pgadmin4:/lib/pgadmin/
-  #   restart: always
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-  #   ports:
-  #     - 5050:80
-  #   depends_on:
-  #     - db
-
 
   api:
     build:
       context: .
       dockerfile: Dockerfile-api
-    # image: raffisdocker/api:v1.0
     env_file:
       - .env
     container_name: api
@@ -49,8 +34,7 @@ services:
       - frontend
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
+
     depends_on:
       db:
         condition: service_healthy
@@ -80,7 +64,21 @@ services:
         condition: service_healthy
     restart: always
 
-  
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    ports:
+      - "443:443"
+      - "80:80"
+    networks:
+      - frontend
+    depends_on:
+      - api
+    restart: always
+
 
 volumes:
   postgres_data:
