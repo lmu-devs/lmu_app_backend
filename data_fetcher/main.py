@@ -4,7 +4,6 @@ import time
 import signal
 import sys
 
-
 from api.database import init_db
 from data_fetcher.service.canteen_service import update_canteen_database
 from data_fetcher.service.menu_service import update_date_range_menu_database
@@ -35,7 +34,7 @@ def fetch_scheduled_data():
     # Get the current date
     date = time.localtime()
     year = date.tm_year
-    current_week = int(time.strftime("%V")) - 25
+    current_week = int(time.strftime("%V"))
     
     # Calculate the week 4 weeks in the future
     future_week = current_week + 4
@@ -84,8 +83,8 @@ def fetch_data_current_year():
 def create_data_fetcher():
     print("Setting up schedule...")
     
-    # fetch_data_current_year()
-    fetch_scheduled_data()
+    fetch_data_current_year()
+    # fetch_scheduled_data()
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
     print("Entering data_fecther loop...")

@@ -1,9 +1,0 @@
-FROM postgres:16.4-bookworm
-
-ARG POSTGRES_USER
-ARG POSTGRES_PASSWORD
-ARG POSTGRES_DB
-
-RUN echo "CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';" > /docker-entrypoint-initdb.d/init.sql
-RUN echo "CREATE DATABASE ${POSTGRES_DB};" >> /docker-entrypoint-initdb.d/init.sql
-RUN echo "GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO ${POSTGRES_USER};" >> /docker-entrypoint-initdb.d/init.sql
