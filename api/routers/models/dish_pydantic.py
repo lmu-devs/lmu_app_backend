@@ -2,6 +2,7 @@ from typing import Dict
 import uuid
 
 from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
+from api.models.rating_model import RatingDto
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 
 
@@ -46,15 +47,19 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> DishDto:
         )
         for price in dish.prices
     ]
+    
+    rating = RatingDto(
+        like_count=dish.like_count,
+        is_liked=user_likes_dish
+    )
 
     return DishDto(
         name=dish.name,
         dish_type=dish.dish_type,
         labels=dish.labels,
-        is_liked=user_likes_dish,
+        rating=rating,
         price_simple=dish.price_simple,
-        prices=prices,
-        like_count=dish.like_count
+        prices=prices
     )
     
 

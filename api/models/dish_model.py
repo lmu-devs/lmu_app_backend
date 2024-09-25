@@ -8,6 +8,7 @@ from datetime import date
 
 from api.database import Base
 from api.models.canteen_model import CanteenDto
+from api.models.rating_model import RatingDto
 
 
 class DishPriceDto(BaseModel):
@@ -19,8 +20,7 @@ class DishPriceDto(BaseModel):
 class DishDto(BaseModel):
     name: str
     dish_type: str
-    like_count: int
-    is_liked: Optional[bool] = None
+    rating: RatingDto
     price_simple: Optional[str] = None
     labels: List[str]
     prices: List[DishPriceDto]

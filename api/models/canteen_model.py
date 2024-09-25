@@ -6,6 +6,8 @@ from sqlalchemy import UUID, Column, DateTime, Integer, String, ForeignKey, Time
 from sqlalchemy.orm import relationship
 from datetime import time as datetime_time
 
+from api.models.rating_model import RatingDto
+
 class Weekday(str, enum.Enum):
     MONDAY = "MONDAY"
     TUESDAY = "TUESDAY"
@@ -31,9 +33,7 @@ class CanteenDto(BaseModel):
     id: str
     name: str
     location: LocationDto
-    is_liked: Optional[bool] = None
-    like_count: int
-    like_abbreviate: str
+    rating: RatingDto
     opening_hours: List[OpeningHoursDto]
     
 class CanteensDto(RootModel):
