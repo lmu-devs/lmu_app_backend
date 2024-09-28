@@ -1,4 +1,5 @@
 from api.models.canteen_model import CanteenDto, CanteenTable, LocationDto, OpeningHoursDto, Weekday
+from api.models.image_model import ImageDto
 from api.models.rating_model import RatingDto
 
 
@@ -35,11 +36,21 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
         like_count=like_count_value, 
         is_liked=user_likes_canteen
         )
+    
+    images = []
+    for image in canteen.images:
+        image_dto = ImageDto(
+            url=image.url,
+            name=image.name
+        )
+        images.append(image_dto)
+        
 
     return CanteenDto(
         id=canteen.id,
         name=canteen.name,
         rating=rating,
         location=location,
-        opening_hours=opening_hours
+        opening_hours=opening_hours,
+        images=images
     )

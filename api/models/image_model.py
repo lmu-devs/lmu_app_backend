@@ -1,27 +1,29 @@
 
 from typing import List
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, Integer, String, func
-from datetime import time as datetime_time
+
 
 from api.database import Base
 
 class ImageDto(BaseModel):
-    image_url: str
+    url: str
     name: str
-    created_at: datetime_time
-    
-    
-class ImagesDto(BaseModel):
-    images: List[ImageDto]
+    # created_at: datetime_time
+
     
     
 ### Database Models ###
 
-class ImageTable(Base):
-    __tablename__ = "images"
+# class ImageTable(Base):
+#     __tablename__ = "images"
 
-    id = Column(Integer, primary_key=True, index=True)
-    image_url = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-    created_at = Column(DateTime, default=func.now())
+#     id = Column(Integer, primary_key=True, index=True)
+#     image_url = Column(String, nullable=False)
+#     name = Column(String, nullable=False)
+#     created_at = Column(DateTime, default=func.now())
+
+#     # Relationship
+#     canteens = relationship("CanteenImageTable", back_populates="image")
+
+#     def __repr__(self):
+#         return f"<Image(id='{self.id}', name='{self.name}')>"

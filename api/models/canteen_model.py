@@ -1,11 +1,12 @@
+import enum
 from pydantic import BaseModel, ConfigDict, RootModel
 from typing import List, Optional
-import enum
 from api.database import Base
 from sqlalchemy import UUID, Column, DateTime, Integer, String, ForeignKey, Time, Float, func
 from sqlalchemy.orm import relationship
 from datetime import time as datetime_time
 
+from api.models.image_model import ImageDto
 from api.models.rating_model import RatingDto
 
 class Weekday(str, enum.Enum):
@@ -29,12 +30,14 @@ class OpeningHoursDto(BaseModel):
     
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
+    
 class CanteenDto(BaseModel):
     id: str
     name: str
     location: LocationDto
     rating: RatingDto
     opening_hours: List[OpeningHoursDto]
+    images: List[ImageDto]
     
 class CanteensDto(RootModel):
     root: List[CanteenDto]
@@ -50,13 +53,13 @@ class CanteenTable(Base):
 
     id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
-    like_count = Column(Integer, default=0)
 
     # Relationships
     location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
     opening_hours = relationship("OpeningHoursTable", back_populates="canteen", cascade="all, delete-orphan")
     menu_weeks = relationship("MenuWeekTable", back_populates="canteen", cascade="all, delete-orphan")
     likes = relationship("CanteenLikeTable", back_populates="canteen", cascade="all, delete-orphan")
+    images = relationship("CanteenImageTable", back_populates="canteen", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Canteen(id='{self.id}', name='{self.name}')>"
@@ -101,5 +104,22 @@ class CanteenLikeTable(Base):
 
     def __repr__(self):
         return f"<CanteenLike(canteen_id='{self.canteen_id}', user_id='{self.user_id}')>"
+    
+    
+# Table to represent the many-to-many relationship between canteens and images
+class CanteenImageTable(Base):
+    __tablename__ = "canteen_images"
+
+    id = Column(Integer, primary_key=True, index=True)
+    url = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    canteen_id = Column(String, ForeignKey('canteens.id'), nullable=False)
+    created_at = Column(DateTime, default=func.now())
+
+    # Relationships
+    canteen = relationship("CanteenTable", back_populates="images")
+    
+    def __repr__(self):
+        return f"<CanteenImage(canteen_id='{self.canteen_id}')>"
 
 

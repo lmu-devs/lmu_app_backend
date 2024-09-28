@@ -1,8 +1,11 @@
+from typing import List, Tuple
 import requests
 from sqlalchemy.orm import Session
-from api.models.canteen_model import CanteenTable, LocationTable, OpeningHoursTable, Base
+from api.models.canteen_model import CanteenImageTable, CanteenTable, LocationTable, OpeningHoursTable
 from datetime import datetime
 from api.database import get_db
+from data_fetcher.service.images_service import generate_image_urls
+from data_fetcher.static.constants import base_url
 
 def fetch_canteen_data():
     url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
@@ -10,6 +13,34 @@ def fetch_canteen_data():
     response.raise_for_status()
     print("Response tum-dev eat-api: ", response.status_code)
     return response.json()
+
+
+def set_canteen_images(canteen_table: CanteenTable, files: List[Tuple[str, str]], db: Session):
+    """
+    Set or update the images associated with this canteen.
+    """
+
+    # Remove existing images
+    db.query(CanteenImageTable).filter(CanteenImageTable.canteen_id == canteen_table.id).delete()
+
+
+    # Add new images
+    image_count = 0
+    for location, url in files:
+        # Check if the canteen's ID is in the image URL
+        if str(canteen_table.id) in url:
+            print(f"Image found for {canteen_table.name}")
+            image_count = image_count + 1
+            new_image = CanteenImageTable(
+                canteen_id=canteen_table.id,
+                url=url,
+                name=f"{canteen_table.name} Image {len(canteen_table.images) + {image_count}}",
+            )
+            db.add(new_image)
+            
+    print("Finished adding canteen images")
+
+
     
 
 def store_canteen_data(canteens: list, db: Session):
@@ -37,6 +68,12 @@ def store_canteen_data(canteens: list, db: Session):
 
         # Update Opening Hours
         open_hours = canteen['open_hours']
+        
+        # Update Canteen Images
+        directory_path = "data_fetcher/assets/canteens/"
+        image_url_prefix = f"{base_url}/images/"
+        files = generate_image_urls(directory_path, image_url_prefix)
+        set_canteen_images(canteen_obj, files, db)
         
         opening_hours = []
         for day, hours in open_hours.items():
@@ -70,6 +107,7 @@ def update_canteen_database():
         canteen_data = fetch_canteen_data()
         store_canteen_data(canteen_data, db)
         print("canteen data updated successfully!")
+        print("==============================================================\n")
     except Exception as e:
         print(f"Error while updating canteen database: {str(e)}")
     finally:
@@ -77,3 +115,7 @@ def update_canteen_database():
 
 if __name__ == "__main__":
     update_canteen_database()
+    
+    
+    
+
