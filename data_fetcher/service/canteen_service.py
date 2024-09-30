@@ -34,7 +34,7 @@ def set_canteen_images(canteen_table: CanteenTable, files: List[Tuple[str, str]]
             new_image = CanteenImageTable(
                 canteen_id=canteen_table.id,
                 url=url,
-                name=f"{canteen_table.name} Image {len(canteen_table.images) + {image_count}}",
+                name=f"{canteen_table.name} Image {len(canteen_table.images)} {image_count}",
             )
             db.add(new_image)
             
