@@ -8,7 +8,6 @@ from api.service.label_enum_service import labels, labels_sorted, label_presets
 router = APIRouter()
 
 
-# Gets labels
 @router.get("/enums/labels", response_model=List[LabelDto])
 async def get_labels():
     return labels

@@ -1022,6 +1022,4 @@ label_presets = [
     "exclude": 
       ["PORK", "SHELLFISH", "MOLLUSCS"]
   },
-  
-
 ]
