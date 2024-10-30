@@ -1,7 +1,7 @@
 from typing import List, Tuple
 import requests
 from sqlalchemy.orm import Session
-from api.models.canteen_model import CanteenImageTable, CanteenTable, LocationTable, OpeningHoursTable
+from api.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from datetime import datetime
 from api.database import get_db
 from data_fetcher.service.images_service import generate_image_urls
@@ -41,6 +41,39 @@ def set_canteen_images(canteen_table: CanteenTable, files: List[Tuple[str, str]]
     print("Finished adding canteen images")
 
 
+def process_canteen_name(full_name: str) -> Tuple[str, CanteenType]:
+    """
+    Processes a canteen name and returns a tuple of (clean_name, type).
+    
+    Examples:
+    "Mensa Garching" -> ("Garching", CanteenType.MENSA)
+    "StuBistro Arcisstraße" -> ("Arcisstraße", CanteenType.STUBISTRO)
+    "IPP Bistro Garching" -> ("Garching", CanteenType.STUBISTRO)
+    "Mediziner Mensa" -> ("Mediziner", CanteenType.MENSA)
+    """
+    
+    # Special cases first
+    if full_name.startswith("IPP Bistro") or full_name.startswith("FMI Bistro"):
+        clean_name = full_name.replace("IPP Bistro", "").replace("FMI Bistro", "").strip()
+        return (clean_name, CanteenType.STUBISTRO)
+    
+    if full_name.startswith("Mediziner Mensa"):
+        return ("Mediziner", CanteenType.MENSA)
+
+    # Regular cases
+    if full_name.startswith("Mensa"):
+        canteen_type = CanteenType.MENSA
+        clean_name = full_name.replace("Mensa", "", 1).strip()
+    elif full_name.startswith("StuBistro"):
+        canteen_type = CanteenType.STUBISTRO
+        clean_name = full_name.replace("StuBistro", "", 1).strip()
+    elif full_name.startswith("StuCafé"):
+        canteen_type = CanteenType.STUCAFE
+        clean_name = full_name.replace("StuCafé", "", 1).strip()
+    else:
+        raise ValueError(f"Unknown canteen type in name: {full_name}")
+
+    return (clean_name, canteen_type)
     
 
 def store_canteen_data(canteens: list, db: Session):
@@ -56,7 +89,9 @@ def store_canteen_data(canteens: list, db: Session):
         # Update Name
         name = canteen['name']
         
-        canteen_obj.name = name
+        clean_name, canteen_type = process_canteen_name(canteen['name'])
+        canteen_obj.name = clean_name
+        canteen_obj.type = canteen_type
 
         # Update Location
         location = canteen['location']

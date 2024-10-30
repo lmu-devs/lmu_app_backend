@@ -85,6 +85,7 @@ def create_data_fetcher():
     
     # fetch_data_current_year()
     # fetch_scheduled_data()
+    update_canteen_database()
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
     print("Entering data_fecther loop...")

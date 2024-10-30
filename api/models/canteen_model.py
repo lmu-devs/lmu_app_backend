@@ -2,7 +2,7 @@ import enum
 from pydantic import BaseModel, ConfigDict, RootModel
 from typing import List, Optional
 from api.database import Base
-from sqlalchemy import UUID, Column, DateTime, Integer, String, ForeignKey, Time, Float, func
+from sqlalchemy import UUID, Column, DateTime, Integer, String, ForeignKey, Time, Float, Enum, func
 from sqlalchemy.orm import relationship
 from datetime import time as datetime_time
 
@@ -17,6 +17,13 @@ class Weekday(str, enum.Enum):
     FRIDAY = "FRIDAY"
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
+    
+class CanteenType(str, enum.Enum):
+    MENSA = "MENSA"
+    STUBISTRO = "STUBISTRO"
+    STUCAFE = "STUCAFE"
+    
+
 
 class LocationDto(BaseModel):
     address: str
@@ -34,6 +41,7 @@ class OpeningHoursDto(BaseModel):
 class CanteenDto(BaseModel):
     id: str
     name: str
+    type: CanteenType
     location: LocationDto
     rating: RatingDto
     opening_hours: List[OpeningHoursDto]
@@ -53,6 +61,7 @@ class CanteenTable(Base):
 
     id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
+    type = Column(Enum(CanteenType))
 
     # Relationships
     location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")

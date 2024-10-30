@@ -49,6 +49,7 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
     return CanteenDto(
         id=canteen.id,
         name=canteen.name,
+        type=canteen.type,
         rating=rating,
         location=location,
         opening_hours=opening_hours,
