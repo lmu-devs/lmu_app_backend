@@ -20,3 +20,4 @@ urllib3==2.2.2
 uvicorn==0.29.0
 python-dotenv==1.0.1
 babel==2.16.0
+alembic==1.13.3

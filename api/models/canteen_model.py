@@ -61,7 +61,7 @@ class CanteenTable(Base):
 
     id = Column(String, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
-    type = Column(Enum(CanteenType))
+    type = Column(Enum(CanteenType, name="canteen_type", create_type=False))
 
     # Relationships
     location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
