@@ -54,7 +54,7 @@ def process_canteen_name(full_name: str) -> Tuple[str, CanteenType]:
     
     # Special cases first
     if full_name.startswith("IPP Bistro") or full_name.startswith("FMI Bistro"):
-        clean_name = full_name.replace("IPP Bistro", "").replace("FMI Bistro", "").strip()
+        clean_name = full_name.replace(" Bistro", "").strip()
         return (clean_name, CanteenType.STUBISTRO)
     
     if full_name.startswith("Mediziner Mensa"):
