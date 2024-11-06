@@ -1030,6 +1030,7 @@ taste_profile = {
       {
          "enum_name":"ALL",
          "name":"Alles",
+         "emoji_abbreviation":"🥩"
          "exclude":[
             
          ]
@@ -1037,6 +1038,7 @@ taste_profile = {
       {
          "enum_name":"VEGETARIAN",
          "name":"Vegetarisch",
+         "emoji_abbreviation":"🥕"
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1051,6 +1053,7 @@ taste_profile = {
       {
          "enum_name":"VEGAN",
          "name":"Vegan",
+         "emoji_abbreviation":"🌱"
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1068,6 +1071,7 @@ taste_profile = {
       {
          "enum_name":"PESCETARIAN",
          "name":"Pescetarisch",
+         "emoji_abbreviation":"🐠"
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1080,6 +1084,7 @@ taste_profile = {
       {
          "enum_name":"GLUTENFREE",
          "name":"Glutenfrei",
+         "emoji_abbreviation":"🌾"
          "exclude":[
             "GLUTEN",
             "WHEAT",
@@ -1093,28 +1098,29 @@ taste_profile = {
       {
          "enum_name":"LACTOSEFREE",
          "name":"Lactosefrei",
+         "emoji_abbreviation":"🥛"
          "exclude":[
             "MILK",
             "LACTOSE"
          ]
       },
-      {
-         "enum_name":"HALAL",
-         "name":"Halal",
-         "exclude":[
-            "PORK",
-            "ALCOHOL"
-         ]
-      },
-      {
-         "enum_name":"KOSHER",
-         "name":"Kosher",
-         "exclude":[
-            "PORK",
-            "SHELLFISH",
-            "MOLLUSCS"
-         ]
-      }
+      # {
+      #    "enum_name":"HALAL",
+      #    "name":"Halal",
+      #    "exclude":[
+      #       "PORK",
+      #       "ALCOHOL"
+      #    ]
+      # },
+      # {
+      #    "enum_name":"KOSHER",
+      #    "name":"Kosher",
+      #    "exclude":[
+      #       "PORK",
+      #       "SHELLFISH",
+      #       "MOLLUSCS"
+      #    ]
+      # }
    ],
    "sorted_labels":[
       {
