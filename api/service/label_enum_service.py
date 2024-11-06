@@ -1050,7 +1050,7 @@ taste_profile = {
       },
       {
          "enum_name":"VEGAN",
-         "name":"Vegetarisch",
+         "name":"Vegan",
          "exclude":[
             "POULTRY",
             "BEEF",
