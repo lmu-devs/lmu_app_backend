@@ -1030,7 +1030,7 @@ taste_profile = {
       {
          "enum_name":"ALL",
          "name":"Alles",
-         "emoji_abbreviation":"🥩"
+         "emoji_abbreviation":"🥩",
          "exclude":[
             
          ]
@@ -1038,7 +1038,7 @@ taste_profile = {
       {
          "enum_name":"VEGETARIAN",
          "name":"Vegetarisch",
-         "emoji_abbreviation":"🥕"
+         "emoji_abbreviation":"🥕",
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1053,7 +1053,7 @@ taste_profile = {
       {
          "enum_name":"VEGAN",
          "name":"Vegan",
-         "emoji_abbreviation":"🌱"
+         "emoji_abbreviation":"🌱",
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1071,7 +1071,7 @@ taste_profile = {
       {
          "enum_name":"PESCETARIAN",
          "name":"Pescetarisch",
-         "emoji_abbreviation":"🐠"
+         "emoji_abbreviation":"🐠",
          "exclude":[
             "POULTRY",
             "BEEF",
@@ -1084,7 +1084,7 @@ taste_profile = {
       {
          "enum_name":"GLUTENFREE",
          "name":"Glutenfrei",
-         "emoji_abbreviation":"🌾"
+         "emoji_abbreviation":"🌾",
          "exclude":[
             "GLUTEN",
             "WHEAT",
@@ -1098,7 +1098,7 @@ taste_profile = {
       {
          "enum_name":"LACTOSEFREE",
          "name":"Lactosefrei",
-         "emoji_abbreviation":"🥛"
+         "emoji_abbreviation":"🥛",
          "exclude":[
             "MILK",
             "LACTOSE"
@@ -1134,7 +1134,7 @@ taste_profile = {
                   "EN":"poultry"
                },
                "emoji_abbreviation":"🐔",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"BEEF",
@@ -1143,7 +1143,7 @@ taste_profile = {
                   "EN":"beef"
                },
                "emoji_abbreviation":"🐮",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"VEAL",
@@ -1152,7 +1152,7 @@ taste_profile = {
                   "EN":"veal"
                },
                "emoji_abbreviation":"🐂",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"PORK",
@@ -1161,7 +1161,7 @@ taste_profile = {
                   "EN":"pork"
                },
                "emoji_abbreviation":"🐷",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"LAMB",
@@ -1170,7 +1170,7 @@ taste_profile = {
                   "EN":"lamb"
                },
                "emoji_abbreviation":"🐑",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"WILD_MEAT",
@@ -1179,7 +1179,7 @@ taste_profile = {
                   "EN":"wild meat"
                },
                "emoji_abbreviation":"🐗",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             }
          ]
       },
@@ -1226,7 +1226,7 @@ taste_profile = {
                   "DE":"Laktose",
                   "EN":"lactose"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"La"
             },
             {
@@ -1259,7 +1259,7 @@ taste_profile = {
                   "DE":"Weizen",
                   "EN":"wheat"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"GlW"
             },
             {
@@ -1269,7 +1269,7 @@ taste_profile = {
                   "EN":"cereal"
                },
                "emoji_abbreviation":"🌾",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"RYE",
@@ -1277,7 +1277,7 @@ taste_profile = {
                   "DE":"Roggen",
                   "EN":"rye"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"GlR"
             },
             {
@@ -1286,7 +1286,7 @@ taste_profile = {
                   "DE":"Gerste",
                   "EN":"barley"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"GlG"
             },
             {
@@ -1304,7 +1304,7 @@ taste_profile = {
                   "DE":"Dinkel",
                   "EN":"spelt"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"GlD"
             }
          ]
@@ -1328,7 +1328,7 @@ taste_profile = {
                   "DE":"Mandeln",
                   "EN":"almonds"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScM"
             },
             {
@@ -1346,7 +1346,7 @@ taste_profile = {
                   "DE":"Walnüsse",
                   "EN":"walnuts"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScW"
             },
             {
@@ -1355,7 +1355,7 @@ taste_profile = {
                   "DE":"Cashewnüsse",
                   "EN":"cashews"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScC"
             },
             {
@@ -1364,7 +1364,7 @@ taste_profile = {
                   "DE":"Pekanüsse",
                   "EN":"pecans"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScP"
             },
             {
@@ -1373,7 +1373,7 @@ taste_profile = {
                   "DE":"Pistazien",
                   "EN":"pistachios"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScP"
             },
             {
@@ -1382,7 +1382,7 @@ taste_profile = {
                   "DE":"Macadamianüsse",
                   "EN":"macadamias"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"ScMa"
             },
             {
@@ -1391,7 +1391,7 @@ taste_profile = {
                   "DE":"Sesam",
                   "EN":"sesame"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"K"
             }
          ]
@@ -1443,7 +1443,7 @@ taste_profile = {
                   "EN":"with a source of phenylalanine"
                },
                "emoji_abbreviation":"💊",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"ANTIOXIDANTS",
@@ -1451,7 +1451,7 @@ taste_profile = {
                   "DE":"Antioxidanten",
                   "EN":"antioxidants"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"3"
             }
          ]
@@ -1466,7 +1466,7 @@ taste_profile = {
                   "DE":"Soja",
                   "EN":"soy"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"F"
             },
             {
@@ -1475,7 +1475,7 @@ taste_profile = {
                   "DE":"Hybridstämme",
                   "EN":"hybrid strains"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"GlHy"
             },
             {
@@ -1484,7 +1484,7 @@ taste_profile = {
                   "DE":"Sellerie",
                   "EN":"celery"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"I"
             },
             {
@@ -1520,7 +1520,7 @@ taste_profile = {
                   "DE":"Lupine",
                   "EN":"lupin"
                },
-               "emoji_abbreviation":"None",
+               "emoji_abbreviation":null,
                "text_abbreviation":"M"
             },
             {
@@ -1566,7 +1566,7 @@ taste_profile = {
                   "EN":"cocoa-containing grease"
                },
                "emoji_abbreviation":"🍫",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"GELATIN",
@@ -1575,7 +1575,7 @@ taste_profile = {
                   "EN":"gelatin"
                },
                "emoji_abbreviation":"🍮",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"ALCOHOL",
@@ -1584,7 +1584,7 @@ taste_profile = {
                   "EN":"alcohol"
                },
                "emoji_abbreviation":"🍷",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"GARLIC",
@@ -1593,7 +1593,7 @@ taste_profile = {
                   "EN":"garlic"
                },
                "emoji_abbreviation":"🧄",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"BAVARIA",
@@ -1602,7 +1602,7 @@ taste_profile = {
                   "EN":"Certified quality Bavaria"
                },
                "emoji_abbreviation":"🥨",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             },
             {
                "enum_name":"MSC",
@@ -1611,7 +1611,7 @@ taste_profile = {
                   "EN":"Marine Stewardship Council"
                },
                "emoji_abbreviation":"🎣",
-               "text_abbreviation":"None"
+               "text_abbreviation":null
             }
          ]
       }
