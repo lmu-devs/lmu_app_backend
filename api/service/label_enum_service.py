@@ -1075,6 +1075,7 @@ taste_profile = {
             "GLUTEN",
             "WHEAT",
             "RYE",
+            "CEREAL",
             "BARLEY",
             "OAT",
             "SPELT",
