@@ -1019,13 +1019,16 @@ label_presets = [
 ]
 
 taste_profile = {
-   "version":1,
-   "presets":[
-      {
-         "enum_name":"VEGETARIAN",
-         "name":"Vegetarisch",
-         "emoji_abbreviation":"🥕",
-         "exclude":[
+    "version":1,
+    "presets": [
+        {
+          "enum_name": "VEGETARIAN",
+          "text": {
+            "DE": "Vegetarisch",
+            "EN": "Vegetarian"
+          },
+          "emoji_abbreviation": "🥕",
+          "exclude": [
             "POULTRY",
             "BEEF",
             "VEAL",
@@ -1034,13 +1037,16 @@ taste_profile = {
             "WILD_MEAT",
             "FISH",
             "SHELLFISH"
-         ]
-      },
-      {
-         "enum_name":"VEGAN",
-         "name":"Vegan",
-         "emoji_abbreviation":"🌱",
-         "exclude":[
+          ]
+        },
+        {
+          "enum_name": "VEGAN",
+          "text": {
+            "DE": "Vegan",
+            "EN": "Vegan"
+          },
+          "emoji_abbreviation": "🌱",
+          "exclude": [
             "POULTRY",
             "BEEF",
             "VEAL",
@@ -1052,26 +1058,32 @@ taste_profile = {
             "MILK",
             "LACTOSE",
             "CHICKEN_EGGS"
-         ]
-      },
-      {
-         "enum_name":"PESCETARIAN",
-         "name":"Pescetarisch",
-         "emoji_abbreviation":"🐠",
-         "exclude":[
+          ]
+        },
+        {
+          "enum_name": "PESCETARIAN",
+          "text": {
+            "DE": "Pescetarisch",
+            "EN": "Pescetarian"
+          },
+          "emoji_abbreviation": "🐠",
+          "exclude": [
             "POULTRY",
             "BEEF",
             "VEAL",
             "PORK",
             "LAMB",
             "WILD_MEAT"
-         ]
-      },
-      {
-         "enum_name":"GLUTENFREE",
-         "name":"Glutenfrei",
-         "emoji_abbreviation":"🌾",
-         "exclude":[
+          ]
+        },
+        {
+          "enum_name": "GLUTENFREE",
+          "text": {
+            "DE": "Glutenfrei",
+            "EN": "Gluten-Free"
+          },
+          "emoji_abbreviation": "🌾",
+          "exclude": [
             "GLUTEN",
             "WHEAT",
             "RYE",
@@ -1080,11 +1092,14 @@ taste_profile = {
             "OAT",
             "SPELT",
             "HYBRIDS"
-         ]
-      },
+          ]
+        },
       {
          "enum_name":"LACTOSEFREE",
-         "name":"Lactosefrei",
+        "text":{
+            "DE":"Lactosefrei",
+            "EN":"Lactose-Free"
+          },
          "emoji_abbreviation":"🥛",
          "exclude":[
             "MILK",
@@ -1118,7 +1133,7 @@ taste_profile = {
                "enum_name":"POULTRY",
                "text":{
                   "DE":"Geflügel",
-                  "EN":"poultry"
+                  "EN":"Poultry"
                },
                "emoji_abbreviation":"🐔",
                "text_abbreviation":""
@@ -1127,7 +1142,7 @@ taste_profile = {
                "enum_name":"BEEF",
                "text":{
                   "DE":"Rinderfleisch",
-                  "EN":"beef"
+                  "EN":"Beef"
                },
                "emoji_abbreviation":"🐮",
                "text_abbreviation":""
@@ -1136,7 +1151,7 @@ taste_profile = {
                "enum_name":"VEAL",
                "text":{
                   "DE":"Kalbsfleisch",
-                  "EN":"veal"
+                  "EN":"Veal"
                },
                "emoji_abbreviation":"🐂",
                "text_abbreviation":""
@@ -1145,7 +1160,7 @@ taste_profile = {
                "enum_name":"PORK",
                "text":{
                   "DE":"Schweinefleisch",
-                  "EN":"pork"
+                  "EN":"Pork"
                },
                "emoji_abbreviation":"🐷",
                "text_abbreviation":""
@@ -1154,7 +1169,7 @@ taste_profile = {
                "enum_name":"LAMB",
                "text":{
                   "DE":"Lammfleisch",
-                  "EN":"lamb"
+                  "EN":"Lamb"
                },
                "emoji_abbreviation":"🐑",
                "text_abbreviation":""
@@ -1163,7 +1178,7 @@ taste_profile = {
                "enum_name":"WILD_MEAT",
                "text":{
                   "DE":"Wildfleisch",
-                  "EN":"wild meat"
+                  "EN":"Wild meat"
                },
                "emoji_abbreviation":"🐗",
                "text_abbreviation":""
@@ -1178,7 +1193,7 @@ taste_profile = {
                "enum_name":"FISH",
                "text":{
                   "DE":"Fisch",
-                  "EN":"fish"
+                  "EN":"Fish"
                },
                "emoji_abbreviation":"🐠",
                "text_abbreviation":"D"
@@ -1187,7 +1202,7 @@ taste_profile = {
                "enum_name":"SHELLFISH",
                "text":{
                   "DE":"Krebstiere",
-                  "EN":"shellfish"
+                  "EN":"Shellfish"
                },
                "emoji_abbreviation":"🦀",
                "text_abbreviation":"B"
@@ -1202,7 +1217,7 @@ taste_profile = {
                "enum_name":"MILK",
                "text":{
                   "DE":"Milch",
-                  "EN":"milk"
+                  "EN":"Milk"
                },
                "emoji_abbreviation":"🥛",
                "text_abbreviation":"G"
@@ -1211,7 +1226,7 @@ taste_profile = {
                "enum_name":"LACTOSE",
                "text":{
                   "DE":"Laktose",
-                  "EN":"lactose"
+                  "EN":"Lactose"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"La"
@@ -1220,7 +1235,7 @@ taste_profile = {
                "enum_name":"CHICKEN_EGGS",
                "text":{
                   "DE":"Eier",
-                  "EN":"egg"
+                  "EN":"Egg"
                },
                "emoji_abbreviation":"🥚",
                "text_abbreviation":"C"
@@ -1235,7 +1250,7 @@ taste_profile = {
                "enum_name":"GLUTEN",
                "text":{
                   "DE":"Gluten",
-                  "EN":"gluten-containing cereals"
+                  "EN":"Gluten-containing cereals"
                },
                "emoji_abbreviation":"🥖",
                "text_abbreviation":"A"
@@ -1244,7 +1259,7 @@ taste_profile = {
                "enum_name":"WHEAT",
                "text":{
                   "DE":"Weizen",
-                  "EN":"wheat"
+                  "EN":"Wheat"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlW"
@@ -1253,7 +1268,7 @@ taste_profile = {
                "enum_name":"CEREAL",
                "text":{
                   "DE":"Getreide",
-                  "EN":"cereal"
+                  "EN":"Cereal"
                },
                "emoji_abbreviation":"🌾",
                "text_abbreviation":""
@@ -1262,7 +1277,7 @@ taste_profile = {
                "enum_name":"RYE",
                "text":{
                   "DE":"Roggen",
-                  "EN":"rye"
+                  "EN":"Rye"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlR"
@@ -1271,7 +1286,7 @@ taste_profile = {
                "enum_name":"BARLEY",
                "text":{
                   "DE":"Gerste",
-                  "EN":"barley"
+                  "EN":"Barley"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlG"
@@ -1280,7 +1295,7 @@ taste_profile = {
                "enum_name":"OAT",
                "text":{
                   "DE":"Hafer",
-                  "EN":"oat"
+                  "EN":"Oat"
                },
                "emoji_abbreviation":"🥣",
                "text_abbreviation":"GlH"
@@ -1289,7 +1304,7 @@ taste_profile = {
                "enum_name":"SPELT",
                "text":{
                   "DE":"Dinkel",
-                  "EN":"spelt"
+                  "EN":"Spelt"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlD"
@@ -1304,7 +1319,7 @@ taste_profile = {
                "enum_name":"PEANUTS",
                "text":{
                   "DE":"Erdnüsse",
-                  "EN":"peanut"
+                  "EN":"Peanut"
                },
                "emoji_abbreviation":"🥜",
                "text_abbreviation":"E"
@@ -1313,7 +1328,7 @@ taste_profile = {
                "enum_name":"ALMONDS",
                "text":{
                   "DE":"Mandeln",
-                  "EN":"almonds"
+                  "EN":"Almonds"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScM"
@@ -1322,7 +1337,7 @@ taste_profile = {
                "enum_name":"HAZELNUTS",
                "text":{
                   "DE":"Haselnüsse",
-                  "EN":"hazelnuts"
+                  "EN":"Hazelnuts"
                },
                "emoji_abbreviation":"🌰",
                "text_abbreviation":"ScH"
@@ -1331,7 +1346,7 @@ taste_profile = {
                "enum_name":"WALNUTS",
                "text":{
                   "DE":"Walnüsse",
-                  "EN":"walnuts"
+                  "EN":"Walnuts"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScW"
@@ -1340,7 +1355,7 @@ taste_profile = {
                "enum_name":"CASHEWS",
                "text":{
                   "DE":"Cashewnüsse",
-                  "EN":"cashews"
+                  "EN":"Cashews"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScC"
@@ -1349,7 +1364,7 @@ taste_profile = {
                "enum_name":"PECAN",
                "text":{
                   "DE":"Pekanüsse",
-                  "EN":"pecans"
+                  "EN":"Pecans"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScP"
@@ -1358,7 +1373,7 @@ taste_profile = {
                "enum_name":"PISTACHIOES",
                "text":{
                   "DE":"Pistazien",
-                  "EN":"pistachios"
+                  "EN":"Pistachios"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScP"
@@ -1367,7 +1382,7 @@ taste_profile = {
                "enum_name":"MACADAMIA",
                "text":{
                   "DE":"Macadamianüsse",
-                  "EN":"macadamias"
+                  "EN":"Macadamias"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScMa"
@@ -1376,7 +1391,7 @@ taste_profile = {
                "enum_name":"SESAME",
                "text":{
                   "DE":"Sesam",
-                  "EN":"sesame"
+                  "EN":"Sesame"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"K"
@@ -1391,7 +1406,7 @@ taste_profile = {
                "enum_name":"SWEETENERS",
                "text":{
                   "DE":"Süßungsmittel",
-                  "EN":"sweeteners"
+                  "EN":"Sweeteners"
                },
                "emoji_abbreviation":"🍬",
                "text_abbreviation":"11"
@@ -1400,7 +1415,7 @@ taste_profile = {
                "enum_name":"FLAVOR_ENHANCER",
                "text":{
                   "DE":"Geschmacksverstärker",
-                  "EN":"flavor enhancer"
+                  "EN":"Flavor enhancer"
                },
                "emoji_abbreviation":"🔬",
                "text_abbreviation":"4"
@@ -1409,7 +1424,7 @@ taste_profile = {
                "enum_name":"DYESTUFF",
                "text":{
                   "DE":"Farbstoffe",
-                  "EN":"dyestuff"
+                  "EN":"Dyestuff"
                },
                "emoji_abbreviation":"🎨",
                "text_abbreviation":"1"
@@ -1418,7 +1433,7 @@ taste_profile = {
                "enum_name":"PRESERVATIVES",
                "text":{
                   "DE":"Preservate",
-                  "EN":"preservatives"
+                  "EN":"Preservatives"
                },
                "emoji_abbreviation":"🥫",
                "text_abbreviation":"2"
@@ -1427,7 +1442,7 @@ taste_profile = {
                "enum_name":"PHENYLALANINE",
                "text":{
                   "DE":"Phenylaline",
-                  "EN":"with a source of phenylalanine"
+                  "EN":"Phenylalanine"
                },
                "emoji_abbreviation":"💊",
                "text_abbreviation":""
@@ -1436,7 +1451,7 @@ taste_profile = {
                "enum_name":"ANTIOXIDANTS",
                "text":{
                   "DE":"Antioxidanten",
-                  "EN":"antioxidants"
+                  "EN":"Antioxidants"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"3"
@@ -1451,7 +1466,7 @@ taste_profile = {
                "enum_name":"SOY",
                "text":{
                   "DE":"Soja",
-                  "EN":"soy"
+                  "EN":"Soy"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"F"
@@ -1460,7 +1475,7 @@ taste_profile = {
                "enum_name":"HYBRIDS",
                "text":{
                   "DE":"Hybridstämme",
-                  "EN":"hybrid strains"
+                  "EN":"Hybrid strains"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlHy"
@@ -1469,7 +1484,7 @@ taste_profile = {
                "enum_name":"CELERY",
                "text":{
                   "DE":"Sellerie",
-                  "EN":"celery"
+                  "EN":"Celery"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"I"
@@ -1478,7 +1493,7 @@ taste_profile = {
                "enum_name":"MUSTARD",
                "text":{
                   "DE":"Senf",
-                  "EN":"mustard"
+                  "EN":"Mustard"
                },
                "emoji_abbreviation":"🌭",
                "text_abbreviation":"J"
@@ -1487,7 +1502,7 @@ taste_profile = {
                "enum_name":"SULPHURS",
                "text":{
                   "DE":"Schwefeldioxid",
-                  "EN":"sulphurs"
+                  "EN":"Sulphurs"
                },
                "emoji_abbreviation":"🔻",
                "text_abbreviation":"L"
@@ -1496,7 +1511,7 @@ taste_profile = {
                "enum_name":"SULFITES",
                "text":{
                   "DE":"Sulfite",
-                  "EN":"sulfites"
+                  "EN":"Sulfites"
                },
                "emoji_abbreviation":"🔺",
                "text_abbreviation":"L"
@@ -1505,7 +1520,7 @@ taste_profile = {
                "enum_name":"LUPIN",
                "text":{
                   "DE":"Lupine",
-                  "EN":"lupin"
+                  "EN":"Lupin"
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"M"
@@ -1514,7 +1529,7 @@ taste_profile = {
                "enum_name":"MOLLUSCS",
                "text":{
                   "DE":"Weichtiere",
-                  "EN":"molluscs"
+                  "EN":"Molluscs"
                },
                "emoji_abbreviation":"🐙",
                "text_abbreviation":"N"
@@ -1523,7 +1538,7 @@ taste_profile = {
                "enum_name":"SHELL_FRUITS",
                "text":{
                   "DE":"Schalenfrüchte",
-                  "EN":"shell fruits"
+                  "EN":"Shell fruits"
                },
                "emoji_abbreviation":"🥥",
                "text_abbreviation":"H"
@@ -1532,7 +1547,7 @@ taste_profile = {
                "enum_name":"WAXED",
                "text":{
                   "DE":"Gewachst",
-                  "EN":"waxed"
+                  "EN":"Waxed"
                },
                "emoji_abbreviation":"🐝",
                "text_abbreviation":"13"
@@ -1541,7 +1556,7 @@ taste_profile = {
                "enum_name":"PHOSPATES",
                "text":{
                   "DE":"Phosphate",
-                  "EN":"phosphates"
+                  "EN":"Phosphates"
                },
                "emoji_abbreviation":"🔷",
                "text_abbreviation":"7"
@@ -1550,7 +1565,7 @@ taste_profile = {
                "enum_name":"COCOA_CONTAINING_GREASE",
                "text":{
                   "DE":"Kakaohaltiges Fett",
-                  "EN":"cocoa-containing grease"
+                  "EN":"Cocoa-containing grease"
                },
                "emoji_abbreviation":"🍫",
                "text_abbreviation":""
@@ -1559,7 +1574,7 @@ taste_profile = {
                "enum_name":"GELATIN",
                "text":{
                   "DE":"Gelatine",
-                  "EN":"gelatin"
+                  "EN":"Gelatin"
                },
                "emoji_abbreviation":"🍮",
                "text_abbreviation":""
@@ -1568,7 +1583,7 @@ taste_profile = {
                "enum_name":"ALCOHOL",
                "text":{
                   "DE":"Alkohol",
-                  "EN":"alcohol"
+                  "EN":"Alcohol"
                },
                "emoji_abbreviation":"🍷",
                "text_abbreviation":""
@@ -1577,7 +1592,7 @@ taste_profile = {
                "enum_name":"GARLIC",
                "text":{
                   "DE":"Knoblauch",
-                  "EN":"garlic"
+                  "EN":"Garlic"
                },
                "emoji_abbreviation":"🧄",
                "text_abbreviation":""
