@@ -975,12 +975,6 @@ labels_sorted = [
 
 label_presets = [
   {
-    "enum_name": "ALL",
-    "name": "Alles",
-    "exclude": 
-      []
-  },
-  {
     "enum_name": "VEGETARIAN",
     "name": "Vegetarisch",
     "exclude": 
@@ -1027,14 +1021,6 @@ label_presets = [
 taste_profile = {
    "version":1,
    "presets":[
-      {
-         "enum_name":"ALL",
-         "name":"Alles",
-         "emoji_abbreviation":"🥩",
-         "exclude":[
-            
-         ]
-      },
       {
          "enum_name":"VEGETARIAN",
          "name":"Vegetarisch",
