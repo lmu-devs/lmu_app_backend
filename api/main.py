@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from api.routers.fastapi import canteen_router, menu_router, dish_router, taste_router, user_router
 
 from api.database import init_db
@@ -15,6 +16,14 @@ def create_app():
     app.include_router(dish_router.router,      prefix="/eat/v1", tags=["dish"])
     app.include_router(user_router.router,      prefix="/eat/v1", tags=["user"])
     app.include_router(taste_router.router,     prefix="/eat/v1", tags=["taste"])
+    
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["https://students-app.lmu-dev.org","http://localhost:53480"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers="*",
+    )
     
     # Middleware to add charset to JSON responses for üäö
     @app.middleware("http")
