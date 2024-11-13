@@ -18,6 +18,7 @@ class DishPriceDto(BaseModel):
     unit: str
     
 class DishDto(BaseModel):
+    id: int
     name: str
     dish_type: str
     rating: RatingDto
