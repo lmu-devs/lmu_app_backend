@@ -29,6 +29,9 @@ async def get_menu(
     user_id = current_user.id if current_user else None
     menu_weeks = get_menu_weeks_from_db(db, canteen_id, year, week, current_user, only_liked_canteens)
     
+    # Adjusting for 5 days a week even if there are less menu days in the week
+    menu_week_adjusted = []
+    
     if current_user:
         for menu_week_obj in menu_weeks:
             dishes_table: List[DishTable] = []

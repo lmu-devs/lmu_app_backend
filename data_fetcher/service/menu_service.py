@@ -3,7 +3,7 @@ from requests.exceptions import HTTPError, RequestException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from api.database import get_db
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from api.models.dish_model import DishPriceTable, DishTable
 from api.models.menu_model import MenuDayTable, MenuDishAssociation, MenuWeekTable
@@ -44,31 +44,33 @@ def store_menu_data(data: dict, db: Session, canteen_id: str):
         # Use merge to either insert or update the MenuWeekTable entry
         menu_week_obj = db.merge(MenuWeekTable(canteen_id=canteen_id, year=year, week=week))
         
-        days = data.get('days', [])
-        for day in days:
-            date_str = day.get('date')
-            if not date_str:
-                print(f"Skipping day with missing date")
-                continue
+        # Get all days from the API response
+        api_days = {day.get('date'): day for day in data.get('days', [])}
+        
+        # Calculate all weekdays for this week
+        first_day_of_week = datetime.strptime(f"{year}-W{int(week):02d}-1", "%Y-W%W-%w").date()
+        weekdays = [first_day_of_week + timedelta(days=i) for i in range(5)]  # Monday to Friday
+        
+        # Process each weekday
+        for weekday in weekdays:
+            date_str = weekday.strftime('%Y-%m-%d')
+            day_data = api_days.get(date_str, {'date': date_str, 'dishes': []})
             
-            date = datetime.strptime(date_str, '%Y-%m-%d').date()
-            
-            # Use merge for MenuDayTable
+            # Create or update MenuDayTable entry for each weekday
             menu_day_obj = db.merge(MenuDayTable(
-                date=date,
+                date=weekday,
                 menu_week_week=week,
                 menu_week_year=year,
                 menu_week_canteen_id=canteen_id
             ))
             
-            # Process dishes for this day
-            dishes = day.get('dishes', [])
+            # Process dishes only if they exist
+            dishes = day_data.get('dishes', [])
             for dish_data in dishes:
                 # Get or create the dish
                 dish_name = dish_data.get('name', '')
                 dish_obj = db.query(DishTable).filter_by(name=dish_name).first()
                 if not dish_obj:
-                    
                     dish_obj = DishTable(
                         name=dish_name,
                         dish_type=dish_data.get('dish_type', ''),
@@ -76,19 +78,19 @@ def store_menu_data(data: dict, db: Session, canteen_id: str):
                         price_simple=calculate_simple_price(dish_data.get("prices", {}).get("students", {}))
                     )
                     db.add(dish_obj)
-                    db.flush()  # This will assign an ID to the new dish
+                    db.flush()
                 
                 # Create or update the MenuDishAssociation
                 association = db.query(MenuDishAssociation).filter_by(
                     dish_id=dish_obj.id,
-                    menu_day_date=date,
+                    menu_day_date=weekday,
                     menu_day_canteen_id=canteen_id
                 ).first()
                 
                 if not association:
                     association = MenuDishAssociation(
                         dish_id=dish_obj.id,
-                        menu_day_date=date,
+                        menu_day_date=weekday,
                         menu_day_canteen_id=canteen_id
                     )
                     db.add(association)
@@ -125,6 +127,7 @@ def store_menu_data(data: dict, db: Session, canteen_id: str):
         db.rollback()
         print(f"Unexpected error while updating menu database: {str(e)}")
         print(f"Error details: {type(e).__name__}, {str(e)}")
+
 
 
     
