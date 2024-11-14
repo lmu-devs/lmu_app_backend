@@ -1,7 +1,7 @@
 import enum
+
 from datetime import time as datetime_time
 from typing import List, Optional
-
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from api.schemas.image_scheme import Image

@@ -1,5 +1,4 @@
-from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey,
-                        Integer, String, Time, func)
+from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 
 from shared.database import Base

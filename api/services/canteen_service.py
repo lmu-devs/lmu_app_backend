@@ -1,6 +1,6 @@
 import uuid
-from typing import Dict, List
 
+from typing import Dict, List
 from fastapi import HTTPException
 from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError

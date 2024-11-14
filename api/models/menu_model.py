@@ -1,11 +1,7 @@
-from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint,
-                        Integer, String)
+from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Integer, String)
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
-
-
-    
 
 
 class MenuDishAssociation(Base):
