@@ -1,33 +1,31 @@
-import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base 
 from sqlalchemy_utils import database_exists, create_database
+from api.core.settings import get_settings
+
+settings = get_settings()
 
 
 Base = declarative_base()
 
+def get_database_url() -> str:
+    return f'postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}'
 
-def get_engine(user, password, host, port, db):
-    url = f'postgresql://{user}:{password}@{host}:{port}/{db}'
+def get_engine():
+    url = get_database_url()
     if not database_exists(url):
         create_database(url)
     engine = create_engine(url)
     return engine
 
 
-DB_USER = os.environ.get('POSTGRES_USER')
-DB_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-DB_HOST = os.environ.get('POSTGRES_HOST')
-DB_PORT = os.environ.get('POSTGRES_PORT', '5432')
-DB_NAME = os.environ.get('POSTGRES_DB')
 
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME))
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
 
 def init_db():
     # Create an engine
-    engine = get_engine(DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, DB_NAME)
+    engine = get_engine()
     
     # Create all Tables
     Base.metadata.create_all(bind=engine)

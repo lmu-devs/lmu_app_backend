@@ -134,17 +134,21 @@ def store_canteen_data(canteens: list, db: Session):
     db.commit()
 
 
-def update_canteen_database():
+def update_canteen_database() -> str:
     print("\n==============================================================")
     print("Updating canteen data...")
     try:
         db = next(get_db())
         canteen_data = fetch_canteen_data()
         store_canteen_data(canteen_data, db)
-        print("canteen data updated successfully!")
+        message = "Canteen data updated successfully!"
+        print(message)
         print("==============================================================\n")
+        return message
     except Exception as e:
-        print(f"Error while updating canteen database: {str(e)}")
+        message = f"Error while updating canteen database: {str(e)}"
+        print(message)
+        return message
     finally:
         db.close()
 

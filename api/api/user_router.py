@@ -7,7 +7,7 @@ from api.core.database import get_db
 from api.models.user_model import UserTable
 from api.routers.models.user_pydantic import user_to_pydantic
 from api.schemas.user_scheme import User
-from api.service.user_service import create_user_data
+from api.services.user_service import UserService
 
 
 router = APIRouter()
@@ -19,5 +19,5 @@ def create_user(device_id: str, db: Session = Depends(get_db), api_key: APIKey =
         user = user_to_pydantic(existing_user)
         return user
     
-    new_user = create_user_data(device_id, db)
+    new_user = UserService(db).create_user(device_id)
     return user_to_pydantic(new_user)

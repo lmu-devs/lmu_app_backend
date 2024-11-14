@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from api.service.label_enum_service import taste_profile
+from api.services.label_enum_service import taste_profile
 
 
 router = APIRouter()

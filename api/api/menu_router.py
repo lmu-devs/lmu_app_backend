@@ -10,7 +10,7 @@ from api.core.database import get_db
 from api.models.user_model import UserTable
 from api.schemas.menu_scheme import Menus
 from api.routers.models.menu_pydantic import menu_days_to_pydantic
-from api.service.menu_service import get_menu_days_from_db
+from api.services.menu_service import MenuService
 from data_fetcher.main import fetch_data_current_year
 from data_fetcher.service.menu_service import update_menu_database
 
@@ -47,8 +47,7 @@ async def get_menu(
     date_to = date_from + timedelta(days=days_amount)
     user_id = current_user.id if current_user else None
     
-    menu_days = get_menu_days_from_db(
-        db, 
+    menu_days = MenuService(db).get_days(
         canteen_id, 
         date_from,
         date_to,
