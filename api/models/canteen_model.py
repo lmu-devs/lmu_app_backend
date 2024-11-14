@@ -6,8 +6,6 @@ from shared.database import Base
 from api.schemas.canteen_scheme import CanteenType
 
 
-
-
 class CanteenTable(Base):
     __tablename__ = "canteens"
 
@@ -37,6 +35,7 @@ class LocationTable(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
+    # Relationships
     canteen = relationship("CanteenTable", back_populates="location")
 
 class OpeningHoursTable(Base):
@@ -47,6 +46,7 @@ class OpeningHoursTable(Base):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
+    # Relationships
     canteen = relationship("CanteenTable", back_populates="opening_hours")
     
     

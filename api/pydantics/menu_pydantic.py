@@ -3,7 +3,7 @@ from typing import List
 
 from api.models.menu_model import MenuDayTable
 from api.schemas.menu_scheme import MenuDay, Menus
-from api.routers.models.dish_pydantic import dish_to_pydantic
+from .dish_pydantic import dish_to_pydantic
 
 
 def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> MenuDay:

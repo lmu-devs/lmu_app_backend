@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from api.core.api_key import generate_user_api_key
+from api.core.api_key import APIKey
 from api.models.user_model import UserTable
 
 
@@ -24,7 +24,7 @@ class UserService:
         print("Storing user data of one user...")
         new_user = UserTable(
             device_id=user_data['device_id'],
-            api_key=generate_user_api_key()
+            api_key=APIKey.generate_user_key()
         )
         self.db.add(new_user)
         self.db.commit()

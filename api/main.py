@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from api.api import canteen_router, menu_router, dish_router, taste_router, user_router
+from api.routers import canteen_router, menu_router, dish_router, taste_router, user_router
 
 from shared.database import Database
 from dotenv import load_dotenv
