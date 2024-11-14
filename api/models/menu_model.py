@@ -1,7 +1,7 @@
 from pydantic import BaseModel, RootModel, field_validator
 from typing import List
 from api.database import Base
-from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, Date, UniqueConstraint
+from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from datetime import date
 
@@ -12,23 +12,18 @@ from api.models.dish_model import DishDto
     
 class MenuDayDto(BaseModel):
     date: date
+    canteen_id: str
     dishes: List[DishDto]
     
-class MenuWeekDto(BaseModel):
-    week: int
-    year: int
-    canteen_id: str
-    menu_days: List[MenuDayDto]
+class MenusDto(RootModel):
+    root: List[MenuDayDto]
     
-    @field_validator('menu_days')
+    @field_validator('root')
     def sort_menu_days(cls, v):
         return sorted(v, key=lambda x: x.date)
 
     class Config:
         from_attributes = True
-    
-class MenusDto(RootModel):
-    root: List[MenuWeekDto]
     
 
 
@@ -42,10 +37,11 @@ class MenuDishAssociation(Base):
     menu_day_date = Column(Date, nullable=False)
     menu_day_canteen_id = Column(String, nullable=False)
 
+    # Define composite foreign key
     __table_args__ = (
         ForeignKeyConstraint(
             ['menu_day_date', 'menu_day_canteen_id'],
-            ['menu_days.date', 'menu_days.menu_week_canteen_id']
+            ['menu_days.date', 'menu_days.canteen_id']
         ),
     )
 
@@ -58,43 +54,17 @@ class MenuDishAssociation(Base):
 
 
 
-class MenuWeekTable(Base):
-    __tablename__ = "menu_weeks"
-
-    week = Column(Integer, primary_key=True)
-    year = Column(Integer, primary_key=True)
-    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
-
-    # Relationships
-    canteen = relationship("CanteenTable", back_populates="menu_weeks")
-    menu_days = relationship("MenuDayTable", back_populates="menu_week", cascade="all, delete-orphan")
-
-    def __repr__(self):
-        return f"<MenuWeek(week='{self.week}', year='{self.year}', canteen_id='{self.canteen_id}')>"
-
-
 class MenuDayTable(Base):
     __tablename__ = "menu_days"
 
     date = Column(Date, primary_key=True)
-    menu_week_canteen_id = Column(String, nullable=False, primary_key=True)
-    menu_week_week = Column(Integer, nullable=False)
-    menu_week_year = Column(Integer, nullable=False)
+    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
     
-    
-    # Define the foreign key constraint
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['menu_week_week', 'menu_week_year', 'menu_week_canteen_id'],
-            ['menu_weeks.week', 'menu_weeks.year', 'menu_weeks.canteen_id']
-        ),
-    )
-
     # Relationships
-    menu_week = relationship("MenuWeekTable", back_populates="menu_days")
+    canteen = relationship("CanteenTable", back_populates="menu_days")
     dish_associations = relationship("MenuDishAssociation", back_populates="menu_day", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<MenuDay(date='{self.date}', week='{self.menu_week_week}', year='{self.menu_week_year}', canteen_id='{self.menu_week_canteen_id}')>"
+        return f"<MenuDay(date='{self.date}', canteen_id='{self.canteen_id}')>"
 
 

@@ -22,7 +22,7 @@ def create_app():
         allow_origins=["https://students-app.lmu-dev.org","http://localhost:53480"],
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE"],
-        allow_headers="*",
+        allow_headers=["*"],
     )
     
     # Middleware to add charset to JSON responses for üäö

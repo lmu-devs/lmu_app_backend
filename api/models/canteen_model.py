@@ -66,7 +66,7 @@ class CanteenTable(Base):
     # Relationships
     location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
     opening_hours = relationship("OpeningHoursTable", back_populates="canteen", cascade="all, delete-orphan")
-    menu_weeks = relationship("MenuWeekTable", back_populates="canteen", cascade="all, delete-orphan")
+    menu_days = relationship("MenuDayTable", back_populates="canteen", cascade="all, delete-orphan")
     likes = relationship("CanteenLikeTable", back_populates="canteen", cascade="all, delete-orphan")
     images = relationship("CanteenImageTable", back_populates="canteen", cascade="all, delete-orphan")
 
