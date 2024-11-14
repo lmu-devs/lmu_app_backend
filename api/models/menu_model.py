@@ -1,4 +1,4 @@
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, RootModel, field_validator
 from typing import List
 from api.database import Base
 from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, Date, UniqueConstraint
@@ -19,6 +19,13 @@ class MenuWeekDto(BaseModel):
     year: int
     canteen_id: str
     menu_days: List[MenuDayDto]
+    
+    @field_validator('menu_days')
+    def sort_menu_days(cls, v):
+        return sorted(v, key=lambda x: x.date)
+
+    class Config:
+        from_attributes = True
     
 class MenusDto(RootModel):
     root: List[MenuWeekDto]

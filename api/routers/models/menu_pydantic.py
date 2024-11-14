@@ -6,8 +6,10 @@ from api.routers.models.dish_pydantic import dish_to_pydantic
 
 
 def menu_week_to_pydantic(menu_week: MenuWeekTable, user_id: uuid.UUID = None) -> MenusDto:
+    
+    sorted_menu_days = sorted(menu_week.menu_days, key=lambda x: x.date)
     menu_days = []
-    for menu_day in menu_week.menu_days:
+    for menu_day in sorted_menu_days:
         
         dishes_dto = [
             dish_to_pydantic(

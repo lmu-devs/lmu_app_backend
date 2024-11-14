@@ -17,7 +17,9 @@ def get_menu_weeks_from_db(db: Session, canteen_id: str, year: int, week: str, c
             select(MenuWeekTable)
             .options(
                 joinedload(MenuWeekTable.canteen),
-                joinedload(MenuWeekTable.menu_days)
+                joinedload(MenuWeekTable.menu_days.and_(
+                    MenuDayTable.date.asc()
+                ))
                 .joinedload(MenuDayTable.dish_associations)
                 .joinedload(MenuDishAssociation.dish)
             )
