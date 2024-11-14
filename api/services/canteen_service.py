@@ -6,7 +6,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from api.models.canteen_model import CanteenLikeTable, CanteenTable
+from shared.models.canteen_model import CanteenLikeTable, CanteenTable
 
 
 class CanteenService:

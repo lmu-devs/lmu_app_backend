@@ -3,11 +3,13 @@ import schedule
 import time
 import signal
 import sys
-from datetime import datetime, timedelta
 
-from shared.database import Database
-from data_fetcher.service.canteen_service import update_canteen_database
-from data_fetcher.service.menu_service import update_menu_database
+from datetime import datetime, timedelta
+from sqlalchemy.orm import Session
+
+from shared.database import Database, get_db
+from data_fetcher.service.canteen_service import CanteenFetcher
+from data_fetcher.service.menu_service import MenuService
 from data_fetcher.enums.mensa_enums import CanteenID
 from shared.settings import get_settings
 
@@ -25,11 +27,12 @@ signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 # ------ Needed for stopping docker container ------ #
 
-def fetch_data_current_year():
+def fetch_data_current_year(db: Session):
     """Fetches data for the next 14 days for all canteens"""
     try:
         # Update canteen information first
-        update_canteen_database()
+        canteen_fetcher = CanteenFetcher(db)
+        canteen_fetcher.update_canteen_database()
 
         # Get current date
         date_from = datetime.now().date()
@@ -38,7 +41,8 @@ def fetch_data_current_year():
         # Update menu for each canteen
         for canteen in CanteenID:
             try:
-                update_menu_database(
+                menu_service = MenuService(db)
+                menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
                     date_to=date_from + timedelta(days=days_amount)
@@ -50,13 +54,14 @@ def fetch_data_current_year():
     except Exception as e:
         print(f"An error occurred during data fetch: {str(e)}")
 
-def fetch_scheduled_data():
+def fetch_scheduled_data(db: Session):
     """Fetches data for the next 14 days for all canteens"""
     print("Attempting to fetch data for next 14 days...")
     
     try:
         # Update canteen database first
-        update_canteen_database()
+        canteen_fetcher = CanteenFetcher(db)
+        canteen_fetcher.update_canteen_database()
 
         # Get current date
         date_from = datetime.now().date()
@@ -65,7 +70,8 @@ def fetch_scheduled_data():
         # Update menu for each canteen
         for canteen in CanteenID:
             try:
-                update_menu_database(
+                menu_service = MenuService(db)
+                menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
                     date_to=date_from + timedelta(days=days_amount)
@@ -84,7 +90,8 @@ def create_data_fetcher():
     print("Setting up schedule...")
     
     # Initial fetch
-    fetch_scheduled_data()
+    db = next(get_db())
+    fetch_scheduled_data(db)
     
     # Schedule daily updates
     schedule.every().day.at("08:08").do(fetch_scheduled_data)

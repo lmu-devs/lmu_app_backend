@@ -5,9 +5,9 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
-from api.models.canteen_model import CanteenLikeTable
-from api.models.menu_model import MenuDayTable, MenuDishAssociation
-from api.models.user_model import UserTable
+from shared.models.canteen_model import CanteenLikeTable
+from shared.models.menu_model import MenuDayTable, MenuDishAssociation
+from shared.models.user_model import UserTable
 
 
 

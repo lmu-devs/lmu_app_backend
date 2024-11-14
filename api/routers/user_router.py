@@ -4,7 +4,7 @@ from fastapi.security.api_key import APIKey as APIKeyHeader
 
 from api.core.api_key import APIKey
 from shared.database import get_db
-from api.models.user_model import UserTable
+from shared.models.user_model import UserTable
 from api.pydantics.user_pydantic import user_to_pydantic
 from api.schemas.user_scheme import User
 from api.services.user_service import UserService

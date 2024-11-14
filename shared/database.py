@@ -12,6 +12,10 @@ class Database:
                 raise ValueError("Settings required for initial Database creation")
             cls._instance = super().__new__(cls)
             cls._instance.__init__(settings)
+            
+            # Create all tables when database is first initialized
+            Base.metadata.create_all(bind=cls._instance.engine)
+            
         return cls._instance
 
     def __init__(self, settings=None):

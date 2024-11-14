@@ -1,4 +1,4 @@
-from api.models.canteen_model import CanteenTable
+from shared.models.canteen_model import CanteenTable
 from api.schemas.canteen_scheme import Canteen, Image, Weekday, OpeningHours, Location
 from api.schemas.rating_scheme import Rating
 

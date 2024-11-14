@@ -6,12 +6,12 @@ from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
 from shared.database import get_db
-from api.models.user_model import UserTable
+from shared.models.user_model import UserTable
 from api.schemas.menu_scheme import Menus
 from api.pydantics.menu_pydantic import menu_days_to_pydantic
 from api.services.menu_service import MenuService
 from data_fetcher.main import fetch_data_current_year
-from data_fetcher.service.menu_service import update_menu_database
+from data_fetcher.service.menu_service import MenuService as DataFetcherMenuService
 
 router = APIRouter()
 
@@ -46,7 +46,8 @@ async def get_menu(
     date_to = date_from + timedelta(days=days_amount)
     user_id = current_user.id if current_user else None
     
-    menu_days = MenuService(db).get_days(
+    menu_service = MenuService(db)
+    menu_days = menu_service.get_days(
         canteen_id, 
         date_from,
         date_to,
@@ -81,7 +82,8 @@ async def update_menu(
     
     date_to = date_from + timedelta(days=days_amount)
     
-    update_menu_database(
+    db = next(get_db())
+    DataFetcherMenuService(db).update_menu_database(
         canteen_id=canteen_id,
         date_from=date_from,
         date_to=date_to

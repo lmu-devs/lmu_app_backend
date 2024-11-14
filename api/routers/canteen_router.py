@@ -5,12 +5,12 @@ from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
 from shared.database import get_db
-from api.models.canteen_model import CanteenTable
-from api.models.user_model import UserTable
+from shared.models.canteen_model import CanteenTable
+from shared.models.user_model import UserTable
 from api.pydantics.canteen_pydantic import canteen_to_pydantic
 from api.schemas.canteen_scheme import Canteens
 from api.services.canteen_service import CanteenService
-from data_fetcher.service.canteen_service import update_canteen_database
+from data_fetcher.service.canteen_service import CanteenFetcher
 
 router = APIRouter()
 
@@ -45,7 +45,9 @@ async def read_canteens(
 
 @router.put("/canteens/update", response_model=dict)
 async def trigger_canteen_update(api_key: APIKey = Depends(APIKey.get_system_key_header)):
-    return {"message": update_canteen_database()}
+    db = next(get_db())
+    canteen_fetcher = CanteenFetcher(db)
+    return {"message": canteen_fetcher.update_canteen_database()}
 
 
 

@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
 from shared.database import get_db
-from api.models.canteen_model import CanteenTable
-from api.models.user_model import UserTable
+from shared.models.canteen_model import CanteenTable
+from shared.models.user_model import UserTable
 from api.schemas.dish_scheme import DishDates, Dishes
 from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
 from api.services.canteen_service import CanteenService

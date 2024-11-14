@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
-from api.models.user_model import UserTable
+from shared.models.user_model import UserTable
 
 
 

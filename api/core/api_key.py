@@ -5,7 +5,7 @@ from fastapi.security.api_key import APIKeyHeader
 from requests import Session
 
 from shared.database import get_db
-from api.models.user_model import UserTable
+from shared.models.user_model import UserTable
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 API_KEY = os.environ.get('API_KEY')

@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_
 
-from api.models.canteen_model import CanteenTable
-from api.models.dish_model import DishTable, DishLikeTable
-from api.models.menu_model import MenuDayTable, MenuDishAssociation
+from shared.models.canteen_model import CanteenTable
+from shared.models.dish_model import DishTable, DishLikeTable
+from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 
 
 class DishService:
