@@ -1,33 +1,12 @@
-from pydantic import BaseModel, RootModel, field_validator
-from typing import List
-from api.database import Base
-from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, Date
+from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint,
+                        Integer, String)
 from sqlalchemy.orm import relationship
-from datetime import date
 
-from api.models.dish_model import DishDto
-
+from api.core.database import Base
 
 
     
-class MenuDayDto(BaseModel):
-    date: date
-    canteen_id: str
-    dishes: List[DishDto]
-    
-class MenusDto(RootModel):
-    root: List[MenuDayDto]
-    
-    @field_validator('root')
-    def sort_menu_days(cls, v):
-        return sorted(v, key=lambda x: x.date)
 
-    class Config:
-        from_attributes = True
-    
-
-
-### Database Models ###
 
 class MenuDishAssociation(Base):
     __tablename__ = "menu_dish_associations"

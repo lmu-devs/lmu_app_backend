@@ -1,8 +1,9 @@
-from api.models.user_model import UserDto, UserTable
+from api.models.user_model import UserTable
+from api.schemas.user_scheme import User
 
 
-def user_to_pydantic(user: UserTable) -> UserDto:
-    return UserDto(
+def user_to_pydantic(user: UserTable) -> User:
+    return User(
         id=user.id,
         device_id=user.device_id,
         name=user.name,

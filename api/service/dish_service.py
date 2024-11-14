@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import and_
 
 from api.models.canteen_model import CanteenTable
 from api.models.dish_model import DishTable, DishLikeTable
@@ -97,11 +98,20 @@ def get_dish_dates_from_db(db: Session, dish_id: int):
         stmt = (
             select(
                 MenuDishAssociation.menu_day_date,
-                MenuDayTable.menu_week_canteen_id,
+                MenuDayTable.canteen_id,
                 CanteenTable
             )
-            .join(MenuDayTable, MenuDishAssociation.menu_day_date == MenuDayTable.date)
-            .join(CanteenTable, MenuDayTable.menu_week_canteen_id == CanteenTable.id)
+            .join(
+                MenuDayTable,
+                and_(
+                    MenuDishAssociation.menu_day_date == MenuDayTable.date,
+                    MenuDishAssociation.menu_day_canteen_id == MenuDayTable.canteen_id
+                )
+            )
+            .join(
+                CanteenTable,
+                MenuDayTable.canteen_id == CanteenTable.id
+            )
             .where(MenuDishAssociation.dish_id == dish_id)
             .order_by(MenuDishAssociation.menu_day_date)
         )
@@ -109,10 +119,15 @@ def get_dish_dates_from_db(db: Session, dish_id: int):
         dish_dates = db.execute(stmt).all()
         
         if not dish_dates:
-            raise HTTPException(status_code=404, detail=f"No dates found for dish with id {dish_id}")
+            raise HTTPException(
+                status_code=404, 
+                detail=f"No dates found for dish with id {dish_id}"
+            )
         
         return dish_dates
     except SQLAlchemyError as e:
+        print(f"Database error in get_dish_dates_from_db: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error occurred") from e
     except Exception as e:
+        print(f"Unexpected error in get_dish_dates_from_db: {str(e)}")
         raise HTTPException(status_code=500, detail="Unexpected error occurred") from e

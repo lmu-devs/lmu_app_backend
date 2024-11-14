@@ -1,47 +1,10 @@
 import enum
-from typing import List, Optional
-from pydantic import BaseModel
 from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
-from datetime import date
+
+from api.core.database import Base
 
 
-from api.database import Base
-from api.models.canteen_model import CanteenDto
-from api.models.rating_model import RatingDto
-
-
-class DishPriceDto(BaseModel):
-    category: str
-    base_price: float
-    price_per_unit: float
-    unit: str
-    
-class DishDto(BaseModel):
-    id: int
-    name: str
-    dish_type: str
-    rating: RatingDto
-    price_simple: Optional[str] = None
-    labels: List[str]
-    prices: List[DishPriceDto]
-    
-class DishesDto(BaseModel):
-    dishes: List[DishDto]
-    
-
-class DishDateDto(BaseModel):
-    date: date
-    canteens: List[CanteenDto]
-
-class DishDatesDto(BaseModel):
-    dates: List[DishDateDto]
-    
-    
-    
-    
-    
-### Database Models ###
 
 class DishTable(Base):
     __tablename__ = "dishes"

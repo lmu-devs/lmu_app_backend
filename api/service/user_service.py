@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from api.api_key import generate_user_api_key
+from api.core.api_key import generate_user_api_key
 from api.models.user_model import UserTable
 
 

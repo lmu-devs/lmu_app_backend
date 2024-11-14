@@ -5,7 +5,7 @@ import signal
 import sys
 from datetime import datetime, timedelta
 
-from api.database import init_db
+from api.core.database import init_db
 from data_fetcher.service.canteen_service import update_canteen_database
 from data_fetcher.service.menu_service import update_menu_database
 from data_fetcher.enums.mensa_enums import CanteenID

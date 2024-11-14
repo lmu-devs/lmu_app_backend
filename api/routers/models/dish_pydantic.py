@@ -1,12 +1,13 @@
-from typing import Dict
 import uuid
+from typing import Dict
 
-from api.models.dish_model import DishDatesDto, DishDateDto, DishDto, DishPriceDto, DishTable
-from api.models.rating_model import RatingDto
+from api.models.dish_model import DishTable
+from api.schemas.dish_scheme import Dish, DishDate, DishDates, DishPrice
+from api.schemas.rating_scheme import Rating
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
 
 
-def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDatesDto:
+def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:
     date_canteen_map = {}
     for date, canteen_id, canteen in results:
         if date not in date_canteen_map:
@@ -14,7 +15,7 @@ def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None)
         date_canteen_map[date].append(canteen)
 
     dish_dates = [
-        DishDateDto(
+        DishDate(
             date=date,
             canteens=[
                 canteen_to_pydantic(
@@ -26,11 +27,11 @@ def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None)
         for date, canteens in date_canteen_map.items()
     ]
 
-    return DishDatesDto(dates=dish_dates)
+    return DishDates(dates=dish_dates)
 
 
 
-def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> DishDto:
+def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
 
 
     user_likes_dish = None
@@ -39,7 +40,7 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> DishDto:
     
 
     prices = [
-        DishPriceDto(
+        DishPrice(
             category=price.category,
             base_price=price.base_price,
             price_per_unit=price.price_per_unit,
@@ -48,12 +49,12 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> DishDto:
         for price in dish.prices
     ]
     
-    rating = RatingDto(
+    rating = Rating(
         like_count=dish.like_count,
         is_liked=user_likes_dish
     )
 
-    return DishDto(
+    return Dish(
         id=dish.id,
         name=dish.name,
         dish_type=dish.dish_type,

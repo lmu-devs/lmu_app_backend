@@ -1,59 +1,11 @@
-import enum
-from pydantic import BaseModel, ConfigDict, RootModel
-from typing import List, Optional
-from api.database import Base
-from sqlalchemy import UUID, Column, DateTime, Integer, String, ForeignKey, Time, Float, Enum, func
+from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey,
+                        Integer, String, Time, func)
 from sqlalchemy.orm import relationship
-from datetime import time as datetime_time
 
-from api.models.image_model import ImageDto
-from api.models.rating_model import RatingDto
-
-class Weekday(str, enum.Enum):
-    MONDAY = "MONDAY"
-    TUESDAY = "TUESDAY"
-    WEDNESDAY = "WEDNESDAY"
-    THURSDAY = "THURSDAY"
-    FRIDAY = "FRIDAY"
-    SATURDAY = "SATURDAY"
-    SUNDAY = "SUNDAY"
-    
-class CanteenType(str, enum.Enum):
-    MENSA = "MENSA"
-    STUBISTRO = "STUBISTRO"
-    STUCAFE = "STUCAFE"
-    
+from api.core.database import Base
+from api.schemas.canteen_scheme import CanteenType
 
 
-class LocationDto(BaseModel):
-    address: str
-    latitude: float
-    longitude: float
-    
-class OpeningHoursDto(BaseModel):
-    day: Weekday
-    start_time: Optional[datetime_time]
-    end_time: Optional[datetime_time]
-    
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    
-    
-class CanteenDto(BaseModel):
-    id: str
-    name: str
-    type: CanteenType
-    location: LocationDto
-    rating: RatingDto
-    opening_hours: List[OpeningHoursDto]
-    images: List[ImageDto]
-    
-class CanteensDto(RootModel):
-    root: List[CanteenDto]
-
-
-
-
-### Database Models ###
 
 
 class CanteenTable(Base):

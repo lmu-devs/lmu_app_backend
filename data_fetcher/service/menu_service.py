@@ -2,7 +2,7 @@ import requests
 from requests.exceptions import HTTPError, RequestException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from api.database import get_db
+from api.core.database import get_db
 from datetime import datetime, date, timedelta
 
 from api.models.dish_model import DishPriceTable, DishTable

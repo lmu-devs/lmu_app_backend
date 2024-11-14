@@ -1,13 +1,14 @@
 from datetime import date, datetime, timedelta
-from typing import List
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
-from fastapi.security.api_key import APIKey
 
-from api.api_key import get_system_api_key_header, get_user_from_api_key_soft
-from api.database import get_db
-from api.models.menu_model import MenusDto
+from fastapi import APIRouter, Depends, Query
+from fastapi.security.api_key import APIKey
+from sqlalchemy.orm import Session
+
+from api.core.api_key import (get_system_api_key_header,
+                              get_user_from_api_key_soft)
+from api.core.database import get_db
 from api.models.user_model import UserTable
+from api.schemas.menu_scheme import Menus
 from api.routers.models.menu_pydantic import menu_days_to_pydantic
 from api.service.menu_service import get_menu_days_from_db
 from data_fetcher.main import fetch_data_current_year
@@ -15,7 +16,7 @@ from data_fetcher.service.menu_service import update_menu_database
 
 router = APIRouter()
 
-@router.get("/menus", response_model=MenusDto)
+@router.get("/menus", response_model=Menus)
 async def get_menu(
     date_from: date = Query(
         default=None,

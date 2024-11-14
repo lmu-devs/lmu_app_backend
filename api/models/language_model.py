@@ -1,19 +1,8 @@
-from pydantic import BaseModel
 from sqlalchemy import Column, String
 
-from api.database import Base
+from api.core.database import Base
 
-
-class LanguageDto(BaseModel):
-    country_code: str
-    flag_emoji: str
-    written: float
-    
-    
-### Database Models ###
-
-
-class Language(Base):
+class LanguageTable(Base):
     __tablename__ = "languages"
     
     country_code = Column(String, nullable=False)

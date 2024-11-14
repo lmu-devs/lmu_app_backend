@@ -1,10 +1,10 @@
-from api.models.canteen_model import CanteenDto, CanteenTable, LocationDto, OpeningHoursDto, Weekday
-from api.models.image_model import ImageDto
-from api.models.rating_model import RatingDto
+from api.models.canteen_model import CanteenTable
+from api.schemas.canteen_scheme import Canteen, Image, Weekday, OpeningHours, Location
+from api.schemas.rating_scheme import Rating
 
 
-def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenDto:
-    location = LocationDto(
+def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> Canteen:
+    location = Location(
         address=canteen.location.address,
         latitude=float(canteen.location.latitude),
         longitude=float(canteen.location.longitude)
@@ -24,7 +24,7 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
     for oh in canteen.opening_hours:
         weekday = day_mapping.get(oh.day)
         if weekday:
-            opening_hours.append(OpeningHoursDto(
+            opening_hours.append(OpeningHours(
                 day=weekday,
                 start_time=oh.start_time,
                 end_time=oh.end_time
@@ -32,21 +32,21 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
     
     like_count_value = canteen.like_count
     
-    rating = RatingDto(
+    rating = Rating(
         like_count=like_count_value, 
         is_liked=user_likes_canteen
         )
     
     images = []
     for image in canteen.images:
-        image_dto = ImageDto(
+        image_dto = Image(
             url=image.url,
             name=image.name
         )
         images.append(image_dto)
         
 
-    return CanteenDto(
+    return Canteen(
         id=canteen.id,
         name=canteen.name,
         type=canteen.type,

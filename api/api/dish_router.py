@@ -1,22 +1,22 @@
 from typing import Annotated, List
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from api.core.api_key import (get_user_from_api_key, get_user_from_api_key_soft)
+from api.core.database import get_db
 from api.models.canteen_model import CanteenTable
-from api.models.dish_model import DishDatesDto, DishesDto
 from api.models.user_model import UserTable
-from api.api_key import get_user_from_api_key_soft, get_user_from_api_key
-from api.database import get_db
-from api.routers.models.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
+from api.schemas.dish_scheme import DishDates, Dishes
+from api.routers.models.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
 from api.service.canteen_service import get_user_liked_canteens
-from api.service.dish_service import get_dish_dates_from_db, get_dishes_from_db, toggle_dish_like
-
+from api.service.dish_service import (get_dish_dates_from_db, get_dishes_from_db, toggle_dish_like)
 
 router = APIRouter()
 
 
 # Gets dish data
-@router.get("/dishes", response_model=DishesDto)
+@router.get("/dishes", response_model=Dishes)
 async def get_dish(
     dish_id: Annotated[int, Query(
         description="Specific dish ID to fetch",
@@ -32,12 +32,12 @@ async def get_dish(
     user_id = current_user.id if current_user else None
     dishes = get_dishes_from_db(db, dish_id, user_id, only_liked_dishes)
     
-    return DishesDto(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
+    return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 
 
 
 # Gets list of multiple canteens where dish is available in past and future dates
-@router.get("/dishes/dates", response_model=DishDatesDto)
+@router.get("/dishes/dates", response_model=DishDates)
 async def read_dish_dates(
     dish_id: Annotated[int, Query(
         ..., 

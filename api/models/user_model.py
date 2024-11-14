@@ -1,22 +1,8 @@
-from pydantic import BaseModel
-from typing import List
-from api.database import Base
+from api.core.database import Base
 from sqlalchemy import Column, String, DateTime, UUID, func
 from sqlalchemy.orm import relationship
-from datetime import datetime
 import uuid
 
-class UserDto(BaseModel):
-    id: uuid.UUID
-    device_id: str
-    name: str | None
-    email: str | None
-    password: str | None
-    api_key: str
-    creation_date: datetime
-    
-
-# Tables
     
 class UserTable(Base):
     __tablename__ = "users"

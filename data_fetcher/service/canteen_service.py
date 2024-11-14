@@ -3,7 +3,7 @@ import requests
 from sqlalchemy.orm import Session
 from api.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from datetime import datetime
-from api.database import get_db
+from api.core.database import get_db
 from data_fetcher.service.images_service import generate_image_urls
 from data_fetcher.static.constants import base_url
 
