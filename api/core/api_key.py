@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security.api_key import APIKeyHeader
 from requests import Session
 
-from api.core.database import get_db
+from shared.database import get_db
 from api.models.user_model import UserTable
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)

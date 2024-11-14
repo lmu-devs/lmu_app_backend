@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey
 
 from api.core.api_key import get_system_api_key_header
-from api.core.database import get_db
+from shared.database import get_db
 from api.models.user_model import UserTable
 from api.routers.models.user_pydantic import user_to_pydantic
 from api.schemas.user_scheme import User

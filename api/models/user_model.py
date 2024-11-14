@@ -1,4 +1,4 @@
-from api.core.database import Base
+from shared.database import Base
 from sqlalchemy import Column, String, DateTime, UUID, func
 from sqlalchemy.orm import relationship
 import uuid

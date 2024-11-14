@@ -10,6 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./data_fetcher /app/data_fetcher
 COPY ./api /app/api
+COPY ./shared /app/shared
 
 # COPY . .
 

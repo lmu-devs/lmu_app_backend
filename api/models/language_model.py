@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 
-from api.core.database import Base
+from shared.database import Base
 
 class LanguageTable(Base):
     __tablename__ = "languages"

@@ -2,7 +2,7 @@ import enum
 from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from api.core.database import Base
+from shared.database import Base
 
 
 

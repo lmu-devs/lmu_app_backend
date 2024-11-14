@@ -2,8 +2,10 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from api.api import canteen_router, menu_router, dish_router, taste_router, user_router
 
-from api.core.database import init_db
+from shared.database import Database
 from dotenv import load_dotenv
+
+from shared.settings import get_settings
 
 
 def create_app():
@@ -38,7 +40,8 @@ def create_app():
         return {"message": "Hello Wörld"}
     
     # Initialize the database
-    session = init_db()
+    settings = get_settings()
+    Database(settings=settings)
 
     return app
 

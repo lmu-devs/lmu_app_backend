@@ -8,11 +8,13 @@ class Settings(BaseSettings):
     
     API_KEY: str
     
+    
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
     POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str
+
     
     CORS_ORIGINS: list[str] = [
         "https://lmu-students.lmu-dev.org",

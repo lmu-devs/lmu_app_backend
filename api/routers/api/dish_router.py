@@ -3,14 +3,16 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from api.core.api_key import (get_user_from_api_key, get_user_from_api_key_soft)
+from api.core.api_key import get_user_from_api_key, get_user_from_api_key_soft
 from shared.database import get_db
 from api.models.canteen_model import CanteenTable
+from api.models.dish_model import DishDates, Dishes
 from api.models.user_model import UserTable
-from api.schemas.dish_scheme import DishDates, Dishes
-from api.routers.models.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
-from api.services.canteen_service import CanteenService
-from api.services.dish_service import DishService
+from api.routers.models.dish_pydantic import (dish_dates_to_pydantic,
+                                              dish_to_pydantic)
+from api.service.canteen_service import get_user_liked_canteens
+from api.service.dish_service import (get_dish_dates_from_db,
+                                      get_dishes_from_db, toggle_dish_like)
 
 router = APIRouter()
 
@@ -30,7 +32,7 @@ async def get_dish(
     ):
     
     user_id = current_user.id if current_user else None
-    dishes = DishService(db).get_dishes(dish_id, user_id, only_liked_dishes)
+    dishes = get_dishes_from_db(db, dish_id, user_id, only_liked_dishes)
     
     return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 
@@ -50,13 +52,13 @@ async def read_dish_dates(
     current_user: UserTable = Depends(get_user_from_api_key_soft)
     ):
     
-    dish_dates = DishService(db).get_dates(dish_id)
+    dish_dates = get_dish_dates_from_db(db, dish_id)
     
     user_likes_canteen = None
     
     if current_user:
         canteens: List[CanteenTable] = [row[2] for row in dish_dates]
-        user_likes_canteen = CanteenService(db).get_user_liked(current_user.id, canteens)
+        user_likes_canteen = get_user_liked_canteens(current_user.id, canteens, db)
     
     return dish_dates_to_pydantic(dish_dates, user_likes_canteen)
 
@@ -71,7 +73,7 @@ def toggle_like(
     current_user: UserTable = Depends(get_user_from_api_key)
     ):
 
-    like_status = DishService(db).toggle_like(dish_id, current_user.id)
+    like_status = toggle_dish_like(dish_id, current_user.id, db)
     return like_status
 
     

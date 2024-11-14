@@ -2,7 +2,7 @@ from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey,
                         Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 
-from api.core.database import Base
+from shared.database import Base
 from api.schemas.canteen_scheme import CanteenType
 
 

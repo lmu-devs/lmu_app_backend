@@ -5,10 +5,11 @@ import signal
 import sys
 from datetime import datetime, timedelta
 
-from api.core.database import init_db
+from shared.database import Database
 from data_fetcher.service.canteen_service import update_canteen_database
 from data_fetcher.service.menu_service import update_menu_database
 from data_fetcher.enums.mensa_enums import CanteenID
+from shared.settings import get_settings
 
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
@@ -99,7 +100,8 @@ if __name__ == "__main__":
     print("Script started")
     try:
         # Initialize the database
-        init_db()
+        settings = get_settings()
+        Database(settings=settings)
         
         # Start the main loop
         create_data_fetcher()

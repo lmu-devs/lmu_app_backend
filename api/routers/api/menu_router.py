@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from typing import List
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.security.api_key import APIKey
@@ -7,10 +8,10 @@ from sqlalchemy.orm import Session
 from api.core.api_key import (get_system_api_key_header,
                               get_user_from_api_key_soft)
 from shared.database import get_db
+from api.models.menu_model import Menus
 from api.models.user_model import UserTable
-from api.schemas.menu_scheme import Menus
 from api.routers.models.menu_pydantic import menu_days_to_pydantic
-from api.services.menu_service import MenuService
+from api.service.menu_service import get_menu_days_from_db
 from data_fetcher.main import fetch_data_current_year
 from data_fetcher.service.menu_service import update_menu_database
 
@@ -47,7 +48,8 @@ async def get_menu(
     date_to = date_from + timedelta(days=days_amount)
     user_id = current_user.id if current_user else None
     
-    menu_days = MenuService(db).get_days(
+    menu_days = get_menu_days_from_db(
+        db, 
         canteen_id, 
         date_from,
         date_to,

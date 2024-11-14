@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from api.core.api_key import (get_system_api_key_header, get_user_from_api_key,
                               get_user_from_api_key_soft)
-from api.core.database import get_db
+from shared.database import get_db
 from api.models.canteen_model import CanteenTable
 from api.models.user_model import UserTable
 from api.routers.models.canteen_pydantic import canteen_to_pydantic
