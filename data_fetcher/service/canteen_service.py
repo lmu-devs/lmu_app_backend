@@ -5,14 +5,13 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from shared.core.exceptions import DataFetchError, DataProcessingError
-from shared.core.logging import setup_logger
+from shared.core.logging import get_data_fetcher_logger
 from shared.database import get_db
 from shared.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from data_fetcher.service.images_service import ImageService
 from shared.settings import get_settings
 
-logger = setup_logger(__name__, "data_fetcher")
-
+logger = get_data_fetcher_logger(__name__)
 class CanteenFetcher:
     """
     Fetches canteen data from the tum-eat-api and stores it in the database.
@@ -20,7 +19,7 @@ class CanteenFetcher:
     
     def __init__(self, db: Session):
         self.db = db
-    
+        
     def fetch_canteen_data(self):
         try:
             url = "https://tum-dev.github.io/eat-api/enums/canteens.json"

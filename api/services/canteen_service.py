@@ -9,11 +9,14 @@ from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable, CanteenTable
 from shared.core.logging import get_canteen_logger
 
+logger = get_canteen_logger(__name__)
+
+
+
 class CanteenService:
     def __init__(self, db: Session) -> None:
         """Initialize the CanteenService with a database session."""
         self.db = db
-        self.logger = get_canteen_logger(__name__)
     
     def get_canteen(self, canteen_id: str) -> CanteenTable:
         """Retrieve a canteen from the database by its ID."""
@@ -21,14 +24,14 @@ class CanteenService:
             stmt = select(CanteenTable).where(CanteenTable.id == canteen_id)
             canteen = self.db.execute(stmt).scalar_one_or_none()
             if canteen is None:
-                self.logger.error(f"Canteen with id {canteen_id} not found")
+                logger.error(f"Canteen with id {canteen_id} not found")
                 raise NotFoundError(
                 detail=f"Canteen with id {canteen_id} not found",
                 extra={"canteen_id": canteen_id}
             )
             return canteen
         except SQLAlchemyError as e:
-            self.logger.error(f"Failed to fetch canteen: {str(e)}")
+            logger.error(f"Failed to fetch canteen: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch canteen",
                 extra={"original_error": str(e)}
@@ -45,7 +48,7 @@ class CanteenService:
             canteen_like = self.db.execute(stmt).scalar_one_or_none()
             return canteen_like
         except SQLAlchemyError as e:
-            self.logger.error(f"Failed to fetch canteen like status: {str(e)}")
+            logger.error(f"Failed to fetch canteen like status: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch canteen like status",
                 extra={

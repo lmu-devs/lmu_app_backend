@@ -5,19 +5,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.service.price_service import PriceService
-from shared.core.exceptions import (DatabaseError, DataProcessingError,
-                                    ExternalAPIError)
-from shared.core.logging import setup_logger
+from shared.core.exceptions import (DatabaseError, DataProcessingError,ExternalAPIError)
+from shared.core.logging import get_data_fetcher_logger
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 
-logger = setup_logger(__name__, "data_fetcher")
+logger = get_data_fetcher_logger(__name__)
 
 class MenuFetcher:
     
     def __init__(self, db: Session):
         self.db = db
-    
+
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
         
@@ -127,11 +126,13 @@ class MenuFetcher:
             self.db.commit()
             logger.info("Menu data stored successfully.")
         except IntegrityError as e:
+            logger.error(f"Database integrity error while storing menu data: {str(e)}")
             raise DatabaseError(
                 detail="Database integrity error while storing menu data",
                 extra={"error": str(e)}
             )
         except Exception as e:
+            logger.error(f"Failed to process menu data: {str(e)}")
             raise DataProcessingError(
                 detail="Failed to process menu data",
                 extra={"error": str(e)}
@@ -153,6 +154,7 @@ class MenuFetcher:
                 current_date += timedelta(days=7)
             logger.info("Menu data updated successfully!")
         except Exception as e:
+            logger.error(f"Failed to update menu database: {str(e)}")
             raise DataProcessingError(
                 detail="Failed to update menu database",
                 extra={"error": str(e)}
