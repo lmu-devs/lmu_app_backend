@@ -12,7 +12,7 @@ from api.services.user_service import UserService
 
 router = APIRouter()
 
-@router.post("/users/create", response_model=User)
+@router.post("/users/create", response_model=User, description="Create a new user and return the user object. Returns the user object if the user already exists.")
 def create_user(device_id: str, db: Session = Depends(get_db), api_key: APIKeyHeader = Depends(APIKey.get_system_key_header)):
     existing_user = db.query(UserTable).filter(UserTable.device_id == device_id).first()
     if existing_user:

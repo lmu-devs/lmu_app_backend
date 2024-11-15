@@ -15,8 +15,8 @@ from api.services.canteen_service import CanteenService
 router = APIRouter()
 
 
-@router.get("/canteens", response_model=Canteens)
-async def read_canteens(
+@router.get("/canteens", response_model=Canteens, description="Get all canteens or a specific canteen by ID. Authenticated users can also get liked canteens.", )
+async def get_canteens(
     canteen_id: Optional[str] = Query(None, description="Specific canteen ID to fetch"),
     db: Session = Depends(get_db),
     current_user: Optional[UserTable] = Depends(APIKey.get_user_from_key_soft)
@@ -43,7 +43,7 @@ async def read_canteens(
 
 
 
-@router.post("/canteens/toggle-like", response_model=bool)
+@router.post("/canteens/toggle-like", response_model=bool, description="Authenticated user can toggle like for a canteen. Returns True if the canteen was liked, False if it was unliked.")
 def toggle_like(
     canteen_id: str,
     db: Session = Depends(get_db),

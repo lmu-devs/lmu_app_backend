@@ -12,7 +12,7 @@ from api.routers import canteen_router, menu_router, dish_router, taste_router, 
 
 def create_app():
     load_dotenv()
-    app = FastAPI(title="lmu-eat-api", description="API for canteen and menu data from munich.", version="0.1.0")
+    app = FastAPI(title="lmu-dev-api", description="API for Students App in Munich.", version="0.1.0", docs_url="/docs", contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"})
     
     # Add exception handlers
     app.add_exception_handler(Exception, api_error_handler)
@@ -20,11 +20,12 @@ def create_app():
     
     # Include routers
     app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])
-    app.include_router(menu_router.router,      prefix="/eat/v1", tags=["menu"])
-    app.include_router(dish_router.router,      prefix="/eat/v1", tags=["dish"])
+    app.include_router(menu_router.router,      prefix="/eat/v1", tags=["canteen"])
+    app.include_router(dish_router.router,      prefix="/eat/v1", tags=["canteen"])
+    app.include_router(taste_router.router,     prefix="/eat/v1", tags=["canteen"])
     app.include_router(user_router.router,      prefix="/eat/v1", tags=["user"])
-    app.include_router(taste_router.router,     prefix="/eat/v1", tags=["taste"])
     
+    # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["https://students-app.lmu-dev.org","http://localhost:53480"],
@@ -41,7 +42,7 @@ def create_app():
             response.headers["content-type"] = "application/json; charset=utf-8"
         return response
 
-    @app.get("/")
+    @app.get("/", include_in_schema=False)
     async def root():
         return {"message": "Hello Wörld"}
     

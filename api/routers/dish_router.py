@@ -16,7 +16,7 @@ router = APIRouter()
 
 
 # Gets dish data
-@router.get("/dishes", response_model=Dishes)
+@router.get("/dishes", response_model=Dishes, description="Get all dishes or a specific dish by ID. Authenticated users can also get liked dishes.")
 async def get_dish(
     id: Annotated[int, Query(
         description="Specific dish ID to fetch",
@@ -37,7 +37,7 @@ async def get_dish(
 
 
 # Gets list of multiple canteens where dish is available in past and future dates
-@router.get("/dishes/dates", response_model=DishDates)
+@router.get("/dishes/dates", response_model=DishDates, description="Get all canteens where a dish is available in past and future dates")
 async def read_dish_dates(
     dish_id: Annotated[int, Query(
         ..., 
@@ -64,7 +64,7 @@ async def read_dish_dates(
 
 
 
-@router.post("/dishes/toggle-like", response_model=bool)
+@router.post("/dishes/toggle-like", response_model=bool, description="Authenticated user can toggle like for a dish. Returns True if the dish was liked, False if it was unliked.")
 def toggle_like(
     dish_id: int, 
     db: Session = Depends(get_db), 

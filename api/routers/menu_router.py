@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
@@ -12,12 +13,12 @@ from api.services.menu_service import MenuService
 
 router = APIRouter()
 
-@router.get("/menus", response_model=Menus)
+@router.get("/menus", response_model=Menus, description="Get all menus or a specific canteen by ID. Authenticated users can also get liked dishes.")
 async def get_menu(
-    date_from: date = Query(
-        default=None,
+    date_from: Optional[date] = Query(
+        default=datetime.now().date(),
         description="Start date for menu search. Defaults to today",
-        example="2024-11-14"
+        example=datetime.now().date()
         
     ),
     days_amount: int = Query(
@@ -28,7 +29,8 @@ async def get_menu(
     ),
     canteen_id: str = Query(
         default=None,
-        description="Filter by canteen_id, if not provided, all canteens will be fetched"
+        description="Filter by canteen_id, if not provided, all canteens will be fetched",
+        example="mensa-leopoldstr"
     ),
     current_user: UserTable = Depends(APIKey.get_user_from_key_soft),
     only_liked_canteens: bool = Query(
@@ -37,11 +39,10 @@ async def get_menu(
     ),
     db: Session = Depends(get_db)
 ):
-    if date_from is None:
-        date_from = datetime.now().date()
     
     date_to = date_from + timedelta(days=days_amount)
     user_id = current_user.id if current_user else None
+    
     
     menu_service = MenuService(db)
     menu_days = menu_service.get_days(
