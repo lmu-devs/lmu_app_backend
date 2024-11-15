@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get("/canteens", response_model=Canteens, description="Get all canteens or a specific canteen by ID. Authenticated users can also get liked canteens.", )
 async def get_canteens(
-    canteen_id: Optional[str] = Query(None, description="Specific canteen ID to fetch"),
+    canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr"),
     db: Session = Depends(get_db),
     current_user: Optional[UserTable] = Depends(APIKey.get_user_from_key_soft)
 ):

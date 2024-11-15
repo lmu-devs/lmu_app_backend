@@ -4,21 +4,33 @@ from typing import List, Tuple
 from sqlalchemy.orm import Session
 from datetime import datetime
 
+from shared.core.exceptions import DataFetchError, DataProcessingError
+from shared.core.logging import setup_logger
 from shared.database import get_db
 from shared.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from data_fetcher.service.images_service import ImageService
 from data_fetcher.static.constants import base_url
 
 class CanteenFetcher:
+    """
+    Fetches canteen data from the tum-eat-api and stores it in the database.
+    """
+    logger = setup_logger("data_fetcher", "fetcher")
+    
     def __init__(self, db: Session):
         self.db = db
     
     def fetch_canteen_data(self):
-        url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
-        response = requests.get(url)
-        response.raise_for_status()
-        print("Response tum-dev eat-api: ", response.status_code)
-        return response.json()
+        try:
+            url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
+            response = requests.get(url)
+            response.raise_for_status()
+            self.logger.info(f"Successfully fetched canteen data from TUM API: {response.status_code}")
+            return response.json()
+        except Exception as e:
+            message = f"Error while fetching canteen data from TUM API: {str(e)}"
+            self.logger.error(message)
+            raise DataFetchError(message)
 
 
     def set_canteen_images(self, canteen_table: CanteenTable, files: List[Tuple[str, str]]):
@@ -44,7 +56,7 @@ class CanteenFetcher:
                 )
                 self.db.add(new_image)
                 
-        print("Finished adding canteen images")
+        self.logger.info(f"Added {image_count} canteen images for {canteen_table.name}")
 
 
     def process_canteen_name(self, full_name: str) -> Tuple[str, CanteenType]:
@@ -83,77 +95,76 @@ class CanteenFetcher:
         
 
     def store_canteen_data(self, canteens: list):
-        print("Storing canteen data...")
+        self.logger.info("Storing canteen data...")
         for canteen in canteens:
-            # Update Canteen
-            canteen_id = canteen['canteen_id']
-            
-            canteen_obj = self.db.query(CanteenTable).filter(CanteenTable.id == canteen_id).first()
-            if not canteen_obj:
-                canteen_obj = CanteenTable(id=canteen_id)
-            
-            # Update Name
-            name = canteen['name']
-            
-            clean_name, canteen_type = self.process_canteen_name(canteen['name'])
-            canteen_obj.name = clean_name
-            canteen_obj.type = canteen_type
-
-            # Update Location
-            location = canteen['location']
-            address = location['address']
-            latitude = location['latitude']
-            longitude = location['longitude']
-            
-            canteen_obj.location = LocationTable(canteen_id=canteen_obj.id, address=address, latitude=latitude, longitude=longitude)
-
-            # Update Opening Hours
-            open_hours = canteen['open_hours']
-            
-            # Update Canteen Images
-            directory_path = "data_fetcher/assets/canteens/"
-            image_url_prefix = f"{base_url}/images/"
-            files = ImageService.generate_image_urls(directory_path, image_url_prefix)
-            self.set_canteen_images(canteen_obj, files)
-            
-            opening_hours = []
-            for day, hours in open_hours.items():
-                start_time = datetime.strptime(hours['start'], '%H:%M').time()
-                end_time = datetime.strptime(hours['end'], '%H:%M').time()
+            try:
+                # Update Canteen
+                canteen_id = canteen['canteen_id']
                 
-                opening_hour = OpeningHoursTable(
-                    canteen_id=canteen_id,
-                    day=day,
-                    start_time=start_time,
-                    end_time=end_time
-                )
-                opening_hours.append(opening_hour)
+                canteen_obj = self.db.query(CanteenTable).filter(CanteenTable.id == canteen_id).first()
+                if not canteen_obj:
+                    canteen_obj = CanteenTable(id=canteen_id)
                 
-            canteen_obj.opening_hours = opening_hours
-            
-            # Save to database
-            self.db.add(canteen_obj)
-            self.db.add(canteen_obj.location)
-            self.db.add_all(canteen_obj.opening_hours)
-            
-        # Commit changes
-        self.db.commit()
+                # Update Name
+                clean_name, canteen_type = self.process_canteen_name(canteen['name'])
+                canteen_obj.name = clean_name
+                canteen_obj.type = canteen_type
+
+                # Update Location
+                location = canteen['location']
+                address = location['address']
+                latitude = location['latitude']
+                longitude = location['longitude']
+                
+                canteen_obj.location = LocationTable(canteen_id=canteen_obj.id, address=address, latitude=latitude, longitude=longitude)
+
+                # Update Opening Hours
+                open_hours = canteen['open_hours']
+                
+                # Update Canteen Images
+                directory_path = "shared/images/canteens/"
+                image_url_prefix = f"{base_url}/images/"
+                files = ImageService.generate_image_urls(directory_path, image_url_prefix)
+                self.set_canteen_images(canteen_obj, files)
+                
+                opening_hours = []
+                for day, hours in open_hours.items():
+                    start_time = datetime.strptime(hours['start'], '%H:%M').time()
+                    end_time = datetime.strptime(hours['end'], '%H:%M').time()
+                    
+                    opening_hour = OpeningHoursTable(
+                        canteen_id=canteen_id,
+                        day=day,
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+                    opening_hours.append(opening_hour)
+                    
+                canteen_obj.opening_hours = opening_hours
+                
+                # Save to database
+                self.db.add(canteen_obj)
+                self.db.add(canteen_obj.location)
+                self.db.add_all(canteen_obj.opening_hours)
+                
+                # Commit changes
+                self.db.commit()
+            except Exception as e:
+                message = f"Error while storing canteen data: {str(e)}"
+                self.logger.error(message)
+                raise DataProcessingError(message)
 
 
-    def update_canteen_database(self) -> str:
+    def update_canteen_database(self):
         print("\n==============================================================")
-        print("Updating canteen data...")
+        self.logger.info("Updating canteen data...")
         try:
             canteen_data = self.fetch_canteen_data()
             self.store_canteen_data(canteen_data)
-            message = "Canteen data updated successfully!"
-            print(message)
+            self.logger.info("Canteen data updated successfully!")
             print("==============================================================\n")
-            return message
         except Exception as e:
-            message = f"Error while updating canteen database: {str(e)}"
-            print(message)
-            return message
+            self.logger.error(f"Error while updating canteen database: {str(e)}")
         finally:
             self.db.close()
 

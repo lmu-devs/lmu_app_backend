@@ -43,7 +43,7 @@ class MenuService:
 
 
     def store_menu_data(self, data: dict, canteen_id: str):
-        print("Storing menu data...")
+        logger.info(f"Storing menu data for canteen {canteen_id}")
         
         try:
             week = data.get('number')
@@ -52,7 +52,7 @@ class MenuService:
             if not week or not year:
                 raise ValueError("Week or year data is missing")
             
-            print(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
+            logger.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
             
             # Get all days from the API response
             api_days = {day.get('date'): day for day in data.get('days', [])}
@@ -124,7 +124,7 @@ class MenuService:
                                 price_obj.unit = price_data.get('unit')
             
             self.db.commit()
-            print("Menu data stored successfully.")
+            logger.info("Menu data stored successfully.")
         except IntegrityError as e:
             raise DatabaseError(
                 detail="Database integrity error while storing menu data",

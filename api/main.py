@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
@@ -17,6 +18,9 @@ def create_app():
     # Add exception handlers
     app.add_exception_handler(Exception, api_error_handler)
     app.add_exception_handler(APIException, api_error_handler)
+    
+    # Add static files
+    app.mount(path="/eat/v1/images", app= StaticFiles(directory="/app/shared/images/canteens"), name="images")
     
     # Include routers
     app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])
