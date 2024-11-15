@@ -4,13 +4,12 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, date, timedelta
 
-from shared.core.logging import setup_logger
+from shared.core.logging import logger_fetcher
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.core.exceptions import ExternalAPIError, DataProcessingError, DatabaseError
 from data_fetcher.service.price_service import PriceService
 
-logger = setup_logger("menu_service", "menu")
 class MenuService:
     
     def __init__(self, db: Session):
@@ -22,7 +21,7 @@ class MenuService:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            logger.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
+            logger_fetcher.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
             return response.json()
         except requests.exceptions.HTTPError as e:
             raise ExternalAPIError(
@@ -43,7 +42,7 @@ class MenuService:
 
 
     def store_menu_data(self, data: dict, canteen_id: str):
-        logger.info(f"Storing menu data for canteen {canteen_id}")
+        logger_fetcher.info(f"Storing menu data for canteen {canteen_id}")
         
         try:
             week = data.get('number')
@@ -52,7 +51,7 @@ class MenuService:
             if not week or not year:
                 raise ValueError("Week or year data is missing")
             
-            logger.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
+            logger_fetcher.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
             
             # Get all days from the API response
             api_days = {day.get('date'): day for day in data.get('days', [])}
@@ -124,7 +123,7 @@ class MenuService:
                                 price_obj.unit = price_data.get('unit')
             
             self.db.commit()
-            logger.info("Menu data stored successfully.")
+            logger_fetcher.info("Menu data stored successfully.")
         except IntegrityError as e:
             raise DatabaseError(
                 detail="Database integrity error while storing menu data",

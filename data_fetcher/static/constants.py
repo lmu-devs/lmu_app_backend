@@ -1,1 +1,0 @@
-base_url = "https://api.lmu-dev.org"

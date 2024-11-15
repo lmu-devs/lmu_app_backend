@@ -13,6 +13,9 @@ from api.routers import canteen_router, menu_router, dish_router, taste_router, 
 
 def create_app():
     load_dotenv()
+    settings = get_settings()
+    eat_prefix = settings.BASE_PREFIX_EAT
+    
     app = FastAPI(title="lmu-dev-api", description="API for Students App in Munich.", version="0.1.0", docs_url="/docs", contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"})
     
     # Add exception handlers
@@ -20,14 +23,14 @@ def create_app():
     app.add_exception_handler(APIException, api_error_handler)
     
     # Add static files
-    app.mount(path="/eat/v1/images", app= StaticFiles(directory="/app/shared/images/canteens"), name="images")
+    app.mount(path=f"{eat_prefix}/images", app= StaticFiles(directory="/app/shared/images/canteens"), name="images")
     
     # Include routers
-    app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])
-    app.include_router(menu_router.router,      prefix="/eat/v1", tags=["canteen"])
-    app.include_router(dish_router.router,      prefix="/eat/v1", tags=["canteen"])
-    app.include_router(taste_router.router,     prefix="/eat/v1", tags=["canteen"])
-    app.include_router(user_router.router,      prefix="/eat/v1", tags=["user"])
+    app.include_router(canteen_router.router,   prefix=eat_prefix, tags=["canteen"])
+    app.include_router(menu_router.router,      prefix=eat_prefix, tags=["canteen"])
+    app.include_router(dish_router.router,      prefix=eat_prefix, tags=["canteen"])
+    app.include_router(taste_router.router,     prefix=eat_prefix, tags=["canteen"])
+    app.include_router(user_router.router,      prefix=eat_prefix, tags=["user"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
@@ -51,7 +54,6 @@ def create_app():
         return {"message": "Hello Wörld"}
     
     # Initialize the database
-    settings = get_settings()
     Database(settings=settings)
 
     return app

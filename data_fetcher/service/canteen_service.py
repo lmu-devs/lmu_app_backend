@@ -5,17 +5,16 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from shared.core.exceptions import DataFetchError, DataProcessingError
-from shared.core.logging import setup_logger
+from shared.core.logging import logger_fetcher
 from shared.database import get_db
 from shared.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from data_fetcher.service.images_service import ImageService
-from data_fetcher.static.constants import base_url
+from shared.settings import get_settings
 
 class CanteenFetcher:
     """
     Fetches canteen data from the tum-eat-api and stores it in the database.
     """
-    logger = setup_logger("data_fetcher", "fetcher")
     
     def __init__(self, db: Session):
         self.db = db
@@ -25,11 +24,11 @@ class CanteenFetcher:
             url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
             response = requests.get(url)
             response.raise_for_status()
-            self.logger.info(f"Successfully fetched canteen data from TUM API: {response.status_code}")
+            logger_fetcher.info(f"Successfully fetched canteen data from TUM API: {response.status_code}")
             return response.json()
         except Exception as e:
             message = f"Error while fetching canteen data from TUM API: {str(e)}"
-            self.logger.error(message)
+            logger_fetcher.error(message)
             raise DataFetchError(message)
 
 
@@ -52,11 +51,11 @@ class CanteenFetcher:
                 new_image = CanteenImageTable(
                     canteen_id=canteen_table.id,
                     url=url,
-                    name=f"{canteen_table.name} Image {len(canteen_table.images)} {image_count}",
+                    name=f"{location} Image {image_count}",
                 )
                 self.db.add(new_image)
                 
-        self.logger.info(f"Added {image_count} canteen images for {canteen_table.name}")
+        logger_fetcher.info(f"Added {image_count} canteen images for {location}")
 
 
     def process_canteen_name(self, full_name: str) -> Tuple[str, CanteenType]:
@@ -95,7 +94,7 @@ class CanteenFetcher:
         
 
     def store_canteen_data(self, canteens: list):
-        self.logger.info("Storing canteen data...")
+        logger_fetcher.info("Storing canteen data...")
         for canteen in canteens:
             try:
                 # Update Canteen
@@ -123,7 +122,8 @@ class CanteenFetcher:
                 
                 # Update Canteen Images
                 directory_path = "shared/images/canteens/"
-                image_url_prefix = f"{base_url}/images/"
+                settings = get_settings()
+                image_url_prefix = f"{settings.BASE_URL}{settings.BASE_PREFIX_EAT}/images/"
                 files = ImageService.generate_image_urls(directory_path, image_url_prefix)
                 self.set_canteen_images(canteen_obj, files)
                 
@@ -151,20 +151,20 @@ class CanteenFetcher:
                 self.db.commit()
             except Exception as e:
                 message = f"Error while storing canteen data: {str(e)}"
-                self.logger.error(message)
+                logger_fetcher.error(message)
                 raise DataProcessingError(message)
 
 
     def update_canteen_database(self):
         print("\n==============================================================")
-        self.logger.info("Updating canteen data...")
+        logger_fetcher.info("Updating canteen data...")
         try:
             canteen_data = self.fetch_canteen_data()
             self.store_canteen_data(canteen_data)
-            self.logger.info("Canteen data updated successfully!")
+            logger_fetcher.info("Canteen data updated successfully!")
             print("==============================================================\n")
         except Exception as e:
-            self.logger.error(f"Error while updating canteen database: {str(e)}")
+            logger_fetcher.error(f"Error while updating canteen database: {str(e)}")
         finally:
             self.db.close()
 

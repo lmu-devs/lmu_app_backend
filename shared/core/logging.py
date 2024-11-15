@@ -30,3 +30,5 @@ def setup_logger(name: str, log_file: str = None):
         logger.addHandler(file_handler)
     
     return logger 
+
+logger_fetcher = setup_logger("data_fetcher", "fetcher")
