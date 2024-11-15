@@ -60,11 +60,11 @@ class MenuService:
             if not menu_days:
                 raise NotFoundError(
                     detail="No menus found for the specified period",
-                    extra={"canteen_id": canteen_id, "date_from": date_from, "date_to": date_to}
+                    extra={"canteen_id": canteen_id, "date_from": date_from.isoformat(), "date_to": date_to.isoformat()}
                 )
             
             return menu_days
-        
+
         except SQLAlchemyError as e:
             raise DatabaseError(
                 detail="Failed to fetch menus",

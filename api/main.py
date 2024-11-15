@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from shared.core.error_handlers import api_error_handler
+from shared.core.exceptions import APIException
 from shared.settings import get_settings
 from shared.database import Database
 from api.routers import canteen_router, menu_router, dish_router, taste_router, user_router
@@ -15,6 +16,7 @@ def create_app():
     
     # Add exception handlers
     app.add_exception_handler(Exception, api_error_handler)
+    app.add_exception_handler(APIException, api_error_handler)
     
     # Include routers
     app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])

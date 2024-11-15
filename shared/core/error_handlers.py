@@ -16,7 +16,7 @@ def create_error_response(error_code: str, message: str, extra: Dict[str, Any] =
         }
     }
 
-def handle_error(exc: Exception) -> Dict:
+def handle_error(exc: Exception, context: str = "API") -> Dict:
     if isinstance(exc, (BaseException, APIException)):
         return create_error_response(
             error_code=exc.error_code,
@@ -40,9 +40,18 @@ def handle_error(exc: Exception) -> Dict:
 
 # FastAPI specific handler
 async def api_error_handler(request: Any, exc: Union[Exception, APIException]) -> JSONResponse:
-    error_response = handle_error(exc)
-    status_code = exc.status_code if isinstance(exc, APIException) else 500
+    if isinstance(exc, APIException):
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={
+                "detail": exc.detail,
+                "code": exc.error_code,
+                "extra": exc.extra
+            }
+        )
+    
+    error_response = handle_error(exc, context="API")
     return JSONResponse(
-        status_code=status_code,
+        status_code=500,
         content=error_response
     ) 

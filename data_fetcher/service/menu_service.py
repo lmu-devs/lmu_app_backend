@@ -1,16 +1,16 @@
 import requests
 
-from requests.exceptions import HTTPError, RequestException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, date, timedelta
 
+from shared.core.logging import setup_logger
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.core.exceptions import ExternalAPIError, DataProcessingError, DatabaseError
 from data_fetcher.service.price_service import PriceService
 
-
+logger = setup_logger("menu_service", "menu")
 class MenuService:
     
     def __init__(self, db: Session):
@@ -22,7 +22,7 @@ class MenuService:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            print("Response tum-dev eat-api: ", response.status_code)
+            logger.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
             return response.json()
         except requests.exceptions.HTTPError as e:
             raise ExternalAPIError(
