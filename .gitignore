@@ -1,6 +1,7 @@
 .venv
 .env
 venv
+logs/
 
 # Python cache files
 __pycache__/

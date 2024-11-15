@@ -1,11 +1,11 @@
-import logging
 from typing import Union, Any, Dict
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.exceptions import BaseException, APIException
 
-logger = logging.getLogger(__name__)
+
+
 
 def create_error_response(error_code: str, message: str, extra: Dict[str, Any] = None) -> Dict:
     return {
@@ -25,14 +25,11 @@ def handle_error(exc: Exception, context: str = "API") -> Dict:
         )
     
     if isinstance(exc, SQLAlchemyError):
-        logger.error(f"Database error: {str(exc)}")
         return create_error_response(
             error_code="DATABASE_ERROR",
             message="A database error occurred"
         )
 
-    # Log unexpected errors
-    logger.error(f"Unexpected error: {str(exc)}", exc_info=True)
     return create_error_response(
         error_code="INTERNAL_SERVER_ERROR",
         message="An unexpected error occurred"
@@ -44,14 +41,15 @@ async def api_error_handler(request: Any, exc: Union[Exception, APIException]) -
         return JSONResponse(
             status_code=exc.status_code,
             content={
-                "detail": exc.detail,
-                "code": exc.error_code,
-                "extra": exc.extra
-            }
+                "detail": str(exc.detail),
+                "code": str(exc.error_code),
+                "extra": {k: str(v) for k, v in (exc.extra or {}).items()}
+            },
         )
     
     error_response = handle_error(exc, context="API")
     return JSONResponse(
         status_code=500,
-        content=error_response
+        content=(error_response),
+
     ) 

@@ -11,9 +11,10 @@ from api.schemas.dish_scheme import DishDates, Dishes
 from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
 from api.services.canteen_service import CanteenService
 from api.services.dish_service import DishService
+from shared.core.logging import get_dish_logger
 
 router = APIRouter()
-
+dish_logger = get_dish_logger(__name__)
 
 # Gets dish data
 @router.get("/dishes", response_model=Dishes, description="Get all dishes or a specific dish by ID. Authenticated users can also get liked dishes.")
@@ -31,6 +32,7 @@ async def get_dish(
     
     user_id = current_user.id if current_user else None
     dishes = DishService(db).get_dishes(id, user_id, only_liked_dishes)
+    dish_logger.info(f"Fetched dishes {id} with user_id: {user_id} and only_liked_dishes: {only_liked_dishes}")
     
     return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 
@@ -58,9 +60,9 @@ async def read_dish_dates(
         canteens: List[CanteenTable] = [row[2] for row in dish_dates]
         user_likes_canteen = CanteenService(db).get_user_liked(current_user.id, canteens)
     
+    dish_logger.info(f"Fetched dish dates {dish_id} with user_id: {current_user.id} and user_likes_canteen: {user_likes_canteen}")
+    
     return dish_dates_to_pydantic(dish_dates, user_likes_canteen)
-
-
 
 
 
@@ -72,6 +74,7 @@ def toggle_like(
     ):
 
     like_status = DishService(db).toggle_like(dish_id, current_user.id)
+    dish_logger.info(f"Toggled like for dish {dish_id} by user {current_user.id}. Result: {like_status}")
     return like_status
 
     

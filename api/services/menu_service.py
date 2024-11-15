@@ -8,15 +8,14 @@ from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.models.user_model import UserTable
-
-
-
+from shared.core.logging import get_menu_logger
 
 class MenuService:
     def __init__(self, db: Session):
         """Initialize the MenuService with a database session."""
         self.db = db
-
+        self.logger = get_menu_logger(__name__)
+        
     def get_days(
         self, 
         canteen_id: str, 
@@ -58,14 +57,20 @@ class MenuService:
             menu_days = result.unique().scalars().all()
             
             if not menu_days:
+                self.logger.warning(f"No menus found for {canteen_id} between {date_from} and {date_to}")
                 raise NotFoundError(
                     detail="No menus found for the specified period",
-                    extra={"canteen_id": canteen_id, "date_from": date_from.isoformat(), "date_to": date_to.isoformat()}
+                    extra={
+                        "canteen_id": canteen_id, 
+                        "date_from": date_from.isoformat(), 
+                        "date_to": date_to.isoformat()
+                    }
                 )
             
             return menu_days
 
         except SQLAlchemyError as e:
+            self.logger.error(f"Database error while fetching menus: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch menus",
                 extra={"original_error": str(e)}

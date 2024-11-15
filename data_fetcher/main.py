@@ -1,20 +1,21 @@
-import requests
-import schedule
-import time
 import signal
 import sys
-
+import time
 from datetime import datetime, timedelta
+
+import requests
+import schedule
 from sqlalchemy.orm import Session
 
-from shared.database import Database, get_db
-from data_fetcher.service.canteen_service import CanteenFetcher
-from data_fetcher.service.menu_service import MenuService
 from data_fetcher.enums.mensa_enums import CanteenID
-from shared.settings import get_settings
-from shared.core.exceptions import ExternalAPIError, DatabaseError, DataProcessingError
+from data_fetcher.service.canteen_service import CanteenFetcher
+from data_fetcher.service.menu_service import MenuFetcher
 from shared.core.error_handlers import handle_error
-from shared.core.logging import setup_logger, logger_fetcher
+from shared.core.exceptions import (DatabaseError, DataProcessingError,
+                                    ExternalAPIError)
+from shared.core.logging import setup_logger
+from shared.database import Database, get_db
+from shared.settings import get_settings
 
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
@@ -31,12 +32,12 @@ signal.signal(signal.SIGINT, signal_handler)
 # ------ Needed for stopping docker container ------ #
 
 
-
+logger = setup_logger(__name__, "data_fetcher")
 
 def fetch_data_current_year(db: Session):
     """Fetches data for the next 14 days for all canteens"""
     try:
-        logger_fetcher.info("Starting data fetch for next 14 days")
+        logger.info("Starting data fetch for next 14 days")
         # Update canteen information first
         canteen_fetcher = CanteenFetcher(db)
         canteen_fetcher.update_canteen_database()
@@ -48,16 +49,16 @@ def fetch_data_current_year(db: Session):
         # Update menu for each canteen
         for canteen in CanteenID:
             try:
-                menu_service = MenuService(db)
+                menu_service = MenuFetcher(db)
                 menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
                     date_to=date_from + timedelta(days=default_days_amount)
                 )
-                logger_fetcher.info(f"Successfully updated menu for {canteen.value}")
+                logger.info(f"Successfully updated menu for {canteen.value}")
             except (ExternalAPIError, DatabaseError, DataProcessingError) as e:
                 error_response = handle_error(e)
-                logger_fetcher.error(
+                logger.error(
                     f"Error updating menu for canteen {canteen.value}",
                     extra=error_response['error']['extra'],
                     exc_info=True
@@ -66,7 +67,7 @@ def fetch_data_current_year(db: Session):
             
     except Exception as e:
         error_response = handle_error(e)
-        logger_fetcher.error(
+        logger.error(
             "Unexpected error during data fetch",
             extra=error_response['error']['extra'],
             exc_info=True
@@ -89,7 +90,7 @@ def fetch_scheduled_data(db: Session):
         # Update menu for each canteen
         for canteen in CanteenID:
             try:
-                menu_service = MenuService(db)
+                menu_service = MenuFetcher(db)
                 menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,

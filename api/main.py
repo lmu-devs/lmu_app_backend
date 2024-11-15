@@ -8,7 +8,9 @@ from shared.core.exceptions import APIException
 from shared.settings import get_settings
 from shared.database import Database
 from api.routers import canteen_router, menu_router, dish_router, taste_router, user_router
+from shared.core.logging import get_api_logger
 
+api_logger = get_api_logger(__name__)
 
 
 def create_app():
@@ -54,13 +56,17 @@ def create_app():
         return {"message": "Hello Wörld"}
     
     # Initialize the database
-    Database(settings=settings)
+    try:
+        Database(settings=settings)
+    except Exception as e:
+        api_logger.fatal(f"Error initializing database: {e}")
+        raise APIException(f"Error initializing database: {e}")
 
     return app
 
 
 def main():
-    print("Running main()...")
+    api_logger.info("Running main()")
     return create_app()
 
 app = main()  # This line is crucial, gets called in Dockerfile

@@ -2,16 +2,15 @@ from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
 from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.core.logging import get_user_logger
 from shared.models.user_model import UserTable
-
-
 
 
 class UserService:
     def __init__(self, db: Session):
         """Initialize the UserService with a database session."""
         self.db = db
-
+        self.logger = get_user_logger(__name__)
     def get_user(self, user_id: int) -> UserTable | None:
         """Get user from database by user_id"""
         user = self.db.query(UserTable).filter(UserTable.id == user_id).first()
@@ -25,7 +24,7 @@ class UserService:
 
     def store_user(self, user_data) -> UserTable:
         """Store user data in the database"""
-        print("Storing user data of one user...")
+        self.logger.info(f"Storing user data of one user with device_id: {user_data['device_id']}")
         new_user = UserTable(
             device_id=user_data['device_id'],
             api_key=APIKey.generate_user_key()
@@ -38,17 +37,16 @@ class UserService:
 
     def create_user(self, device_id: str) -> UserTable:
         """Prepare and store user data in the database"""
-        print("\n==============================================================")
-        print("Updating user data...")
+        self.logger.info(f"Updating user data with device_id: {device_id}")
         try:
             user_data = {
                 'device_id': device_id,
             }
             new_user = self.store_user(user_data)
-            print("User data updated successfully!")
+            self.logger.info(f"User data for device_id {device_id} updated successfully!\n")
             return new_user
         except Exception as e:
-            print(f"Error while updating user database: {str(e)}")
+            self.logger.error(f"Error while updating user database: {str(e)}\n")
             self.db.rollback()
             raise DatabaseError(
                 detail="Failed to create user",
@@ -56,4 +54,3 @@ class UserService:
             )
         finally:
             self.db.close()
-            print("==============================================================\n")

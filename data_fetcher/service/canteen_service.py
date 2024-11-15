@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 
 from shared.core.exceptions import DataFetchError, DataProcessingError
-from shared.core.logging import logger_fetcher
+from shared.core.logging import setup_logger
 from shared.database import get_db
 from shared.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
 from data_fetcher.service.images_service import ImageService
 from shared.settings import get_settings
+
+logger = setup_logger(__name__, "data_fetcher")
 
 class CanteenFetcher:
     """
@@ -24,11 +26,11 @@ class CanteenFetcher:
             url = "https://tum-dev.github.io/eat-api/enums/canteens.json"
             response = requests.get(url)
             response.raise_for_status()
-            logger_fetcher.info(f"Successfully fetched canteen data from TUM API: {response.status_code}")
+            logger.info(f"Successfully fetched canteen data from TUM API: {response.status_code}")
             return response.json()
         except Exception as e:
             message = f"Error while fetching canteen data from TUM API: {str(e)}"
-            logger_fetcher.error(message)
+            logger.error(message)
             raise DataFetchError(message)
 
 
@@ -46,7 +48,6 @@ class CanteenFetcher:
         for location, url in files:
             # Check if the canteen's ID is in the image URL
             if str(canteen_table.id) in url:
-                print(f"Image found for {canteen_table.name}")
                 image_count = image_count + 1
                 new_image = CanteenImageTable(
                     canteen_id=canteen_table.id,
@@ -55,7 +56,7 @@ class CanteenFetcher:
                 )
                 self.db.add(new_image)
                 
-        logger_fetcher.info(f"Added {image_count} canteen images for {location}")
+        logger.info(f"Added {image_count} canteen images for {canteen_table.name}")
 
 
     def process_canteen_name(self, full_name: str) -> Tuple[str, CanteenType]:
@@ -94,7 +95,7 @@ class CanteenFetcher:
         
 
     def store_canteen_data(self, canteens: list):
-        logger_fetcher.info("Storing canteen data...")
+        logger.info("Storing canteen data...")
         for canteen in canteens:
             try:
                 # Update Canteen
@@ -151,20 +152,20 @@ class CanteenFetcher:
                 self.db.commit()
             except Exception as e:
                 message = f"Error while storing canteen data: {str(e)}"
-                logger_fetcher.error(message)
+                logger.error(message)
                 raise DataProcessingError(message)
 
 
     def update_canteen_database(self):
         print("\n==============================================================")
-        logger_fetcher.info("Updating canteen data...")
+        logger.info("Updating canteen data...")
         try:
             canteen_data = self.fetch_canteen_data()
             self.store_canteen_data(canteen_data)
-            logger_fetcher.info("Canteen data updated successfully!")
+            logger.info("Canteen data updated successfully!")
             print("==============================================================\n")
         except Exception as e:
-            logger_fetcher.error(f"Error while updating canteen database: {str(e)}")
+            logger.error(f"Error while updating canteen database: {str(e)}")
         finally:
             self.db.close()
 

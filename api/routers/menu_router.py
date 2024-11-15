@@ -10,8 +10,10 @@ from api.core.api_key import APIKey
 from api.schemas.menu_scheme import Menus
 from api.pydantics.menu_pydantic import menu_days_to_pydantic
 from api.services.menu_service import MenuService
+from shared.core.logging import get_menu_logger
 
 router = APIRouter()
+menu_logger = get_menu_logger(__name__)
 
 @router.get("/menus", response_model=Menus, description="Get all menus or a specific canteen by ID. Authenticated users can also get liked dishes.")
 async def get_menu(
@@ -52,39 +54,9 @@ async def get_menu(
         current_user, 
         only_liked_canteens
     )
+    menu_logger.info(f"Fetched menu days for canteen {canteen_id} from {date_from} to {date_to} with user_id: {user_id} and only_liked_canteens: {only_liked_canteens}")
     
     return menu_days_to_pydantic(menu_days, user_id)
-
-
-# @router.put("/menus")
-# async def update_menu(
-#     canteen_id: str,
-#     date_from: date = Query(
-#         default=None,
-#         description="Start date for menu update. Defaults to today"
-#     ),
-#     days_amount: int = Query(
-#         default=14,
-#         description="Number of days to update from start date",
-#         ge=1,
-#         le=31
-#     ),
-#     api_key: APIKeyHeader = Depends(APIKey.get_system_key_header)
-# ):
-#     if date_from is None:
-#         date_from = datetime.now().date()
-    
-#     date_to = date_from + timedelta(days=days_amount)
-    
-#     db = next(get_db())
-#     DataFetcherMenuService(db).update_menu_database(
-#         canteen_id=canteen_id,
-#         date_from=date_from,
-#         date_to=date_to
-#     )
-#     return {
-#         "message": f"Menu items for canteen {canteen_id} updated for {days_amount} days starting from {date_from}"
-#     }
 
 
     

@@ -11,11 +11,13 @@ from shared.models.canteen_model import CanteenTable
 from shared.models.dish_model import DishTable, DishLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 
+from shared.core.logging import get_dish_logger
 
 class DishService:
     def __init__(self, db: Session):
         """Initialize the DishService with a database session."""
         self.db = db
+        self.logger = get_dish_logger(__name__)
 
     def get_dishes(
         self, 
@@ -46,10 +48,11 @@ class DishService:
                     detail=f"No dishes found with the specified criteria",
                     extra={"dish_id": dish_id}
                 )
-
+            self.logger.debug(f"Found {len(dishes)} dishes matching criteria")
             return dishes
 
         except SQLAlchemyError as e:
+            self.logger.error(f"Failed to fetch dishes: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch dishes",
                 extra={"original_error": str(e)}
@@ -71,15 +74,11 @@ class DishService:
             result = self.db.execute(stmt)
             dish_like = result.scalar_one_or_none()
             
-            if dish_like is None:
-                raise NotFoundError(
-                    detail="Dish like not found",
-                    extra={"dish_id": dish_id, "user_id": user_id}
-                )
             
             return dish_like
         
         except SQLAlchemyError as e:
+            self.logger.error(f"Failed to fetch dish like: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch dish like",
                 extra={"original_error": str(e)}

@@ -1,16 +1,19 @@
+from datetime import date, datetime, timedelta
+
 import requests
-
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime, date, timedelta
+from sqlalchemy.orm import Session
 
-from shared.core.logging import logger_fetcher
+from data_fetcher.service.price_service import PriceService
+from shared.core.exceptions import (DatabaseError, DataProcessingError,
+                                    ExternalAPIError)
+from shared.core.logging import setup_logger
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
-from shared.core.exceptions import ExternalAPIError, DataProcessingError, DatabaseError
-from data_fetcher.service.price_service import PriceService
 
-class MenuService:
+logger = setup_logger(__name__, "data_fetcher")
+
+class MenuFetcher:
     
     def __init__(self, db: Session):
         self.db = db
@@ -21,7 +24,7 @@ class MenuService:
         try:
             response = requests.get(url)
             response.raise_for_status()
-            logger_fetcher.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
+            logger.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
             return response.json()
         except requests.exceptions.HTTPError as e:
             raise ExternalAPIError(
@@ -42,7 +45,6 @@ class MenuService:
 
 
     def store_menu_data(self, data: dict, canteen_id: str):
-        logger_fetcher.info(f"Storing menu data for canteen {canteen_id}")
         
         try:
             week = data.get('number')
@@ -51,7 +53,7 @@ class MenuService:
             if not week or not year:
                 raise ValueError("Week or year data is missing")
             
-            logger_fetcher.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
+            logger.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
             
             # Get all days from the API response
             api_days = {day.get('date'): day for day in data.get('days', [])}
@@ -123,7 +125,7 @@ class MenuService:
                                 price_obj.unit = price_data.get('unit')
             
             self.db.commit()
-            logger_fetcher.info("Menu data stored successfully.")
+            logger.info("Menu data stored successfully.")
         except IntegrityError as e:
             raise DatabaseError(
                 detail="Database integrity error while storing menu data",
@@ -138,7 +140,7 @@ class MenuService:
 
     def update_menu_database(self, canteen_id: str, date_from: date, date_to: date):
         """Update menu data for a specific canteen within a date range"""
-        print(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to}...")
+        logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to}...")
         
         try:
             current_date = date_from
@@ -149,7 +151,7 @@ class MenuService:
                 if menu_data:
                     self.store_menu_data(menu_data, canteen_id)
                 current_date += timedelta(days=7)
-            print("Menu data updated successfully!")
+            logger.info("Menu data updated successfully!")
         except Exception as e:
             raise DataProcessingError(
                 detail="Failed to update menu database",
