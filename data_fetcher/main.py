@@ -12,6 +12,9 @@ from data_fetcher.service.canteen_service import CanteenFetcher
 from data_fetcher.service.menu_service import MenuService
 from data_fetcher.enums.mensa_enums import CanteenID
 from shared.settings import get_settings
+from shared.core.exceptions import ExternalAPIError, DatabaseError, DataProcessingError
+from shared.core.error_handlers import handle_error
+from shared.core.logging import setup_logger
 
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
@@ -27,16 +30,20 @@ signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 # ------ Needed for stopping docker container ------ #
 
+
+logger = setup_logger("data_fetcher", "fetcher")
+
 def fetch_data_current_year(db: Session):
     """Fetches data for the next 14 days for all canteens"""
     try:
+        logger.info("Starting data fetch for next 14 days")
         # Update canteen information first
         canteen_fetcher = CanteenFetcher(db)
         canteen_fetcher.update_canteen_database()
 
         # Get current date
         date_from = datetime.now().date()
-        days_amount = 14  # Default to 14 days
+        default_days_amount = 14
 
         # Update menu for each canteen
         for canteen in CanteenID:
@@ -45,14 +52,26 @@ def fetch_data_current_year(db: Session):
                 menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
-                    date_to=date_from + timedelta(days=days_amount)
+                    date_to=date_from + timedelta(days=default_days_amount)
                 )
-            except Exception as e:
-                print(f"Error updating menu for canteen {canteen.value}: {str(e)}")
+                logger.info(f"Successfully updated menu for {canteen.value}")
+            except (ExternalAPIError, DatabaseError, DataProcessingError) as e:
+                error_response = handle_error(e)
+                logger.error(
+                    f"Error updating menu for canteen {canteen.value}",
+                    extra=error_response['error']['extra'],
+                    exc_info=True
+                )
                 continue
-        
+            
     except Exception as e:
-        print(f"An error occurred during data fetch: {str(e)}")
+        error_response = handle_error(e)
+        logger.error(
+            "Unexpected error during data fetch",
+            extra=error_response['error']['extra'],
+            exc_info=True
+        )
+
 
 def fetch_scheduled_data(db: Session):
     """Fetches data for the next 14 days for all canteens"""

@@ -1,9 +1,10 @@
 import os
 import secrets
-from fastapi import Depends, HTTPException, Security
+from fastapi import Depends, Security
 from fastapi.security.api_key import APIKeyHeader
 from requests import Session
 
+from shared.core.exceptions import AuthorizationError
 from shared.database import get_db
 from shared.models.user_model import UserTable
 
@@ -19,7 +20,10 @@ class APIKey:
         print("Checking API key...")
         if api_key_header == API_KEY:
             return True
-        raise HTTPException(status_code=403, detail="Could not validate credentials")
+        raise AuthorizationError(
+            detail="Could not validate system credentials",
+            extra={"header": "x-api-key"}
+        )
 
     @staticmethod
     def generate_user_key() -> str:
@@ -33,7 +37,10 @@ class APIKey:
         print("Checking user API key and UUID...")
         user = db.query(UserTable).filter(UserTable.api_key == api_key_header).first()
         if user is None:
-            raise HTTPException(status_code=403, detail="Could not validate user credentials")
+            raise AuthorizationError(
+                detail="Could not validate user credentials",
+                extra={"header": "x-api-key"}
+            )
         return user
 
     @staticmethod

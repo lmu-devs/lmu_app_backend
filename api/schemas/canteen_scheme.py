@@ -23,7 +23,6 @@ class CanteenType(str, enum.Enum):
     STUCAFE = "STUCAFE"
     
 
-
 class Location(BaseModel):
     address: str
     latitude: float

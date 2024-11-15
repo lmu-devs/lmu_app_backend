@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from fastapi.security.api_key import APIKey as APIKeyHeader
 
-from api.core.api_key import APIKey
 from shared.database import get_db
 from shared.models.user_model import UserTable
+from api.core.api_key import APIKey
 from api.pydantics.user_pydantic import user_to_pydantic
 from api.schemas.user_scheme import User
 from api.services.user_service import UserService

@@ -1,17 +1,14 @@
 from datetime import date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.security.api_key import APIKey as APIKeyHeader
 from sqlalchemy.orm import Session
 
-from api.core.api_key import APIKey
 from shared.database import get_db
 from shared.models.user_model import UserTable
+from api.core.api_key import APIKey
 from api.schemas.menu_scheme import Menus
 from api.pydantics.menu_pydantic import menu_days_to_pydantic
 from api.services.menu_service import MenuService
-from data_fetcher.main import fetch_data_current_year
-from data_fetcher.service.menu_service import MenuService as DataFetcherMenuService
 
 router = APIRouter()
 
@@ -57,40 +54,36 @@ async def get_menu(
     
     return menu_days_to_pydantic(menu_days, user_id)
 
-@router.put("/menus/update-all")
-async def update_all_menus(api_key: APIKeyHeader = Depends(APIKey.get_system_key_header)):
-    fetch_data_current_year()
-    return {"message": "Menu items for current year updated successfully"}
 
-@router.put("/menus")
-async def update_menu(
-    canteen_id: str,
-    date_from: date = Query(
-        default=None,
-        description="Start date for menu update. Defaults to today"
-    ),
-    days_amount: int = Query(
-        default=14,
-        description="Number of days to update from start date",
-        ge=1,
-        le=31
-    ),
-    api_key: APIKeyHeader = Depends(APIKey.get_system_key_header)
-):
-    if date_from is None:
-        date_from = datetime.now().date()
+# @router.put("/menus")
+# async def update_menu(
+#     canteen_id: str,
+#     date_from: date = Query(
+#         default=None,
+#         description="Start date for menu update. Defaults to today"
+#     ),
+#     days_amount: int = Query(
+#         default=14,
+#         description="Number of days to update from start date",
+#         ge=1,
+#         le=31
+#     ),
+#     api_key: APIKeyHeader = Depends(APIKey.get_system_key_header)
+# ):
+#     if date_from is None:
+#         date_from = datetime.now().date()
     
-    date_to = date_from + timedelta(days=days_amount)
+#     date_to = date_from + timedelta(days=days_amount)
     
-    db = next(get_db())
-    DataFetcherMenuService(db).update_menu_database(
-        canteen_id=canteen_id,
-        date_from=date_from,
-        date_to=date_to
-    )
-    return {
-        "message": f"Menu items for canteen {canteen_id} updated for {days_amount} days starting from {date_from}"
-    }
+#     db = next(get_db())
+#     DataFetcherMenuService(db).update_menu_database(
+#         canteen_id=canteen_id,
+#         date_from=date_from,
+#         date_to=date_to
+#     )
+#     return {
+#         "message": f"Menu items for canteen {canteen_id} updated for {days_amount} days starting from {date_from}"
+#     }
 
 
     

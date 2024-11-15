@@ -6,6 +6,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable, CanteenTable
 
 
@@ -21,12 +22,16 @@ class CanteenService:
             stmt = select(CanteenTable).where(CanteenTable.id == canteen_id)
             canteen = self.db.execute(stmt).scalar_one_or_none()
             if canteen is None:
-                raise HTTPException(status_code=404, detail=f"Canteen with id {canteen_id} not found")
+                raise NotFoundError(
+                detail=f"Canteen with id {canteen_id} not found",
+                extra={"canteen_id": canteen_id}
+            )
             return canteen
         except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail="Database error occurred") from e
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="Unexpected error occurred") from e
+            raise DatabaseError(
+                detail="Failed to fetch canteen",
+                extra={"original_error": str(e)}
+            ) from e
 
 
     def get_like(self, canteen_id: int, user_id: str) -> CanteenLikeTable:
@@ -39,9 +44,14 @@ class CanteenService:
             canteen_like = self.db.execute(stmt).scalar_one_or_none()
             return canteen_like
         except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail="Database error occurred") from e
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="Unexpected error occurred") from e
+            raise DatabaseError(
+                detail="Failed to fetch canteen like status",
+                extra={
+                    "canteen_id": canteen_id,
+                    "user_id": user_id,
+                    "original_error": str(e)
+                }
+            ) from e
 
 
     def toggle_like(self, canteen_id: str, user_id: uuid.UUID) -> bool:

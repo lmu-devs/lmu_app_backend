@@ -3,10 +3,10 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from api.core.api_key import APIKey
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
+from api.core.api_key import APIKey
 from api.schemas.dish_scheme import DishDates, Dishes
 from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
 from api.services.canteen_service import CanteenService
@@ -18,7 +18,7 @@ router = APIRouter()
 # Gets dish data
 @router.get("/dishes", response_model=Dishes)
 async def get_dish(
-    dish_id: Annotated[int, Query(
+    id: Annotated[int, Query(
         description="Specific dish ID to fetch",
         gt=0,
         example=11,
@@ -30,7 +30,7 @@ async def get_dish(
     ):
     
     user_id = current_user.id if current_user else None
-    dishes = DishService(db).get_dishes(dish_id, user_id, only_liked_dishes)
+    dishes = DishService(db).get_dishes(id, user_id, only_liked_dishes)
     
     return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 

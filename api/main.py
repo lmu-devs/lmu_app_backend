@@ -1,16 +1,20 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+
+from shared.core.error_handlers import api_error_handler
+from shared.settings import get_settings
+from shared.database import Database
 from api.routers import canteen_router, menu_router, dish_router, taste_router, user_router
 
-from shared.database import Database
-from dotenv import load_dotenv
-
-from shared.settings import get_settings
 
 
 def create_app():
     load_dotenv()
     app = FastAPI(title="lmu-eat-api", description="API for canteen and menu data from munich.", version="0.1.0")
+    
+    # Add exception handlers
+    app.add_exception_handler(Exception, api_error_handler)
     
     # Include routers
     app.include_router(canteen_router.router,   prefix="/eat/v1", tags=["canteen"])

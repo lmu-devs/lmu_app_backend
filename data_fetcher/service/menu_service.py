@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from datetime import datetime, date, timedelta
 
-from shared.database import get_db
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
+from shared.core.exceptions import ExternalAPIError, DataProcessingError, DatabaseError
 from data_fetcher.service.price_service import PriceService
 
 
@@ -24,13 +24,22 @@ class MenuService:
             response.raise_for_status()
             print("Response tum-dev eat-api: ", response.status_code)
             return response.json()
-        except HTTPError as http_err:
-            print(f"HTTP error occurred: {http_err}")
-        except RequestException as req_err:
-            print(f"Request error occurred: {req_err}")
-        except Exception as err:
-            print(f"An error occurred: {err}")
-        return None
+        except requests.exceptions.HTTPError as e:
+            raise ExternalAPIError(
+                detail="Failed to fetch menu data from TUM API",
+                service="tum-dev-eat-api",
+                extra={
+                    "url": url,
+                    "status_code": e.response.status_code if e.response else None,
+                    "error": str(e)
+                }
+            )
+        except requests.exceptions.RequestException as e:
+            raise ExternalAPIError(
+                detail="Connection error while fetching menu data",
+                service="tum-dev-eat-api",
+                extra={"url": url, "error": str(e)}
+            )
 
 
     def store_menu_data(self, data: dict, canteen_id: str):
@@ -117,12 +126,15 @@ class MenuService:
             self.db.commit()
             print("Menu data stored successfully.")
         except IntegrityError as e:
-            self.db.rollback()
-            print(f"Error while updating menu database: {str(e)}")
+            raise DatabaseError(
+                detail="Database integrity error while storing menu data",
+                extra={"error": str(e)}
+            )
         except Exception as e:
-            self.db.rollback()
-            print(f"Unexpected error while updating menu database: {str(e)}")
-            print(f"Error details: {type(e).__name__}, {str(e)}")
+            raise DataProcessingError(
+                detail="Failed to process menu data",
+                extra={"error": str(e)}
+            )
 
 
     def update_menu_database(self, canteen_id: str, date_from: date, date_to: date):
@@ -140,7 +152,10 @@ class MenuService:
                 current_date += timedelta(days=7)
             print("Menu data updated successfully!")
         except Exception as e:
-            print(f"Error while updating menu database: {str(e)}")
+            raise DataProcessingError(
+                detail="Failed to update menu database",
+                extra={"error": str(e)}
+            )
 
 
     def get_last_week_of_year(self, year):

@@ -1,12 +1,12 @@
 import uuid
 
 from typing import List, Optional
-from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_
 
+from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenTable
 from shared.models.dish_model import DishTable, DishLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
@@ -42,14 +42,18 @@ class DishService:
             dishes = self.db.execute(stmt).scalars().all()
 
             if not dishes:
-                raise HTTPException(status_code=404, detail=f"Dish with id {dish_id} not found")
+                raise NotFoundError(
+                    detail=f"No dishes found with the specified criteria",
+                    extra={"dish_id": dish_id}
+                )
 
             return dishes
 
         except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail="Database error occurred") from e
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="Unexpected error occurred") from e
+            raise DatabaseError(
+                detail="Failed to fetch dishes",
+                extra={"original_error": str(e)}
+            )
     
 
 
@@ -67,17 +71,25 @@ class DishService:
             result = self.db.execute(stmt)
             dish_like = result.scalar_one_or_none()
             
+            if dish_like is None:
+                raise NotFoundError(
+                    detail="Dish like not found",
+                    extra={"dish_id": dish_id, "user_id": user_id}
+                )
+            
             return dish_like
         
         except SQLAlchemyError as e:
-            raise HTTPException(status_code=500, detail="Database error occurred") from e
-        except Exception as e:
-            raise HTTPException(status_code=500, detail="Unexpected error occurred") from e
+            raise DatabaseError(
+                detail="Failed to fetch dish like",
+                extra={"original_error": str(e)}
+            )
 
 
     def toggle_like(self, dish_id: int, user_id: uuid.UUID) -> bool:
         """Toggle the like status of a dish"""
         existing_like = self.get_like(dish_id, user_id)
+
 
         if existing_like:
             # If the user already liked the dish, remove the like
@@ -86,13 +98,11 @@ class DishService:
             return False
         else:
             # If the user has not liked the dish yet, add a new like
-            try:
-                new_like = DishLikeTable(dish_id=dish_id, user_id=user_id)
-                self.db.add(new_like)
-                self.db.commit()
-                return True
-            except SQLAlchemyError as e:
-                raise HTTPException(status_code=500, detail="Database error occurred") from e
+            new_like = DishLikeTable(dish_id=dish_id, user_id=user_id)
+            self.db.add(new_like)
+            self.db.commit()
+            return True
+
         
 
         
@@ -125,15 +135,16 @@ class DishService:
             dish_dates = self.db.execute(stmt).all()
             
             if not dish_dates:
-                raise HTTPException(
-                    status_code=404, 
-                    detail=f"No dates found for dish with id {dish_id}"
+                raise NotFoundError(
+                    detail="No dates found for the specified dish",
+                    extra={"dish_id": dish_id}
                 )
             
             return dish_dates
+        
         except SQLAlchemyError as e:
-            print(f"Database error in get_dish_dates_from_db: {str(e)}")
-            raise HTTPException(status_code=500, detail="Database error occurred") from e
-        except Exception as e:
-            print(f"Unexpected error in get_dish_dates_from_db: {str(e)}")
-            raise HTTPException(status_code=500, detail="Unexpected error occurred") from e
+            raise DatabaseError(
+                detail="Failed to fetch dish dates",
+                extra={"original_error": str(e)}
+            )
+

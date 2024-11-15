@@ -1,10 +1,10 @@
 from datetime import date
 from typing import List
-from fastapi import HTTPException
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
+from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.models.user_model import UserTable
@@ -58,15 +58,15 @@ class MenuService:
             menu_days = result.unique().scalars().all()
             
             if not menu_days:
-                raise HTTPException(status_code=404, detail="No menus found for the specified period")
+                raise NotFoundError(
+                    detail="No menus found for the specified period",
+                    extra={"canteen_id": canteen_id, "date_from": date_from, "date_to": date_to}
+                )
             
             return menu_days
         
         except SQLAlchemyError as e:
-            print(f"Database error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
-        except HTTPException:
-            raise
-        except Exception as e:
-            print(f"Unexpected error: {str(e)}")
-            raise HTTPException(status_code=500, detail="Internal server error")
+            raise DatabaseError(
+                detail="Failed to fetch menus",
+                extra={"original_error": str(e)}
+            ) from e

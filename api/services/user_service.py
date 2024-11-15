@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from api.core.api_key import APIKey
+from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.user_model import UserTable
 
 
@@ -15,7 +16,10 @@ class UserService:
         """Get user from database by user_id"""
         user = self.db.query(UserTable).filter(UserTable.id == user_id).first()
         if not user:
-            raise Exception("User not found")
+            raise NotFoundError(
+                detail="User not found",
+                extra={"user_id": user_id}
+            )
         return user
 
 
@@ -46,7 +50,10 @@ class UserService:
         except Exception as e:
             print(f"Error while updating user database: {str(e)}")
             self.db.rollback()
-            raise e
+            raise DatabaseError(
+                detail="Failed to create user",
+                extra={"original_error": str(e)}
+            )
         finally:
             self.db.close()
             print("==============================================================\n")

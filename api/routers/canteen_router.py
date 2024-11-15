@@ -3,14 +3,14 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from api.core.api_key import APIKey
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
+from api.core.api_key import APIKey
 from api.pydantics.canteen_pydantic import canteen_to_pydantic
 from api.schemas.canteen_scheme import Canteens
 from api.services.canteen_service import CanteenService
-from data_fetcher.service.canteen_service import CanteenFetcher
+
 
 router = APIRouter()
 
@@ -39,15 +39,6 @@ async def read_canteens(
             ])
         else:
             return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
-
-
-
-
-@router.put("/canteens/update", response_model=dict)
-async def trigger_canteen_update(api_key: APIKey = Depends(APIKey.get_system_key_header)):
-    db = next(get_db())
-    canteen_fetcher = CanteenFetcher(db)
-    return {"message": canteen_fetcher.update_canteen_database()}
 
 
 
