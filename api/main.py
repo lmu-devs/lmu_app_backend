@@ -7,7 +7,7 @@ from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.settings import get_settings
 from shared.database import Database
-from api.routers import canteen_router, menu_router, dish_router, taste_router, user_router
+from api.routers import canteen_router, log_router, menu_router, dish_router, taste_router, user_router
 from shared.core.logging import get_api_logger
 
 api_logger = get_api_logger(__name__)
@@ -33,6 +33,7 @@ def create_app():
     app.include_router(dish_router.router,      prefix=eat_prefix, tags=["canteen"])
     app.include_router(taste_router.router,     prefix=eat_prefix, tags=["canteen"])
     app.include_router(user_router.router,      prefix=eat_prefix, tags=["user"])
+    app.include_router(log_router.router,                          tags=["log"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

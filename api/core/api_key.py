@@ -1,33 +1,35 @@
 import os
 import secrets
+
 from fastapi import Depends, Security
 from fastapi.security.api_key import APIKeyHeader
 from requests import Session
 
-from shared.core.exceptions import AuthorizationError
+from shared.core.exceptions import AuthenticationError, AuthorizationError
+from shared.core.logging import setup_logger
 from shared.database import get_db
 from shared.models.user_model import UserTable
-from shared.core.logging import setup_logger
+from shared.settings import get_settings
 
 logger = setup_logger(__name__, "api_key")
 
 api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
-API_KEY = os.environ.get('API_KEY')
 
 class APIKey:
     def __init__(self):
         pass
 
     @staticmethod
-    async def get_system_key_header(api_key_header: str = Security(api_key_header)) -> bool:
-        if api_key_header == API_KEY:
-            logger.info("Successfully validated system API key")
-            return True
-        logger.error("Failed to validate system API key")
-        raise AuthorizationError(
-            detail="Could not validate system credentials",
-            extra={"header": "x-api-key"}
-        )
+    async def verify_system_api_key(api_key: str = Security(api_key_header)) -> bool:
+        """Verify the system API key."""
+        settings = get_settings()
+        if api_key != settings.API_KEY:
+            logger.warning("Invalid API key used for log access")
+            raise AuthenticationError(
+                detail="Invalid API key",
+                extra={"api_key": api_key},
+                )
+        return True
 
     @staticmethod
     def generate_user_key() -> str:
