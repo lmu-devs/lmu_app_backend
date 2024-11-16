@@ -3,12 +3,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
-from shared.settings import get_settings
 from shared.database import Database
-from api.routers import canteen_router, log_router, menu_router, dish_router, taste_router, user_router
+from shared.core.error_handlers import api_error_handler
+from shared.settings import get_settings
 from shared.core.logging import get_api_logger
+from api.routers import canteen_router, log_router, menu_router, dish_router, taste_router, user_router
 
 api_logger = get_api_logger(__name__)
 
