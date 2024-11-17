@@ -1,7 +1,7 @@
 from enum import Enum
 
 class CanteenID(Enum):
-    MENSA_ARCISSTR = "mensa-arcisstr"
+    # MENSA_ARCISSTR = "mensa-arcisstr"
     # MENSA_GARCHING = "mensa-garching"
     MENSA_LEOPOLDSTR = "mensa-leopoldstr"
     # MENSA_LOTHSTR = "mensa-lothstr"
@@ -12,7 +12,7 @@ class CanteenID(Enum):
     # STUBISTRO_GOETHESTR = "stubistro-goethestr"
     # STUBISTRO_BUTENANDSTR = "stubistro-butenandstr"
     # STUBISTRO_ROSENHEIM = "stubistro-rosenheim"
-    STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
+    # STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
     # STUBISTRO_MARTINSRIED = "stubistro-martinsried"
     # STUCAFE_ADALBERTSTR = "stucafe-adalbertstr"
     # STUCAFE_AKADEMIE_WEIHENSTEPHAN = "stucafe-akademie-weihenstephan"

@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
+import os
 
 class Settings(BaseSettings):
     
@@ -16,6 +17,8 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str
+    
+    DEEPL_API_KEY: str
 
     
     class Config:
