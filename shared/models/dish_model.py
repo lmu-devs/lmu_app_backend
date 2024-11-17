@@ -20,6 +20,7 @@ class DishTable(Base):
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")
     prices = relationship("DishPriceTable", back_populates="dish", cascade="all, delete-orphan")
     likes = relationship("DishLikeTable", back_populates="dish", cascade="all, delete-orphan")
+    translations = relationship("DishTranslationTable", back_populates="dish", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Dish(id='{self.id}', name='{self.name}', type='{self.dish_type}')>"
@@ -62,6 +63,17 @@ class DishLikeTable(Base):
     dish = relationship("DishTable", back_populates="likes")
     user = relationship("UserTable", back_populates="liked_dishes")
 
+
     def __repr__(self):
         return f"<DishLike(dish_id='{self.dish_id}', user_id='{self.user_id}')>"
+
+class DishTranslationTable(Base):
+    __tablename__ = "dish_translations"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    dish_id = Column(Integer, ForeignKey("dishes.id"), nullable=False)
+    language = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    
+    dish = relationship("DishTable", back_populates="translations")
 

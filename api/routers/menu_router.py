@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from shared.core.language import Language, get_language
 from shared.database import get_db
 from shared.models.user_model import UserTable
 from api.core.api_key import APIKey
@@ -39,6 +40,7 @@ async def get_menu(
         default=False,
         description="Filter menus by liked canteens"
     ),
+    language: Language = Depends(get_language),
     db: Session = Depends(get_db)
 ):
     
@@ -52,9 +54,9 @@ async def get_menu(
         date_from,
         date_to,
         current_user, 
-        only_liked_canteens
+        only_liked_canteens,
+        language
     )
-    menu_logger.info(f"Fetched menu days for canteen {canteen_id} from {date_from} to {date_to} with user_id: {user_id} and only_liked_canteens: {only_liked_canteens}")
     
     return menu_days_to_pydantic(menu_days, user_id)
 

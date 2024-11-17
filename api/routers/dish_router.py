@@ -3,6 +3,7 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from shared.core.language import Language, get_language
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
@@ -27,7 +28,8 @@ async def get_dish(
     )] = None,
     only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
     current_user: UserTable = Depends(APIKey.get_user_from_key_soft),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    language: Language = Depends(get_language)
     ):
     
     user_id = current_user.id if current_user else None

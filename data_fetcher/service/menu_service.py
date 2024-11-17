@@ -5,7 +5,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.service.price_service import PriceService
+from data_fetcher.service.translation.dish_translation_service import DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,ExternalAPIError)
+from shared.core.language import Language
 from shared.core.logging import get_data_fetcher_logger
 from shared.models.dish_model import DishPriceTable, DishTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
@@ -16,7 +18,9 @@ class MenuFetcher:
     
     def __init__(self, db: Session):
         self.db = db
-
+        self.dish_translation_service = DishTranslationService(db)
+        self.target_languages = [Language.GERMAN, Language.ENGLISH_US]
+        
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
         
@@ -50,6 +54,7 @@ class MenuFetcher:
             year = data.get('year')
             
             if not week or not year:
+                logger.error(f"Week or year data is missing: {data}")
                 raise ValueError("Week or year data is missing")
             
             logger.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
@@ -82,17 +87,25 @@ class MenuFetcher:
                 dishes = day_data.get('dishes', [])
                 for dish_data in dishes:
                     # Get or create the dish
-                    dish_name = dish_data.get('name', '')
-                    dish_obj = self.db.query(DishTable).filter_by(name=dish_name).first()
+                    dish_name_de = dish_data.get('name', '')
+                    
+                    dish_obj = self.db.query(DishTable).filter_by(name=dish_name_de).first()
                     if not dish_obj:
+
+                        
                         dish_obj = DishTable(
-                            name=dish_name,
+                            name=dish_name_de,
                             dish_type=dish_data.get('dish_type', ''),
                             labels=dish_data.get('labels', []),
                             price_simple=PriceService.calculate_simple_price(dish_data.get("prices", {}).get("students", {}))
                         )
                         self.db.add(dish_obj)
                         self.db.flush()
+                        
+                        self.dish_translation_service.create_translations(
+                            dish_obj=dish_obj,
+                            target_languages=self.target_languages
+                        )
                     
                     # Create new MenuDishAssociation
                     association = MenuDishAssociation(

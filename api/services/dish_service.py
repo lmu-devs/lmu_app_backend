@@ -48,7 +48,7 @@ class DishService:
                     detail=f"No dishes found with the specified criteria",
                     extra={"dish_id": dish_id}
                 )
-            logger.warning(f"Found {len(dishes)} dishes matching criteria")
+            logger.info(f"Found {len(dishes)} dishes matching criteria")
             return dishes
 
         except SQLAlchemyError as e:

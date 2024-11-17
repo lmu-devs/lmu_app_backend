@@ -37,6 +37,11 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
     user_likes_dish = None
     if user_id:
         user_likes_dish = any(like.user_id == user_id for like in dish.likes)
+        
+        
+    name = dish.name  # fallback to default name
+    if dish.translations:
+        name = dish.translations[0].name  # Use the filtered translation
     
 
     prices = [
@@ -56,7 +61,7 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
 
     return Dish(
         id=dish.id,
-        name=dish.name,
+        name=name,
         dish_type=dish.dish_type,
         labels=dish.labels,
         rating=rating,

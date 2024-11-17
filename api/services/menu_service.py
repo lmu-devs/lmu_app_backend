@@ -4,11 +4,14 @@ from sqlalchemy import and_, select
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import SQLAlchemyError
 
+from shared.core.language import Language
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.models.user_model import UserTable
+from shared.models.dish_model import DishTable, DishTranslationTable
 from shared.core.logging import get_menu_logger
+from sqlalchemy.orm import contains_eager
 
 logger = get_menu_logger(__name__)
 class MenuService:
@@ -16,29 +19,38 @@ class MenuService:
         """Initialize the MenuService with a database session."""
         self.db = db
         
+
     def get_days(
         self, 
         canteen_id: str, 
         date_from: date,
         date_to: date,
         current_user: UserTable, 
-        only_liked_canteens: bool
+        only_liked_canteens: bool,
+        language: Language = Language.GERMAN
     ) -> List[MenuDayTable]:
         """Get menu days from the database within a date range"""
         try:
-            # Base query
+            # Base query with explicit joins for translations
             stmt = (
                 select(MenuDayTable)
+                .join(MenuDayTable.canteen)
+                .join(MenuDayTable.dish_associations)
+                .join(MenuDishAssociation.dish)
+                .join(DishTable.translations)
+                .filter(DishTranslationTable.language == language.value)
                 .options(
-                    joinedload(MenuDayTable.canteen),
-                    joinedload(MenuDayTable.dish_associations)
-                    .joinedload(MenuDishAssociation.dish)
+                    contains_eager(MenuDayTable.canteen),
+                    contains_eager(MenuDayTable.dish_associations)
+                    .contains_eager(MenuDishAssociation.dish)
+                    .contains_eager(DishTable.translations)
                 )
                 .where(
                     MenuDayTable.date >= date_from,
                     MenuDayTable.date <= date_to
                 )
             )
+            logger.info(f"Fetching menu days for canteen {canteen_id} from {date_from} to {date_to} with language {language.value}, user_id: {current_user.id if current_user else None}, only_liked_canteens: {only_liked_canteens}")
 
             # Apply filters based on parameters
             if canteen_id:
