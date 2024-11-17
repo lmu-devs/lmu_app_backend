@@ -1,7 +1,7 @@
 from datetime import date
 from typing import List
 from sqlalchemy import and_, select
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.language import Language
@@ -11,7 +11,6 @@ from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 from shared.models.user_model import UserTable
 from shared.models.dish_model import DishTable, DishTranslationTable
 from shared.core.logging import get_menu_logger
-from sqlalchemy.orm import contains_eager
 
 logger = get_menu_logger(__name__)
 class MenuService:
