@@ -62,7 +62,7 @@ async def read_dish_dates(
         canteens: List[CanteenTable] = [row[2] for row in dish_dates]
         user_likes_canteen = CanteenService(db).get_user_liked(current_user.id, canteens)
     
-    dish_logger.info(f"Fetched dish dates {dish_id} with user_id: {current_user.id} and user_likes_canteen: {user_likes_canteen}")
+    dish_logger.info(f"Fetched dish dates {dish_id} with user_id: {current_user.id if current_user else None} and user_likes_canteen: {user_likes_canteen}")
     
     return dish_dates_to_pydantic(dish_dates, user_likes_canteen)
 
