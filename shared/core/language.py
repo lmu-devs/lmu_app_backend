@@ -24,8 +24,8 @@ class Language(str, Enum):
 
 async def get_language(
     accept_language: Optional[str] = Header(
-        default=None,
-        description="Preferred language (e.g., en-US, de-DE)"
+        default=Language.GERMAN,
+        description="Currently supported languages (en, de)"
     )
 ) -> Language:
     """

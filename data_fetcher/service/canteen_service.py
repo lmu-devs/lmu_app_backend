@@ -121,7 +121,7 @@ class CanteenFetcher:
                 open_hours = canteen['open_hours']
                 
                 # Update Canteen Images
-                directory_path = "shared/images/canteens/"
+                directory_path = "shared/assets/canteens/"
                 settings = get_settings()
                 image_url_prefix = f"{settings.BASE_URL}{settings.BASE_PREFIX_EAT}/images/"
                 files = ImageService.generate_image_urls(directory_path, image_url_prefix)

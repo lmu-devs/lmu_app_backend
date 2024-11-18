@@ -1,4 +1,3 @@
-import os
 import secrets
 
 from fastapi import Depends, Security

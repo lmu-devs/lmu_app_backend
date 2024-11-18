@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -14,18 +13,24 @@ api_logger = get_api_logger(__name__)
 
 
 def create_app():
-    load_dotenv()
     settings = get_settings()
     eat_prefix = settings.BASE_PREFIX_EAT
     
-    app = FastAPI(title="lmu-dev-api", description="API for Students App in Munich.", version="0.1.0", docs_url="/docs", contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"})
+    app = FastAPI(
+        title="lmu-dev-api", 
+        description="API for Students App in Munich.", 
+        version="0.1.0", 
+        docs_url="/docs", 
+        contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
+        swagger_ui_parameters={"persistAuthorization": True, "language": "en"}
+    )
     
     # Add exception handlers
     app.add_exception_handler(Exception, api_error_handler)
     app.add_exception_handler(APIException, api_error_handler)
     
     # Add static files
-    app.mount(path=f"{eat_prefix}/images", app= StaticFiles(directory="/app/shared/images/canteens"), name="images")
+    app.mount(path=f"{eat_prefix}/images", app= StaticFiles(directory="/app/shared/assets/canteens"), name="images")
     
     # Include routers
     app.include_router(canteen_router.router,   prefix=eat_prefix, tags=["canteen"])
