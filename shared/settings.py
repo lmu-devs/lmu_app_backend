@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings
 from functools import lru_cache
-import os
 
 class Settings(BaseSettings):
     
@@ -14,9 +13,14 @@ class Settings(BaseSettings):
     # Postgres database credentials
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
     POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str
+    POSTGRES_HOST: str
+    
+    # PgAdmin settings
+    PGADMIN_PORT: str = "5050"
+    PGADMIN_DEFAULT_EMAIL: str
+    PGADMIN_DEFAULT_PASSWORD: str
     
     DEEPL_API_KEY: str
 

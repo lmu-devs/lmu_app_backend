@@ -22,7 +22,6 @@ def create_app():
         version="0.1.1", 
         docs_url="/docs", 
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
-        swagger_ui_parameters={"persistAuthorization": True, "language": "en"}
     )
     
     # Add exception handlers

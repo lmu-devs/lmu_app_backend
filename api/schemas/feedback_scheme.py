@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from uuid import UUID
 
-from shared.models.feedback_model import FeedbackRating
+from shared.models.feedback_model import FeedbackRating, FeedbackType
 
 class FeedbackCreate(BaseModel):
-    rating: FeedbackRating
+    type: FeedbackType
+    rating: FeedbackRating = Field(default=FeedbackRating.NEUTRAL)
     message: Optional[str] = None
     screen: str
     tags: Optional[List[str]] = None

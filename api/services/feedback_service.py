@@ -27,7 +27,7 @@ class FeedbackService:
             self.db.commit()
             self.db.refresh(new_feedback)
             
-            logger.info(f"Created new feedback for user {user_id}")
+            logger.info(f"Created new feedback for user {user_id}, screen: {feedback_data['screen']}, rating: {feedback_data['rating']}")
             return new_feedback
             
         except SQLAlchemyError as e:

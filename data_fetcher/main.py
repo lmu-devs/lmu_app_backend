@@ -110,7 +110,8 @@ def create_data_fetcher():
     
     # Initial fetch
     db = next(get_db())
-    fetch_scheduled_data(db)
+    # fetch_scheduled_data(db)
+    CanteenFetcher(db).update_canteen_database()
     
     # Schedule daily updates
     schedule.every().day.at("08:08").do(fetch_scheduled_data)

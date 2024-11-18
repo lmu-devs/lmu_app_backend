@@ -8,12 +8,18 @@ class FeedbackRating(str, Enum):
     BAD = "BAD"
     NEUTRAL = "NEUTRAL"
     GOOD = "GOOD"
+    
+class FeedbackType(str, Enum):
+    BUG = "BUG"
+    SUGGESTION = "SUGGESTION"
+    GENERAL = "GENERAL"
 
 class FeedbackTable(Base):
     __tablename__ = "feedback"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
+    type = Column(String, nullable=False)
     rating = Column(String, nullable=False)
     message = Column(String, nullable=True)
     screen = Column(String, nullable=False)

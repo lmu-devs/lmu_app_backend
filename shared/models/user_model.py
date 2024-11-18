@@ -20,4 +20,4 @@ class UserTable(Base):
     feedback = relationship("FeedbackTable", back_populates="user")
 
     def __repr__(self):
-        return f"<User(id='{self.id}', username='{self.username}')>"
+        return f"<User(id='{self.id}')>"
