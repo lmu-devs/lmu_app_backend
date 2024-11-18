@@ -17,6 +17,7 @@ class UserTable(Base):
     
     liked_dishes = relationship("DishLikeTable", back_populates="user")
     liked_canteens = relationship("CanteenLikeTable", back_populates="user")
+    feedback = relationship("FeedbackTable", back_populates="user")
 
     def __repr__(self):
         return f"<User(id='{self.id}', username='{self.username}')>"
