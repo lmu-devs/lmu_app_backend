@@ -1,5 +1,7 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
+
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     
@@ -8,8 +10,8 @@ class Settings(BaseSettings):
     BASE_PREFIX_EAT: str = "/eat/v1"
     
     # API key for authentication our api
-    API_KEY: str
-    
+    SYSTEM_API_KEY: str
+    ADMIN_API_KEY: str
     # Postgres database credentials
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str

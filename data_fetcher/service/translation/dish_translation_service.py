@@ -36,7 +36,7 @@ class DishTranslationService:
             source_translation = DishTranslationTable(
                 dish_id=dish_obj.id,
                 language=source_language.value,
-                name=dish_obj.name
+                translation=dish_obj.name
             )
             self.db.add(source_translation)
             translations.append(source_translation)
@@ -53,7 +53,7 @@ class DishTranslationService:
                         translation = DishTranslationTable(
                             dish_id=dish_obj.id,
                             language=target_lang.value,
-                            name=translated_name
+                            translation=translated_name
                         )
                         logger.info(f"Created translation for dish {dish_obj.id} to {target_lang.value}: {translated_name}")
                         self.db.add(translation)

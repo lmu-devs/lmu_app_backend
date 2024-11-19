@@ -3,6 +3,7 @@ from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
+from shared.models.language_model import LanguageTable
 
 
 
@@ -67,12 +68,10 @@ class DishLikeTable(Base):
     def __repr__(self):
         return f"<DishLike(dish_id='{self.dish_id}', user_id='{self.user_id}')>"
 
-class DishTranslationTable(Base):
+class DishTranslationTable(LanguageTable, Base):
     __tablename__ = "dish_translations"
     
-    id = Column(Integer, primary_key=True, index=True)
-    dish_id = Column(Integer, ForeignKey("dishes.id"), nullable=False)
-    language = Column(String, nullable=False)
+    dish_id = Column(Integer, ForeignKey("dishes.id"), nullable=False, primary_key=True)
     name = Column(String, nullable=False)
     
     dish = relationship("DishTable", back_populates="translations")

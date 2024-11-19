@@ -17,12 +17,24 @@ api_key_header = APIKeyHeader(name="x-api-key", auto_error=False)
 class APIKey:
     def __init__(self):
         pass
+    
+    @staticmethod
+    async def verify_admin_api_key(api_key: str = Security(api_key_header)) -> bool:
+        """Verify the admin API key."""
+        settings = get_settings()
+        if api_key != settings.ADMIN_API_KEY:
+            logger.warning("Invalid API key used for admin access")
+            raise AuthenticationError(
+                detail="Invalid API key",
+                extra={"api_key": api_key},
+            )
+        return True
 
     @staticmethod
     async def verify_system_api_key(api_key: str = Security(api_key_header)) -> bool:
         """Verify the system API key."""
         settings = get_settings()
-        if api_key != settings.API_KEY:
+        if api_key != settings.SYSTEM_API_KEY:
             logger.warning("Invalid API key used for log access")
             raise AuthenticationError(
                 detail="Invalid API key",
