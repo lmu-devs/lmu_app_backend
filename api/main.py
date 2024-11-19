@@ -2,10 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.routers import (canteen_router, dish_router, feedback_router,
-                         log_router, menu_router, taste_router, user_router,
-                         wishlist_router)
-from api.utils.openapi_schema import get_custom_openapi_schema
+from api.routers import canteen_router, dish_router, feedback_router, log_router, menu_router, taste_router, user_router, wishlist_router
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.core.logging import get_api_logger
