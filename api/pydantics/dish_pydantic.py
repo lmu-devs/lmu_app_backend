@@ -41,7 +41,7 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
         
     name = dish.name  # fallback to default name
     if dish.translations:
-        name = dish.translations[0].name  # Use the filtered translation
+        name = dish.translations[0].tranlation  # Use the filtered translation
     
 
     prices = [

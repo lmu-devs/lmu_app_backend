@@ -4,10 +4,12 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.core.language import Language, get_language
+from shared.core.language import Language
 from shared.database import get_db
+from shared.enums.mensa_enums import CanteenID
 from shared.models.user_model import UserTable
 from api.core.api_key import APIKey
+from api.core.language import get_language
 from api.schemas.menu_scheme import Menus
 from api.pydantics.menu_pydantic import menu_days_to_pydantic
 from api.services.menu_service import MenuService
@@ -33,7 +35,8 @@ async def get_menu(
     canteen_id: str = Query(
         default=None,
         description="Filter by canteen_id, if not provided, all canteens will be fetched",
-        example="mensa-leopoldstr"
+        example="mensa-leopoldstr",
+        enum=[canteen.value for canteen in CanteenID]
     ),
     current_user: UserTable = Depends(APIKey.get_user_from_key_soft),
     only_liked_canteens: bool = Query(

@@ -1,6 +1,7 @@
-from pydantic_settings import BaseSettings
 from functools import lru_cache
-import os
+
+from pydantic_settings import BaseSettings
+
 
 class Settings(BaseSettings):
     
@@ -9,14 +10,19 @@ class Settings(BaseSettings):
     BASE_PREFIX_EAT: str = "/eat/v1"
     
     # API key for authentication our api
-    API_KEY: str
-    
+    SYSTEM_API_KEY: str
+    ADMIN_API_KEY: str
     # Postgres database credentials
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_HOST: str
     POSTGRES_PORT: str = "5432"
     POSTGRES_DB: str
+    POSTGRES_HOST: str
+    
+    # PgAdmin settings
+    PGADMIN_PORT: str = "5050"
+    PGADMIN_DEFAULT_EMAIL: str
+    PGADMIN_DEFAULT_PASSWORD: str
     
     DEEPL_API_KEY: str
 

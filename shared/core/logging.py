@@ -59,6 +59,9 @@ def get_dish_logger(module_name: str):
 def get_user_logger(module_name: str):
     return setup_logger(module_name, "user", "user_api")
 
+def get_feedback_logger(module_name: str):
+    return setup_logger(module_name, "feedback", "feedback_api")
+
 # Data Fetcher Loggers
 def get_data_fetcher_logger(module_name: str):
     return setup_logger(module_name, "data_fetcher", "data_fetcher")

@@ -3,11 +3,12 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.core.language import Language, get_language
+from shared.core.language import Language
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
 from api.core.api_key import APIKey
+from api.core.language import get_language
 from api.schemas.dish_scheme import DishDates, Dishes
 from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
 from api.services.canteen_service import CanteenService

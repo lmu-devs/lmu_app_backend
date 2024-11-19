@@ -17,7 +17,7 @@ logger = get_api_logger(__name__)
     response_class=FileResponse,
     description="Get all logs as a compressed zip file. Requires system API key.")
 async def get_logs(
-    authorized: Annotated[bool, Depends(APIKey.verify_system_api_key)]
+    authorized: Annotated[bool, Depends(APIKey.verify_admin_api_key)]
 ):
     """Endpoint to retrieve compressed log files."""
     try:

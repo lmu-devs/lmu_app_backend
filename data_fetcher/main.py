@@ -1,21 +1,20 @@
 import signal
 import sys
 import time
-from datetime import datetime, timedelta
-
 import requests
 import schedule
+
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from data_fetcher.enums.mensa_enums import CanteenID
-from data_fetcher.service.canteen_service import CanteenFetcher
-from data_fetcher.service.menu_service import MenuFetcher
+from shared.enums.mensa_enums import CanteenID
+from shared.core.exceptions import DatabaseError, DataProcessingError, ExternalAPIError
 from shared.core.error_handlers import handle_error
-from shared.core.exceptions import (DatabaseError, DataProcessingError,
-                                    ExternalAPIError)
 from shared.core.logging import setup_logger
 from shared.database import Database, get_db
 from shared.settings import get_settings
+from data_fetcher.service.canteen_service import CanteenFetcher
+from data_fetcher.service.menu_service import MenuFetcher
 
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
@@ -111,7 +110,8 @@ def create_data_fetcher():
     
     # Initial fetch
     db = next(get_db())
-    fetch_scheduled_data(db)
+    # fetch_scheduled_data(db)
+    CanteenFetcher(db).update_canteen_database()
     
     # Schedule daily updates
     schedule.every().day.at("08:08").do(fetch_scheduled_data)

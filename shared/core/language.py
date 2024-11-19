@@ -1,5 +1,3 @@
-from typing import Optional
-from fastapi import Header
 from enum import Enum
 
 from shared.core.logging import get_api_logger
@@ -21,18 +19,3 @@ class Language(str, Enum):
             return cls.ENGLISH_US  # Default to US English
         logger.warning(f"No supported language found in Accept-Language header: {header}")
         return cls.GERMAN  # Default fallback
-
-async def get_language(
-    accept_language: Optional[str] = Header(
-        default=Language.GERMAN,
-        description="Currently supported languages (en, de)"
-    )
-) -> Language:
-    """
-    FastAPI dependency that extracts the preferred language from the Accept-Language header.
-    Falls back to German if no supported language is found.
-    """
-    if not accept_language:
-        return Language.GERMAN
-        
-    return Language.from_header(accept_language)

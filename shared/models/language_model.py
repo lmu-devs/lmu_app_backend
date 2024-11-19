@@ -1,12 +1,15 @@
 from sqlalchemy import Column, String
+from sqlalchemy.ext.declarative import declared_attr
 
-from shared.database import Base
-
-class LanguageTable(Base):
-    __tablename__ = "languages"
+class LanguageTable:
+    """
+    Abstract base class for language translations.
+    Declares a language and a translation column.
+    """
+    __abstract__ = True
     
-    country_code = Column(String, nullable=False)
-    flag_emoji = Column(String, nullable=False)
-    written = Column(String, nullable=False)
+    @declared_attr
+    def language(cls):
+        return Column(String, primary_key=True)
     
      

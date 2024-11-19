@@ -2,12 +2,15 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from shared.core.exceptions import APIException
-from shared.database import Database
+from api.routers import (canteen_router, dish_router, feedback_router,
+                         log_router, menu_router, taste_router, user_router,
+                         wishlist_router)
+from api.utils.openapi_schema import get_custom_openapi_schema
 from shared.core.error_handlers import api_error_handler
-from shared.settings import get_settings
+from shared.core.exceptions import APIException
 from shared.core.logging import get_api_logger
-from api.routers import canteen_router, log_router, menu_router, dish_router, taste_router, user_router
+from shared.database import Database
+from shared.settings import get_settings
 
 api_logger = get_api_logger(__name__)
 
@@ -19,10 +22,9 @@ def create_app():
     app = FastAPI(
         title="lmu-dev-api", 
         description="API for Students App in Munich.", 
-        version="0.1.0", 
+        version="0.1.1", 
         docs_url="/docs", 
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
-        swagger_ui_parameters={"persistAuthorization": True, "language": "en"}
     )
     
     # Add exception handlers
@@ -37,8 +39,10 @@ def create_app():
     app.include_router(menu_router.router,      prefix=eat_prefix, tags=["canteen"])
     app.include_router(dish_router.router,      prefix=eat_prefix, tags=["canteen"])
     app.include_router(taste_router.router,     prefix=eat_prefix, tags=["canteen"])
-    app.include_router(user_router.router,      prefix=eat_prefix, tags=["user"])
+    app.include_router(user_router.router,                         tags=["user"])
     app.include_router(log_router.router,                          tags=["log"])
+    app.include_router(feedback_router.router,                     tags=["feedback"])
+    app.include_router(wishlist_router.router,                     tags=["wishlist"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
