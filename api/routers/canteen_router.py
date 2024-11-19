@@ -32,18 +32,17 @@ async def get_canteens(
         return Canteens([canteen_to_pydantic(canteen, likes_canteen)])
     
     # Fetch all canteens
-    else:
-        canteens = db.query(CanteenTable).all()
-        if current_user:
-            likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
-            canteen_logger.info(f"Fetched {len(canteens)} canteens with likes_canteens: {likes_canteens}")
-            return Canteens([
-                canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
-                for canteen in canteens
-            ])
-        else:
-            canteen_logger.info(f"Fetched {len(canteens)} canteens")
-            return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
+    canteens = db.query(CanteenTable).all()
+    if current_user:
+        likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
+        canteen_logger.info(f"Fetched {len(canteens)} canteens with likes_canteens: {likes_canteens}")
+        return Canteens([
+            canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
+            for canteen in canteens
+        ])
+
+    canteen_logger.info(f"Fetched {len(canteens)} canteens")
+    return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
 
 
 

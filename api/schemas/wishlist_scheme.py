@@ -14,8 +14,6 @@ class WishlistTranslation(BaseModel):
     language: Language
 
 class WishlistCreate(BaseModel):
-    title: str
-    description: str
     status: WishlistStatus
     release_date: Optional[datetime] = None
     prototype_url: Optional[str] = None

@@ -18,8 +18,6 @@ class WishlistTable(Base):
     __tablename__ = "wishlists"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
     status = Column(Enum(WishlistStatus), nullable=False)
     release_date = Column(DateTime, nullable=True)
     prototype_url = Column(String, nullable=True)

@@ -16,6 +16,6 @@ class Language(str, Enum):
         if header.startswith("DE"):
             return cls.GERMAN
         if header.startswith("EN"):
-            return cls.ENGLISH_US  # Default to US English
+            return cls.ENGLISH_US
         logger.warning(f"No supported language found in Accept-Language header: {header}")
         return cls.GERMAN  # Default fallback

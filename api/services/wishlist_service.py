@@ -7,7 +7,6 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_api_logger
-from shared.core.language import Language
 from shared.models.wishlist_model import WishlistTable, WishlistImageTable, WishlistLikeTable, WishlistTranslationTable
 
 logger = get_api_logger(__name__)
@@ -54,8 +53,6 @@ class WishlistService:
             
             # Create wishlist
             new_wishlist = WishlistTable(
-                title=wishlist_data["title"],
-                description=wishlist_data["description"],
                 status=wishlist_data["status"],
                 release_date=wishlist_data.get("release_date"),
                 prototype_url=wishlist_data.get("prototype_url")
