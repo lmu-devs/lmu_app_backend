@@ -1,22 +1,26 @@
 import uuid
 from typing import Optional
 
+from shared.core.language import Language
 from shared.models.wishlist_model import WishlistTable
 from api.schemas.wishlist_scheme import Wishlist
 from api.schemas.rating_scheme import Rating
 from api.schemas.image_scheme import Image
 
 
-def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:
-    # Handle translations
-    title = wishlist.title  # fallback to default title
-    description = wishlist.description  # fallback to default description
+def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None, language: Language = Language.GERMAN) -> Wishlist:
+    title = wishlist.title
+    description = wishlist.description
     
-    if wishlist.translations:
-        # Use first translation found (should be filtered by language middleware)
-        translation = wishlist.translations[0]
-        title = translation.title
-        description = translation.description
+    if language != Language.GERMAN:
+        translation = next(
+            (t for t in wishlist.translations if t.language == language.value),
+            None
+        )
+        if translation:
+            title = translation.title
+            description = translation.description
+    
 
     # Handle likes
     user_likes_wishlist = None

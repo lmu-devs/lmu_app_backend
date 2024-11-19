@@ -1,11 +1,17 @@
 from datetime import datetime
-from typing import Dict, List, Optional
-from pydantic import BaseModel
+from typing import List, Optional
+from pydantic import BaseModel, Field
 
 from api.schemas.image_scheme import Image
 from api.schemas.rating_scheme import Rating
+from shared.core.language import Language
 from shared.models.wishlist_model import WishlistStatus
 
+
+class WishlistTranslation(BaseModel):
+    title: str
+    description: str
+    language: Language
 
 class WishlistCreate(BaseModel):
     title: str
@@ -13,8 +19,8 @@ class WishlistCreate(BaseModel):
     status: WishlistStatus
     release_date: Optional[datetime] = None
     prototype_url: Optional[str] = None
-    images: List[Image] = []
-    translations: Dict[str, Dict[str, str]] = {}
+    images: List[Image] = Field(default_factory=list)
+    translations: List[WishlistTranslation] = Field(default_factory=list)
 
 
 class WishlistUpdate(WishlistCreate):
@@ -36,3 +42,5 @@ class Wishlist(BaseModel):
 
 class Wishlists(BaseModel):
     wishlists: List[Wishlist]
+    
+    

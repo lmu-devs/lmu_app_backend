@@ -55,6 +55,7 @@ class WishlistTranslationTable(LanguageTable, Base):
     wishlist_id = Column(Integer, ForeignKey("wishlists.id"), primary_key=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    
     wishlist = relationship("WishlistTable", back_populates="translations")
     
     

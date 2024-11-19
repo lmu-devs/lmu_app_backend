@@ -1,12 +1,13 @@
 import uuid
 
-from typing import List, Optional
+from typing import Optional
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_api_logger
+from shared.core.language import Language
 from shared.models.wishlist_model import WishlistTable, WishlistImageTable, WishlistLikeTable, WishlistTranslationTable
 
 logger = get_api_logger(__name__)
@@ -15,13 +16,25 @@ class WishlistService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_wishlists(self, wishlist_id: Optional[int] = None) -> List[WishlistTable]:
+    def get_wishlists(self, wishlist_id: Optional[int] = None) -> WishlistTable:
         try:
-            query = select(WishlistTable)
+            query = (
+                select(WishlistTable)
+                .outerjoin(WishlistTable.translations)
+                .outerjoin(WishlistTable.images)
+                .options(
+                    contains_eager(WishlistTable.translations),
+                    contains_eager(WishlistTable.images)
+                )
+            )
+            
+            
+            query = query.options(contains_eager(WishlistTable.images))
+
             if wishlist_id:
                 query = query.filter(WishlistTable.id == wishlist_id)
             
-            wishlists = self.db.execute(query).scalars().all()
+            wishlists = self.db.execute(query).scalars().unique().all()
             if not wishlists:
                 raise NotFoundError(
                     detail="No wishlists found",
@@ -38,7 +51,7 @@ class WishlistService:
         try:
             # Extract nested data
             images_data = wishlist_data.pop("images", [])
-            translations_data = wishlist_data.pop("translations", {})
+            translations = wishlist_data.pop("translations", [])
             
             # Create wishlist
             new_wishlist = WishlistTable(
@@ -48,22 +61,22 @@ class WishlistService:
                 release_date=wishlist_data.get("release_date"),
                 prototype_url=wishlist_data.get("prototype_url")
             )
+
             
             # Add images
             for image in images_data:
                 new_wishlist.images.append(WishlistImageTable(**image))
             
             # Add translations
-            for language, trans in translations_data.get("title", {}).items():
+            for translation in translations:
                 new_wishlist.translations.append(
-                    WishlistTranslationTable(
-                        language=language,
-                        title=trans,
-                        description=translations_data["description"].get(language, ""),
+                WishlistTranslationTable(
+                        language=translation["language"],
+                        title=translation["title"],
+                        description=translation["description"],
                         wishlist=new_wishlist
                     )
                 )
-            
             self.db.add(new_wishlist)
             self.db.commit()
             self.db.refresh(new_wishlist)
@@ -81,7 +94,7 @@ class WishlistService:
             
             # Extract nested data
             images_data = wishlist_data.pop("images", None)
-            translations_data = wishlist_data.pop("translations", None)
+            translations = wishlist_data.pop("translations", None)
             
             # Update basic fields
             for key, value in wishlist_data.items():
@@ -94,14 +107,14 @@ class WishlistService:
                     wishlist.images.append(WishlistImageTable(**image))
         
             # Update translations if provided
-            if translations_data:
+            if translations is not None:
                 wishlist.translations = []
-                for language, trans in translations_data.items():
+                for translation in translations:
                     wishlist.translations.append(
                         WishlistTranslationTable(
-                            language=language,
-                            title=trans.get("title", wishlist.title),
-                            description=trans.get("description", wishlist.description),
+                            language=translation["language"],
+                            title=translation["title"],
+                            description=translation["description"],
                             wishlist=wishlist
                         )
                     )
