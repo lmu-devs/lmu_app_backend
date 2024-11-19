@@ -22,14 +22,13 @@ class WishlistService:
                 select(WishlistTable)
                 .outerjoin(WishlistTable.translations)
                 .outerjoin(WishlistTable.images)
+                .outerjoin(WishlistTable.likes)
                 .options(
                     contains_eager(WishlistTable.translations),
-                    contains_eager(WishlistTable.images)
+                    contains_eager(WishlistTable.images),
+                    contains_eager(WishlistTable.likes)
                 )
             )
-            
-            
-            query = query.options(contains_eager(WishlistTable.images))
 
             if wishlist_id:
                 query = query.filter(WishlistTable.id == wishlist_id)

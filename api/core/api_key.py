@@ -12,9 +12,21 @@ from shared.settings import get_settings
 
 logger = get_api_logger(__name__)
 
-user_api_key = APIKeyHeader(name="user-api-key", auto_error=False)
-admin_api_key = APIKeyHeader(name="admin-api-key", auto_error=False)
-system_api_key = APIKeyHeader(name="system-api-key", auto_error=False)
+user_api_key = APIKeyHeader(
+    name="user-api-key", 
+    auto_error=False,
+    description="User API key for authenticated user operations"
+)
+system_api_key = APIKeyHeader(
+    name="system-api-key", 
+    auto_error=False,
+    description="System API key for creating users"
+)
+admin_api_key = APIKeyHeader(
+    name="admin-api-key", 
+    auto_error=False,
+    description="Admin API key for administrative operations"
+)
 
 class APIKey:
     def __init__(self):

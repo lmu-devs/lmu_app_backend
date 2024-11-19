@@ -25,7 +25,7 @@ async def get_wishlists(
     wishlists = wishlist_service.get_wishlists(id)
     
     return Wishlists(wishlists=[
-        wishlist_to_pydantic(wishlist, current_user.id if current_user else None, language) 
+        wishlist_to_pydantic(wishlist, language, current_user.id if current_user else None) 
         for wishlist in wishlists
     ])
 

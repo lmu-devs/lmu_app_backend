@@ -8,18 +8,18 @@ from api.schemas.rating_scheme import Rating
 from api.schemas.image_scheme import Image
 
 
-def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None, language: Language = Language.GERMAN) -> Wishlist:
+def wishlist_to_pydantic(wishlist: WishlistTable, language: Language, user_id: Optional[uuid.UUID] = None) -> Wishlist:
     title = wishlist.title
     description = wishlist.description
     
-    if language != Language.GERMAN:
-        translation = next(
-            (t for t in wishlist.translations if t.language == language.value),
-            None
-        )
-        if translation:
-            title = translation.title
-            description = translation.description
+
+    translation = next(
+        (t for t in wishlist.translations if t.language == language.value),
+        None
+    )
+    if translation:
+        title = translation.title
+        description = translation.description
     
 
     # Handle likes
