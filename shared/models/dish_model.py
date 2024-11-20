@@ -1,6 +1,5 @@
 import enum
-
-from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String, DateTime, func
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
@@ -15,6 +14,8 @@ class DishTable(Base):
     labels = Column(ARRAY(String), nullable=False)
     price_simple = Column(String, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
     like_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationship
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")

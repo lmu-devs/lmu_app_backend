@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.ext.declarative import declared_attr
 
 class LanguageTable:
@@ -12,4 +12,11 @@ class LanguageTable:
     def language(cls):
         return Column(String, primary_key=True)
     
+    @declared_attr
+    def created_at(cls):
+        return Column(DateTime, default=func.now())
+    
+    @declared_attr
+    def updated_at(cls):
+        return Column(DateTime, default=func.now(), onupdate=func.now())
      

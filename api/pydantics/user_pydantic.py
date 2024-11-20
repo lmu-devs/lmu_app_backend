@@ -1,5 +1,5 @@
-from shared.models.user_model import UserTable
 from api.schemas.user_scheme import User
+from shared.models.user_model import UserTable
 
 
 def user_to_pydantic(user: UserTable) -> User:
@@ -10,5 +10,5 @@ def user_to_pydantic(user: UserTable) -> User:
         email=user.email,
         password=user.password,
         api_key=user.api_key,
-        creation_date=user.creation_date
+        creation_date=user.created_at
     )

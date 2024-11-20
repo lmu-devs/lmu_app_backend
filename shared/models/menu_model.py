@@ -1,4 +1,4 @@
-from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint, Integer, String)
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, ForeignKeyConstraint, Integer, String, func)
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
@@ -34,6 +34,8 @@ class MenuDayTable(Base):
 
     date = Column(Date, primary_key=True)
     canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
     # Relationships
     canteen = relationship("CanteenTable", back_populates="menu_days")

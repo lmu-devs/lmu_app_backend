@@ -31,12 +31,35 @@ class DishService:
         Otherwise, return all dishes.
         """
         try:
-            stmt = select(DishTable).options(contains_eager(DishTable.translations))
+            # Base query with translations
+            stmt = (
+                select(DishTable)
+                .join(DishTable.translations)  # Join translations
+            )
 
-            if user_id and only_liked:
-                stmt = stmt.join(DishLikeTable).filter(DishLikeTable.user_id == user_id)
+            # Add filters based on parameters
             if dish_id:
-                stmt = stmt.filter(DishTable.id == dish_id).options(noload(DishTable.likes))
+                stmt = stmt.where(DishTable.id == dish_id)
+                
+            if user_id and only_liked:
+                # Return only dishes liked by the user
+                stmt = (
+                    stmt
+                    .join(DishLikeTable)
+                    .where(DishLikeTable.user_id == user_id)
+                )
+            elif user_id:
+                # Left join with DishLikeTable to get like status for the user
+                stmt = (
+                    stmt
+                    .outerjoin(
+                        DishLikeTable,
+                        and_(
+                            DishLikeTable.dish_id == DishTable.id,
+                            DishLikeTable.user_id == user_id
+                        )
+                    )
+                )
 
             dishes = self.db.execute(stmt).unique().scalars().all()
 

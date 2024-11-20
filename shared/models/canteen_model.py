@@ -2,6 +2,7 @@ from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
+from shared.models.image_model import ImageTable
 from api.schemas.canteen_scheme import CanteenType
 
 
@@ -12,7 +13,6 @@ class CanteenTable(Base):
     name = Column(String, nullable=False)
     type = Column(Enum(CanteenType, name="canteen_type", create_type=False))
 
-    # Relationships
     location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
     opening_hours = relationship("OpeningHoursTable", back_populates="canteen", cascade="all, delete-orphan")
     menu_days = relationship("MenuDayTable", back_populates="canteen", cascade="all, delete-orphan")
@@ -34,7 +34,6 @@ class LocationTable(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
-    # Relationships
     canteen = relationship("CanteenTable", back_populates="location")
 
 class OpeningHoursTable(Base):
@@ -57,8 +56,8 @@ class CanteenLikeTable(Base):
     canteen_id = Column(String, ForeignKey('canteens.id'), nullable=False)
     user_id = Column(UUID(as_uuid=True),  ForeignKey('users.id'), nullable=False)
     created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    # Relationships
     canteen = relationship("CanteenTable", back_populates="likes")
     user = relationship("UserTable", back_populates="liked_canteens")
 
@@ -67,16 +66,11 @@ class CanteenLikeTable(Base):
     
     
 # Table to represent the many-to-many relationship between canteens and images
-class CanteenImageTable(Base):
+class CanteenImageTable(ImageTable, Base):
     __tablename__ = "canteen_images"
 
-    id = Column(Integer, primary_key=True, index=True)
-    url = Column(String, nullable=False)
-    name = Column(String, nullable=False)
     canteen_id = Column(String, ForeignKey('canteens.id'), nullable=False)
-    created_at = Column(DateTime, default=func.now())
 
-    # Relationships
     canteen = relationship("CanteenTable", back_populates="images")
     
     def __repr__(self):

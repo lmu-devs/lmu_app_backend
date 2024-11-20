@@ -25,8 +25,6 @@ def get_translation(
     """
     default_value = "not translated"
     
-    logger.info(f"Getting translation with language: {language.value}")
-    
     # Try to find translation in requested language
     translation = next(
         (t for t in translations if language_getter(t) == language.value),

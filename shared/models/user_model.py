@@ -1,9 +1,11 @@
-from shared.database import Base
-from sqlalchemy import Column, String, DateTime, UUID, func
-from sqlalchemy.orm import relationship
 import uuid
 
-    
+from sqlalchemy import UUID, Column, DateTime, String, func
+from sqlalchemy.orm import relationship
+
+from shared.database import Base
+
+
 class UserTable(Base):
     __tablename__ = "users"
 
@@ -13,7 +15,8 @@ class UserTable(Base):
     email = Column(String, nullable=True)
     password = Column(String, nullable=True)
     api_key = Column(String, nullable=False) 
-    creation_date = Column(DateTime, default=func.now())
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
     liked_dishes = relationship("DishLikeTable", back_populates="user")
     liked_canteens = relationship("CanteenLikeTable", back_populates="user")

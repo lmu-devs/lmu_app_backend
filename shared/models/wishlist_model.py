@@ -34,6 +34,7 @@ class WishlistImageTable(ImageTable, Base):
     __tablename__ = "wishlist_images"
     
     wishlist_id = Column(Integer, ForeignKey("wishlists.id"), nullable=False)
+    
     wishlist = relationship("WishlistTable", back_populates="images")
 
 
@@ -43,6 +44,7 @@ class WishlistLikeTable(Base):
     wishlist_id = Column(Integer, ForeignKey("wishlists.id"), primary_key=True)
     user_id = Column(ForeignKey("users.id"), primary_key=True)
     created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
     wishlist = relationship("WishlistTable", back_populates="likes")
     user = relationship("UserTable", back_populates="liked_wishlists") 
@@ -50,6 +52,7 @@ class WishlistLikeTable(Base):
 
 class WishlistTranslationTable(LanguageTable, Base):
     __tablename__ = "wishlist_translations"
+    
     wishlist_id = Column(Integer, ForeignKey("wishlists.id"), primary_key=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
