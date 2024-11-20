@@ -8,11 +8,11 @@ from shared.core.language import Language
 from shared.database import get_db
 from shared.enums.mensa_enums import CanteenID
 from shared.models.user_model import UserTable
-from api.core.api_key import APIKey
-from api.core.language import get_language
-from api.schemas.menu_scheme import Menus
-from api.pydantics.menu_pydantic import menu_days_to_pydantic
-from api.services.menu_service import MenuService
+from api.v1.core.api_key import APIKey
+from api.v1.core.language import get_language
+from api.v1.schemas.menu_scheme import Menus
+from api.v1.pydantics.menu_pydantic import menu_days_to_pydantic
+from api.v1.services.menu_service import MenuService
 from shared.core.logging import get_menu_logger
 
 router = APIRouter()

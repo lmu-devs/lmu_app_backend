@@ -1,4 +1,4 @@
-from api.schemas.user_scheme import User
+from api.v1.schemas.user_scheme import User
 from shared.models.user_model import UserTable
 
 

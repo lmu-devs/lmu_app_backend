@@ -1,11 +1,14 @@
+import enum
 from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
 from shared.models.image_model import ImageTable
-from api.schemas.canteen_scheme import CanteenType
 
-
+class CanteenType(str, enum.Enum):
+    MENSA = "MENSA"
+    STUBISTRO = "STUBISTRO"
+    STUCAFE = "STUCAFE"
 class CanteenTable(Base):
     __tablename__ = "canteens"
 

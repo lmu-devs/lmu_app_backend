@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 
 from shared.database import get_db
 from shared.models.user_model import UserTable
-from api.core.api_key import APIKey
-from api.schemas.feedback_scheme import FeedbackCreate, Feedback
-from api.services.feedback_service import FeedbackService
+from api.v1.core.api_key import APIKey
+from api.v1.schemas.feedback_scheme import FeedbackCreate, Feedback
+from api.v1.services.feedback_service import FeedbackService
 
 router = APIRouter()
 

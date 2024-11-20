@@ -7,11 +7,11 @@ from shared.database import get_db
 from shared.enums.mensa_enums import CanteenID
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
-from api.core.api_key import APIKey
-from api.pydantics.canteen_pydantic import canteen_to_pydantic
-from api.schemas.canteen_scheme import Canteens
-from api.services.canteen_service import CanteenService
 from shared.core.logging import get_canteen_logger
+from api.v1.core.api_key import APIKey
+from api.v1.pydantics.canteen_pydantic import canteen_to_pydantic
+from api.v1.schemas.canteen_scheme import Canteens
+from api.v1.services.canteen_service import CanteenService
 
 router = APIRouter()
 canteen_logger = get_canteen_logger(__name__)

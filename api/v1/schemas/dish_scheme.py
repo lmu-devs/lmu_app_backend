@@ -3,8 +3,8 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from api.schemas.canteen_scheme import Canteen
-from api.schemas.rating_scheme import Rating
+from api.v1.schemas.canteen_scheme import Canteen
+from api.v1.schemas.rating_scheme import Rating
 
 
 class DishPrice(BaseModel):

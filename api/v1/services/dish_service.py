@@ -2,16 +2,16 @@ import uuid
 
 from typing import List, Optional
 from sqlalchemy import select, and_
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
-from api.utils.translation_utils import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.language import Language
 from shared.core.logging import get_dish_logger
 from shared.models.canteen_model import CanteenTable
 from shared.models.dish_model import DishTable, DishLikeTable, DishTranslationTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
+from api.v1.core.translation_utils import apply_translation_query
 
 logger = get_dish_logger(__name__)
 

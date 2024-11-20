@@ -1,14 +1,16 @@
-import requests
-
-from typing import List, Tuple
-from sqlalchemy.orm import Session
 from datetime import datetime
+from typing import List, Tuple
 
+import requests
+from sqlalchemy.orm import Session
+
+from data_fetcher.service.images_service import ImageService
 from shared.core.exceptions import DataFetchError, DataProcessingError
 from shared.core.logging import get_data_fetcher_logger
 from shared.database import get_db
-from shared.models.canteen_model import CanteenImageTable, CanteenTable, CanteenType, LocationTable, OpeningHoursTable
-from data_fetcher.service.images_service import ImageService
+from shared.models.canteen_model import (CanteenImageTable, CanteenTable,
+                                         CanteenType, LocationTable,
+                                         OpeningHoursTable)
 from shared.settings import get_settings
 
 logger = get_data_fetcher_logger(__name__)
@@ -123,7 +125,7 @@ class CanteenFetcher:
                 # Update Canteen Images
                 directory_path = "shared/assets/canteens/"
                 settings = get_settings()
-                image_url_prefix = f"{settings.BASE_URL}{settings.BASE_PREFIX_EAT}/images/"
+                image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_BASE_PREFIX_EAT}/images/"
                 files = ImageService.generate_image_urls(directory_path, image_url_prefix)
                 self.set_canteen_images(canteen_obj, files)
                 

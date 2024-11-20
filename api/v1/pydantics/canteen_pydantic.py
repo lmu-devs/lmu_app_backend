@@ -1,6 +1,6 @@
 from shared.models.canteen_model import CanteenTable
-from api.schemas.canteen_scheme import Canteen, Image, Weekday, OpeningHours, Location
-from api.schemas.rating_scheme import Rating
+from api.v1.schemas.canteen_scheme import Canteen, Image, Weekday, OpeningHours, Location
+from api.v1.schemas.rating_scheme import Rating
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> Canteen:

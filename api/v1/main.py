@@ -2,7 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.routers import canteen_router, dish_router, feedback_router, log_router, menu_router, taste_router, user_router, wishlist_router
+from api.v1.routers import (canteen_router, dish_router, feedback_router,
+                            log_router, menu_router, taste_router, user_router,
+                            wishlist_router)
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.core.logging import get_api_logger
@@ -14,7 +16,8 @@ api_logger = get_api_logger(__name__)
 
 def create_app():
     settings = get_settings()
-    eat_prefix = settings.BASE_PREFIX_EAT
+    prefix = settings.API_V1_BASE_PREFIX
+    eat_prefix = settings.API_V1_BASE_PREFIX_EAT
     
     app = FastAPI(
         title="lmu-dev-api", 
@@ -36,10 +39,10 @@ def create_app():
     app.include_router(menu_router.router,      prefix=eat_prefix, tags=["canteen"])
     app.include_router(dish_router.router,      prefix=eat_prefix, tags=["canteen"])
     app.include_router(taste_router.router,     prefix=eat_prefix, tags=["canteen"])
-    app.include_router(user_router.router,                         tags=["user"])
-    app.include_router(log_router.router,                          tags=["log"])
-    app.include_router(feedback_router.router,                     tags=["feedback"])
-    app.include_router(wishlist_router.router,                     tags=["wishlist"])
+    app.include_router(user_router.router,      prefix=prefix, tags=["user"])
+    app.include_router(log_router.router,       prefix=prefix, tags=["log"])
+    app.include_router(feedback_router.router,  prefix=prefix, tags=["feedback"])
+    app.include_router(wishlist_router.router,  prefix=prefix, tags=["wishlist"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

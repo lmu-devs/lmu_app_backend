@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./shared /app/shared
 COPY ./api /app/api
 
-# gets called in docker-compose.yml
-# CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "80"]
+
+CMD ["uvicorn", "api.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

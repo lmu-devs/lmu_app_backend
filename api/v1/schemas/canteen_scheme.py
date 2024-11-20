@@ -4,8 +4,9 @@ from datetime import time as datetime_time
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, RootModel
 
-from api.schemas.image_scheme import Image
-from api.schemas.rating_scheme import Rating
+from shared.models.canteen_model import CanteenType
+from api.v1.schemas.image_scheme import Image
+from api.v1.schemas.rating_scheme import Rating
 
 
 class Weekday(str, enum.Enum):
@@ -17,10 +18,7 @@ class Weekday(str, enum.Enum):
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
     
-class CanteenType(str, enum.Enum):
-    MENSA = "MENSA"
-    STUBISTRO = "STUBISTRO"
-    STUCAFE = "STUCAFE"
+
     
 
 class Location(BaseModel):

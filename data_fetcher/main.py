@@ -53,7 +53,7 @@ def fetch_data_current_year(db: Session):
                 menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
-                    date_to=date_from + timedelta(days=default_days_amount - 1)
+                    date_to=date_from + timedelta(days=default_days_amount)
                 )
                 logger.info(f"Successfully updated menu for {canteen.value}")
             except (ExternalAPIError, DatabaseError, DataProcessingError) as e:

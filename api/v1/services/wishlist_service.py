@@ -5,11 +5,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
-from api.utils.translation_utils import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.language import Language
 from shared.core.logging import get_api_logger
 from shared.models.wishlist_model import WishlistTable, WishlistImageTable, WishlistLikeTable, WishlistTranslationTable
+from api.v1.core.translation_utils import apply_translation_query
 
 logger = get_api_logger(__name__)
 

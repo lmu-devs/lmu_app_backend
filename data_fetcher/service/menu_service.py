@@ -172,11 +172,11 @@ class MenuFetcher:
 
     def update_menu_database(self, canteen_id: str, date_from: date, date_to: date):
         """Update menu data for a specific canteen within a date range"""
-        logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to}...")
+        logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to- timedelta(days=1)}...")
         
         try:
             current_date = date_from
-            while current_date <= date_to:
+            while current_date <= date_to - timedelta(days=1):
                 year = current_date.year
                 week = current_date.strftime("%V")
                 menu_data = self.fetch_menu_data(canteen_id, week, year)

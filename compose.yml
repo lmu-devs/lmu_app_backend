@@ -42,33 +42,33 @@ services:
       - frontend
       - backend
 
-  api:
+  api_v1:
     build:
       context: .
-      dockerfile: Dockerfile-api
+      dockerfile: docker/Dockerfile-api
+    environment:
+      - API_VERSION=v1
+      - PYTHONPATH=/app
     env_file:
       - .env
-    container_name: api
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    container_name: api_v1
     networks:
       - backend
       - frontend
     volumes:
       - .:/app
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8000"
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      - PYTHONPATH=/app
     restart: always
 
 
   data_fetcher:
     build:
       context: .
-      dockerfile: Dockerfile-data_fetcher
+      dockerfile: docker/Dockerfile-data_fetcher
     env_file:
       - .env
     container_name: data_fetcher

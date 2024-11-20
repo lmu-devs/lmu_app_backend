@@ -2,9 +2,9 @@ import uuid
 from typing import Optional
 
 from shared.models.wishlist_model import WishlistTable
-from api.schemas.wishlist_scheme import Wishlist
-from api.schemas.rating_scheme import Rating
-from api.schemas.image_scheme import Image
+from api.v1.schemas.wishlist_scheme import Wishlist
+from api.v1.schemas.rating_scheme import Rating
+from api.v1.schemas.image_scheme import Image
 
 
 

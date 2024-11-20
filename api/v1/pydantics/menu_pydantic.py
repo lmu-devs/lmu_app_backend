@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 from shared.models.menu_model import MenuDayTable
-from api.schemas.menu_scheme import MenuDay, Menus
+from api.v1.schemas.menu_scheme import MenuDay, Menus
 from .dish_pydantic import dish_to_pydantic
 
 

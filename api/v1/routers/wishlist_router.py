@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from api.core.language import get_language
-from api.pydantics.wishlist_pydantic import wishlist_to_pydantic
 from shared.core.language import Language
 from shared.database import get_db
 from shared.models.user_model import UserTable
-from api.core.api_key import APIKey
-from api.schemas.wishlist_scheme import Wishlist, WishlistCreate, WishlistUpdate, Wishlists
-from api.services.wishlist_service import WishlistService
 from shared.core.logging import get_api_logger
+from api.v1.core.language import get_language
+from api.v1.pydantics.wishlist_pydantic import wishlist_to_pydantic
+from api.v1.core.api_key import APIKey
+from api.v1.schemas.wishlist_scheme import Wishlist, WishlistCreate, WishlistUpdate, Wishlists
+from api.v1.services.wishlist_service import WishlistService
 
 router = APIRouter()
 logger = get_api_logger(__name__)

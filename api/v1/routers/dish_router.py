@@ -7,13 +7,13 @@ from shared.core.language import Language
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
-from api.core.api_key import APIKey
-from api.core.language import get_language
-from api.schemas.dish_scheme import DishDates, Dishes
-from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
-from api.services.canteen_service import CanteenService
-from api.services.dish_service import DishService
 from shared.core.logging import get_dish_logger
+from api.v1.core.api_key import APIKey
+from api.v1.core.language import get_language
+from api.v1.schemas.dish_scheme import DishDates, Dishes
+from api.v1.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
+from api.v1.services.canteen_service import CanteenService
+from api.v1.services.dish_service import DishService
 
 router = APIRouter()
 dish_logger = get_dish_logger(__name__)

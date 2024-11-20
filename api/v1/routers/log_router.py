@@ -5,9 +5,9 @@ from fastapi.responses import FileResponse
 from typing import Annotated
 
 from shared.core.exceptions import ConfigurationError
-from api.core.api_key import APIKey
-from api.services.log_service import LogService
 from shared.core.logging import get_api_logger
+from api.v1.core.api_key import APIKey
+from api.v1.services.log_service import LogService
 
 router = APIRouter()
 logger = get_api_logger(__name__)

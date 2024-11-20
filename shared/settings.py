@@ -6,8 +6,9 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     
     # Base URL for the eat API
-    BASE_URL: str = "https://api.lmu-dev.org"
-    BASE_PREFIX_EAT: str = "/eat/v1"
+    API_BASE_URL: str = "https://api.lmu-dev.org"
+    API_V1_BASE_PREFIX: str = "/v1"
+    API_V1_BASE_PREFIX_EAT: str = f"{API_V1_BASE_PREFIX}/eat"
     
     # API key for authentication our api
     SYSTEM_API_KEY: str

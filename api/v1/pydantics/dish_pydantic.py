@@ -1,9 +1,9 @@
 import uuid
 from typing import Dict
 
-from api.pydantics.canteen_pydantic import canteen_to_pydantic
-from api.schemas.dish_scheme import Dish, DishDate, DishDates, DishPrice
-from api.schemas.rating_scheme import Rating
+from api.v1.pydantics.canteen_pydantic import canteen_to_pydantic
+from api.v1.schemas.dish_scheme import Dish, DishDate, DishDates, DishPrice
+from api.v1.schemas.rating_scheme import Rating
 from shared.models.dish_model import DishTable
 
 
