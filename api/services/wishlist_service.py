@@ -5,7 +5,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
+from api.utils.translation_utils import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.core.language import Language
 from shared.core.logging import get_api_logger
 from shared.models.wishlist_model import WishlistTable, WishlistImageTable, WishlistLikeTable, WishlistTranslationTable
 
@@ -15,19 +17,19 @@ class WishlistService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_wishlists(self, wishlist_id: Optional[int] = None) -> WishlistTable:
+    def get_wishlists(self, language: Language = Language.GERMAN, wishlist_id: Optional[int] = None) -> WishlistTable:
         try:
             query = (
                 select(WishlistTable)
-                .outerjoin(WishlistTable.translations)
                 .outerjoin(WishlistTable.images)
                 .outerjoin(WishlistTable.likes)
                 .options(
-                    contains_eager(WishlistTable.translations),
                     contains_eager(WishlistTable.images),
                     contains_eager(WishlistTable.likes)
                 )
             )
+            
+            query = apply_translation_query(base_query=query, model=WishlistTable, translation_model=WishlistTranslationTable, language=language)
 
             if wishlist_id:
                 query = query.filter(WishlistTable.id == wishlist_id)
@@ -86,7 +88,7 @@ class WishlistService:
 
     def update_wishlist(self, wishlist_id: int, wishlist_data: dict) -> WishlistTable:
         try:
-            wishlist = self.get_wishlists(wishlist_id)[0]
+            wishlist = self.get_wishlists(wishlist_id=wishlist_id)[0]
             
             # Extract nested data
             images_data = wishlist_data.pop("images", None)
@@ -127,7 +129,7 @@ class WishlistService:
 
     def delete_wishlist(self, wishlist_id: int) -> bool:
         try:
-            wishlist = self.get_wishlists(wishlist_id)[0]
+            wishlist = self.get_wishlists(wishlist_id=wishlist_id)[0]
             self.db.delete(wishlist)
             self.db.commit()
             return True

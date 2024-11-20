@@ -4,7 +4,6 @@ from sqlalchemy import and_, select, case
 from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
-from api.utils.translation_utils import apply_translation_query
 from shared.core.language import Language
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable
@@ -37,12 +36,12 @@ class MenuService:
                 .join(MenuDayTable.canteen)
                 .join(MenuDayTable.dish_associations)
                 .join(MenuDishAssociation.dish)
-                .join(DishTable.translations)
+                .outerjoin(DishTable.translations)
             )
             
             # Apply translation query - modify to use the already joined translations
             stmt = (
-                stmt.filter(DishTranslationTable.language.in_([language.value, Language.GERMAN.value]))
+                stmt
                 .options(
                     contains_eager(MenuDayTable.canteen),
                     contains_eager(MenuDayTable.dish_associations)

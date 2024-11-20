@@ -4,8 +4,6 @@ from typing import Dict
 from api.pydantics.canteen_pydantic import canteen_to_pydantic
 from api.schemas.dish_scheme import Dish, DishDate, DishDates, DishPrice
 from api.schemas.rating_scheme import Rating
-from api.utils.translation_utils import get_translation
-from shared.core.language import Language
 from shared.models.dish_model import DishTable
 
 

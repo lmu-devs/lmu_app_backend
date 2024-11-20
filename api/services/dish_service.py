@@ -40,8 +40,6 @@ class DishService:
             )
             
             stmt = apply_translation_query(base_query=stmt, model=DishTable, translation_model=DishTranslationTable, language=language)
-            
-            logger.info(f"Final query: {stmt}")
 
             # Add filters based on parameters
             if dish_id:
@@ -69,13 +67,6 @@ class DishService:
 
             dishes = self.db.execute(stmt).unique().scalars().all()
             
-            # More detailed logging
-            for dish in dishes:
-                logger.info(f"""
-                    Dish ID: {dish.id}
-                    Translations: {[(t.language, t.title) for t in dish.translations]}
-                    Translation count: {len(dish.translations)}
-                """)
 
             if not dishes:
                 raise NotFoundError(

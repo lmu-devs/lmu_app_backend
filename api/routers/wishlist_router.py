@@ -22,10 +22,10 @@ async def get_wishlists(
     current_user: UserTable = Depends(APIKey.get_user_from_key_soft)
 ):
     wishlist_service = WishlistService(db)
-    wishlists = wishlist_service.get_wishlists(id)
+    wishlists = wishlist_service.get_wishlists(language, id)
     
     return Wishlists(wishlists=[
-        wishlist_to_pydantic(wishlist, language, current_user.id if current_user else None) 
+        wishlist_to_pydantic(wishlist, current_user.id if current_user else None) 
         for wishlist in wishlists
     ])
 
