@@ -16,13 +16,15 @@ from shared.settings import get_settings
 from data_fetcher.service.canteen_service import CanteenFetcher
 from data_fetcher.service.menu_service import MenuFetcher
 
+logger = setup_logger(__name__, "data_fetcher")
+
 # ------ Needed for stopping docker container ------ #
 # Global flag to control the main loop
 running = True
 
 def signal_handler(signum, frame):
     global running
-    print("Received shutdown signal. Stopping gracefully...")
+    logger.info("Received shutdown signal. Stopping gracefully...")
     running = False
 
 # Register the signal handler
@@ -31,7 +33,6 @@ signal.signal(signal.SIGINT, signal_handler)
 # ------ Needed for stopping docker container ------ #
 
 
-logger = setup_logger(__name__, "data_fetcher")
 
 def fetch_data_current_year(db: Session):
     """Fetches data for the next 14 days for all canteens"""
@@ -73,7 +74,7 @@ def fetch_data_current_year(db: Session):
         )
 
 
-def fetch_scheduled_data(db: Session):
+def fetch_scheduled_data(db: Session, days_amount: int = 14):
     """Fetches data for the next 14 days for all canteens"""
     print("Attempting to fetch data for next 14 days...")
     
@@ -84,7 +85,6 @@ def fetch_scheduled_data(db: Session):
 
         # Get current date
         date_from = datetime.now().date()
-        days_amount = 14  # Fetch 2 weeks worth of data
 
         # Update menu for each canteen
         for canteen in CanteenID:
@@ -101,30 +101,29 @@ def fetch_scheduled_data(db: Session):
                 continue
                 
     except requests.exceptions.RequestException as e:
-        print("Error fetching data:", e)
+        logger.error("Error fetching data:", e)
     except Exception as e:
-        print(f"Unexpected error during scheduled fetch: {str(e)}")
+        logger.error(f"Unexpected error during scheduled fetch: {str(e)}")
         
 def create_data_fetcher():
-    print("Setting up schedule...")
+    logger.info("Setting up schedule...")
     
     # Initial fetch
     db = next(get_db())
-    # fetch_scheduled_data(db)
-    CanteenFetcher(db).update_canteen_database()
+    fetch_scheduled_data(db, days_amount=1)
+    # CanteenFetcher(db).update_canteen_database()
     
-    # Schedule daily updates
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
-    print("Entering data_fetcher loop...")
+    logger.info("Entering data_fetcher loop...")
     while running:
         schedule.run_pending()
         time.sleep(1)
     
-    print("Exiting main loop...")
+    logger.info("Exiting main loop...")
 
 if __name__ == "__main__":
-    print("Script started")
+    logger.info("data_fetcher started")
     try:
         # Initialize the database
         settings = get_settings()
@@ -133,7 +132,7 @@ if __name__ == "__main__":
         # Start the main loop
         create_data_fetcher()
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error(f"An error occurred: {e}")
     finally:
-        print("Script is shutting down")
+        logger.info("data_fetcher is shutting down")
     sys.exit(0)

@@ -6,10 +6,9 @@ from sqlalchemy.orm import Session, noload, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.exceptions import DatabaseError, NotFoundError
-from shared.core.language import Language
 from shared.core.logging import get_dish_logger
 from shared.models.canteen_model import CanteenTable
-from shared.models.dish_model import DishTable, DishLikeTable, DishTranslationTable
+from shared.models.dish_model import DishTable, DishLikeTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 
 logger = get_dish_logger(__name__)
@@ -24,7 +23,6 @@ class DishService:
         dish_id: Optional[int] = None, 
         user_id: Optional[uuid.UUID] = None,
         only_liked: bool = False,
-        language: Language = Language.GERMAN
     ) -> List[DishTable]:
         """
         Get dishes from the database.
@@ -33,20 +31,13 @@ class DishService:
         Otherwise, return all dishes.
         """
         try:
-            # Base query
-            stmt = (
-                select(DishTable)
-                .join(DishTable.translations)
-                .filter(DishTranslationTable.language == language.value)
-                .options(contains_eager(DishTable.translations))
-            )
+            stmt = select(DishTable).options(contains_eager(DishTable.translations))
 
             if user_id and only_liked:
                 stmt = stmt.join(DishLikeTable).filter(DishLikeTable.user_id == user_id)
             if dish_id:
                 stmt = stmt.filter(DishTable.id == dish_id).options(noload(DishTable.likes))
 
-            # Execute the query and return the results in one step
             dishes = self.db.execute(stmt).unique().scalars().all()
 
             if not dishes:
@@ -54,7 +45,7 @@ class DishService:
                     detail=f"No dishes found with the specified criteria",
                     extra={"dish_id": dish_id}
                 )
-            logger.info(f"Found {len(dishes)} dishes matching criteria. dish_id: {dish_id}, user_id: {user_id}, only_liked: {only_liked}, language: {language.value}")
+            logger.info(f"Found {len(dishes)} dishes matching criteria. dish_id: {dish_id}, user_id: {user_id}, only_liked: {only_liked}")
             return dishes
 
         except SQLAlchemyError as e:

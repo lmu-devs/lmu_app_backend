@@ -1,20 +1,20 @@
 from typing import List
-from sqlalchemy.orm import Session
-from shared.models.dish_model import DishTable, DishTranslationTable
+
 from shared.core.language import Language
-from shared.services.translation_service import TranslationService
 from shared.core.logging import get_data_fetcher_logger
+from shared.models.dish_model import DishTable, DishTranslationTable
+from shared.services.translation_service import TranslationService
 
 logger = get_data_fetcher_logger(__name__)
 
 class DishTranslationService:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self):
         self.translation_service = TranslationService()
 
     def create_translations(
         self,
         dish_obj: DishTable,
+        source_dish: DishTranslationTable,
         target_languages: List[Language],
         source_language: Language = Language.GERMAN
     ) -> List[DishTranslationTable]:
@@ -31,21 +31,13 @@ class DishTranslationService:
         """
         try:
             translations = []
-            
-            # Add source language translation
-            source_translation = DishTranslationTable(
-                dish_id=dish_obj.id,
-                language=source_language.value,
-                translation=dish_obj.name
-            )
-            self.db.add(source_translation)
-            translations.append(source_translation)
+            translations.append(source_dish)
             
             # Create translations for each target language
             for target_lang in target_languages:
                 if target_lang != source_language:
                     translated_name = self.translation_service.translate_text(
-                        dish_obj.name,
+                        source_dish.title,
                         target_lang=target_lang.value
                     )
                     
@@ -53,10 +45,9 @@ class DishTranslationService:
                         translation = DishTranslationTable(
                             dish_id=dish_obj.id,
                             language=target_lang.value,
-                            translation=translated_name
+                            title=translated_name
                         )
                         logger.info(f"Created translation for dish {dish_obj.id} to {target_lang.value}: {translated_name}")
-                        self.db.add(translation)
                         translations.append(translation)
                     else:
                         logger.warning(

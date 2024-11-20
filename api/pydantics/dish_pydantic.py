@@ -1,10 +1,12 @@
 import uuid
 from typing import Dict
 
-from shared.models.dish_model import DishTable
+from api.pydantics.canteen_pydantic import canteen_to_pydantic
 from api.schemas.dish_scheme import Dish, DishDate, DishDates, DishPrice
 from api.schemas.rating_scheme import Rating
-from api.pydantics.canteen_pydantic import canteen_to_pydantic
+from api.utils.translation_utils import get_translation
+from shared.core.language import Language
+from shared.models.dish_model import DishTable
 
 
 def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:
@@ -29,21 +31,22 @@ def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None)
 
     return DishDates(dates=dish_dates)
 
+def _get_translation(dish: DishTable, language: Language) -> str:
+    return get_translation(
+        dish.translations,
+        language,
+        lambda t: t.language,
+        lambda t: t.title
+    )
 
+def dish_to_pydantic(dish: DishTable, language: Language, user_id: uuid.UUID = None) -> Dish:
 
-def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
-
+    title = _get_translation(dish, language)
 
     user_likes_dish = None
     if user_id:
         user_likes_dish = any(like.user_id == user_id for like in dish.likes)
         
-        
-    name = dish.name  # fallback to default name
-    if dish.translations:
-        name = dish.translations[0].tranlation  # Use the filtered translation
-    
-
     prices = [
         DishPrice(
             category=price.category,
@@ -61,7 +64,7 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
 
     return Dish(
         id=dish.id,
-        name=name,
+        title=title,
         dish_type=dish.dish_type,
         labels=dish.labels,
         rating=rating,

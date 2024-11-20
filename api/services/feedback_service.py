@@ -17,6 +17,7 @@ class FeedbackService:
             new_feedback = FeedbackTable(
                 id=uuid.uuid4(),
                 user_id=user_id,
+                type=feedback_data['type'],
                 rating=feedback_data['rating'],
                 message=feedback_data.get('message'),
                 screen=feedback_data['screen'],

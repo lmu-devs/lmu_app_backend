@@ -1,9 +1,11 @@
 from datetime import date
 from typing import List, Optional
+
 from pydantic import BaseModel
 
 from api.schemas.canteen_scheme import Canteen
 from api.schemas.rating_scheme import Rating
+
 
 class DishPrice(BaseModel):
     category: str
@@ -13,7 +15,7 @@ class DishPrice(BaseModel):
     
 class Dish(BaseModel):
     id: int
-    name: str
+    title: str
     dish_type: str
     rating: Rating
     price_simple: Optional[str] = None

@@ -1,4 +1,5 @@
 import enum
+
 from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -6,12 +7,10 @@ from shared.database import Base
 from shared.models.language_model import LanguageTable
 
 
-
 class DishTable(Base):
     __tablename__ = "dishes"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, nullable=False) # should only save 1 entry per name
     dish_type = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
     price_simple = Column(String, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
@@ -72,7 +71,7 @@ class DishTranslationTable(LanguageTable, Base):
     __tablename__ = "dish_translations"
     
     dish_id = Column(Integer, ForeignKey("dishes.id"), nullable=False, primary_key=True)
-    name = Column(String, nullable=False)
+    title = Column(String, nullable=False)
     
     dish = relationship("DishTable", back_populates="translations")
 

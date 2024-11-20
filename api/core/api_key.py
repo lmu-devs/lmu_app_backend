@@ -50,7 +50,7 @@ class APIKey:
         """Verify the system API key."""
         settings = get_settings()
         if api_key != settings.SYSTEM_API_KEY:
-            logger.warning("Invalid API key used for log access")
+            logger.warning("Invalid API key used for system access")
             raise AuthenticationError(
                 detail="Invalid API key",
                 extra={"system-api-key": api_key},

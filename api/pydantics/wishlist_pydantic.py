@@ -6,34 +6,24 @@ from shared.models.wishlist_model import WishlistTable
 from api.schemas.wishlist_scheme import Wishlist
 from api.schemas.rating_scheme import Rating
 from api.schemas.image_scheme import Image
+from api.utils.translation_utils import get_translation
 
 
 def _get_translation(wishlist: WishlistTable, language: Language) -> tuple[str, str]:
-    title = "not translated"
-    description = "not translated"
-    
-    # Try to find translation in requested language
-    translation = next(
-        (t for t in wishlist.translations if t.language == language.value),
-        None
+    title = get_translation(
+        wishlist.translations,
+        language,
+        lambda t: t.language,
+        lambda t: t.title
     )
     
-    # If not found, try German
-    if not translation and language != Language.GERMAN:
-        translation = next(
-            (t for t in wishlist.translations if t.language == Language.GERMAN.value),
-            None
-        )
+    description = get_translation(
+        wishlist.translations,
+        language,
+        lambda t: t.language,
+        lambda t: t.description
+    )
     
-    # If still not found, use first available translation
-    if not translation and wishlist.translations:
-        translation = wishlist.translations[0]
-    
-    # Use translation if found
-    if translation:
-        title = translation.title
-        description = translation.description
-        
     return title, description
 
 
