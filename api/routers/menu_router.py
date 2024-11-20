@@ -61,7 +61,7 @@ async def get_menu(
         language
     )
     
-    return menu_days_to_pydantic(menu_days, language, user_id)
+    return menu_days_to_pydantic(menu_days, user_id)
 
 
     

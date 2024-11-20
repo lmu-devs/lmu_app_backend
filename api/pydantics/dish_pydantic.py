@@ -31,17 +31,10 @@ def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None)
 
     return DishDates(dates=dish_dates)
 
-def _get_translation(dish: DishTable, language: Language) -> str:
-    return get_translation(
-        dish.translations,
-        language,
-        lambda t: t.language,
-        lambda t: t.title
-    )
 
-def dish_to_pydantic(dish: DishTable, language: Language, user_id: uuid.UUID = None) -> Dish:
+def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
 
-    title = _get_translation(dish, language)
+    title = dish.translations[0].title if dish.translations else "not translated"
 
     user_likes_dish = None
     if user_id:

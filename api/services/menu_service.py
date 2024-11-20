@@ -1,9 +1,10 @@
 from datetime import date
 from typing import List
-from sqlalchemy import and_, select
+from sqlalchemy import and_, select, case
 from sqlalchemy.orm import Session, contains_eager
 from sqlalchemy.exc import SQLAlchemyError
 
+from api.utils.translation_utils import apply_translation_query
 from shared.core.language import Language
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.models.canteen_model import CanteenLikeTable
@@ -30,24 +31,38 @@ class MenuService:
     ) -> List[MenuDayTable]:
         """Get menu days from the database within a date range"""
         try:
-            # Base query with explicit joins for translations
+            # Base query
             stmt = (
                 select(MenuDayTable)
                 .join(MenuDayTable.canteen)
                 .join(MenuDayTable.dish_associations)
                 .join(MenuDishAssociation.dish)
                 .join(DishTable.translations)
-                .filter(DishTranslationTable.language == language.value)
+            )
+            
+            # Apply translation query - modify to use the already joined translations
+            stmt = (
+                stmt.filter(DishTranslationTable.language.in_([language.value, Language.GERMAN.value]))
                 .options(
                     contains_eager(MenuDayTable.canteen),
                     contains_eager(MenuDayTable.dish_associations)
                     .contains_eager(MenuDishAssociation.dish)
                     .contains_eager(DishTable.translations)
                 )
-                .where(
-                    MenuDayTable.date >= date_from,
-                    MenuDayTable.date <= date_to
+                .order_by(
+                    DishTable.id,
+                    case(
+                        (DishTranslationTable.language == language.value, 1),
+                        (DishTranslationTable.language == Language.GERMAN.value, 2),
+                        else_=3
+                    )
                 )
+            )
+            
+            # Add date filters
+            stmt = stmt.where(
+                MenuDayTable.date >= date_from,
+                MenuDayTable.date <= date_to
             )
             logger.info(f"Fetching menu days for canteen {canteen_id} from {date_from} to {date_to} with language {language.value}, user_id: {current_user.id if current_user else None}, only_liked_canteens: {only_liked_canteens}")
 

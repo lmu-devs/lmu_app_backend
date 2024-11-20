@@ -24,7 +24,7 @@ class DishTable(Base):
     translations = relationship("DishTranslationTable", back_populates="dish", cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Dish(id='{self.id}', name='{self.name}', type='{self.dish_type}')>"
+        return f"<Dish(id='{self.id}', type='{self.dish_type}')>"
     
     @property
     def like_count(self):

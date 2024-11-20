@@ -34,10 +34,10 @@ async def get_dish(
     ):
     
     user_id = current_user.id if current_user else None
-    dishes = DishService(db).get_dishes(id, user_id, only_liked_dishes)
+    dishes = DishService(db).get_dishes(id, user_id, only_liked_dishes, language)
     dish_logger.info(f"Fetched dishes {id} with user_id: {user_id} and only_liked_dishes: {only_liked_dishes} with language: {language}")
     
-    return Dishes(dishes=[dish_to_pydantic(dish, language, user_id) for dish in dishes])
+    return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
 
 
 

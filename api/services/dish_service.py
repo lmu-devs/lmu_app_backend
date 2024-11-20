@@ -2,13 +2,15 @@ import uuid
 
 from typing import List, Optional
 from sqlalchemy import select, and_
-from sqlalchemy.orm import Session, noload, contains_eager
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import SQLAlchemyError
 
+from api.utils.translation_utils import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.core.language import Language
 from shared.core.logging import get_dish_logger
 from shared.models.canteen_model import CanteenTable
-from shared.models.dish_model import DishTable, DishLikeTable
+from shared.models.dish_model import DishTable, DishLikeTable, DishTranslationTable
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
 
 logger = get_dish_logger(__name__)
@@ -23,6 +25,7 @@ class DishService:
         dish_id: Optional[int] = None, 
         user_id: Optional[uuid.UUID] = None,
         only_liked: bool = False,
+        language: Language = Language.ENGLISH_US
     ) -> List[DishTable]:
         """
         Get dishes from the database.
@@ -34,8 +37,11 @@ class DishService:
             # Base query with translations
             stmt = (
                 select(DishTable)
-                .join(DishTable.translations)  # Join translations
             )
+            
+            stmt = apply_translation_query(base_query=stmt, model=DishTable, translation_model=DishTranslationTable, language=language)
+            
+            logger.info(f"Final query: {stmt}")
 
             # Add filters based on parameters
             if dish_id:
@@ -62,6 +68,14 @@ class DishService:
                 )
 
             dishes = self.db.execute(stmt).unique().scalars().all()
+            
+            # More detailed logging
+            for dish in dishes:
+                logger.info(f"""
+                    Dish ID: {dish.id}
+                    Translations: {[(t.language, t.title) for t in dish.translations]}
+                    Translation count: {len(dish.translations)}
+                """)
 
             if not dishes:
                 raise NotFoundError(

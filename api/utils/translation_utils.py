@@ -1,6 +1,10 @@
 from typing import TypeVar, Any, Sequence
+
+from sqlalchemy import Select, case, select
+from sqlalchemy.orm import selectinload, contains_eager
 from shared.core.language import Language
 from shared.core.logging import get_api_logger
+from shared.models.dish_model import DishTable
 logger = get_api_logger(__name__)
 
 T = TypeVar('T')
@@ -24,6 +28,7 @@ def get_translation(
         Translated value or "not translated" if no translation found
     """
     default_value = "not translated"
+    logger.info(f"Getting translation for language: {language}")
     
     # Try to find translation in requested language
     translation = next(
@@ -47,3 +52,33 @@ def get_translation(
         return value_getter(translation)
         
     return default_value 
+
+def apply_translation_query(base_query : Select, model, translation_model, language: Language) -> Select:
+    """
+    Generic function to apply translation filtering logic to any query with translations.
+    
+    Args:
+        base_query: The base SQLAlchemy select statement
+        model: The main model class (e.g., DishTable, WishlistTable)
+        translation_model: The translation model class (e.g., DishTranslationTable)
+        language: Target language
+    
+    Returns:
+        Modified query with translation filtering logic
+    """
+    return (
+        base_query
+        .join(model.translations)
+        .filter(translation_model.language.in_([language.value, Language.GERMAN.value]))
+        .options(
+            contains_eager(model.translations)
+        )
+        .order_by(
+            model.id,  # Ensure consistent ordering
+            case(
+                (translation_model.language == language.value, 1),
+                (translation_model.language == Language.GERMAN.value, 2),
+                else_=3
+            )
+        )
+    )
