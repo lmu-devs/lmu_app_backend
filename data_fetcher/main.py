@@ -77,7 +77,7 @@ signal.signal(signal.SIGINT, signal_handler)
 #         )
 
 
-def fetch_scheduled_data(db: Session, days_amount: int = 14):
+def fetch_scheduled_data(db: Session, days_amount: int = 21):
     """Fetches data for the next 14 days for all canteens"""
     print("Attempting to fetch data for next 14 days...")
     
@@ -121,7 +121,7 @@ def create_data_fetcher():
     
     # Initial fetch
     db = next(get_db())
-    fetch_scheduled_data(db)
+    fetch_scheduled_data(db, days_amount=7)
     # CanteenFetcher(db).update_canteen_database()
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
