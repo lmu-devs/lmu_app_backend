@@ -34,44 +34,47 @@ signal.signal(signal.SIGINT, signal_handler)
 
 
 
-def fetch_data_current_year(db: Session):
-    """Fetches data for the next 14 days for all canteens"""
-    try:
-        logger.info("Starting data fetch for next 14 days")
-        # Update canteen information first
-        canteen_fetcher = CanteenFetcher(db)
-        canteen_fetcher.update_canteen_database()
+# def fetch_data_current_year(db: Session):
+#     """Fetches data for the next 14 days for all canteens"""
+#     try:
+#         logger.info("Starting data fetch for next 14 days")
+#         # Update canteen information first
+#         canteen_fetcher = CanteenFetcher(db)
+#         canteen_fetcher.update_canteen_database()
 
-        # Get current date
-        date_from = datetime.now().date()
-        default_days_amount = 14
+#         # Get current date
+#         date_from = datetime.now().date()
+#         default_days_amount = 14
+        
+#         logger.info(f"Fetching data for {default_days_amount} days")
+#         logger.info(f"Date from: {date_from}")
 
-        # Update menu for each canteen
-        for canteen in CanteenID:
-            try:
-                menu_service = MenuFetcher(db)
-                menu_service.update_menu_database(
-                    canteen_id=canteen.value,
-                    date_from=date_from,
-                    date_to=date_from + timedelta(days=default_days_amount)
-                )
-                logger.info(f"Successfully updated menu for {canteen.value}")
-            except (ExternalAPIError, DatabaseError, DataProcessingError) as e:
-                error_response = handle_error(e)
-                logger.error(
-                    f"Error updating menu for canteen {canteen.value}",
-                    extra=error_response['error']['extra'],
-                    exc_info=True
-                )
-                continue
+#         # Update menu for each canteen
+#         for canteen in CanteenID:
+#             try:
+#                 menu_service = MenuFetcher(db)
+#                 menu_service.update_menu_database(
+#                     canteen_id=canteen.value,
+#                     date_from=date_from,
+#                     date_to=date_from + timedelta(days=default_days_amount)
+#                 )
+#                 logger.info(f"Successfully updated menu for {canteen.value}")
+#             except (ExternalAPIError, DatabaseError, DataProcessingError) as e:
+#                 error_response = handle_error(e)
+#                 logger.error(
+#                     f"Error updating menu for canteen {canteen.value}",
+#                     extra=error_response['error']['extra'],
+#                     exc_info=True
+#                 )
+#                 continue
             
-    except Exception as e:
-        error_response = handle_error(e)
-        logger.error(
-            "Unexpected error during data fetch",
-            extra=error_response['error']['extra'],
-            exc_info=True
-        )
+#     except Exception as e:
+#         error_response = handle_error(e)
+#         logger.error(
+#             "Unexpected error during data fetch",
+#             extra=error_response['error']['extra'],
+#             exc_info=True
+#         )
 
 
 def fetch_scheduled_data(db: Session, days_amount: int = 14):
@@ -86,6 +89,9 @@ def fetch_scheduled_data(db: Session, days_amount: int = 14):
         # Get current date
         date_from = datetime.now().date()
 
+        logger.info(f"Fetching data for {days_amount} days")
+        logger.info(f"Date from: {date_from}")
+
         # Update menu for each canteen
         for canteen in CanteenID:
             try:
@@ -93,11 +99,16 @@ def fetch_scheduled_data(db: Session, days_amount: int = 14):
                 menu_service.update_menu_database(
                     canteen_id=canteen.value,
                     date_from=date_from,
-                    date_to=date_from + timedelta(days=days_amount)
+                    date_to=date_from + timedelta(days=days_amount -1)
                 )
-                print(f"Successfully updated menu for {canteen.value}")
+                logger.info(f"Successfully updated menu for {canteen.value}")
             except Exception as e:
-                print(f"Error updating menu for canteen {canteen.value}: {str(e)}")
+                error_response = handle_error(e)
+                logger.error(
+                    f"Error updating menu for canteen {canteen.value}",
+                    extra=error_response['error']['extra'],
+                    exc_info=True
+                )
                 continue
                 
     except requests.exceptions.RequestException as e:
@@ -110,7 +121,7 @@ def create_data_fetcher():
     
     # Initial fetch
     db = next(get_db())
-    fetch_scheduled_data(db, days_amount=1)
+    fetch_scheduled_data(db)
     # CanteenFetcher(db).update_canteen_database()
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)

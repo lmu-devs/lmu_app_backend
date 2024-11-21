@@ -175,8 +175,11 @@ class MenuFetcher:
         logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to- timedelta(days=1)}...")
         
         try:
-            current_date = date_from
-            while current_date <= date_to - timedelta(days=1):
+            # Get the first day (Monday) of the week for date_from
+            current_date = date_from - timedelta(days=date_from.weekday())
+            
+            # Process each week until we cover the entire date range
+            while current_date < date_to:
                 year = current_date.year
                 week = current_date.strftime("%V")
                 menu_data = self.fetch_menu_data(canteen_id, week, year)

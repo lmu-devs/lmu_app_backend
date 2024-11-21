@@ -2,9 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.v1.routers import (canteen_router, dish_router, feedback_router,
-                            log_router, menu_router, taste_router, user_router,
-                            wishlist_router)
+from api.v1.routers import canteen_router, dish_router, feedback_router, log_router, menu_router, taste_router, user_router, wishlist_router
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.core.logging import get_api_logger
@@ -22,8 +20,8 @@ def create_app():
     app = FastAPI(
         title="lmu-dev-api", 
         description="API for Students App in Munich.", 
-        version="0.1.1", 
-        docs_url="/docs", 
+        version="1.1.5", 
+        docs_url="/v1/docs", 
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
     )
     

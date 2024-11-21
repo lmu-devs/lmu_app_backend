@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 
-from api.v1.core.api_key import APIKey
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_user_logger
 from shared.models.user_model import UserTable
+from api.v1.core.api_key import APIKey
 
 logger = get_user_logger(__name__)
 
