@@ -4,7 +4,7 @@ import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from data_fetcher.service.price_service import PriceService
+from data_fetcher.service.simple_price_service import PriceService
 from data_fetcher.service.translation.dish_translation_service import \
     DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
@@ -136,23 +136,20 @@ class MenuFetcher:
                     # Update prices
                     prices = dish_data.get("prices", {})
                     if prices:
+                        # First, delete all existing price records for this dish
+                        self.db.query(DishPriceTable).filter_by(dish_id=dish_obj.id).delete()
+                        
+                        # Then create new price records
                         for category, price_data in prices.items():
                             if isinstance(price_data, dict):
-                                price_obj = self.db.query(DishPriceTable).filter_by(
+                                price_obj = DishPriceTable(
                                     dish_id=dish_obj.id,
-                                    category=category
-                                ).first()
-                                
-                                if not price_obj:
-                                    price_obj = DishPriceTable(
-                                        dish_id=dish_obj.id,
-                                        category=category
-                                    )
-                                    self.db.add(price_obj)
-                                
-                                price_obj.base_price = price_data.get('base_price')
-                                price_obj.price_per_unit = price_data.get('price_per_unit')
-                                price_obj.unit = price_data.get('unit')
+                                    category=category.upper(),
+                                    base_price=price_data.get('base_price'),
+                                    price_per_unit=price_data.get('price_per_unit'),
+                                    unit=price_data.get('unit')
+                                )
+                                self.db.add(price_obj)
             
             self.db.commit()
             logger.info("Menu data stored successfully.")

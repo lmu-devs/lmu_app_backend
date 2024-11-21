@@ -3,11 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api.v1.routers import canteen_router, dish_router, feedback_router, log_router, menu_router, taste_router, user_router, wishlist_router
-from shared.core.error_handlers import api_error_handler
-from shared.core.exceptions import APIException
-from shared.core.logging import get_api_logger
 from shared.database import Database
 from shared.settings import get_settings
+from shared.core.exceptions import APIException
+from shared.core.logging import get_api_logger
+from shared.core.error_handlers import api_error_handler
 
 api_logger = get_api_logger(__name__)
 
@@ -21,7 +21,7 @@ def create_app():
         title="lmu-dev-api", 
         description="API for Students App in Munich.", 
         version="1.1.5", 
-        docs_url="/v1/docs", 
+        docs_url=f"{prefix}/docs", 
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
     )
     
