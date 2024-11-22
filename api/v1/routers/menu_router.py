@@ -8,12 +8,13 @@ from shared.core.language import Language
 from shared.database import get_db
 from shared.enums.mensa_enums import CanteenID
 from shared.models.user_model import UserTable
+from shared.core.logging import get_menu_logger
+from shared.core.timezone import TimezoneManager
 from api.v1.core.api_key import APIKey
 from api.v1.core.language import get_language
 from api.v1.schemas.menu_scheme import Menus
 from api.v1.pydantics.menu_pydantic import menu_days_to_pydantic
 from api.v1.services.menu_service import MenuService
-from shared.core.logging import get_menu_logger
 
 router = APIRouter()
 menu_logger = get_menu_logger(__name__)
@@ -21,10 +22,9 @@ menu_logger = get_menu_logger(__name__)
 @router.get("/menus", response_model=Menus, description="Get all menus or a specific canteen by ID. Authenticated users can also get liked dishes.")
 async def get_menu(
     date_from: Optional[date] = Query(
-        default=datetime.now().date(),
+        default=None,
         description="Start date for menu search. Defaults to today",
-        example=datetime.now().date()
-        
+        example=TimezoneManager.now_date()
     ),
     days_amount: int = Query(
         default=14,
@@ -46,7 +46,9 @@ async def get_menu(
     language: Language = Depends(get_language),
     db: Session = Depends(get_db)
 ):
-    
+    if date_from is None:
+        date_from = TimezoneManager.now_date()
+
     date_to = date_from + timedelta(days=days_amount)
     user_id = current_user.id if current_user else None
     
