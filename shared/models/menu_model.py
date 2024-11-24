@@ -20,7 +20,6 @@ class MenuDishAssociation(Base):
         ),
     )
 
-    # Relationships
     dish = relationship("DishTable", back_populates="menu_associations")
     menu_day = relationship("MenuDayTable", back_populates="dish_associations")
 
@@ -33,11 +32,10 @@ class MenuDayTable(Base):
     __tablename__ = "menu_days"
 
     date = Column(Date, primary_key=True)
-    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
-    # Relationships
     canteen = relationship("CanteenTable", back_populates="menu_days")
     dish_associations = relationship("MenuDishAssociation", back_populates="menu_day", cascade="all, delete-orphan")
 

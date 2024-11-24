@@ -4,17 +4,17 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.core.language import Language
+from api.v1.core.api_key import APIKey
+from api.v1.core.language import get_language
+from api.v1.pydantics.menu_pydantic import menu_days_to_pydantic
+from api.v1.schemas.menu_scheme import Menus
+from api.v1.services.menu_service import MenuService
+from shared.enums.language_enums import Language
+from shared.core.logging import get_menu_logger
+from shared.core.timezone import TimezoneManager
 from shared.database import get_db
 from shared.enums.mensa_enums import CanteenID
 from shared.models.user_model import UserTable
-from shared.core.logging import get_menu_logger
-from shared.core.timezone import TimezoneManager
-from api.v1.core.api_key import APIKey
-from api.v1.core.language import get_language
-from api.v1.schemas.menu_scheme import Menus
-from api.v1.pydantics.menu_pydantic import menu_days_to_pydantic
-from api.v1.services.menu_service import MenuService
 
 router = APIRouter()
 menu_logger = get_menu_logger(__name__)
@@ -38,7 +38,7 @@ async def get_menu(
         example="mensa-leopoldstr",
         enum=[canteen.value for canteen in CanteenID]
     ),
-    current_user: UserTable = Depends(APIKey.get_user_from_key_soft),
+    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     only_liked_canteens: bool = Query(
         default=False,
         description="Filter menus by liked canteens"

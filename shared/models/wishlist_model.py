@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum, func
+from sqlalchemy import UUID, Column, Integer, String, DateTime, ForeignKey, Enum, func
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
@@ -33,7 +33,7 @@ class WishlistTable(Base):
 class WishlistImageTable(ImageTable, Base):
     __tablename__ = "wishlist_images"
     
-    wishlist_id = Column(Integer, ForeignKey("wishlists.id"), nullable=False)
+    wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), nullable=False)
     
     wishlist = relationship("WishlistTable", back_populates="images")
 
@@ -41,8 +41,8 @@ class WishlistImageTable(ImageTable, Base):
 class WishlistLikeTable(Base):
     __tablename__ = "wishlist_likes"
 
-    wishlist_id = Column(Integer, ForeignKey("wishlists.id"), primary_key=True)
-    user_id = Column(ForeignKey("users.id"), primary_key=True)
+    wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), primary_key=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete='CASCADE'), primary_key=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
@@ -53,7 +53,7 @@ class WishlistLikeTable(Base):
 class WishlistTranslationTable(LanguageTable, Base):
     __tablename__ = "wishlist_translations"
     
-    wishlist_id = Column(Integer, ForeignKey("wishlists.id"), primary_key=True)
+    wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), primary_key=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
     

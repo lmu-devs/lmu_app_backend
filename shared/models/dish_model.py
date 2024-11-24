@@ -11,6 +11,7 @@ class DishTable(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     dish_type = Column(String, nullable=False)
+    dish_category = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
     price_simple = Column(String, nullable=True) # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
     like_count = Column(Integer, default=0)
@@ -40,7 +41,7 @@ class DishPriceTable(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     category = Column(String, nullable=False)
-    dish_id = Column(Integer, ForeignKey('dishes.id'), nullable=False)
+    dish_id = Column(Integer, ForeignKey('dishes.id', ondelete='CASCADE'), nullable=False)
     base_price = Column(Float, nullable=True)
     price_per_unit = Column(Float, nullable=True)
     unit = Column(String, nullable=True)
@@ -57,8 +58,8 @@ class DishLikeTable(Base):
     __tablename__ = "dish_likes"
 
     id = Column(Integer, primary_key=True, index=True)
-    dish_id = Column(Integer, ForeignKey('dishes.id'), nullable=False)
-    user_id = Column(UUID(as_uuid=True),  ForeignKey('users.id'), nullable=False)
+    dish_id = Column(Integer, ForeignKey('dishes.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
 
     # Relationships
     dish = relationship("DishTable", back_populates="likes")
@@ -71,7 +72,7 @@ class DishLikeTable(Base):
 class DishTranslationTable(LanguageTable, Base):
     __tablename__ = "dish_translations"
     
-    dish_id = Column(Integer, ForeignKey("dishes.id"), nullable=False, primary_key=True)
+    dish_id = Column(Integer, ForeignKey("dishes.id", ondelete='CASCADE'), nullable=False, primary_key=True)
     title = Column(String, nullable=False)
     
     dish = relationship("DishTable", back_populates="translations")

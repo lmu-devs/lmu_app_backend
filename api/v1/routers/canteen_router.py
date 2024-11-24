@@ -3,15 +3,15 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.database import get_db
-from shared.enums.mensa_enums import CanteenID
-from shared.models.canteen_model import CanteenTable
-from shared.models.user_model import UserTable
-from shared.core.logging import get_canteen_logger
 from api.v1.core.api_key import APIKey
 from api.v1.pydantics.canteen_pydantic import canteen_to_pydantic
 from api.v1.schemas.canteen_scheme import Canteens
 from api.v1.services.canteen_service import CanteenService
+from shared.core.logging import get_canteen_logger
+from shared.database import get_db
+from shared.enums.mensa_enums import CanteenID
+from shared.models.canteen_model import CanteenTable
+from shared.models.user_model import UserTable
 
 router = APIRouter()
 canteen_logger = get_canteen_logger(__name__)
@@ -21,7 +21,7 @@ canteen_logger = get_canteen_logger(__name__)
 async def get_canteens(
     canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenID]),
     db: Session = Depends(get_db),
-    current_user: Optional[UserTable] = Depends(APIKey.get_user_from_key_soft)
+    current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
     canteen_service = CanteenService(db)
     # Fetch a specific canteen
@@ -51,7 +51,7 @@ async def get_canteens(
 def toggle_like(
     canteen_id: str = Query(..., description="Canteen ID to toggle like", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenID]),
     db: Session = Depends(get_db),
-    current_user: UserTable = Depends(APIKey.get_user_from_key)
+    current_user: UserTable = Depends(APIKey.verify_user_api_key)
 ) -> bool:
     canteen_service = CanteenService(db)
     result = canteen_service.toggle_like(canteen_id, current_user.id)

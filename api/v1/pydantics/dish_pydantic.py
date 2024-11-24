@@ -57,6 +57,7 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
         id=dish.id,
         title=title,
         dish_type=dish.dish_type,
+        dish_category=dish.dish_category,
         labels=dish.labels,
         rating=rating,
         price_simple=dish.price_simple,

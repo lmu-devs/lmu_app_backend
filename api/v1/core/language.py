@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import Header
 
-from shared.core.language import Language
+from shared.enums.language_enums import Language
 
 async def get_language(
     accept_language: Optional[str] = Header(

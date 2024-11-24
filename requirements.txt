@@ -23,3 +23,4 @@ alembic==1.13.3
 pydantic-settings==2.6.1
 asyncpg==0.29.0
 deepl==1.20.0
+pydantic[email]>=2.2.0

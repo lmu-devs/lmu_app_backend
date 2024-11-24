@@ -9,8 +9,9 @@ from data_fetcher.service.translation.dish_translation_service import \
     DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
                                     ExternalAPIError)
-from shared.core.language import Language
+from shared.enums.language_enums import Language
 from shared.core.logging import get_data_fetcher_logger
+from shared.enums.dish_category_enums import DishCategory
 from shared.models.dish_model import (DishPriceTable, DishTable,
                                       DishTranslationTable)
 from shared.models.menu_model import MenuDayTable, MenuDishAssociation
@@ -22,7 +23,7 @@ class MenuFetcher:
     def __init__(self, db: Session):
         self.db = db
         self.dish_translation_service = DishTranslationService()
-        self.target_languages = [Language.GERMAN, Language.ENGLISH_US]
+        self.target_languages = [Language.GERMAN]
         
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
@@ -102,9 +103,14 @@ class MenuFetcher:
                         .first()
                     )
                     
+                    
                     if not dish_obj:
+                        dish_type = dish_data.get('dish_type', '')
+                        dish_category = self._map_dish_type_to_category(dish_type).value
+                        
                         dish_obj = DishTable(
-                            dish_type=dish_data.get('dish_type', ''),
+                            dish_type=dish_type,
+                            dish_category=dish_category,
                             labels=dish_data.get('labels', []),
                             price_simple=PriceService.calculate_simple_price(dish_data.get("prices", {}).get("students", {}))
                         )
@@ -195,4 +201,22 @@ class MenuFetcher:
     def get_last_week_of_year(self, year):
         last_day = date(year, 12, 31)
         return last_day.isocalendar()[1]
-
+    
+    
+    def _map_dish_type_to_category(self, dish_type: str):
+        words = dish_type.strip().split(",")[0].split()
+        first_word = words[0].upper()
+        
+        dessert_types = ["SÜSSSPEISE", "DESSERT"]
+        side_types = ["BEILAGEN", "SIDE"]
+        soup_types = ["STUDITOPF", "TAGESSUPPE"]
+        
+        # match case
+        if first_word in dessert_types:
+            return DishCategory.DESSERT
+        elif first_word in side_types:
+            return DishCategory.SIDE
+        elif first_word in soup_types:
+            return DishCategory.SOUP
+        else:
+            return DishCategory.MAIN

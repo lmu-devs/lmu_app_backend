@@ -1,5 +1,7 @@
+import uuid
 from sqlalchemy.orm import Session
 
+from api.v1.schemas.user_scheme import UserUpdate
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_user_logger
 from shared.models.user_model import UserTable
@@ -56,3 +58,34 @@ class UserService:
             )
         finally:
             self.db.close()
+            
+    def update_user(self, user: UserTable, update_data: UserUpdate) -> None:
+        """Update user in database"""
+        logger.info(f"Updating user with user_id: {user.id}")
+        try:
+            for key, value in update_data.model_dump().items():
+                setattr(user, key, value)
+            self.db.commit()
+            logger.info(f"User with user_id: {user.id} updated successfully")
+        except Exception as e:
+            logger.error(f"Error while updating user in database: {str(e)}")
+            self.db.rollback()
+            raise DatabaseError(
+                detail="Failed to update user",
+                extra={"original_error": str(e)}
+            )
+        
+    def delete_user(self, user: UserTable) -> None:
+        """Delete user from database by user_id"""
+        logger.info(f"Deleting user with user_id: {user.id}")
+        try:
+            self.db.delete(user)
+            self.db.commit()
+            logger.info(f"User with user_id: {user.id} deleted successfully")
+        except Exception as e:
+            logger.error(f"Error while deleting user from database: {str(e)}")
+            self.db.rollback()
+            raise DatabaseError(
+                detail="Failed to delete user",
+                extra={"original_error": str(e)}
+            )

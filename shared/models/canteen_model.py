@@ -32,7 +32,7 @@ class CanteenTable(Base):
 class LocationTable(Base):
     __tablename__ = "locations"
 
-    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
     address = Column(String, nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
@@ -42,12 +42,11 @@ class LocationTable(Base):
 class OpeningHoursTable(Base):
     __tablename__ = "opening_hours"
 
-    canteen_id = Column(String, ForeignKey('canteens.id'), primary_key=True)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
     day = Column(String, primary_key=True)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
-    # Relationships
     canteen = relationship("CanteenTable", back_populates="opening_hours")
     
     
@@ -56,8 +55,8 @@ class CanteenLikeTable(Base):
     __tablename__ = "canteen_likes"
 
     id = Column(Integer, primary_key=True, index=True)
-    canteen_id = Column(String, ForeignKey('canteens.id'), nullable=False)
-    user_id = Column(UUID(as_uuid=True),  ForeignKey('users.id'), nullable=False)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -72,7 +71,7 @@ class CanteenLikeTable(Base):
 class CanteenImageTable(ImageTable, Base):
     __tablename__ = "canteen_images"
 
-    canteen_id = Column(String, ForeignKey('canteens.id'), nullable=False)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), nullable=False)
 
     canteen = relationship("CanteenTable", back_populates="images")
     

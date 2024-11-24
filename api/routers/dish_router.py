@@ -3,18 +3,17 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from api.v1.core.api_key import APIKey
-from api.v1.core.language import get_language
-from api.v1.pydantics.dish_pydantic import (dish_dates_to_pydantic,
-                                            dish_to_pydantic)
-from api.v1.schemas.dish_scheme import DishDates, Dishes
-from api.v1.services.canteen_service import CanteenService
-from api.v1.services.dish_service import DishService
 from shared.enums.language_enums import Language
-from shared.core.logging import get_dish_logger
 from shared.database import get_db
 from shared.models.canteen_model import CanteenTable
 from shared.models.user_model import UserTable
+from api.core.api_key import APIKey
+from api.core.language import get_language
+from api.schemas.dish_scheme import DishDates, Dishes
+from api.pydantics.dish_pydantic import (dish_dates_to_pydantic, dish_to_pydantic)
+from api.services.canteen_service import CanteenService
+from api.services.dish_service import DishService
+from shared.core.logging import get_dish_logger
 
 router = APIRouter()
 dish_logger = get_dish_logger(__name__)
@@ -29,7 +28,7 @@ async def get_dish(
         title="Dish ID"
     )] = None,
     only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
-    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
+    current_user: UserTable = Depends(APIKey.get_user_from_key_soft),
     db: Session = Depends(get_db),
     language: Language = Depends(get_language)
     ):
@@ -53,7 +52,7 @@ async def read_dish_dates(
         title="Dish ID"
     )],
     db: Session = Depends(get_db),
-    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    current_user: UserTable = Depends(APIKey.get_user_from_key_soft)
     ):
     
     dish_dates = DishService(db).get_dates(dish_id)
@@ -74,7 +73,7 @@ async def read_dish_dates(
 def toggle_like(
     dish_id: int, 
     db: Session = Depends(get_db), 
-    current_user: UserTable = Depends(APIKey.verify_user_api_key)
+    current_user: UserTable = Depends(APIKey.get_user_from_key)
     ):
 
     like_status = DishService(db).toggle_like(dish_id, current_user.id)

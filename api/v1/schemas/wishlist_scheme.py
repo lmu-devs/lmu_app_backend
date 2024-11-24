@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-from shared.core.language import Language
+from shared.enums.language_enums import Language
 from shared.models.wishlist_model import WishlistStatus
 from api.v1.schemas.image_scheme import Image
 from api.v1.schemas.rating_scheme import Rating

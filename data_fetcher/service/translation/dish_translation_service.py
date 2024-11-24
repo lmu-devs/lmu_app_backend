@@ -1,6 +1,6 @@
 from typing import List
 
-from shared.core.language import Language
+from shared.enums.language_enums import Language
 from shared.core.logging import get_data_fetcher_logger
 from shared.models.dish_model import DishTable, DishTranslationTable
 from shared.services.translation_service import TranslationService

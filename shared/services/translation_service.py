@@ -1,6 +1,6 @@
 from typing import Optional
 import deepl
-from shared.core.language import Language
+from shared.enums.language_enums import Language
 from shared.settings import get_settings
 from shared.core.logging import setup_logger
 

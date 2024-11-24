@@ -17,10 +17,11 @@ class Dish(BaseModel):
     id: int
     title: str
     dish_type: str
-    rating: Rating
+    dish_category: str
     price_simple: Optional[str] = None
-    labels: List[str]
     prices: List[DishPrice]
+    rating: Rating
+    labels: List[str]
     
 class Dishes(BaseModel):
     dishes: List[Dish]

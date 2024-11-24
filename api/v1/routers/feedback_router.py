@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from api.v1.core.api_key import APIKey
+from api.v1.schemas.feedback_scheme import Feedback, FeedbackCreate
+from api.v1.services.feedback_service import FeedbackService
 from shared.database import get_db
 from shared.models.user_model import UserTable
-from api.v1.core.api_key import APIKey
-from api.v1.schemas.feedback_scheme import FeedbackCreate, Feedback
-from api.v1.services.feedback_service import FeedbackService
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ router = APIRouter()
 async def create_feedback(
     feedback_data: FeedbackCreate,
     db: Session = Depends(get_db),
-    current_user: UserTable = Depends(APIKey.get_user_from_key)
+    current_user: UserTable = Depends(APIKey.verify_user_api_key)
 ):
     feedback_service = FeedbackService(db)
     feedback = feedback_service.create_feedback(current_user.id, feedback_data.model_dump())
