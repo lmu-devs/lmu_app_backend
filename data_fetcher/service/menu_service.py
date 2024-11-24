@@ -209,7 +209,7 @@ class MenuFetcher:
         
         dessert_types = ["SÜSSSPEISE", "DESSERT"]
         side_types = ["BEILAGEN", "SIDE"]
-        soup_types = ["STUDITOPF", "TAGESSUPPE"]
+        soup_types = ["STUDITOPF", "TAGESSUPE"]
         
         # match case
         if first_word in dessert_types:
