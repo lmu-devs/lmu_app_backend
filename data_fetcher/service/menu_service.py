@@ -54,6 +54,7 @@ class MenuFetcher:
     def store_menu_data(self, data: dict, canteen_id: str):
         
         try:
+            dish_amount = 0
             week = data.get('number')
             year = data.get('year')
             
@@ -114,6 +115,7 @@ class MenuFetcher:
                             labels=dish_data.get('labels', []),
                             price_simple=PriceService.calculate_simple_price(dish_data.get("prices", {}).get("students", {}))
                         )
+                        dish_amount += 1
                         self.db.add(dish_obj)
                         self.db.flush()
                         
@@ -158,7 +160,7 @@ class MenuFetcher:
                                 self.db.add(price_obj)
             
             self.db.commit()
-            logger.info("Menu data stored successfully.")
+            logger.info(f"Menu data stored successfully. {dish_amount} dishes added.")
         except IntegrityError as e:
             logger.error(f"Database integrity error while storing menu data: {str(e)}")
             raise DatabaseError(
