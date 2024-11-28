@@ -41,9 +41,9 @@ def dish_to_pydantic(dish: DishTable, user_id: uuid.UUID = None) -> Dish:
     prices = [
         DishPrice(
             category=price.category,
-            base_price=price.base_price,
-            price_per_unit=price.price_per_unit,
-            unit=price.unit
+            base_price=price.base_price or 0,
+            price_per_unit=price.price_per_unit or 0,
+            unit=price.unit or "None"
         )
         for price in dish.prices
     ]

@@ -7,7 +7,6 @@ class CanteenID(Enum):
     MENSA_LOTHSTR = "mensa-lothstr"
     MENSA_MARTINSRIED = "mensa-martinsried"
     MENSA_PASING = "mensa-pasing"
-    MENSA_STRAUBING = "mensa-straubing"
     MENSA_WEIHENSTEPHAN = "mensa-weihenstephan"
     MEDIZINER_MENSA = "mediziner-mensa"
     STUBISTRO_ARCISSTR = "stubistro-arcisstr"
@@ -26,3 +25,4 @@ class CanteenID(Enum):
     FMI_BISTRO = "fmi-bistro"
     IPP_BISTRO = "ipp-bistro"
     # MENSA_BILDUNGSCAMPUS_HEILBRONN = "mensa-bildungscampus-heilbronn"
+    # MENSA_STRAUBING = "mensa-straubing"
