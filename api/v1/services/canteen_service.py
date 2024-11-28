@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.enums.mensa_enums import CanteenID
 from shared.models.canteen_model import CanteenLikeTable, CanteenTable
 from shared.core.logging import get_canteen_logger
 
@@ -34,6 +35,21 @@ class CanteenService:
             logger.error(f"Failed to fetch canteen: {str(e)}")
             raise DatabaseError(
                 detail="Failed to fetch canteen",
+                extra={"original_error": str(e)}
+            ) from e
+            
+    
+    def get_all_active_canteens(self) -> List[CanteenTable]:
+        """Retrieve all canteens that are defined in the CanteenID enum."""
+        try:
+            active_canteen_ids = [canteen.value for canteen in CanteenID]
+            stmt = select(CanteenTable).where(CanteenTable.id.in_(active_canteen_ids))
+            canteens = self.db.execute(stmt).scalars().all()
+            return canteens
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to fetch active canteens: {str(e)}")
+            raise DatabaseError(
+                detail="Failed to fetch active canteens",
                 extra={"original_error": str(e)}
             ) from e
 
@@ -88,3 +104,5 @@ class CanteenService:
         
         liked_canteen_ids = set(liked_canteens)
         return {canteen.id: canteen.id in liked_canteen_ids for canteen in canteens}
+
+

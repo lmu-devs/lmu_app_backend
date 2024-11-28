@@ -17,31 +17,30 @@ router = APIRouter()
 canteen_logger = get_canteen_logger(__name__)
 
 
-@router.get("/canteens", response_model=Canteens, description="Get all canteens or a specific canteen by ID. Authenticated users can also get liked canteens.", )
+@router.get("/canteens", response_model=Canteens)
 async def get_canteens(
     canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenID]),
     db: Session = Depends(get_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
     canteen_service = CanteenService(db)
-    # Fetch a specific canteen
     if canteen_id:
         canteen = canteen_service.get_canteen(canteen_id)
         likes_canteen = bool(canteen_service.get_like(canteen_id, current_user.id)) if current_user else None
         canteen_logger.info(f"Fetched canteen {canteen_id} with likes_canteen: {likes_canteen}")
         return Canteens([canteen_to_pydantic(canteen, likes_canteen)])
     
-    # Fetch all canteens
-    canteens = db.query(CanteenTable).all()
+
+    canteens = canteen_service.get_all_active_canteens()
     if current_user:
         likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
-        canteen_logger.info(f"Fetched {len(canteens)} canteens with likes_canteens: {likes_canteens}")
+        canteen_logger.info(f"Fetched {len(canteens)} active canteens with likes_canteens: {likes_canteens}")
         return Canteens([
             canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
             for canteen in canteens
         ])
 
-    canteen_logger.info(f"Fetched {len(canteens)} canteens")
+    canteen_logger.info(f"Fetched {len(canteens)} active canteens")
     return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
 
 
