@@ -16,7 +16,8 @@ taste_profile = {
             "LAMB",
             "WILD_MEAT",
             "FISH",
-            "SHELLFISH"
+            "SHELLFISH",
+            "GELATIN"
           ]
         },
         {
@@ -37,7 +38,8 @@ taste_profile = {
             "SHELLFISH",
             "MILK",
             "LACTOSE",
-            "CHICKEN_EGGS"
+            "CHICKEN_EGGS",
+            "GELATIN"
           ]
         },
         {
@@ -53,7 +55,8 @@ taste_profile = {
             "VEAL",
             "PORK",
             "LAMB",
-            "WILD_MEAT"
+            "WILD_MEAT",
+            "GELATIN"
           ]
         },
         {
