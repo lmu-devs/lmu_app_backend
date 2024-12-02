@@ -17,7 +17,7 @@ async def fetch_scheduled_data(db: Session):
     lmu_movie_service = MovieService()
     processed_movies = await lmu_movie_service.fetch_and_process_movies()
     
-    for movie, translations, screening, ratings in processed_movies:
+    for movie, translations, screening, ratings, trailers, trailer_translations in processed_movies:
         try:
             # Add movie to database
             db.merge(movie)
@@ -34,6 +34,13 @@ async def fetch_scheduled_data(db: Session):
             # Add ratings
             for rating in ratings:
                 db.merge(rating)
+            
+            # Add trailers and their translations
+            for trailer in trailers:
+                db.merge(trailer)
+            
+            for trailer_translation in trailer_translations:
+                db.merge(trailer_translation)
             
             # Commit the transaction
             db.commit()

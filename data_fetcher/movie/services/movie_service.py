@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
 import requests
@@ -11,7 +11,7 @@ from shared.enums.language_enums import Language
 from shared.enums.rating_enums import RatingSource
 from shared.enums.university_enums import University
 from shared.tables.movie_table import (MovieRatingTable, MovieScreeningTable,
-                                       MovieTable, MovieTranslationTable)
+                                       MovieTable, MovieTranslationTable, MovieTrailerTable, MovieTrailerTranslationTable)
 from shared.settings import get_settings
 
 settings = get_settings()
@@ -62,7 +62,7 @@ class MovieService:
                 details_url = f"{self.tmdb_base_url}/movie/{movie_id}"
                 params = {
                     "language": lang.value.lower(),
-                    "append_to_response": "external_ids"
+                    "append_to_response": "external_ids,videos"
                 }
                 
                 details_response = requests.get(
@@ -123,8 +123,8 @@ class MovieService:
             logger.error(f"Error normalizing rating {value} for source {source}: {e}")
             return 0.0
 
-    def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], movie_data: LmuMovie) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable]]:
-        """Create MovieTable and MovieTranslationTable instances from API data"""
+    def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], movie_data: LmuMovie) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
+        """Create MovieTable and related instances from API data"""
         base_data = tmdb_data[Language.ENGLISH_US]  # Use English as base
         
         backdrop_path = base_data.get("backdrop_path", "")
@@ -142,7 +142,7 @@ class MovieService:
             popularity=base_data.get("popularity", 0.0),
             poster_path=poster_path,
             backdrop_path=backdrop_path,
-            release_date=datetime.strptime(base_data["release_date"], "%Y-%m-%d").date(),
+            release_date=datetime.fromisoformat(base_data["release_date"]),
             runtime=base_data.get("runtime", 0),
             language=base_data.get("original_language", "en"),
             homepage=base_data.get("homepage", ""),
@@ -152,9 +152,21 @@ class MovieService:
         # Create screenings
         # TODO: make this dynamic
         date = movie_data.date.replace(hour=20)
+        end_time = date + timedelta(minutes=movie.runtime)
+        entry_time = date - timedelta(minutes=30)
+        address = "Hörsaal B052, Theresienstraße 37-39"
+        longitude = 11.573249
+        latitude = 48.147902
+        
         screening = MovieScreeningTable(
             date=date,
             university_id=University.LMU.value,
+            start_time=date,
+            end_time=end_time,
+            entry_time=entry_time,
+            address=address,
+            longitude=longitude,
+            latitude=latitude
         )
 
         # Create translations
@@ -184,9 +196,46 @@ class MovieService:
                     )
                     ratings.append(rating)
 
-        return movie, translations, screening, ratings
+        # Create trailers and their translations
+        trailers = []
+        trailer_translations = []
+        
+        # Get trailer data from English response
+        base_videos = tmdb_data[Language.ENGLISH_US].get("videos", {}).get("results", [])
+        
+        for video in base_videos:
+            if video["site"] == "YouTube" and video["type"] == "Trailer":
+                trailer = MovieTrailerTable(
+                    id=video["id"],
+                    movie_id=movie.id,
+                    published_at=datetime.strptime(video["published_at"], "%Y-%m-%dT%H:%M:%S.%fZ"),
+                    official=video["official"],
+                    size=video["size"],
+                    type=video["type"],
+                    site=video["site"]
+                )
+                trailers.append(trailer)
+                
+                # Add translations for each language
+                for lang in Language:
+                    # Find matching video in language-specific response
+                    lang_videos = tmdb_data[lang].get("videos", {}).get("results", [])
+                    matching_video = next(
+                        (v for v in lang_videos if v["id"] == video["id"]), 
+                        video  # Fallback to English if no translation exists
+                    )
+                    
+                    translation = MovieTrailerTranslationTable(
+                        trailer_id=video["id"],
+                        language=lang.value,
+                        title=matching_video["name"],
+                        key=matching_video["key"]
+                    )
+                    trailer_translations.append(translation)
 
-    async def fetch_and_process_movies(self) -> list[tuple[MovieTable, list[MovieTranslationTable], list[MovieScreeningTable], list[MovieRatingTable]]]:
+        return movie, translations, screening, ratings, trailers, trailer_translations
+
+    async def fetch_and_process_movies(self) -> list[tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]]:
         """Fetch LMU movies and enrich with TMDB and OMDB data"""
         logger.info("Starting movie fetch process")
         
@@ -216,9 +265,9 @@ class MovieService:
                 logger.warning(f"Could not find OMDB data for {lmu_movie.title}")
                 continue
 
-            # Create model instances
-            movie, translations, screenings, ratings = self._create_movie_model(tmdb_data, omdb_data, lmu_movie)
-            processed_movies.append((movie, translations, screenings, ratings))
+            # Create model instances (updated to include trailers)
+            movie, translations, screenings, ratings, trailers, trailer_translations = self._create_movie_model(tmdb_data, omdb_data, lmu_movie)
+            processed_movies.append((movie, translations, screenings, ratings, trailers, trailer_translations))
             
             logger.info(f"Successfully processed {lmu_movie.title}")
 

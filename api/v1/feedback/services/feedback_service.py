@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.core.exceptions import DatabaseError
-from shared.tables.feedback_Table import FeedbackTable
+from shared.tables.feedback_table import FeedbackTable
 from shared.core.logging import get_feedback_logger
 
 logger = get_feedback_logger(__name__)

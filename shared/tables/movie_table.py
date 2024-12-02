@@ -1,9 +1,12 @@
 import uuid
-from sqlalchemy import UUID, Boolean, Column, Date, DateTime, Enum, Float, ForeignKey, Integer, String, Table
+
+from sqlalchemy import (UUID, Boolean, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, String, Table)
 from sqlalchemy.orm import relationship
+
 from shared.database import Base
-from shared.tables.language_table import LanguageTable
 from shared.enums.rating_enums import RatingSource
+from shared.tables.language_table import LanguageTable
 
 # Association table for the many-to-many relationship between movies and genres
 movie_genre_association = Table(
@@ -15,9 +18,15 @@ movie_genre_association = Table(
 class MovieScreeningTable(Base):
     __tablename__ = "movie_screenings"
     
-    date = Column(Date, primary_key=True)
-    movie_id = Column(String, ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
+    date = Column(DateTime, primary_key=True)
+    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
     university_id = Column(String, ForeignKey("universities.id", ondelete='CASCADE'), primary_key=True)
+    entry_time = Column(DateTime, nullable=True)
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
+    address = Column(String)
+    longitude = Column(Float)
+    latitude = Column(Float)
     
     movie = relationship("MovieTable", back_populates="screenings")
     university = relationship("UniversityTable", back_populates="screenings")
@@ -84,6 +93,7 @@ class MovieTrailerTable(Base):
     official = Column(Boolean, nullable=False)
     size = Column(Integer, nullable=False)
     type = Column(String, nullable=False)
+    site = Column(String, nullable=False)
     
     movie = relationship("MovieTable", back_populates="trailers")
     translations = relationship("MovieTrailerTranslationTable", back_populates="trailer", cascade="all, delete-orphan")
@@ -94,6 +104,6 @@ class MovieTrailerTranslationTable(LanguageTable, Base):
     
     trailer_id = Column(String, ForeignKey("movie_trailers.id"), primary_key=True)
     title = Column(String, nullable=False)
-    url = Column(String, nullable=False)
+    key = Column(String, nullable=False)
     
     trailer = relationship("MovieTrailerTable", back_populates="translations")

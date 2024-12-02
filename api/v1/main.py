@@ -8,6 +8,7 @@ from api.v1.feedback.routers import feedback_router
 from api.v1.log.routers import log_router
 from api.v1.user.routers import user_router
 from api.v1.wishlist.routers import wishlist_router
+from api.v1.movie.routers import movie_router
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.core.logging import get_food_api_logger
@@ -46,7 +47,7 @@ def create_app():
     app.include_router(log_router.router,       prefix=prefix, tags=["log"])
     app.include_router(feedback_router.router,  prefix=prefix, tags=["feedback"])
     app.include_router(wishlist_router.router,  prefix=prefix, tags=["wishlist"])
-    
+    app.include_router(movie_router.router,     prefix=prefix, tags=["movie"])
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,

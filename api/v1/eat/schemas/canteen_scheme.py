@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from shared.tables.canteen_table import CanteenType
+from api.v1.core.schemas.location_scheme import Location
 from api.v1.core.schemas.image_scheme import Image
 from api.v1.core.schemas.rating_scheme import Rating
 
@@ -18,13 +19,6 @@ class Weekday(str, enum.Enum):
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
     
-
-    
-
-class Location(BaseModel):
-    address: str
-    latitude: float
-    longitude: float
     
 class OpeningHours(BaseModel):
     day: Weekday

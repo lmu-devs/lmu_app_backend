@@ -3,7 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from uuid import UUID
 
-from shared.tables.feedback_Table import FeedbackRating, FeedbackType
+from shared.tables.feedback_table import FeedbackRating, FeedbackType
 
 class FeedbackCreate(BaseModel):
     type: FeedbackType
