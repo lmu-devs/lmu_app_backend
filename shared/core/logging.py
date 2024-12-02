@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+
 def setup_logger(module_name: str, component_name: str, log_file: Optional[str] = None):
     """Configure logger with consistent formatting and multiple handlers
     
@@ -44,17 +45,8 @@ def setup_logger(module_name: str, component_name: str, log_file: Optional[str] 
     return logger
 
 # API Loggers
-def get_api_logger(module_name: str):
-    return setup_logger(module_name, "api", "api_api")
-
-def get_canteen_logger(module_name: str):
-    return setup_logger(module_name, "canteen", "canteen_api")
-
-def get_menu_logger(module_name: str):
-    return setup_logger(module_name, "menu", "menu_api")
-
-def get_dish_logger(module_name: str):
-    return setup_logger(module_name, "dish", "dish_api")
+def get_food_api_logger(module_name: str):
+    return setup_logger(module_name, "food", "food_api")
 
 def get_user_logger(module_name: str):
     return setup_logger(module_name, "user", "user_api")
@@ -63,5 +55,11 @@ def get_feedback_logger(module_name: str):
     return setup_logger(module_name, "feedback", "feedback_api")
 
 # Data Fetcher Loggers
-def get_data_fetcher_logger(module_name: str):
-    return setup_logger(module_name, "data_fetcher", "data_fetcher")
+def get_main_fetcher_logger(module_name: str):
+    return setup_logger(module_name, "main_fetcher", "main_fetcher")
+
+def get_eat_fetcher_logger(module_name: str):
+    return setup_logger(module_name, "eat_fetcher", "eat_fetcher")
+
+def get_movie_fetcher_logger(module_name: str):
+    return setup_logger(module_name, "movie_fetcher", "movie_fetcher")

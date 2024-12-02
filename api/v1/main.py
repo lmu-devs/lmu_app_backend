@@ -2,14 +2,19 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.v1.routers import canteen_router, dish_router, feedback_router, log_router, menu_router, taste_router, user_router, wishlist_router
+from api.v1.eat.routers import (canteen_router, dish_router, menu_router,
+                                taste_router)
+from api.v1.feedback.routers import feedback_router
+from api.v1.log.routers import log_router
+from api.v1.user.routers import user_router
+from api.v1.wishlist.routers import wishlist_router
+from shared.core.error_handlers import api_error_handler
+from shared.core.exceptions import APIException
+from shared.core.logging import get_food_api_logger
 from shared.database import Database
 from shared.settings import get_settings
-from shared.core.exceptions import APIException
-from shared.core.logging import get_api_logger
-from shared.core.error_handlers import api_error_handler
 
-api_logger = get_api_logger(__name__)
+api_logger = get_food_api_logger(__name__)
 
 
 def create_app():

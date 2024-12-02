@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     # API key for authentication our api
     SYSTEM_API_KEY: str
     ADMIN_API_KEY: str
+    
+    # API keys for external services
+    DEEPL_API_KEY: str
+    TMDB_API_KEY: str
+    OMDB_API_KEY: str
+    
     # Postgres database credentials
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
@@ -24,9 +30,6 @@ class Settings(BaseSettings):
     PGADMIN_PORT: str = "5050"
     PGADMIN_DEFAULT_EMAIL: str
     PGADMIN_DEFAULT_PASSWORD: str
-    
-    DEEPL_API_KEY: str
-
     
     class Config:
         env_file = ".env"

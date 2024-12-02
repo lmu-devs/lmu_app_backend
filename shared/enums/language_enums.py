@@ -1,12 +1,12 @@
 from enum import Enum
 
-from shared.core.logging import get_api_logger
+from shared.core.logging import get_food_api_logger
 
-logger = get_api_logger(__name__)
+logger = get_food_api_logger(__name__)
 
 class Language(str, Enum):
-    GERMAN = "DE"
-    ENGLISH_US = "EN-US"
+    GERMAN = "de-DE"
+    ENGLISH_US = "en-US"
     
     @classmethod
     def from_header(cls, header: str) -> "Language":
