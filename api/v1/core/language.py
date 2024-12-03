@@ -1,17 +1,19 @@
 from typing import Optional
+
 from fastapi import Header
 
-from shared.enums.language_enums import Language
+from shared.enums.language_enums import LanguageEnum
+
 
 async def get_language(
     accept_language: Optional[str] = Header(
-        default=Language.GERMAN,
+        default=LanguageEnum.GERMAN,
         description="Supported languages (en, de)",
-        enum=[lang.value for lang in Language]
+        enum=[lang.value for lang in LanguageEnum]
     )
-) -> Language:
+) -> LanguageEnum:
     """
     FastAPI dependency that extracts the preferred language from the Accept-Language header.
     Falls back to German if no supported language is found.
     """ 
-    return Language.from_header(accept_language)
+    return LanguageEnum.from_header(accept_language)

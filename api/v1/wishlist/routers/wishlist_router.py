@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from api.v1.core import APIKey, get_language
 from shared.core.logging import get_food_api_logger
 from shared.database import get_db
-from shared.enums.language_enums import Language
+from shared.enums.language_enums import LanguageEnum
 from shared.tables.user_table import UserTable
 
 from ..pydantics.wishlist_pydantic import wishlist_to_pydantic
@@ -19,7 +19,7 @@ logger = get_food_api_logger(__name__)
 async def get_wishlists(
     id: int | None = None,
     db: Session = Depends(get_db),
-    language: Language = Depends(get_language),
+    language: LanguageEnum = Depends(get_language),
     user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
     wishlist_service = WishlistService(db)

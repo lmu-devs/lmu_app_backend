@@ -1,6 +1,7 @@
 from enum import Enum
 
-class DishCategory(Enum):
+
+class DishCategoryEnum(Enum):
     MAIN = "MAIN"
     SIDE = "SIDE"
     DESSERT = "DESSERT"

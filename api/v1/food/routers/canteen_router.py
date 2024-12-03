@@ -4,13 +4,14 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from api.v1.core import APIKey
+from shared.core.logging import get_food_api_logger
+from shared.database import get_db
+from shared.enums.mensa_enums import CanteenEnum
+from shared.tables.user_table import UserTable
+
 from ..pydantics.canteen_pydantic import canteen_to_pydantic
 from ..schemas import Canteens
 from ..services import CanteenService
-from shared.core.logging import get_food_api_logger
-from shared.database import get_db
-from shared.enums.mensa_enums import CanteenID
-from shared.tables.user_table import UserTable
 
 router = APIRouter()
 food_logger = get_food_api_logger(__name__)
@@ -18,7 +19,7 @@ food_logger = get_food_api_logger(__name__)
 
 @router.get("/canteens", response_model=Canteens)
 async def get_canteens(
-    canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenID]),
+    canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenEnum]),
     db: Session = Depends(get_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
@@ -47,7 +48,7 @@ async def get_canteens(
 
 @router.post("/canteens/toggle-like", response_model=bool, description="Authenticated user can toggle like for a canteen. Returns True if the canteen was liked, False if it was unliked.")
 def toggle_like(
-    canteen_id: str = Query(..., description="Canteen ID to toggle like", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenID]),
+    canteen_id: str = Query(..., description="Canteen ID to toggle like", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenEnum]),
     db: Session = Depends(get_db),
     current_user: UserTable = Depends(APIKey.verify_user_api_key)
 ) -> bool:

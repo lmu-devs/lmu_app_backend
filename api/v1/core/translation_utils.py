@@ -1,10 +1,10 @@
 from sqlalchemy import Select, case
 from sqlalchemy.orm import contains_eager
 
-from shared.enums.language_enums import Language
+from shared.enums.language_enums import LanguageEnum
 
 
-def apply_translation_query(base_query: Select, model, translation_model, language: Language) -> Select:
+def apply_translation_query(base_query: Select, model, translation_model, language: LanguageEnum) -> Select:
     """
     Generic function to apply translation filtering logic to any query with translations.
     """
@@ -18,7 +18,7 @@ def apply_translation_query(base_query: Select, model, translation_model, langua
             model.id,  # Ensure consistent ordering
             case(
                 (translation_model.language == language.value, 1),
-                (translation_model.language == Language.GERMAN.value, 2),
+                (translation_model.language == LanguageEnum.GERMAN.value, 2),
                 else_=3
             )
         )

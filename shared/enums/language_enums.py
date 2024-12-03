@@ -4,12 +4,12 @@ from shared.core.logging import get_food_api_logger
 
 logger = get_food_api_logger(__name__)
 
-class Language(str, Enum):
+class LanguageEnum(str, Enum):
     GERMAN = "de-DE"
     ENGLISH_US = "en-US"
     
     @classmethod
-    def from_header(cls, header: str) -> "Language":
+    def from_header(cls, header: str) -> "LanguageEnum":
         """Convert HTTP Accept-Language header to Language enum"""
         logger.info(f"Converting Accept-Language header: {header}")
         header = header.upper()

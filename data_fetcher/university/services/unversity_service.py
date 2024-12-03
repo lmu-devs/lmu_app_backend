@@ -1,12 +1,14 @@
-from shared.enums.university_enums import University, university_translations
-from shared.tables.university_table import UniversityTable, UniversityTranslationTable
+from shared.enums.university_enums import (UniversityEnum,
+                                           university_translations)
+from shared.tables.university_table import (UniversityTable,
+                                            UniversityTranslationTable)
 
 # add university to database
 # add university translations to database
 # add university movies to database
 
 async def add_university_to_database(db):
-    for university in University:
+    for university in UniversityEnum:
         university_table = UniversityTable(id=university)
         await _add_university_translations_to_database(db, university)
         db.add(university_table)

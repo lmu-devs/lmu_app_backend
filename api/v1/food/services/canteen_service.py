@@ -1,14 +1,14 @@
 import uuid
-
 from typing import Dict, List
+
 from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from shared.core.exceptions import DatabaseError, NotFoundError
-from shared.enums.mensa_enums import CanteenID
-from shared.tables.canteen_table import CanteenLikeTable, CanteenTable
 from shared.core.logging import get_food_api_logger
+from shared.enums.mensa_enums import CanteenEnum
+from shared.tables.canteen_table import CanteenLikeTable, CanteenTable
 
 logger = get_food_api_logger(__name__)
 
@@ -42,7 +42,7 @@ class CanteenService:
     def get_all_active_canteens(self) -> List[CanteenTable]:
         """Retrieve all canteens that are defined in the CanteenID enum."""
         try:
-            active_canteen_ids = [canteen.value for canteen in CanteenID]
+            active_canteen_ids = [canteen.value for canteen in CanteenEnum]
             stmt = select(CanteenTable).where(CanteenTable.id.in_(active_canteen_ids))
             canteens = self.db.execute(stmt).scalars().all()
             return canteens

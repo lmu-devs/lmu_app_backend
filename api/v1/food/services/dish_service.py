@@ -1,17 +1,18 @@
 import uuid
-
 from typing import List, Optional
-from sqlalchemy import select, and_
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 
-from shared.core.exceptions import DatabaseError, NotFoundError
-from shared.enums.language_enums import Language
-from shared.core.logging import get_food_api_logger
-from shared.tables.canteen_table import CanteenTable
-from shared.tables.dish_table import DishTable, DishLikeTable, DishTranslationTable
-from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
+from sqlalchemy import and_, select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
+
 from api.v1.core.translation_utils import apply_translation_query
+from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.core.logging import get_food_api_logger
+from shared.enums.language_enums import LanguageEnum
+from shared.tables.canteen_table import CanteenTable
+from shared.tables.dish_table import (DishLikeTable, DishTable,
+                                      DishTranslationTable)
+from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
 
 logger = get_food_api_logger(__name__)
 
@@ -25,7 +26,7 @@ class DishService:
         dish_id: Optional[int] = None, 
         user_id: Optional[uuid.UUID] = None,
         only_liked: bool = False,
-        language: Language = Language.GERMAN    
+        language: LanguageEnum = LanguageEnum.GERMAN    
     ) -> List[DishTable]:
         """
         Get dishes from the database.

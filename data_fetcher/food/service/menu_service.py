@@ -10,8 +10,8 @@ from data_fetcher.food.service.translation.dish_translation_service import \
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
                                     ExternalAPIError)
 from shared.core.logging import get_food_fetcher_logger
-from shared.enums.dish_category_enums import DishCategory
-from shared.enums.language_enums import Language
+from shared.enums.dish_category_enums import DishCategoryEnum
+from shared.enums.language_enums import LanguageEnum
 from shared.tables.dish_table import (DishPriceTable, DishTable,
                                       DishTranslationTable)
 from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
@@ -23,7 +23,7 @@ class MenuFetcher:
     def __init__(self, db: Session):
         self.db = db
         self.dish_translation_service = DishTranslationService()
-        self.target_languages = [Language.GERMAN]
+        self.target_languages = [LanguageEnum.GERMAN]
         
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
@@ -99,7 +99,7 @@ class MenuFetcher:
                         .join(DishTranslationTable)
                         .filter(
                             DishTranslationTable.title == dish_name_de,
-                            DishTranslationTable.language == Language.GERMAN
+                            DishTranslationTable.language == LanguageEnum.GERMAN
                         )
                         .first()
                     )
@@ -121,7 +121,7 @@ class MenuFetcher:
                         
                         fetched_dish = DishTranslationTable(
                             dish_id=dish_obj.id,
-                            language=Language.GERMAN,
+                            language=LanguageEnum.GERMAN,
                             title=dish_name_de
                         )
                         
@@ -215,10 +215,10 @@ class MenuFetcher:
         
         # match case
         if first_word in dessert_types:
-            return DishCategory.DESSERT
+            return DishCategoryEnum.DESSERT
         elif first_word in side_types:
-            return DishCategory.SIDE
+            return DishCategoryEnum.SIDE
         elif first_word in soup_types:
-            return DishCategory.SOUP
+            return DishCategoryEnum.SOUP
         else:
-            return DishCategory.MAIN
+            return DishCategoryEnum.MAIN

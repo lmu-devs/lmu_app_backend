@@ -1,6 +1,7 @@
 from enum import Enum
 
-class CanteenID(Enum):
+
+class CanteenEnum(Enum):
     MENSA_ARCISSTR = "mensa-arcisstr"
     MENSA_GARCHING = "mensa-garching"
     MENSA_LEOPOLDSTR = "mensa-leopoldstr"

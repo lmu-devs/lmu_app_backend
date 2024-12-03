@@ -1,6 +1,7 @@
 from typing import List
 
 from api.v1.core.pydantics import image_to_pydantic, location_to_pydantic
+from api.v1.core.pydantics.university_pydantic import university_to_pydantic
 from shared.tables import (MovieRatingTable, MovieScreeningTable, MovieTable,
                            MovieTrailerTable, MovieTrailerTranslationTable,
                            MovieTranslationTable)
@@ -83,16 +84,21 @@ def movies_to_pydantic(movies: List[MovieTable]) -> List[Movie]:
     for movie in movies:
         movies_pydantic.append(movie_to_pydantic(movie))
     return movies_pydantic
+
+
     
 def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieScreening]:
     screenings_pydantic = []
     for screening in screenings:
-        location = location_to_pydantic(screening.address)
+        location = location_to_pydantic(screening.location)
+        university = university_to_pydantic(screening.university)
+        movie = movie_to_pydantic(screening.movie)
         screenings_pydantic.append(MovieScreening(
-            movie=movie_to_pydantic(screening.movie),
             entry_time=screening.entry_time,
             start_time=screening.start_time,
             end_time=screening.end_time,
-            location=location
+            location=location,
+            university=university,
+            movie=movie,
         ))
     return screenings_pydantic

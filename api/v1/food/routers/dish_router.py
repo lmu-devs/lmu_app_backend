@@ -3,15 +3,15 @@ from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.enums.language_enums import Language
-from shared.core.logging import get_food_api_logger
-from shared.database import get_db
-from shared.tables.canteen_table import CanteenTable
-from shared.tables.user_table import UserTable
 from api.v1.core.api_key import APIKey
 from api.v1.core.language import get_language
-from ..pydantics.dish_pydantic import (dish_dates_to_pydantic,
-                                            dish_to_pydantic)
+from shared.core.logging import get_food_api_logger
+from shared.database import get_db
+from shared.enums.language_enums import LanguageEnum
+from shared.tables.canteen_table import CanteenTable
+from shared.tables.user_table import UserTable
+
+from ..pydantics.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
 from ..schemas import DishDates, Dishes
 from ..services import CanteenService, DishService
 
@@ -30,7 +30,7 @@ async def get_dish(
     only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     db: Session = Depends(get_db),
-    language: Language = Depends(get_language)
+    language: LanguageEnum = Depends(get_language)
     ):
     
     user_id = current_user.id if current_user else None

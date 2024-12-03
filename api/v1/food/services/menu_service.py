@@ -1,16 +1,17 @@
 from datetime import date
 from typing import List
-from sqlalchemy import and_, select, case
-from sqlalchemy.orm import Session, contains_eager
-from sqlalchemy.exc import SQLAlchemyError
 
-from shared.enums.language_enums import Language
+from sqlalchemy import and_, case, select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session, contains_eager
+
 from shared.core.exceptions import DatabaseError, NotFoundError
+from shared.core.logging import get_food_api_logger
+from shared.enums.language_enums import LanguageEnum
 from shared.tables.canteen_table import CanteenLikeTable
+from shared.tables.dish_table import DishTable, DishTranslationTable
 from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
 from shared.tables.user_table import UserTable
-from shared.tables.dish_table import DishTable, DishTranslationTable
-from shared.core.logging import get_food_api_logger
 
 logger = get_food_api_logger(__name__)
 class MenuService:
@@ -26,7 +27,7 @@ class MenuService:
         date_to: date,
         current_user: UserTable, 
         only_liked_canteens: bool,
-        language: Language = Language.GERMAN
+        language: LanguageEnum = LanguageEnum.GERMAN
     ) -> List[MenuDayTable]:
         """Get menu days from the database within a date range"""
         try:
@@ -52,7 +53,7 @@ class MenuService:
                     DishTable.id,
                     case(
                         (DishTranslationTable.language == language.value, 1),
-                        (DishTranslationTable.language == Language.GERMAN.value, 2),
+                        (DishTranslationTable.language == LanguageEnum.GERMAN.value, 2),
                         else_=3
                     )
                 )

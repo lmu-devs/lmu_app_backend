@@ -1,8 +1,10 @@
 from typing import Optional
+
 import deepl
-from shared.enums.language_enums import Language
-from shared.settings import get_settings
+
 from shared.core.logging import setup_logger
+from shared.enums.language_enums import LanguageEnum
+from shared.settings import get_settings
 
 logger = setup_logger(__name__, "translation")
 
@@ -11,7 +13,7 @@ class TranslationService:
         settings = get_settings()
         self.translator = deepl.Translator(settings.DEEPL_API_KEY)
         
-    def translate_text(self, text: str, target_lang: str, source_lang: str = Language.GERMAN.value) -> Optional[str]:
+    def translate_text(self, text: str, target_lang: str, source_lang: str = LanguageEnum.GERMAN.value) -> Optional[str]:
         """
         Translate text using DeepL API
         """

@@ -1,11 +1,12 @@
-from typing import TypeVar, Any, Sequence
-from shared.enums.language_enums import Language
+from typing import Any, Sequence, TypeVar
+
+from shared.enums.language_enums import LanguageEnum
 
 T = TypeVar('T')
 
 def get_translation(
     translations: Sequence[T],
-    language: Language,
+    language: LanguageEnum,
     language_getter: callable,
     value_getter: callable
 ) -> Any:
@@ -30,9 +31,9 @@ def get_translation(
     )
     
     # If not found, try German
-    if not translation and language != Language.GERMAN:
+    if not translation and language != LanguageEnum.GERMAN:
         translation = next(
-            (t for t in translations if language_getter(t) == Language.GERMAN.value),
+            (t for t in translations if language_getter(t) == LanguageEnum.GERMAN.value),
             None
         )
     

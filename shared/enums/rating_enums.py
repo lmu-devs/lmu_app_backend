@@ -1,12 +1,13 @@
 from enum import Enum
 
-class RatingSource(Enum):
+
+class RatingSourceEnum(Enum):
     IMDB = "IMDB"
     ROTTEN_TOMATOES = "ROTTEN_TOMATOES"
     METACRITIC = "METACRITIC"
 
     @classmethod
-    def from_omdb_source(cls, source: str) -> "RatingSource":
+    def from_omdb_source(cls, source: str) -> "RatingSourceEnum":
         source_mapping = {
             "Internet Movie Database": cls.IMDB,
             "Rotten Tomatoes": cls.ROTTEN_TOMATOES,

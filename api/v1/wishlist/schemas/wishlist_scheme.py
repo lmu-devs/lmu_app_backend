@@ -1,16 +1,17 @@
 from datetime import datetime
 from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
-from shared.enums.language_enums import Language
-from shared.tables.wishlist_table import WishlistStatus
 from api.v1.core import Image, Rating
+from shared.enums.language_enums import LanguageEnum
+from shared.tables.wishlist_table import WishlistStatus
 
 
 class WishlistTranslation(BaseModel):
     title: str
     description: str
-    language: Language
+    language: LanguageEnum
 
 class WishlistCreate(BaseModel):
     status: WishlistStatus

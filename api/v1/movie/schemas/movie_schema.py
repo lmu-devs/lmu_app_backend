@@ -6,11 +6,13 @@ from pydantic import BaseModel
 
 from api.v1.core import Image
 from api.v1.core.schemas.location_scheme import Location
-from shared.enums.rating_enums import RatingSource
+from api.v1.core.schemas.university_scheme import University
+from shared.enums.rating_enums import RatingSourceEnum
+from shared.enums.university_enums import UniversityEnum
 
 
 class MovieRating(BaseModel):
-    source: RatingSource
+    source: RatingSourceEnum
     normalized_rating: float
     raw_rating: str
     
@@ -38,11 +40,12 @@ class Movie(BaseModel):
     trailers: List[MovieTrailer]
     
 class MovieScreening(BaseModel):
-    movie: Movie
     entry_time: datetime
     start_time: datetime
     end_time: datetime
     location: Location
+    university: University
+    movie: Movie
     
     
 

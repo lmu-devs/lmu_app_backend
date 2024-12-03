@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, contains_eager
 from api.v1.core import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_food_api_logger
-from shared.enums.language_enums import Language
+from shared.enums.language_enums import LanguageEnum
 from shared.tables.wishlist_table import (WishlistImageTable,
                                           WishlistLikeTable, WishlistTable,
                                           WishlistTranslationTable)
@@ -19,7 +19,7 @@ class WishlistService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_wishlists(self, language: Language = Language.GERMAN, wishlist_id: Optional[int] = None) -> WishlistTable:
+    def get_wishlists(self, language: LanguageEnum = LanguageEnum.GERMAN, wishlist_id: Optional[int] = None) -> WishlistTable:
         try:
             query = (
                 select(WishlistTable)
