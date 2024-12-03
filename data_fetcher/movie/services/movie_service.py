@@ -10,7 +10,7 @@ from shared.core.logging import get_movie_fetcher_logger
 from shared.enums.language_enums import Language
 from shared.enums.rating_enums import RatingSource
 from shared.enums.university_enums import University
-from shared.tables.movie_table import (MovieRatingTable, MovieScreeningTable,
+from shared.tables.movie_table import (MovieLocationTable, MovieRatingTable, MovieScreeningTable,
                                        MovieTable, MovieTranslationTable, MovieTrailerTable, MovieTrailerTranslationTable)
 from shared.settings import get_settings
 
@@ -145,6 +145,7 @@ class MovieService:
         
         # Create screenings
         # TODO: make this dynamic
+        screening_id = uuid.uuid4()
         date = movie_data.date.replace(hour=20)
         end_time = date + timedelta(minutes=movie.runtime)
         entry_time = date - timedelta(minutes=30)
@@ -153,15 +154,19 @@ class MovieService:
         latitude = 48.147902
         
         screening = MovieScreeningTable(
+            id=screening_id,
             movie_id=movie_id,
             date=date,
             university_id=University.LMU.value,
             start_time=date,
             end_time=end_time,
             entry_time=entry_time,
-            address=address,
-            longitude=longitude,
-            latitude=latitude
+            location=MovieLocationTable(
+                screening_id=screening_id,
+                address=address,
+                longitude=longitude,
+                latitude=latitude
+            )
         )
 
         # Create translations

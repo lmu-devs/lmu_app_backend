@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey,
+from sqlalchemy import (UUID, Column, DateTime, Enum, ForeignKey,
                         Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 

@@ -2,13 +2,14 @@ import asyncio
 import signal
 import sys
 
-from data_fetcher.food.food_fetcher import create_food_fetcher
-from data_fetcher.state import running_eat, running_movie
-from data_fetcher.university.university_fetcher import \
-    create_university_fetcher
 from shared.core.logging import get_main_fetcher_logger
 from shared.database import Database
 from shared.settings import get_settings
+
+from data_fetcher.university.university_fetcher import create_university_fetcher
+from data_fetcher.food.food_fetcher import create_food_fetcher
+from data_fetcher.movie.movie_fetcher import create_movie_fetcher
+from data_fetcher.state import running_eat, running_movie
 
 logger_main = get_main_fetcher_logger(__name__)
 
@@ -33,8 +34,8 @@ if __name__ == "__main__":
         
         # Start the main loop
         # create_university_fetcher()
-        create_food_fetcher()
-        # asyncio.run(create_movie_fetcher())
+        # create_food_fetcher()
+        asyncio.run(create_movie_fetcher())
         
     except Exception as e:
         logger_main.error(f"An error occurred: {e}")
