@@ -4,16 +4,16 @@ from typing import List, Tuple
 import requests
 from sqlalchemy.orm import Session
 
-from data_fetcher.eat.service.images_service import ImageService
+from data_fetcher.food.service.images_service import ImageService
 from shared.core.exceptions import DataFetchError, DataProcessingError
-from shared.core.logging import get_eat_fetcher_logger
+from shared.core.logging import get_food_fetcher_logger
 from shared.database import get_db
-from shared.tables.canteen_table import (CanteenImageTable, CanteenTable,
-                                         CanteenType, LocationTable,
-                                         OpeningHoursTable)
 from shared.settings import get_settings
+from shared.tables.canteen_table import (CanteenImageTable,
+                                         CanteenLocationTable, CanteenTable,
+                                         CanteenType, OpeningHoursTable)
 
-logger = get_eat_fetcher_logger(__name__)
+logger = get_food_fetcher_logger(__name__)
 class CanteenFetcher:
     """
     Fetches canteen data from the tum-eat-api and stores it in the database.
@@ -117,7 +117,7 @@ class CanteenFetcher:
                 latitude = location['latitude']
                 longitude = location['longitude']
                 
-                canteen_obj.location = LocationTable(canteen_id=canteen_obj.id, address=address, latitude=latitude, longitude=longitude)
+                canteen_obj.location = CanteenLocationTable(canteen_id=canteen_obj.id, address=address, latitude=latitude, longitude=longitude)
 
                 # Update Opening Hours
                 open_hours = canteen['open_hours']
@@ -125,7 +125,7 @@ class CanteenFetcher:
                 # Update Canteen Images
                 directory_path = "shared/assets/canteens/"
                 settings = get_settings()
-                image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_BASE_PREFIX_EAT}/images/"
+                image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_BASE_PREFIX_FOOD}/images/"
                 files = ImageService.generate_image_urls(directory_path, image_url_prefix)
                 self.set_canteen_images(canteen_obj, files)
                 

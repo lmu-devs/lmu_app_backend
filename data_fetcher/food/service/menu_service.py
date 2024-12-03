@@ -4,19 +4,19 @@ import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from data_fetcher.eat.service.simple_price_service import PriceService
-from data_fetcher.eat.service.translation.dish_translation_service import \
+from data_fetcher.food.service.simple_price_service import PriceService
+from data_fetcher.food.service.translation.dish_translation_service import \
     DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
                                     ExternalAPIError)
-from shared.core.logging import get_eat_fetcher_logger
+from shared.core.logging import get_food_fetcher_logger
 from shared.enums.dish_category_enums import DishCategory
 from shared.enums.language_enums import Language
 from shared.tables.dish_table import (DishPriceTable, DishTable,
                                       DishTranslationTable)
 from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
 
-logger = get_eat_fetcher_logger(__name__)
+logger = get_food_fetcher_logger(__name__)
 
 class MenuFetcher:
     

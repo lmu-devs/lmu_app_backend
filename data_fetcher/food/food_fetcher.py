@@ -5,15 +5,15 @@ import requests
 import schedule
 from sqlalchemy.orm import Session
 
-from data_fetcher.eat.service.canteen_service import CanteenFetcher
-from data_fetcher.eat.service.menu_service import MenuFetcher
+from data_fetcher.food.service.canteen_service import CanteenFetcher
+from data_fetcher.food.service.menu_service import MenuFetcher
 from data_fetcher.state import running_eat
 from shared.core.error_handlers import handle_error
-from shared.core.logging import get_eat_fetcher_logger
+from shared.core.logging import get_food_fetcher_logger
 from shared.database import get_db
 from shared.enums.mensa_enums import CanteenID
 
-logger = get_eat_fetcher_logger(__name__)
+logger = get_food_fetcher_logger(__name__)
 
 
 # def fetch_data_current_year(db: Session):
@@ -98,13 +98,13 @@ def fetch_scheduled_data(db: Session, days_amount: int = 21):
     except Exception as e:
         logger.error(f"Unexpected error during scheduled fetch: {str(e)}")
         
-def create_eat_fetcher():
+def create_food_fetcher():
     logger.info("Setting up schedule...")
     
     # Initial fetch
     db = next(get_db())
-    fetch_scheduled_data(db, days_amount=7)
-    # CanteenFetcher(db).update_canteen_database()
+    # fetch_scheduled_data(db, days_amount=7)
+    CanteenFetcher(db).update_canteen_database()
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     

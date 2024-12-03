@@ -2,13 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.v1.eat.routers import (canteen_router, dish_router, menu_router,
-                                taste_router)
 from api.v1.feedback.routers import feedback_router
+from api.v1.food.routers import (canteen_router, dish_router, menu_router,
+                                 taste_router)
 from api.v1.log.routers import log_router
+from api.v1.movie.routers import movie_router
 from api.v1.user.routers import user_router
 from api.v1.wishlist.routers import wishlist_router
-from api.v1.movie.routers import movie_router
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
 from shared.core.logging import get_food_api_logger
@@ -21,7 +21,7 @@ api_logger = get_food_api_logger(__name__)
 def create_app():
     settings = get_settings()
     prefix = settings.API_V1_BASE_PREFIX
-    eat_prefix = settings.API_V1_BASE_PREFIX_EAT
+    eat_prefix = settings.API_V1_BASE_PREFIX_FOOD
     
     app = FastAPI(
         title="lmu-dev-api", 

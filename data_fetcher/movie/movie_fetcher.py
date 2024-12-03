@@ -19,30 +19,23 @@ async def fetch_scheduled_data(db: Session):
     
     for movie, translations, screening, ratings, trailers, trailer_translations in processed_movies:
         try:
-            # Add movie to database
             db.merge(movie)
             db.flush()
             
-            # Add translations
             for translation in translations:
                 db.merge(translation)
             
-            # Add screening
-            screening.movie_id = movie.id  # Set the movie_id for the screening
             db.merge(screening)
             
-            # Add ratings
             for rating in ratings:
                 db.merge(rating)
             
-            # Add trailers and their translations
             for trailer in trailers:
                 db.merge(trailer)
             
             for trailer_translation in trailer_translations:
                 db.merge(trailer_translation)
             
-            # Commit the transaction
             db.commit()
             logger.info(f"Successfully added movie {movie.original_title} to database")
             

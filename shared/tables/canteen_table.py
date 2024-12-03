@@ -1,9 +1,13 @@
 import enum
-from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Time, func)
+
+from sqlalchemy import (UUID, Column, DateTime, Enum, Float, ForeignKey,
+                        Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 
 from shared.database import Base
 from shared.tables.image_table import ImageTable
+from shared.tables.location_table import LocationTable
+
 
 class CanteenType(str, enum.Enum):
     MENSA = "MENSA"
@@ -16,7 +20,7 @@ class CanteenTable(Base):
     name = Column(String, nullable=False)
     type = Column(Enum(CanteenType, name="canteen_type", create_type=False))
 
-    location = relationship("LocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
+    location = relationship("CanteenLocationTable", uselist=False, back_populates="canteen", cascade="all, delete-orphan")
     opening_hours = relationship("OpeningHoursTable", back_populates="canteen", cascade="all, delete-orphan")
     menu_days = relationship("MenuDayTable", back_populates="canteen", cascade="all, delete-orphan")
     likes = relationship("CanteenLikeTable", back_populates="canteen", cascade="all, delete-orphan")
@@ -29,13 +33,10 @@ class CanteenTable(Base):
     def like_count(self):
         return len(self.likes)
 
-class LocationTable(Base):
-    __tablename__ = "locations"
+class CanteenLocationTable(LocationTable, Base):
+    __tablename__ = "canteen_locations"
 
     canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
-    address = Column(String, nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
 
     canteen = relationship("CanteenTable", back_populates="location")
 

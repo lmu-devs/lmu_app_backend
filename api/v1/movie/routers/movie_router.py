@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from api.v1.core.api_key import APIKey
+from api.v1.movie.pydantics.movie_pydantic import screenings_to_pydantic, movies_to_pydantic
 from ..schemas.movie_schema import Movie, MovieScreening
 from ..services.movie_service import MovieService
 from shared.database import get_db
@@ -19,7 +20,7 @@ async def get_movie(
 ):
     movie_service = MovieService(db)
     movies = movie_service.get_movies(movie_id)
-    return movies
+    return movies_to_pydantic(movies)
 
 @router.get("/movies/screenings", response_model=List[MovieScreening], description="Get all movie screenings")
 async def get_movie_screenings(
@@ -28,4 +29,4 @@ async def get_movie_screenings(
 ):
     movie_service = MovieService(db)
     screenings = movie_service.get_movie_screenings()
-    return screenings
+    return screenings_to_pydantic(screenings)

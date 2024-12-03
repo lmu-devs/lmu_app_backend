@@ -1,14 +1,12 @@
 from shared.tables.canteen_table import CanteenTable
 from ..schemas import Canteen, Location, Weekday, OpeningHours, Image
-from api.v1.core.schemas.rating_scheme import Rating
+from api.v1.core.schemas import Rating, Location
+from api.v1.core.pydantics.location_pydantic import location_to_pydantic
+
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> Canteen:
-    location = Location(
-        address=canteen.location.address,
-        latitude=float(canteen.location.latitude),
-        longitude=float(canteen.location.longitude)
-    )
+    location = location_to_pydantic(canteen.location)
 
     day_mapping = {
         'mon': Weekday.MONDAY,

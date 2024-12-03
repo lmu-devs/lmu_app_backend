@@ -1,11 +1,11 @@
 from typing import List
 
-from shared.core.logging import get_eat_fetcher_logger
+from shared.core.logging import get_food_fetcher_logger
 from shared.enums.language_enums import Language
-from shared.tables.dish_table import DishTable, DishTranslationTable
 from shared.services.translation_service import TranslationService
+from shared.tables.dish_table import DishTable, DishTranslationTable
 
-logger = get_eat_fetcher_logger(__name__)
+logger = get_food_fetcher_logger(__name__)
 
 class DishTranslationService:
     def __init__(self):

@@ -11,8 +11,8 @@ from shared.tables.language_table import LanguageTable
 # Association table for the many-to-many relationship between movies and genres
 movie_genre_association = Table(
     'movie_genre_associations', Base.metadata,
-    Column('movie_id', String, ForeignKey('movies.id', ondelete='CASCADE'), primary_key=True),
-    Column('genre_id', String, ForeignKey('movie_genres.id', ondelete='CASCADE'), primary_key=True)
+    Column('movie_id', UUID(as_uuid=True), ForeignKey('movies.id', ondelete='CASCADE'), primary_key=True),
+    Column('genre_id', UUID(as_uuid=True), ForeignKey('movie_genres.id', ondelete='CASCADE'), primary_key=True)
 )
 
 class MovieScreeningTable(Base):
@@ -39,8 +39,6 @@ class MovieTable(Base):
     budget = Column(Integer, nullable=False)
     imdb_id = Column(String, nullable=False)
     popularity = Column(Float, nullable=False)
-    poster_path = Column(String, nullable=False)
-    backdrop_path = Column(String, nullable=False)
     release_date = Column(Date, nullable=False)
     runtime = Column(Integer, nullable=False)
     language = Column(String, nullable=False)
@@ -56,11 +54,13 @@ class MovieTable(Base):
 class MovieTranslationTable(LanguageTable, Base):
     __tablename__ = "movie_translations"
     
-    movie_id = Column(String, ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
+    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
     language = Column(String, primary_key=True)
     title = Column(String, nullable=False)
     overview = Column(String, nullable=False)
     tagline = Column(String, nullable=False)
+    poster_path = Column(String, nullable=True)
+    backdrop_path = Column(String, nullable=True)
     
     movie = relationship("MovieTable", back_populates="translations")
 
@@ -68,7 +68,7 @@ class MovieTranslationTable(LanguageTable, Base):
 class MovieGenreTable(Base):
     __tablename__ = "movie_genres"
 
-    id = Column(String, primary_key=True, nullable=False, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, index=True)
     name = Column(String, nullable=False)
     
     movies = relationship("MovieTable", secondary=movie_genre_association, back_populates="genres")
@@ -87,7 +87,7 @@ class MovieRatingTable(Base):
 class MovieTrailerTable(Base):
     __tablename__ = "movie_trailers"
     
-    id = Column(String, primary_key=True, nullable=False, index=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id"))
     published_at = Column(DateTime, nullable=False)
     official = Column(Boolean, nullable=False)
@@ -102,7 +102,7 @@ class MovieTrailerTable(Base):
 class MovieTrailerTranslationTable(LanguageTable, Base):
     __tablename__ = "movie_trailer_translations"
     
-    trailer_id = Column(String, ForeignKey("movie_trailers.id"), primary_key=True)
+    trailer_id = Column(UUID(as_uuid=True), ForeignKey("movie_trailers.id"), primary_key=True)
     title = Column(String, nullable=False)
     key = Column(String, nullable=False)
     

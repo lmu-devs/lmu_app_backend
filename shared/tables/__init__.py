@@ -1,9 +1,9 @@
-from .canteen_table import CanteenTable
-from .menu_table import MenuDayTable, MenuDishAssociation
-from .feedback_table import FeedbackTable
-from .wishlist_table import WishlistTable
-from .user_table import UserTable
+from .canteen_table import CanteenLikeTable, CanteenTable
 from .dish_table import DishTable
-from .canteen_table import CanteenLikeTable
-from .university_table import *
+from .feedback_table import FeedbackTable
+from .location_table import LocationTable
+from .menu_table import MenuDayTable, MenuDishAssociation
 from .movie_table import *
+from .university_table import *
+from .user_table import UserTable
+from .wishlist_table import WishlistTable

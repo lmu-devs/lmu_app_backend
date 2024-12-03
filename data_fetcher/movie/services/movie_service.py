@@ -126,22 +126,16 @@ class MovieService:
     def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], movie_data: LmuMovie) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
         """Create MovieTable and related instances from API data"""
         base_data = tmdb_data[Language.ENGLISH_US]  # Use English as base
-        
-        backdrop_path = base_data.get("backdrop_path", "")
-        if backdrop_path:
-            backdrop_path = f"https://image.tmdb.org/t/p/w1280{backdrop_path}"
-        poster_path = base_data.get("poster_path", "")
-        if poster_path:
-            poster_path = f"https://image.tmdb.org/t/p/w1280{poster_path}"
+    
         
         # Create main movie entry
+        movie_id = uuid.uuid4()
+        
         movie = MovieTable(
-            id=str(uuid.uuid4()),
+            id=movie_id,
             budget=base_data.get("budget", 0),
             imdb_id=base_data["external_ids"]["imdb_id"],
             popularity=base_data.get("popularity", 0.0),
-            poster_path=poster_path,
-            backdrop_path=backdrop_path,
             release_date=datetime.fromisoformat(base_data["release_date"]),
             runtime=base_data.get("runtime", 0),
             language=base_data.get("original_language", "en"),
@@ -159,6 +153,7 @@ class MovieService:
         latitude = 48.147902
         
         screening = MovieScreeningTable(
+            movie_id=movie_id,
             date=date,
             university_id=University.LMU.value,
             start_time=date,
@@ -170,15 +165,24 @@ class MovieService:
         )
 
         # Create translations
+        backdrop_path = base_data.get("backdrop_path", "")
+        if backdrop_path:
+            backdrop_path = f"https://image.tmdb.org/t/p/w1280{backdrop_path}"
+        poster_path = base_data.get("poster_path", "")
+        if poster_path:
+            poster_path = f"https://image.tmdb.org/t/p/w1280{poster_path}"
         translations = []
+        
         for lang in Language:
             lang_data = tmdb_data[lang]
             translation = MovieTranslationTable(
-                movie_id=movie.id,
+                movie_id=movie_id,
                 language=lang.value,
                 title=lang_data["title"],
                 overview=lang_data["overview"],
                 tagline=lang_data.get("tagline", ""),
+                poster_path=poster_path,
+                backdrop_path=backdrop_path,
             )
             translations.append(translation)
 
@@ -189,7 +193,7 @@ class MovieService:
                 source = RatingSource.from_omdb_source(rating_data["Source"])
                 if source:
                     rating = MovieRatingTable(
-                        movie_id=movie.id,
+                        movie_id=movie_id,
                         source=source,
                         normalized_value=self._normalize_rating(source, rating_data["Value"]),
                         raw_value=rating_data["Value"]
@@ -205,9 +209,10 @@ class MovieService:
         
         for video in base_videos:
             if video["site"] == "YouTube" and video["type"] == "Trailer":
+                trailer_id = uuid.uuid4()
                 trailer = MovieTrailerTable(
-                    id=video["id"],
-                    movie_id=movie.id,
+                    id=trailer_id,
+                    movie_id=movie_id,
                     published_at=datetime.strptime(video["published_at"], "%Y-%m-%dT%H:%M:%S.%fZ"),
                     official=video["official"],
                     size=video["size"],
@@ -226,7 +231,7 @@ class MovieService:
                     )
                     
                     translation = MovieTrailerTranslationTable(
-                        trailer_id=video["id"],
+                        trailer_id=trailer_id,
                         language=lang.value,
                         title=matching_video["name"],
                         key=matching_video["key"]
