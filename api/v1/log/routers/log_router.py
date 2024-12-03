@@ -6,12 +6,12 @@ from fastapi.responses import FileResponse
 
 from api.v1.core import APIKey
 from shared.core.exceptions import ConfigurationError
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 
 from ..services.log_service import LogService
 
 router = APIRouter()
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 
 
 @router.get("/logs", 

@@ -23,3 +23,11 @@ def apply_translation_query(base_query: Select, model, translation_model, langua
             )
         )
     )
+    
+def create_translation_order_case(translation_table, language: LanguageEnum):
+    """Helper function to create consistent translation ordering cases"""
+    return case(
+        (translation_table.language == language.value, 1),
+        (translation_table.language == LanguageEnum.GERMAN.value, 2),
+        else_=3
+    )

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from api.v1.core.api_key import APIKey
 from api.v1.core.language import get_language
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.database import get_db
 from shared.enums.language_enums import LanguageEnum
 from shared.tables.canteen_table import CanteenTable
@@ -16,7 +16,7 @@ from ..schemas import DishDates, Dishes
 from ..services import CanteenService, DishService
 
 router = APIRouter()
-food_logger = get_food_api_logger(__name__)
+food_logger = get_food_logger(__name__)
 
 # Gets dish data
 @router.get("/dishes", response_model=Dishes, description="Get all dishes or a specific dish by ID. Authenticated users can also get liked dishes.")

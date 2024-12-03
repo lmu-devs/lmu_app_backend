@@ -26,8 +26,6 @@ def movie_trailers_to_pydantic(trailers: List[MovieTrailerTable]) -> List[MovieT
         trailer_translations: MovieTrailerTranslationTable = trailer.translations[0] if trailer.translations else None
         title = trailer_translations.title if trailer_translations else "not translated"
         key = trailer_translations.key if trailer_translations else "not translated"
-
-        print(key)
         url = None
         thumbnail_url = None
         
@@ -94,6 +92,7 @@ def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieS
         university = university_to_pydantic(screening.university)
         movie = movie_to_pydantic(screening.movie)
         screenings_pydantic.append(MovieScreening(
+            id=screening.id,
             entry_time=screening.entry_time,
             start_time=screening.start_time,
             end_time=screening.end_time,

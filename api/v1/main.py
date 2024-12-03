@@ -11,11 +11,11 @@ from api.v1.user.routers import user_router
 from api.v1.wishlist.routers import wishlist_router
 from shared.core.error_handlers import api_error_handler
 from shared.core.exceptions import APIException
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.database import Database
 from shared.settings import get_settings
 
-api_logger = get_food_api_logger(__name__)
+api_logger = get_food_logger(__name__)
 
 
 def create_app():

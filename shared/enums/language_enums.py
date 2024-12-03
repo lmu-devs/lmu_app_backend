@@ -1,8 +1,8 @@
 from enum import Enum
 
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 
 class LanguageEnum(str, Enum):
     GERMAN = "de-DE"

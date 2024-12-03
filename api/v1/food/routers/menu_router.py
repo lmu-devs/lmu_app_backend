@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from api.v1.core.api_key import APIKey
 from api.v1.core.language import get_language
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.core.timezone import TimezoneManager
 from shared.database import get_db
 from shared.enums.language_enums import LanguageEnum
@@ -18,7 +18,7 @@ from ..schemas import Menus
 from ..services import MenuService
 
 router = APIRouter()
-food_logger = get_food_api_logger(__name__)
+food_logger = get_food_logger(__name__)
 
 @router.get("/menus", response_model=Menus, description="Get all menus or a specific canteen by ID. Authenticated users can also get liked dishes.")
 async def get_menu(

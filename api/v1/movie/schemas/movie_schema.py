@@ -40,6 +40,7 @@ class Movie(BaseModel):
     trailers: List[MovieTrailer]
     
 class MovieScreening(BaseModel):
+    id: uuid.UUID
     entry_time: datetime
     start_time: datetime
     end_time: datetime

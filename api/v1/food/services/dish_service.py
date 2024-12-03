@@ -7,14 +7,14 @@ from sqlalchemy.orm import Session
 
 from api.v1.core.translation_utils import apply_translation_query
 from shared.core.exceptions import DatabaseError, NotFoundError
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.enums.language_enums import LanguageEnum
 from shared.tables.canteen_table import CanteenTable
 from shared.tables.dish_table import (DishLikeTable, DishTable,
                                       DishTranslationTable)
 from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
 
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 
 class DishService:
     def __init__(self, db: Session):

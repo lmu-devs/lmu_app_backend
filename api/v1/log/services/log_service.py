@@ -5,9 +5,9 @@ from datetime import datetime
 from typing import List
 
 from shared.core.exceptions import NotFoundError
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 
 class LogService:
     def __init__(self):

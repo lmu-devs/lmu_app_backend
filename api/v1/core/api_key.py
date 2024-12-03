@@ -5,12 +5,12 @@ from fastapi.security.api_key import APIKeyHeader
 from requests import Session
 
 from shared.core.exceptions import AuthenticationError, AuthorizationError
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_main_logger
 from shared.database import get_db
-from shared.tables.user_table import UserTable
 from shared.settings import get_settings
+from shared.tables.user_table import UserTable
 
-logger = get_food_api_logger(__name__)
+logger = get_main_logger(__name__)
 
 user_api_key = APIKeyHeader(
     name="user-api-key", 

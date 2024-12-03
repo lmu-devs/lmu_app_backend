@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from api.v1.core import APIKey
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.database import get_db
 from shared.enums.mensa_enums import CanteenEnum
 from shared.tables.user_table import UserTable
@@ -14,7 +14,7 @@ from ..schemas import Canteens
 from ..services import CanteenService
 
 router = APIRouter()
-food_logger = get_food_api_logger(__name__)
+food_logger = get_food_logger(__name__)
 
 
 @router.get("/canteens", response_model=Canteens)

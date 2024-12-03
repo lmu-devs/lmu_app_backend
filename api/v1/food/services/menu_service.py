@@ -6,14 +6,14 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, contains_eager
 
 from shared.core.exceptions import DatabaseError, NotFoundError
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.enums.language_enums import LanguageEnum
 from shared.tables.canteen_table import CanteenLikeTable
 from shared.tables.dish_table import DishTable, DishTranslationTable
 from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
 from shared.tables.user_table import UserTable
 
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 class MenuService:
     def __init__(self, db: Session):
         """Initialize the MenuService with a database session."""

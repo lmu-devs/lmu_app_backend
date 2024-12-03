@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from api.v1.core import APIKey, get_language
-from shared.core.logging import get_food_api_logger
+from shared.core.logging import get_food_logger
 from shared.database import get_db
 from shared.enums.language_enums import LanguageEnum
 from shared.tables.user_table import UserTable
@@ -13,7 +13,7 @@ from ..schemas.wishlist_scheme import (Wishlist, WishlistCreate, Wishlists,
 from ..services.wishlist_service import WishlistService
 
 router = APIRouter()
-logger = get_food_api_logger(__name__)
+logger = get_food_logger(__name__)
 
 @router.get("/wishlists", response_model=Wishlists)
 async def get_wishlists(
