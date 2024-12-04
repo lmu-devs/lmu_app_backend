@@ -9,7 +9,7 @@ from shared.core.exceptions import DataFetchError, DataProcessingError
 from shared.core.logging import get_food_fetcher_logger
 from shared.database import get_db
 from shared.settings import get_settings
-from shared.tables.canteen_table import (CanteenImageTable,
+from shared.tables.food.canteen_table import (CanteenImageTable,
                                          CanteenLocationTable, CanteenTable,
                                          CanteenType, OpeningHoursTable)
 

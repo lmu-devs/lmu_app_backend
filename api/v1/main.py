@@ -6,7 +6,7 @@ from api.v1.feedback.routers import feedback_router
 from api.v1.food.routers import (canteen_router, dish_router, menu_router,
                                  taste_router)
 from api.v1.log.routers import log_router
-from api.v1.movie.routers import movie_router
+from api.v1.cinema.routers import movie_router
 from api.v1.user.routers import user_router
 from api.v1.wishlist.routers import wishlist_router
 from shared.core.error_handlers import api_error_handler

@@ -1,7 +1,7 @@
 import uuid
 from typing import List
 
-from shared.tables.menu_table import MenuDayTable
+from shared.tables.food.menu_table import MenuDayTable
 from ..schemas import MenuDay, Menus
 from .dish_pydantic import dish_to_pydantic
 

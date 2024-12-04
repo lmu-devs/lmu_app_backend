@@ -3,10 +3,10 @@ import time
 import schedule
 from sqlalchemy.orm import Session
 
-from data_fetcher.movie.services.movie_service import MovieService
-from data_fetcher.state import running_movie
 from shared.core.logging import get_movie_fetcher_logger
 from shared.database import get_db
+from data_fetcher.state import running_movie
+from .services.movie_service import MovieService
 
 logger = get_movie_fetcher_logger(__name__)
 

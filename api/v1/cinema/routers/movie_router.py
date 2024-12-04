@@ -3,14 +3,14 @@ import uuid
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from api.v1.core.api_key import APIKey
-from api.v1.core.language import get_language
-from api.v1.movie.pydantics.movie_pydantic import screenings_to_pydantic, movies_to_pydantic
 from shared.enums.language_enums import LanguageEnum
-from ..schemas.movie_schema import Movie, MovieScreening
-from ..services.movie_service import MovieService
 from shared.database import get_db
 from shared.tables.user_table import UserTable
+from ..pydantics.movie_pydantic import screenings_to_pydantic, movies_to_pydantic
+from ..schemas.movie_schema import Movie, MovieScreening
+from ..services.movie_service import MovieService
+from api.v1.core.api_key import APIKey
+from api.v1.core.language import get_language
 
 router = APIRouter()
 

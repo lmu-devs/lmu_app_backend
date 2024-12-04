@@ -1,23 +1,23 @@
 from typing import List
 
-from api.v1.core.pydantics import image_to_pydantic, location_to_pydantic
-from api.v1.core.pydantics.university_pydantic import university_to_pydantic
 from shared.tables import (MovieRatingTable, MovieScreeningTable, MovieTable,
                            MovieTrailerTable, MovieTrailerTranslationTable,
                            MovieTranslationTable)
 
-from ..schemas.movie_schema import (Movie, MovieRating, MovieScreening,
-                                    MovieTrailer)
+from api.v1.core.pydantics import image_to_pydantic, location_to_pydantic, university_to_pydantic
+from ..schemas.movie_schema import Movie, MovieRating, MovieScreening, MovieTrailer
 
 
 def movie_ratings_to_pydantic(ratings: List[MovieRatingTable]) -> List[MovieRating]:
     ratings_pydantic = []
     for rating in ratings:
-        ratings_pydantic.append(MovieRating(
-            source=rating.source,
-        normalized_rating=rating.normalized_value,
-            raw_rating=rating.raw_value,
-        ))
+        ratings_pydantic.append(
+            MovieRating(
+                source=rating.source,
+                normalized_rating=rating.normalized_value,
+                raw_rating=rating.raw_value,
+            )
+        )
     return ratings_pydantic
     
 def movie_trailers_to_pydantic(trailers: List[MovieTrailerTable]) -> List[MovieTrailer]:
@@ -34,14 +34,16 @@ def movie_trailers_to_pydantic(trailers: List[MovieTrailerTable]) -> List[MovieT
         
         thumbnail = image_to_pydantic(thumbnail_url, f"YouTube Thumbnail for {title}")
         
-        trailers_pydantic.append(MovieTrailer(
-            id=trailer.id,
-            title=title,
-            published_at=trailer.published_at,
-            url=url,    
-            thumbnail=thumbnail,
-            site=trailer.site,
-        ))
+        trailers_pydantic.append(
+            MovieTrailer(
+                id=trailer.id,
+                title=title,
+                published_at=trailer.published_at,
+                url=url,    
+                thumbnail=thumbnail,
+                site=trailer.site,
+            )
+        )
     return trailers_pydantic
 
 
@@ -53,11 +55,8 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
     title = movie_translations.title if movie_translations else "not translated"
     overview = movie_translations.overview if movie_translations else "not translated"
     tagline = movie_translations.tagline if movie_translations else "not translated"
-    poster = image_to_pydantic(movie_translations.poster_path, "poster") if movie_translations else "not translated"
-    backdrop = image_to_pydantic(movie_translations.backdrop_path, "backdrop") if movie_translations else "not translated"
-    
-    
-    
+    poster = image_to_pydantic(movie_translations.poster_path, "poster") if movie_translations else None
+    backdrop = image_to_pydantic(movie_translations.backdrop_path, "backdrop") if movie_translations else None
     trailers = movie_trailers_to_pydantic(movie.trailers)
     ratings = movie_ratings_to_pydantic(movie.ratings)
     
@@ -76,12 +75,10 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
         homepage=movie.homepage,
         trailers=trailers,
     )
-    
+
+
 def movies_to_pydantic(movies: List[MovieTable]) -> List[Movie]:
-    movies_pydantic = []
-    for movie in movies:
-        movies_pydantic.append(movie_to_pydantic(movie))
-    return movies_pydantic
+    return [movie_to_pydantic(movie) for movie in movies]
 
 
     
@@ -91,13 +88,20 @@ def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieS
         location = location_to_pydantic(screening.location)
         university = university_to_pydantic(screening.university)
         movie = movie_to_pydantic(screening.movie)
-        screenings_pydantic.append(MovieScreening(
-            id=screening.id,
-            entry_time=screening.entry_time,
-            start_time=screening.start_time,
-            end_time=screening.end_time,
-            location=location,
-            university=university,
-            movie=movie,
-        ))
+        screenings_pydantic.append(
+            MovieScreening(
+                id=screening.id,
+                entry_time=screening.entry_time,
+                start_time=screening.start_time,
+                end_time=screening.end_time,
+                location=location,
+                university=university,
+                movie=movie,
+                price=screening.price,
+                is_ov=screening.is_ov,
+                subtitles=screening.subtitles,
+                external_link=screening.external_link,
+                booking_link=screening.booking_link,
+            )
+        )
     return screenings_pydantic

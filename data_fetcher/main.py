@@ -2,6 +2,7 @@ import asyncio
 import signal
 import sys
 
+from data_fetcher.movie.crawler.tum_movie_crawler import crawl_tum_movie_data
 from shared.core.logging import get_main_fetcher_logger
 from shared.database import Database
 from shared.settings import get_settings

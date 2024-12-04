@@ -1,16 +1,17 @@
 from datetime import date
 from typing import List
 
-from sqlalchemy import and_, case, select
+from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, contains_eager
 
+from api.v1.core.translation_utils import create_translation_order_case
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_food_logger
 from shared.enums.language_enums import LanguageEnum
-from shared.tables.canteen_table import CanteenLikeTable
-from shared.tables.dish_table import DishTable, DishTranslationTable
-from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
+from shared.tables.food.canteen_table import CanteenLikeTable
+from shared.tables.food.dish_table import DishTable, DishTranslationTable
+from shared.tables.food.menu_table import MenuDayTable, MenuDishAssociation
 from shared.tables.user_table import UserTable
 
 logger = get_food_logger(__name__)
@@ -49,14 +50,11 @@ class MenuService:
                     .contains_eager(MenuDishAssociation.dish)
                     .contains_eager(DishTable.translations)
                 )
-                .order_by(
-                    DishTable.id,
-                    case(
-                        (DishTranslationTable.language == language.value, 1),
-                        (DishTranslationTable.language == LanguageEnum.GERMAN.value, 2),
-                        else_=3
-                    )
-                )
+            )
+            
+            stmt = stmt.order_by(
+                DishTable.id,
+                create_translation_order_case(DishTranslationTable, language)
             )
             
             # Add date filters

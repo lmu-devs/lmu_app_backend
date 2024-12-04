@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from shared.core.exceptions import DatabaseError, NotFoundError
 from shared.core.logging import get_food_logger
 from shared.enums.mensa_enums import CanteenEnum
-from shared.tables.canteen_table import CanteenLikeTable, CanteenTable
+from shared.tables.food.canteen_table import CanteenLikeTable, CanteenTable
 
 logger = get_food_logger(__name__)
 

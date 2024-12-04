@@ -8,7 +8,7 @@ from api.v1.core.language import get_language
 from shared.core.logging import get_food_logger
 from shared.database import get_db
 from shared.enums.language_enums import LanguageEnum
-from shared.tables.canteen_table import CanteenTable
+from shared.tables.food.canteen_table import CanteenTable
 from shared.tables.user_table import UserTable
 
 from ..pydantics.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic

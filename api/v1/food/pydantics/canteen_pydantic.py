@@ -1,4 +1,4 @@
-from shared.tables.canteen_table import CanteenTable
+from shared.tables.food.canteen_table import CanteenTable
 from ..schemas import Canteen, Location, Weekday, OpeningHours, Image
 from api.v1.core.schemas import Rating, Location
 from api.v1.core.pydantics.location_pydantic import location_to_pydantic

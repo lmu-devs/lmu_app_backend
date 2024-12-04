@@ -6,11 +6,11 @@ from shared.database import Base
 from shared.settings import get_settings
 
 # Import models
-from shared.tables.canteen_table import CanteenTable
-from shared.tables.dish_table import DishTable
+from shared.tables.food.canteen_table import CanteenTable
+from shared.tables.food.dish_table import DishTable
 from shared.tables.image_table import ImageTable
 from shared.tables.wishlist_table import WishlistTable
-from shared.tables.menu_table import MenuDayTable, MenuDishAssociation
+from shared.tables.food.menu_table import MenuDayTable, MenuDishAssociation
 from shared.tables.wishlist_table import WishlistTable, WishlistImageTable, WishlistTranslationTable, WishlistLikeTable, WishlistStatus
 
 

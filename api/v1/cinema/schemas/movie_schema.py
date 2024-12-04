@@ -44,6 +44,10 @@ class MovieScreening(BaseModel):
     entry_time: datetime
     start_time: datetime
     end_time: datetime
+    price: float | None
+    is_ov: bool | None
+    subtitles: str | None
+    external_link: str | None
     location: Location
     university: University
     movie: Movie

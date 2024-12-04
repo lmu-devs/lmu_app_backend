@@ -4,9 +4,9 @@ from .language_enums import LanguageEnum
 
 
 class UniversityEnum(Enum):
-    LMU = "lmu"
-    TUM = "tum"
-    HM = "hm"
+    LMU = "LMU"
+    TUM = "TUM"
+    HM = "HM"
     
 university_translations = {
     UniversityEnum.LMU: {
