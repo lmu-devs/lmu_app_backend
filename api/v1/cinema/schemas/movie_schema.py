@@ -47,6 +47,7 @@ class MovieScreening(BaseModel):
     is_ov: bool | None
     subtitles: str | None
     external_link: str | None
+    note: str | None
     location: Location
     university: University
     movie: Movie

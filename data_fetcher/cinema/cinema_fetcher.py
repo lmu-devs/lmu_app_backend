@@ -6,6 +6,9 @@ from sqlalchemy.orm import Session
 from data_fetcher.state import running_movie
 from shared.core.logging import get_cinema_fetcher_logger
 from shared.database import get_db
+from shared.tables.cinema import (MovieTable, MovieTranslationTable, MovieScreeningTable, 
+                                MovieRatingTable, MovieTrailerTable, MovieTrailerTranslationTable,
+                                MovieLocationTable)
 
 from .services.cinema_service import CinemaService
 from .services.screening_service import ScreeningService
@@ -21,7 +24,26 @@ def save_constant_cinema_data(db: Session):
     db.commit()
     logger.info(f"Successfully added {len(cinemas)} cinemas to database")
 
+def clear_cinema_tables(db: Session):
+    """Clear all cinema-related tables in the correct order"""
+    logger.info("Clearing existing cinema data...")
+    
+    # Delete in reverse order of dependencies
+    db.query(MovieLocationTable).delete()
+    db.query(MovieTrailerTranslationTable).delete()
+    db.query(MovieTrailerTable).delete()
+    db.query(MovieRatingTable).delete()
+    db.query(MovieScreeningTable).delete()
+    db.query(MovieTranslationTable).delete()
+    db.query(MovieTable).delete()
+    
+    db.commit()
+    logger.info("Successfully cleared all cinema tables")
+
+
+
 async def fetch_scheduled_data(db: Session):
+    clear_cinema_tables(db)
     screening_service = ScreeningService()
     processed_movies = await screening_service.fetch_and_process_movies()
 

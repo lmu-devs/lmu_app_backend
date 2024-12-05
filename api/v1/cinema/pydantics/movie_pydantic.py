@@ -104,6 +104,7 @@ def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieS
                 subtitles=screening.subtitles,
                 external_link=screening.external_link,
                 booking_link=screening.booking_link,
+                note=screening.note,
             )
         )
     return screenings_pydantic

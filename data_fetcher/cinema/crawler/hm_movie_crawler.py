@@ -62,12 +62,12 @@ class HmCinemaCrawler:
                     # Extract description and tagline
                     text_container = showcase.find('div', class_='text_container')
                     description_parts = []
-                    tagline = None
+                    note = None
                     if text_container:
                         # Extract tagline from the standalone span (not within p tags)
                         tagline_span = text_container.find('span', recursive=False)  # recursive=False to only get direct children
                         if tagline_span:
-                            tagline = tagline_span.get_text(strip=True)
+                            note = tagline_span.get_text(strip=True)
                         
                         # Extract description from p tags
                         paragraphs = text_container.find_all('p')
@@ -139,7 +139,7 @@ class HmCinemaCrawler:
                         custom_poster_url=custom_poster_url,
                         description=description,
                         runtime=runtime,
-                        tagline=tagline
+                        note=note
                     )
                     screenings.append(screening)
 

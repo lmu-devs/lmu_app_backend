@@ -21,6 +21,7 @@ class ScreeningCrawl:
         external_url:   str     | None = None,
         booking_url:    str     | None = None,
         runtime:        int     | None = None,
+        note:           str     | None = None,
         custom_poster_url:  str     | None = None,
         
     ):
@@ -42,3 +43,4 @@ class ScreeningCrawl:
         self.booking_url = booking_url
         self.custom_poster_url = custom_poster_url
         self.runtime = runtime
+        self.note = note

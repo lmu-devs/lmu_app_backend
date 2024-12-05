@@ -64,6 +64,7 @@ class ScreeningService:
             end_time=end_time,
             entry_time=entry_time,
             price=movie_data.price,
+            note=movie_data.note,
             location=MovieLocationTable(
                 screening_id=screening_id,
                 address=movie_data.address,

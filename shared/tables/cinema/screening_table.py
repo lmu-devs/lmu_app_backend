@@ -26,6 +26,7 @@ class MovieScreeningTable(Base):
     booking_link = Column(String, nullable=True)
     is_ov = Column(Boolean, nullable=True)
     subtitles = Column(String, nullable=True)
+    note = Column(String, nullable=True)
     
     movie = relationship("MovieTable", back_populates="screenings")
     university = relationship("UniversityTable", back_populates="screenings")
