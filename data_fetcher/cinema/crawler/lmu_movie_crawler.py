@@ -4,24 +4,24 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from shared.core.logging import get_movie_fetcher_logger
+from data_fetcher.cinema.constants.location_constants import \
+    CinemaLocationConstants
+from data_fetcher.cinema.models.screening_model import ScreeningCrawl
+from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.university_enums import UniversityEnum
-from ..models.movie_model import ScreeningCrawl
 
 # Initialize logger
-logger = get_movie_fetcher_logger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
 class LmuMovieCrawler:
     def __init__(self):
         self.base_url = "https://u-kino.de/programm/"
-        self.address = "Hörsaal B052, Theresienstraße 37-39"
-        self.longitude = 11.573249
-        self.latitude = 48.147902
         self.price = 3.5
         self.external_link = "https://u-kino.de/programm/"
-        self.university_id = UniversityEnum.LMU.value
+        self.university_id = UniversityEnum.LMU
+        self.is_ov = True
         
-    def _parse_date(date_str) -> datetime:
+    def _parse_date(self, date_str) -> datetime:
         """Convert date string to datetime at 20:00"""
         try:
             # Convert DD.MM.YY to datetime at 20:00
@@ -54,52 +54,55 @@ class LmuMovieCrawler:
         
         screenings = []
         for item in movie_list.find_all('li'):
-            text = item.get_text().strip()
-            logger.debug(f"Processing movie item: {text}")
+            text = item.get_text()
             
-            # Handle surprise movie case
-            if '[Surprise Movie]' in text:
-                match = re.match(r"(\d{2}\.\d{2}\.\d{2}):", text)
-                if match:
-                    screenings.append(ScreeningCrawl(
-                        date=self._parse_date(match.group(1)),
-                        title="Surprise Movie",
-                        aka_name=None,
-                        year=None,
-                        is_ov=True,
-                        address=self.address,
-                        longitude=self.longitude,
-                        latitude=self.latitude,
-                        external_link=self.external_link,
-                        university_id=self.university_id,
-                        price=self.price,
-                    ))
-                    logger.info("Added surprise movie entry")
+            # Extract date and title using regex
+            date_match = re.match(r'(\d{2}\.\d{2}\.\d{2}): (.+)', text)
+            if not date_match:
                 continue
             
-            # Regular movie pattern
-            pattern = r"(\d{2}\.\d{2}\.\d{2}):\s*(.*?)(?:\s+aka\s+(.*?))?\s*\(R:.*?,\s*(\d{4})\)"
-            match = re.match(pattern, text)
+            date_str, full_title = date_match.groups()
+            date = self._parse_date(date_str)
             
-            if match:
-                date_str, title, aka_name, year = match.groups()
-                screenings.append(ScreeningCrawl(
-                    date=self._parse_date(date_str),
-                    title=title.strip(),
-                    aka_name=aka_name.strip() if aka_name else None,
-                    year=int(year),
-                    address=self.address,
-                    longitude=self.longitude,
-                    latitude=self.latitude,
-                    external_link=self.external_link,
-                    university_id=self.university_id,
-                    price=self.price,
-                    
-                ))
-                logger.info(f"Successfully parsed movie: {title} ({year})")
-            else:
-                logger.warning(f"Could not parse movie entry: {text}")
-        
-        logger.info(f"Found {len(screenings)} movies in total")
-        return screenings[0:5]
+            # Extract year and clean title
+            year_match = re.search(r'\(.*?(\d{4})\)', full_title)
+            year = int(year_match.group(1)) if year_match else None
+            
+            # Clean up title
+            title = re.sub(r'\(R:.*?\d{4}\)', '', full_title)  # Remove director and year
+            title = re.sub(r'aka.*$', '', title)  # Remove aka part
+            title = title.strip()
+            
+            # Get aka name if exists
+            aka_match = re.search(r'aka\s+(.+?)\s*(?:\(|$)', full_title)
+            aka_name = aka_match.group(1).strip() if aka_match else None
+            
+            # Check if this is an edge case
+            is_edge_case = year is None or "[" in title
+            
+            location = CinemaLocationConstants[self.university_id]
+            
+            screenings.append(ScreeningCrawl(
+                is_edge_case=is_edge_case,
+                title=title,
+                date=date,
+                aka_name=aka_name,
+                year=year,
+                is_ov=self.is_ov,
+                address=location.address,
+                longitude=location.longitude,
+                latitude=location.latitude,
+                external_url=self.external_link,
+                university_id=self.university_id.value,
+                price=self.price,
+            ))
+            logger.info(f"Successfully parsed movie: {title} ({year})")
 
+        logger.info(f"Found {len(screenings)} movies in total")
+        return screenings[0:3]
+
+if __name__ == "__main__":
+    crawler = LmuMovieCrawler()
+    for screening in crawler.crawl():
+        print(screening.__dict__)
+        print("--------------------------------\n")        

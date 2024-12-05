@@ -1,44 +1,95 @@
 import uuid
-
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
-from shared.core.logging import get_movie_fetcher_logger
-from shared.settings import get_settings
+from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.language_enums import LanguageEnum
 from shared.enums.rating_enums import RatingSourceEnum
-from shared.tables.cinema.movie_table import (MovieLocationTable, MovieRatingTable,
-                                       MovieScreeningTable, MovieTable,
-                                       MovieTrailerTable,
-                                       MovieTrailerTranslationTable,
-                                       MovieTranslationTable)
-from ..models.movie_model import ScreeningCrawl
-from ..utils.rating_util import MovieRatingNormalizer
+from shared.settings import get_settings
+from shared.tables.cinema import (MovieLocationTable,
+                                              MovieRatingTable,
+                                              MovieScreeningTable, MovieTable,
+                                              MovieTrailerTable,
+                                              MovieTrailerTranslationTable,
+                                              MovieTranslationTable)
+
+from ..crawler.hm_movie_crawler import HmCinemaCrawler
 from ..crawler.lmu_movie_crawler import LmuMovieCrawler
 from ..crawler.tum_movie_crawler import TumMovieCrawler
+from ..models.screening_model import ScreeningCrawl
+from ..utils.rating_util import MovieRatingNormalizer
 from .omdb_service import OmdbService
 from .tmdb_service import TmdbService
 
 settings = get_settings()
-logger = get_movie_fetcher_logger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
-class MovieService:
+class ScreeningService:
+    
+    def _create_edge_case_movie_model(self, movie_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
+        """Create MovieTable and related instances from API data"""
+        
+        movie_id = uuid.uuid4()
+        movie = MovieTable(
+            id=movie_id,
+            runtime=movie_data.runtime,
+            homepage=movie_data.external_url,
+            original_title=movie_data.title,
+        )
+        
+        translation = MovieTranslationTable(
+            movie_id=movie_id,
+            language=LanguageEnum.GERMAN.value,
+            title=movie_data.title,
+            tagline=movie_data.tagline,
+            overview=movie_data.description,
+            poster_url=movie_data.custom_poster_url,
+        )
+        
+        end_time = None
+        entry_time = None
+        
+        if movie_data.runtime:
+            end_time = movie_data.date + timedelta(minutes=movie_data.runtime)
+        
+        screening_id = uuid.uuid4()
+        entry_time = movie_data.date - timedelta(minutes=30)
+        screening = MovieScreeningTable(
+            id=screening_id,
+            movie_id=movie_id,
+            date=movie_data.date,
+            university_id=movie_data.university_id,
+            cinema_id=movie_data.university_id,
+            start_time=movie_data.date,
+            end_time=end_time,
+            entry_time=entry_time,
+            price=movie_data.price,
+            location=MovieLocationTable(
+                screening_id=screening_id,
+                address=movie_data.address,
+                longitude=movie_data.longitude,
+                latitude=movie_data.latitude
+            )
+        )
+        
+        
+        return movie, [translation], screening, [], [], []
     
     def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], movie_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
         """Create MovieTable and related instances from API data"""
-        base_data = tmdb_data[LanguageEnum.ENGLISH_US]
+        tmdb_base_data = tmdb_data[LanguageEnum.ENGLISH_US]
     
         movie_id = uuid.uuid4()
         movie = MovieTable(
             id=movie_id,
-            original_title=base_data["original_title"],
-            budget=base_data.get("budget", 0),
-            imdb_id=base_data["external_ids"]["imdb_id"],
-            popularity=base_data.get("popularity", 0.0),
-            release_date=datetime.fromisoformat(base_data["release_date"]),
-            runtime=base_data.get("runtime", 0),
-            language=base_data.get("original_language", "en"),
-            homepage=base_data.get("homepage", ""),
+            original_title=tmdb_base_data["original_title"],
+            budget=tmdb_base_data.get("budget", 0),
+            imdb_id=tmdb_base_data["external_ids"]["imdb_id"],
+            popularity=tmdb_base_data.get("popularity", 0.0),
+            release_date=datetime.fromisoformat(tmdb_base_data["release_date"]),
+            runtime=tmdb_base_data.get("runtime", 0),
+            language=tmdb_base_data.get("original_language", "en"),
+            homepage=tmdb_base_data.get("homepage", ""),
         )
         
         # Create screenings
@@ -54,13 +105,14 @@ class MovieService:
             movie_id=movie_id,
             date=date,
             university_id=university_id,
+            cinema_id=university_id,
             start_time=date,
             end_time=end_time,
             entry_time=entry_time,
             price=movie_data.price,
             is_ov=movie_data.is_ov,
             subtitles=movie_data.subtitles,
-            external_link=movie_data.external_link,
+            external_link=movie_data.external_url,
             location=MovieLocationTable(
                 screening_id=screening_id,
                 address=movie_data.address,
@@ -70,12 +122,12 @@ class MovieService:
         )
 
         # Create translations
-        backdrop_path = base_data.get("backdrop_path", "")
-        if backdrop_path:
-            backdrop_path = f"https://image.tmdb.org/t/p/w1280{backdrop_path}"
-        poster_path = base_data.get("poster_path", "")
-        if poster_path:
-            poster_path = f"https://image.tmdb.org/t/p/w1280{poster_path}"
+        backdrop_url = tmdb_base_data.get("backdrop_path", "")
+        if backdrop_url:
+            backdrop_url = f"https://image.tmdb.org/t/p/w1280{backdrop_url}"
+        poster_url = tmdb_base_data.get("poster_path", "")
+        if poster_url:
+            poster_url = f"https://image.tmdb.org/t/p/w1280{poster_url}"
             
         translations = []
         
@@ -87,8 +139,8 @@ class MovieService:
                 title=lang_data["title"],
                 overview=lang_data["overview"],
                 tagline=lang_data.get("tagline", ""),
-                poster_path=poster_path,
-                backdrop_path=backdrop_path,
+                poster_url=poster_url,
+                backdrop_url=backdrop_url,
             )
             translations.append(translation)
 
@@ -152,9 +204,9 @@ class MovieService:
         logger.info("Starting movie fetch process")
         
         crawled_movies: list[ScreeningCrawl] = []
-        crawled_movies.extend(LmuMovieCrawler().crawl())
-        crawled_movies.extend(TumMovieCrawler().crawl())
-        # TODO: HM crawler
+        # crawled_movies.extend(LmuMovieCrawler().crawl())
+        # crawled_movies.extend(TumMovieCrawler().crawl())
+        crawled_movies.extend(HmCinemaCrawler().crawl())
             
         processed_movies = []
 
@@ -162,23 +214,27 @@ class MovieService:
 
             logger.info(f"Processing movie: {crawled_movie.title}")
             
-            tmdb_service = TmdbService()
-            tmdb_data = tmdb_service.search_tmdb_movie(crawled_movie.title, crawled_movie.year)
-            if not tmdb_data:
-                logger.warning(f"Could not find TMDB data for {crawled_movie.title}")
-                continue
-
-            imdb_id = tmdb_data[LanguageEnum.ENGLISH_US]["external_ids"]["imdb_id"]
-            omdb_service = OmdbService()
-            omdb_data = omdb_service.get_omdb_data(imdb_id)
-            if not omdb_data:
-                logger.warning(f"Could not find OMDB data for {crawled_movie.title}")
-                continue
-
-            crawled_movie, translations, screenings, ratings, trailers, trailer_translations = self._create_movie_model(tmdb_data, omdb_data, crawled_movie)
-            processed_movies.append((crawled_movie, translations, screenings, ratings, trailers, trailer_translations))
+            if crawled_movie.is_edge_case:
+                processed_movies.append(self._create_edge_case_movie_model(crawled_movie))
             
-            logger.info(f"Successfully processed {crawled_movie.original_title}")
+            else:
+                tmdb_service = TmdbService()
+                tmdb_data = tmdb_service.search_tmdb_movie(crawled_movie.title, crawled_movie.year)
+                if not tmdb_data:
+                    logger.warning(f"Could not find TMDB data for {crawled_movie.title}")
+                    continue
+
+                imdb_id = tmdb_data[LanguageEnum.ENGLISH_US]["external_ids"]["imdb_id"]
+                omdb_service = OmdbService()
+                omdb_data = omdb_service.get_omdb_data(imdb_id)
+                if not omdb_data:
+                    logger.warning(f"Could not find OMDB data for {crawled_movie.title}")
+                    continue
+
+                crawled_movie, translations, screenings, ratings, trailers, trailer_translations = self._create_movie_model(tmdb_data, omdb_data, crawled_movie)
+                processed_movies.append((crawled_movie, translations, screenings, ratings, trailers, trailer_translations))
+                
+                logger.info(f"Successfully processed {crawled_movie.original_title}")
 
         logger.info(f"Completed processing {len(processed_movies)} movies")
         return processed_movies 

@@ -1,13 +1,13 @@
-import requests
-
 from typing import Any, Dict, Optional
 
-from shared.core.logging import get_movie_fetcher_logger
-from shared.settings import get_settings
+import requests
+
+from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.language_enums import LanguageEnum
+from shared.settings import get_settings
 
 settings = get_settings()
-logger = get_movie_fetcher_logger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
 
 class TmdbService():

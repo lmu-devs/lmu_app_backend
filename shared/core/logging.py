@@ -67,5 +67,5 @@ def get_main_fetcher_logger(module_name: str):
 def get_food_fetcher_logger(module_name: str):
     return setup_logger(module_name, "eat_fetcher", "eat_fetcher")
 
-def get_movie_fetcher_logger(module_name: str):
+def get_cinema_fetcher_logger(module_name: str):
     return setup_logger(module_name, "movie_fetcher", "movie_fetcher")

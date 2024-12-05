@@ -1,9 +1,9 @@
+from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.rating_enums import RatingSourceEnum
-from shared.core.logging import get_movie_fetcher_logger
 from shared.settings import get_settings
 
 settings = get_settings()
-logger = get_movie_fetcher_logger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
 
 

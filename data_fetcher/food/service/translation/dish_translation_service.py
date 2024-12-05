@@ -3,7 +3,7 @@ from typing import List
 from shared.core.logging import get_food_fetcher_logger
 from shared.enums.language_enums import LanguageEnum
 from shared.services.translation_service import TranslationService
-from shared.tables.dish_table import DishTable, DishTranslationTable
+from shared.tables.food.dish_table import DishTable, DishTranslationTable
 
 logger = get_food_fetcher_logger(__name__)
 

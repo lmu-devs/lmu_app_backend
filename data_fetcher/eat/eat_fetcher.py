@@ -11,7 +11,7 @@ from data_fetcher.state import running_eat
 from shared.core.error_handlers import handle_error
 from shared.core.logging import get_food_fetcher_logger
 from shared.database import get_db
-from shared.enums.mensa_enums import CanteenEnum
+from shared.enums.canteen_enums import CanteenEnum
 
 logger = get_food_fetcher_logger(__name__)
 

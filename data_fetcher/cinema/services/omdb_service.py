@@ -1,12 +1,12 @@
-import requests
-
 from typing import Any, Dict, Optional
 
-from shared.core.logging import get_movie_fetcher_logger
+import requests
+
+from shared.core.logging import get_cinema_fetcher_logger
 from shared.settings import get_settings
 
 settings = get_settings()
-logger = get_movie_fetcher_logger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
 class OmdbService():
     def __init__(self):

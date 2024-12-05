@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload, contains_eager
 from api.v1.core.translation_utils import create_translation_order_case
 from shared.enums.language_enums import LanguageEnum
 from shared.tables.university_table import UniversityTable, UniversityTranslationTable
-from shared.tables.cinema.movie_table import MovieTable, MovieScreeningTable, MovieTranslationTable, MovieTrailerTable, MovieTrailerTranslationTable
+from shared.tables.cinema import MovieTable, MovieScreeningTable, MovieTranslationTable, MovieTrailerTable, MovieTrailerTranslationTable
 from ..schemas.movie_schema import Movie, MovieScreening
 
 class MovieService:

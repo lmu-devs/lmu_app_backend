@@ -1,11 +1,13 @@
 from typing import List
 
+from api.v1.core.pydantics import (image_to_pydantic, location_to_pydantic,
+                                   university_to_pydantic)
 from shared.tables import (MovieRatingTable, MovieScreeningTable, MovieTable,
                            MovieTrailerTable, MovieTrailerTranslationTable,
                            MovieTranslationTable)
 
-from api.v1.core.pydantics import image_to_pydantic, location_to_pydantic, university_to_pydantic
-from ..schemas.movie_schema import Movie, MovieRating, MovieScreening, MovieTrailer
+from ..schemas.movie_schema import (Movie, MovieRating, MovieScreening,
+                                    MovieTrailer)
 
 
 def movie_ratings_to_pydantic(ratings: List[MovieRatingTable]) -> List[MovieRating]:
@@ -55,8 +57,8 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
     title = movie_translations.title if movie_translations else "not translated"
     overview = movie_translations.overview if movie_translations else "not translated"
     tagline = movie_translations.tagline if movie_translations else "not translated"
-    poster = image_to_pydantic(movie_translations.poster_path, "poster") if movie_translations else None
-    backdrop = image_to_pydantic(movie_translations.backdrop_path, "backdrop") if movie_translations else None
+    poster = image_to_pydantic(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
+    backdrop = image_to_pydantic(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
     trailers = movie_trailers_to_pydantic(movie.trailers)
     ratings = movie_ratings_to_pydantic(movie.ratings)
     

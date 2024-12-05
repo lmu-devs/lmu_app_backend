@@ -2,17 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "${relativeFileDirname}.${fileBasenameNoExtension}",
-            "cwd": "${workspaceFolder}"
-        },
-        {
             "name": "Python: Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "justMyCode": true
         }

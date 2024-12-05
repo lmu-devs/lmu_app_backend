@@ -7,7 +7,6 @@ from sqlalchemy.orm import relationship
 from shared.database import Base
 from shared.enums.rating_enums import RatingSourceEnum
 from shared.tables.language_table import LanguageTable
-from shared.tables.location_table import LocationTable
 
 # Association table for the many-to-many relationship between movies and genres
 movie_genre_association = Table(
@@ -16,51 +15,18 @@ movie_genre_association = Table(
     Column('genre_id', UUID(as_uuid=True), ForeignKey('movie_genres.id', ondelete='CASCADE'), primary_key=True)
 )
 
-class MovieScreeningTable(Base):
-    __tablename__ = "movie_screenings"
-    
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    date = Column(DateTime)
-    movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete='CASCADE'))
-    university_id = Column(String, ForeignKey("universities.id", ondelete='CASCADE'))
-    entry_time = Column(DateTime, nullable=True)
-    start_time = Column(DateTime, nullable=True)
-    end_time = Column(DateTime, nullable=True)
-    price = Column(Float, nullable=True)
-    external_link = Column(String, nullable=True)
-    booking_link = Column(String, nullable=True)
-    is_ov = Column(Boolean, nullable=True)
-    subtitles = Column(String, nullable=True)
-    
-    movie = relationship("MovieTable", back_populates="screenings")
-    university = relationship("UniversityTable", back_populates="screenings")
-    cinema = relationship("CinemaTable", back_populates="screenings")
-    location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
-    
-    __table_args__ = (
-        UniqueConstraint('date', 'movie_id', name='uix_date_movie_id'),
-    )
-    
-class MovieLocationTable(LocationTable, Base):
-    __tablename__ = "movie_locations"
-    
-    screening_id = Column(UUID(as_uuid=True), ForeignKey("movie_screenings.id", ondelete='CASCADE'), primary_key=True)
-    
-    screening = relationship("MovieScreeningTable", back_populates="location")
-    
-    
 class MovieTable(Base):
     __tablename__ = "movies"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    original_title = Column(String, nullable=False)
-    release_date = Column(Date, nullable=False)
-    budget = Column(Integer, nullable=False)
-    imdb_id = Column(String, nullable=False)
-    popularity = Column(Float, nullable=False)
-    runtime = Column(Integer, nullable=False)
-    language = Column(String, nullable=False)
-    homepage = Column(String, nullable=False)
+    original_title = Column(String, nullable=True)
+    release_date = Column(Date, nullable=True)
+    budget = Column(Integer, nullable=True)
+    imdb_id = Column(String, nullable=True)
+    popularity = Column(Float, nullable=True)
+    runtime = Column(Integer, nullable=True)
+    language = Column(String, nullable=True)
+    homepage = Column(String, nullable=True)
     
     translations = relationship("MovieTranslationTable", back_populates="movie", cascade="all, delete-orphan")
     genres = relationship("MovieGenreTable", secondary=movie_genre_association, back_populates="movies")
@@ -76,12 +42,11 @@ class MovieTranslationTable(LanguageTable, Base):
     __tablename__ = "movie_translations"
     
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
-    language = Column(String, primary_key=True)
     title = Column(String, nullable=False)
-    overview = Column(String, nullable=False)
-    tagline = Column(String, nullable=False)
-    poster_path = Column(String, nullable=True)
-    backdrop_path = Column(String, nullable=True)
+    overview = Column(String, nullable=True)
+    tagline = Column(String, nullable=True)
+    poster_url = Column(String, nullable=True)
+    backdrop_url = Column(String, nullable=True)
     
     movie = relationship("MovieTable", back_populates="translations")
 

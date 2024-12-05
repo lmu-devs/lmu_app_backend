@@ -5,8 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.food.service.simple_price_service import PriceService
-from data_fetcher.food.service.translation.dish_translation_service import \
-    DishTranslationService
+from data_fetcher.food.service.translation.dish_translation_service import DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
                                     ExternalAPIError)
 from shared.core.logging import get_food_fetcher_logger

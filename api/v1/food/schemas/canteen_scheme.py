@@ -5,7 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, RootModel
 
 from shared.tables.food.canteen_table import CanteenType
-from api.v1.core.schemas.location_scheme import Location
+from shared.schemas.location_scheme import Location
 from api.v1.core.schemas.image_scheme import Image
 from api.v1.core.schemas.rating_scheme import Rating
 

@@ -1,33 +1,32 @@
-import requests
-from bs4 import BeautifulSoup
+import logging
+import re
 from datetime import datetime
 from typing import List
-import re
-import logging
 
+import requests
+from bs4 import BeautifulSoup
+
+from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.enums.university_enums import UniversityEnum
-from data_fetcher.cinema.models.movie_model import ScreeningCrawl
+from data_fetcher.cinema.constants.location_constants import CinemaLocationConstants
 
 logger = logging.getLogger(__name__)
 
-class HMCinemaCrawler:
+class HmCinemaCrawler:
     def __init__(self):
+        self.university_id = UniversityEnum.HM
         self.base_url = "https://www.unifilm.de/studentenkinos/muenchen_hm"
-        self.address = "Hörsaal E0.103 - Tram Station Lothstraße"
-        self.longitude = 11.554943
-        self.latitude = 48.153699
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-        self.university_id = UniversityEnum.HM.value
         self.external_link = "https://www.unifilm.de/studentenkinos/muenchen_hm"
-        self.price = 3.5
+        self.price = 2.0
+        self.is_edge_case = True
 
     def _parse_date_time(self, date_str: str, time_str: str) -> datetime | None:
         """Convert date and time strings to datetime object"""
         try:
-            # Convert German date format to datetime
-            date_match = re.match(r'Do\. (\d{2})\.(\d{2})\.(\d{4})', date_str)
+            date_match = re.match(r'\w+ (\d{2})\.(\d{2})\.(\d{4})', date_str)
             if not date_match:
                 logger.warning(f"Could not parse date string: {date_str}")
                 return None
@@ -39,7 +38,8 @@ class HMCinemaCrawler:
         except (ValueError, AttributeError) as e:
             logger.error(f"Error parsing date/time: {date_str} {time_str} - {str(e)}")
             return None
-
+        
+        
     def _extract_screenings(self, html_content: str) -> List[ScreeningCrawl]:
         """Extract screening information from HTML content"""
         try:
@@ -47,28 +47,54 @@ class HMCinemaCrawler:
             screenings = []
 
             # Find all film rows in the current semester program
-            film_rows = soup.select('.spielplan-thisSemester .semester-film-row')
+            showcase_rows = soup.select('.film-showcase')
             
-            if not film_rows:
+            if not showcase_rows:
                 logger.warning("No film rows found in HTML content")
                 return []
 
-            for row in film_rows:
+            for showcase in showcase_rows:
                 try:
+                    # Extract image URL
+                    image_tag = showcase.find('img')
+                    custom_poster_url = f"https://www.unifilm.de/{image_tag['src']}" if image_tag else None
+
+                    # Extract description and tagline
+                    text_container = showcase.find('div', class_='text_container')
+                    description_parts = []
+                    tagline = None
+                    if text_container:
+                        # Extract tagline from the standalone span (not within p tags)
+                        tagline_span = text_container.find('span', recursive=False)  # recursive=False to only get direct children
+                        if tagline_span:
+                            tagline = tagline_span.get_text(strip=True)
+                        
+                        # Extract description from p tags
+                        paragraphs = text_container.find_all('p')
+                        for p in paragraphs:
+                            description_parts.append(p.get_text(strip=True))
+                    description = ' '.join(description_parts)
+
+                    # Extract runtime
+                    film_data = showcase.find('ul', class_='film-info-filmdaten')
+                    runtime = None
+                    if film_data:
+                        for li in film_data.find_all('li'):
+                            if 'Min.' in li.get_text():
+                                runtime = int(li.get_text().replace(' Min.', '').strip())
+
                     # Extract basic information
-                    date = row.select_one('.film-row-datum')
-                    time = row.select_one('.film-row-uhrzeit')
-                    title = row.select_one('.film-row-titel')
-                    info = row.select_one('.film-row-info')
+                    date = showcase.select_one('.film-info-text.datum')
+                    time = showcase.select_one('.film-info-text.uhrzeit')
+                    title = showcase.select_one('h1.headline-h3 span')
 
                     if not all([date, time, title]):
-                        logger.warning(f"Missing required information in row: {row}")
+                        logger.warning(f"Missing required information in row: {showcase}")
                         continue
 
                     date = date.text.strip()
                     time = time.text.replace('Uhr', '').strip()
                     title = title.text.strip()
-                    info = info.text.strip() if info else None
 
                     # Parse datetime
                     screening_datetime = self._parse_date_time(date, time)
@@ -92,27 +118,28 @@ class HMCinemaCrawler:
                     title = re.sub(r'\[.*?\]', '', title).strip()
                     
                     # Check if it's a special screening with free entrance
-                    price = None
-                    if info and any(text in info for text in ['Gratis Eintritt', 'Freier Eintritt', 'gratis', 'kostenlos']):
-                        price = 0.0
+                    if any(text in description for text in ['Gratis Eintritt', 'Freier Eintritt', 'gratis', 'kostenlos']):
+                        self.price = 0.0
 
-                    # Get additional info from movie details if available
-                    movie_id = row.get('data-id')
-                    year = None
-
+                    location = CinemaLocationConstants[self.university_id]
+                    
                     # Create ScreeningCrawl object
                     screening = ScreeningCrawl(
+                        is_edge_case=self.is_edge_case,
                         date=screening_datetime,
                         title=title,
-                        address=self.address,
-                        longitude=self.longitude,
-                        latitude=self.latitude,
+                        address=location.address,
+                        longitude=location.longitude,
+                        latitude=location.latitude,
                         is_ov=is_ov,
-                        price=price,
+                        price=self.price,
                         subtitles=subtitles,
                         university_id=self.university_id,
-                        year=year,
-                        external_link=self.external_link
+                        external_url=self.external_link,
+                        custom_poster_url=custom_poster_url,
+                        description=description,
+                        runtime=runtime,
+                        tagline=tagline
                     )
                     screenings.append(screening)
 
@@ -147,8 +174,12 @@ class HMCinemaCrawler:
             logger.error(f"Unexpected error during crawl: {str(e)}")
             return []
         
+    
+
 if __name__ == "__main__":
-    crawler = HMCinemaCrawler()
+    crawler = HmCinemaCrawler()
     for screening in crawler.crawl():
+        print("--------------------------------\n")
         print(screening.__dict__)
+    print("Number of screenings: ", len(crawler.crawl()))
 

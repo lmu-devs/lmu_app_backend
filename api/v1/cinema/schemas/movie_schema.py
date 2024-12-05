@@ -4,11 +4,10 @@ from typing import List
 
 from pydantic import BaseModel
 
-from api.v1.core import Image
-from api.v1.core.schemas.location_scheme import Location
-from api.v1.core.schemas.university_scheme import University
 from shared.enums.rating_enums import RatingSourceEnum
-from shared.enums.university_enums import UniversityEnum
+from shared.schemas.location_scheme import Location
+from api.v1.core import Image
+from api.v1.core.schemas.university_scheme import University
 
 
 class MovieRating(BaseModel):
@@ -29,11 +28,11 @@ class Movie(BaseModel):
     title: str
     overview: str
     tagline: str
-    release_year: date
+    release_year: date | None
     budget: int | None
     ratings: List[MovieRating]
-    poster: Image
-    backdrop: Image
+    poster: Image | None
+    backdrop: Image | None
     genres: List[str]
     runtime: int
     homepage: str
@@ -43,7 +42,7 @@ class MovieScreening(BaseModel):
     id: uuid.UUID
     entry_time: datetime
     start_time: datetime
-    end_time: datetime
+    end_time: datetime | None
     price: float | None
     is_ov: bool | None
     subtitles: str | None

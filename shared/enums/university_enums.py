@@ -3,7 +3,7 @@ from enum import Enum
 from .language_enums import LanguageEnum
 
 
-class UniversityEnum(Enum):
+class UniversityEnum(str, Enum):
     LMU = "LMU"
     TUM = "TUM"
     HM = "HM"

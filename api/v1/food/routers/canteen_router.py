@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from api.v1.core import APIKey
 from shared.core.logging import get_food_logger
 from shared.database import get_db
-from shared.enums.mensa_enums import CanteenEnum
+from shared.enums.canteen_enums import CanteenEnum
 from shared.tables.user_table import UserTable
 
 from ..pydantics.canteen_pydantic import canteen_to_pydantic

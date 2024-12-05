@@ -10,7 +10,7 @@ from shared.core.logging import get_food_logger
 from shared.core.timezone import TimezoneManager
 from shared.database import get_db
 from shared.enums.language_enums import LanguageEnum
-from shared.enums.mensa_enums import CanteenEnum
+from shared.enums.canteen_enums import CanteenEnum
 from shared.tables.user_table import UserTable
 
 from ..pydantics import menu_days_to_pydantic
