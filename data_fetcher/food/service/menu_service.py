@@ -104,7 +104,39 @@ class MenuFetcher:
                     )
                     
                     
-                    if not dish_obj:
+                    if dish_obj:
+                        # Updating existing dish
+                        # Update price_simple only if new price is not None
+                        new_price = dish_data.get("prices", {}).get("students")
+                        if new_price is not None:
+                            dish_obj.price_simple = PriceService.calculate_simple_price(new_price)
+                            self.db.add(dish_obj)
+                            self.db.flush()
+                            
+                            prices = dish_data.get("prices", {})
+                            for category, price_data in prices.items():
+                                if price_data is not None:
+                                    # Delete existing price for this category
+                                    self.db.query(DishPriceTable).filter_by(
+                                        dish_id=dish_obj.id,
+                                        category=category.upper()
+                                    ).delete()
+                                    
+                                    # Add new price record
+                                    price_obj = DishPriceTable(
+                                        dish_id=dish_obj.id,
+                                        category=category.upper(),
+                                        base_price=price_data.get('base_price'),
+                                        price_per_unit=price_data.get('price_per_unit'),
+                                        unit=price_data.get('unit')
+                                    )
+                                    self.db.add(price_obj)
+                        else:
+                            logger.warning(f"No price data for dish {dish_obj.translations[0].title} in canteen {canteen_id}")
+                            
+                            
+                    else:
+                        # Creating new dish
                         dish_type = dish_data.get('dish_type', '')
                         dish_category = self._map_dish_type_to_category(dish_type).value
                         
@@ -131,6 +163,19 @@ class MenuFetcher:
                         )
                         
                         self.db.add_all(translations)
+
+                        prices = dish_data.get("prices", {})
+                        for category, price_data in prices.items():
+                            if price_data is not None:
+                                price_obj = DishPriceTable(
+                                    dish_id=dish_obj.id,
+                                    category=category.upper(),
+                                    base_price=price_data.get('base_price'),
+                                    price_per_unit=price_data.get('price_per_unit'),
+                                    unit=price_data.get('unit')
+                                )
+                                self.db.add(price_obj)
+
                     
                     # Create new MenuDishAssociation
                     association = MenuDishAssociation(
@@ -140,24 +185,6 @@ class MenuFetcher:
                     )
                     self.db.add(association)
                     
-                    # Update prices
-                    prices = dish_data.get("prices", {})
-                    if prices:
-                        # First, delete all existing price records for this dish
-                        self.db.query(DishPriceTable).filter_by(dish_id=dish_obj.id).delete()
-                        
-                        # Then create new price records
-                        for category, price_data in prices.items():
-                            if isinstance(price_data, dict):
-                                price_obj = DishPriceTable(
-                                    dish_id=dish_obj.id,
-                                    category=category.upper(),
-                                    base_price=price_data.get('base_price'),
-                                    price_per_unit=price_data.get('price_per_unit'),
-                                    unit=price_data.get('unit')
-                                )
-                                self.db.add(price_obj)
-            
             self.db.commit()
             logger.info(f"Menu data stored successfully. {dish_amount} dishes added.")
         except IntegrityError as e:

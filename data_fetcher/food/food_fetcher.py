@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import requests
 import schedule
 from sqlalchemy.orm import Session
+import asyncio
 
 from data_fetcher.food.service.canteen_service import CanteenFetcher
 from data_fetcher.food.service.menu_service import MenuFetcher
@@ -98,10 +99,10 @@ def fetch_scheduled_data(db: Session, days_amount: int = 21):
     except Exception as e:
         logger.error(f"Unexpected error during scheduled fetch: {str(e)}")
         
-def create_food_fetcher():
+async def create_food_fetcher():
     logger.info("Setting up schedule...")
     
-    # Initial fetch
+
     db = next(get_db())
     fetch_scheduled_data(db, days_amount=7)
     CanteenFetcher(db).update_canteen_database()
@@ -111,7 +112,7 @@ def create_food_fetcher():
     logger.info("Entering data_fetcher loop...")
     while running_eat:
         schedule.run_pending()
-        time.sleep(10)
+        await asyncio.sleep(10)
     
     logger.info("Exiting main loop...")
 

@@ -1,6 +1,6 @@
-import time
-
+import asyncio
 import schedule
+
 from sqlalchemy.orm import Session
 
 from data_fetcher.state import running_movie
@@ -16,7 +16,7 @@ from .services.screening_service import ScreeningService
 logger = get_cinema_fetcher_logger(__name__)
 
 
-def save_constant_cinema_data(db: Session):
+def add_constant_cinema_data(db: Session):
     cinema_service = CinemaService()
     cinemas = cinema_service.get_all_cinema_tables()
     for cinema in cinemas:
@@ -77,12 +77,11 @@ async def fetch_scheduled_data(db: Session):
 
 
 async def create_movie_fetcher():
-    
     logger.info("Setting up cinema fetcher...")
     db = next(get_db())
     
-    # Initial fetch
-    save_constant_cinema_data(db)
+
+    add_constant_cinema_data(db)
     await fetch_scheduled_data(db)
     
     schedule.every().day.at("08:08").do(lambda: fetch_scheduled_data(db))
@@ -90,7 +89,7 @@ async def create_movie_fetcher():
     logger.info("Entering data_fetcher loop...")
     while running_movie:
         schedule.run_pending()
-        time.sleep(10)
+        await asyncio.sleep(10)
     
     logger.info("Exiting main loop...")
 

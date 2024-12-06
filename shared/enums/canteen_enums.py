@@ -3,14 +3,13 @@ from enum import Enum
 
 class CanteenEnum(Enum):
     # MENSA_LEOPOLDSTR = "mensa-leopoldstr"
-    STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
-    # MENSA_LOTHSTR = "mensa-lothstr"
+    # STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
+    MENSA_LOTHSTR = "mensa-lothstr"
     # MENSA_ARCISSTR = "mensa-arcisstr"
     # MENSA_GARCHING = "mensa-garching"
     # MENSA_MARTINSRIED = "mensa-martinsried"
     # MENSA_PASING = "mensa-pasing"
     # MENSA_WEIHENSTEPHAN = "mensa-weihenstephan"
-    # MEDIZINER_MENSA = "mediziner-mensa"
     # STUBISTRO_ARCISSTR = "stubistro-arcisstr"
     # STUBISTRO_GOETHESTR = "stubistro-goethestr"
     # STUBISTRO_BUTENANDSTR = "stubistro-butenandstr"
@@ -22,9 +21,12 @@ class CanteenEnum(Enum):
     # STUCAFE_BOLTZMANNSTR = "stucafe-boltzmannstr"
     # STUCAFE_GARCHING = "stucafe-garching"
     # STUCAFE_KARLSTR = "stucafe-karlstr"
-    # STUCAFE_PASING = "stucafe-pasing"
-    # FMI_BISTRO = "fmi-bistro"
     # IPP_BISTRO = "ipp-bistro"
+    
+    ## TUM API not working
+    # FMI_BISTRO = "fmi-bistro"
+    # STUCAFE_PASING = "stucafe-pasing"
+    # MEDIZINER_MENSA = "mediziner-mensa"
     
     ## Sort out
     # MENSA_BILDUNGSCAMPUS_HEILBRONN = "mensa-bildungscampus-heilbronn"

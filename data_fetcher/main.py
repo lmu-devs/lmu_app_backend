@@ -24,21 +24,27 @@ signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 # ------ Needed for stopping docker container ------ #
 
-
-if __name__ == "__main__":
+async def main():
+    logger_main.info("================================================")
     logger_main.info("data_fetcher started")
     try:
-        # Initialize the database
         settings = get_settings()
         Database(settings=settings)
         
-        # Start the main loop
-        create_university_fetcher()
-        asyncio.run(create_movie_fetcher())
-        create_food_fetcher()
+        tasks = [
+            asyncio.create_task(create_university_fetcher()),
+            asyncio.create_task(create_movie_fetcher()),
+            asyncio.create_task(create_food_fetcher())
+        ]
+        
+        await asyncio.gather(*tasks)
         
     except Exception as e:
         logger_main.error(f"An error occurred: {e}")
     finally:
         logger_main.info("data_fetcher is shutting down")
+        logger_main.info("================================================\n")
+
+if __name__ == "__main__":
+    asyncio.run(main())
     sys.exit(0)
