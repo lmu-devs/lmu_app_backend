@@ -17,8 +17,8 @@ class LocationTable:
     
     @declared_attr
     def latitude(cls):
-        return Column(Float, nullable=False)
+        return Column(Float, nullable=True)
     
     @declared_attr
     def longitude(cls):
-        return Column(Float, nullable=False)
+        return Column(Float, nullable=True)

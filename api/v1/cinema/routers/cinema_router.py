@@ -6,9 +6,9 @@ from sqlalchemy.orm import Session
 from shared.enums.language_enums import LanguageEnum
 from shared.database import get_db
 from shared.tables.user_table import UserTable
-from ..pydantics.movie_pydantic import screenings_to_pydantic, movies_to_pydantic
-from ..schemas.movie_schema import Movie, MovieScreening
-from ..services.movie_service import MovieService
+from ..pydantics.cinema_pydantic import screenings_to_pydantic, movies_to_pydantic
+from ..schemas.cinema_schema import Movie, MovieScreening
+from ..services.cinema_service import MovieService
 from api.v1.core.api_key import APIKey
 from api.v1.core.language import get_language
 
@@ -24,7 +24,7 @@ async def get_movie(
     movies = movie_service.get_movies(movie_id)
     return movies_to_pydantic(movies)
 
-@router.get("/movies/screenings", response_model=List[MovieScreening], description="Get all movie screenings")
+@router.get("/screenings", response_model=List[MovieScreening], description="Get all movie screenings")
 async def get_movie_screenings(
     db: Session = Depends(get_db),
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),

@@ -26,17 +26,24 @@ class MovieTrailer(BaseModel):
 class Movie(BaseModel):
     id: uuid.UUID
     title: str
-    overview: str
     tagline: str | None
+    overview: str | None
     release_year: date | None
     budget: int | None
-    ratings: List[MovieRating]
     poster: Image | None
     backdrop: Image | None
+    runtime: int | None
     genres: List[str]
-    runtime: int
-    homepage: str
+    ratings: List[MovieRating]
     trailers: List[MovieTrailer]
+    
+class Cinema(BaseModel):
+    id: str
+    title: str
+    descriptions: List[dict]
+    external_link: str | None
+    instagram_link: str | None
+    location: Location | None
     
 class MovieScreening(BaseModel):
     id: uuid.UUID
@@ -48,10 +55,10 @@ class MovieScreening(BaseModel):
     subtitles: str | None
     external_link: str | None
     note: str | None
+    movie: Movie
     location: Location
     university: University
-    movie: Movie
-    
+    cinema: Cinema
     
 
 

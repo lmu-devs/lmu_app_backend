@@ -7,8 +7,9 @@ class Settings(BaseSettings):
     
     # Base URL for the eat API
     API_BASE_URL: str = "https://api.lmu-dev.org"
-    API_V1_BASE_PREFIX: str = "/v1"
-    API_V1_BASE_PREFIX_FOOD: str = f"{API_V1_BASE_PREFIX}/food"
+    API_V1_PREFIX: str = "/v1"
+    API_V1_PREFIX_FOOD: str = f"{API_V1_PREFIX}/food"
+    API_V1_PREFIX_CINEMA: str = f"{API_V1_PREFIX}/cinema"
     
     # API key for authentication our api
     SYSTEM_API_KEY: str

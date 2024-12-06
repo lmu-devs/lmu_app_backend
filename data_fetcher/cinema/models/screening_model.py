@@ -12,7 +12,7 @@ class ScreeningCrawl:
         latitude:       float   | None = None,
         year:           int     | None = None,
         tagline:        str     | None = None,
-        description:    str     | None = None,
+        overview:    str     | None = None,
         is_ov:          bool    | None = None, # OV = Original Version
         aka_name:       str     | None = None, 
         price:          float   | None = None, # 0 when "Free Entrance"
@@ -31,7 +31,7 @@ class ScreeningCrawl:
         self.aka_name = aka_name
         self.year = year
         self.tagline = tagline
-        self.description = description
+        self.overview = overview
         self.price = price
         self.address = address
         self.longitude = longitude

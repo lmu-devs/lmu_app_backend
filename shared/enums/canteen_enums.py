@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class CanteenEnum(Enum):
-    # MENSA_LEOPOLDSTR = "mensa-leopoldstr"
+    MENSA_LEOPOLDSTR = "mensa-leopoldstr"
     # STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
     MENSA_LOTHSTR = "mensa-lothstr"
     # MENSA_ARCISSTR = "mensa-arcisstr"

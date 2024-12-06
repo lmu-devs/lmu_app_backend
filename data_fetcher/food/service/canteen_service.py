@@ -10,8 +10,9 @@ from shared.core.logging import get_food_fetcher_logger
 from shared.database import get_db
 from shared.settings import get_settings
 from shared.tables.food.canteen_table import (CanteenImageTable,
-                                         CanteenLocationTable, CanteenTable,
-                                         CanteenType, OpeningHoursTable)
+                                              CanteenLocationTable,
+                                              CanteenTable, CanteenType,
+                                              OpeningHoursTable)
 
 logger = get_food_fetcher_logger(__name__)
 class CanteenFetcher:
@@ -125,7 +126,7 @@ class CanteenFetcher:
                 # Update Canteen Images
                 directory_path = "shared/assets/canteens/"
                 settings = get_settings()
-                image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_BASE_PREFIX_FOOD}/images/"
+                image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_PREFIX_FOOD}/images/"
                 files = ImageService.generate_image_urls(directory_path, image_url_prefix)
                 self.set_canteen_images(canteen_obj, files)
                 
@@ -158,13 +159,13 @@ class CanteenFetcher:
 
 
     def update_canteen_database(self):
-        print("\n==============================================================")
+        logger.info("==============================================================")
         logger.info("Updating canteen data...")
         try:
             canteen_data = self.fetch_canteen_data()
             self.store_canteen_data(canteen_data)
             logger.info("Canteen data updated successfully!")
-            print("==============================================================\n")
+            logger.info("==============================================================\n")
         except Exception as e:
             logger.error(f"Error while updating canteen database: {str(e)}")
         finally:

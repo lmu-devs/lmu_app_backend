@@ -26,7 +26,6 @@ class MovieTable(Base):
     popularity = Column(Float, nullable=True)
     runtime = Column(Integer, nullable=True)
     language = Column(String, nullable=True)
-    homepage = Column(String, nullable=True)
     
     translations = relationship("MovieTranslationTable", back_populates="movie", cascade="all, delete-orphan")
     genres = relationship("MovieGenreTable", secondary=movie_genre_association, back_populates="movies")

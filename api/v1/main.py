@@ -2,11 +2,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from api.v1.cinema.routers import cinema_router
 from api.v1.feedback.routers import feedback_router
 from api.v1.food.routers import (canteen_router, dish_router, menu_router,
                                  taste_router)
 from api.v1.log.routers import log_router
-from api.v1.cinema.routers import movie_router
 from api.v1.user.routers import user_router
 from api.v1.wishlist.routers import wishlist_router
 from shared.core.error_handlers import api_error_handler
@@ -20,8 +20,9 @@ api_logger = get_food_logger(__name__)
 
 def create_app():
     settings = get_settings()
-    prefix = settings.API_V1_BASE_PREFIX
-    eat_prefix = settings.API_V1_BASE_PREFIX_FOOD
+    prefix = settings.API_V1_PREFIX
+    eat_prefix = settings.API_V1_PREFIX_FOOD
+    cinema_prefix = settings.API_V1_PREFIX_CINEMA
     
     app = FastAPI(
         title="lmu-dev-api", 
@@ -47,7 +48,7 @@ def create_app():
     app.include_router(log_router.router,       prefix=prefix, tags=["log"])
     app.include_router(feedback_router.router,  prefix=prefix, tags=["feedback"])
     app.include_router(wishlist_router.router,  prefix=prefix, tags=["wishlist"])
-    app.include_router(movie_router.router,     prefix=prefix, tags=["movie"])
+    app.include_router(cinema_router.router,     prefix=cinema_prefix, tags=["movie"])
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,

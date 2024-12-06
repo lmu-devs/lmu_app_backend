@@ -8,14 +8,16 @@ from data_fetcher.state import running_university
 logger = get_main_fetcher_logger(__name__)
 
 async def create_university_fetcher():
-    logger.info("Starting university fetcher")
+    logger.info("================================================")
+    logger.info(f"Setting up {__name__}...")
     
     db = next(get_db())
     add_university_to_database(db)
     
-    logger.info("Finished adding universities to database")
     
     while running_university:
         await asyncio.sleep(3600*24)
 
+    logger.info(f"Exiting {__name__} loop...")
+    logger.info("================================================\n")
 

@@ -62,14 +62,11 @@ logger = get_food_fetcher_logger(__name__)
 
 def fetch_scheduled_data(db: Session, days_amount: int = 21):
     """Fetches data for the next 14 days for all canteens"""
-    print("Attempting to fetch data for next 14 days...")
+    logger.info("Attempting to fetch data for next 14 days...")
     
     try:
-        # Update canteen database first
-        canteen_fetcher = CanteenFetcher(db)
-        canteen_fetcher.update_canteen_database()
+        CanteenFetcher(db).update_canteen_database()
 
-        # Get current date
         date_from = datetime.now().date()
 
         logger.info(f"Fetching data for {days_amount} days")
@@ -100,7 +97,8 @@ def fetch_scheduled_data(db: Session, days_amount: int = 21):
         logger.error(f"Unexpected error during scheduled fetch: {str(e)}")
         
 async def create_food_fetcher():
-    logger.info("Setting up schedule...")
+    logger.info("================================================")
+    logger.info(f"Setting up {__name__}...")
     
 
     db = next(get_db())
@@ -109,10 +107,10 @@ async def create_food_fetcher():
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     
-    logger.info("Entering data_fetcher loop...")
+    logger.info(f"Entering {__name__} loop...")
     while running_eat:
         schedule.run_pending()
-        await asyncio.sleep(10)
-    
-    logger.info("Exiting main loop...")
+        await asyncio.sleep(60)
 
+    logger.info(f"Exiting {__name__} loop...")
+    logger.info("================================================\n")

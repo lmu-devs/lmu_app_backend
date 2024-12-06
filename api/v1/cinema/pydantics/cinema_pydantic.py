@@ -5,8 +5,9 @@ from api.v1.core.pydantics import (image_to_pydantic, location_to_pydantic,
 from shared.tables import (MovieRatingTable, MovieScreeningTable, MovieTable,
                            MovieTrailerTable, MovieTrailerTranslationTable,
                            MovieTranslationTable)
+from shared.tables.cinema.cinema_table import CinemaTable
 
-from ..schemas.movie_schema import (Movie, MovieRating, MovieScreening,
+from ..schemas.cinema_schema import (Cinema, Movie, MovieRating, MovieScreening,
                                     MovieTrailer)
 
 
@@ -74,7 +75,6 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
         backdrop=backdrop,
         genres=movie.genres,
         runtime=movie.runtime,
-        homepage=movie.homepage,
         trailers=trailers,
     )
 
@@ -82,7 +82,19 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
 def movies_to_pydantic(movies: List[MovieTable]) -> List[Movie]:
     return [movie_to_pydantic(movie) for movie in movies]
 
-
+def cinema_to_pydantic(cinema: CinemaTable) -> Cinema:
+    title = cinema.translations[0].title if cinema.translations else "not translated"
+    descriptions = cinema.translations[0].description if cinema.translations else "not translated"
+    location = location_to_pydantic(cinema.location) if cinema.location else None
+    return Cinema(
+        id=cinema.id,
+        title=title,
+        descriptions=descriptions,
+        external_link=cinema.external_link,
+        instagram_link=cinema.instagram_link,
+        location=location,
+    )
+    
     
 def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieScreening]:
     screenings_pydantic = []
@@ -90,6 +102,7 @@ def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieS
         location = location_to_pydantic(screening.location)
         university = university_to_pydantic(screening.university)
         movie = movie_to_pydantic(screening.movie)
+        cinema = cinema_to_pydantic(screening.cinema)
         screenings_pydantic.append(
             MovieScreening(
                 id=screening.id,
@@ -99,6 +112,7 @@ def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieS
                 location=location,
                 university=university,
                 movie=movie,
+                cinema=cinema,
                 price=screening.price,
                 is_ov=screening.is_ov,
                 subtitles=screening.subtitles,

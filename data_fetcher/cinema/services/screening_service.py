@@ -6,12 +6,11 @@ from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.language_enums import LanguageEnum
 from shared.enums.rating_enums import RatingSourceEnum
 from shared.settings import get_settings
-from shared.tables.cinema import (MovieLocationTable,
-                                              MovieRatingTable,
-                                              MovieScreeningTable, MovieTable,
-                                              MovieTrailerTable,
-                                              MovieTrailerTranslationTable,
-                                              MovieTranslationTable)
+from shared.tables.cinema import (MovieLocationTable, MovieRatingTable,
+                                  MovieScreeningTable, MovieTable,
+                                  MovieTrailerTable,
+                                  MovieTrailerTranslationTable,
+                                  MovieTranslationTable)
 
 from ..crawler.hm_movie_crawler import HmCinemaCrawler
 from ..crawler.lmu_movie_crawler import LmuMovieCrawler
@@ -33,7 +32,6 @@ class ScreeningService:
         movie = MovieTable(
             id=movie_id,
             runtime=movie_data.runtime,
-            homepage=movie_data.external_url,
             original_title=movie_data.title,
         )
         
@@ -42,7 +40,7 @@ class ScreeningService:
             language=LanguageEnum.GERMAN.value,
             title=movie_data.title,
             tagline=movie_data.tagline,
-            overview=movie_data.description,
+            overview=movie_data.overview,
             poster_url=movie_data.custom_poster_url,
         )
         
@@ -90,7 +88,6 @@ class ScreeningService:
             release_date=datetime.fromisoformat(tmdb_base_data["release_date"]),
             runtime=tmdb_base_data.get("runtime", 0),
             language=tmdb_base_data.get("original_language", "en"),
-            homepage=tmdb_base_data.get("homepage", ""),
         )
         
         # Create screenings
@@ -205,8 +202,8 @@ class ScreeningService:
         logger.info("Starting movie fetch process")
         
         crawled_movies: list[ScreeningCrawl] = []
-        # crawled_movies.extend(LmuMovieCrawler().crawl())
-        # crawled_movies.extend(TumMovieCrawler().crawl())
+        crawled_movies.extend(LmuMovieCrawler().crawl())
+        crawled_movies.extend(TumMovieCrawler().crawl())
         crawled_movies.extend(HmCinemaCrawler().crawl())
             
         processed_movies = []

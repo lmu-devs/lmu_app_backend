@@ -32,7 +32,7 @@ class LmuMovieCrawler:
             return None
 
     def crawl(self) -> list[ScreeningCrawl]:
-        response = requests.get(self.base_url)
+        response = requests.get(f"{self.base_url}/programm")
         
         if response.status_code != 200:
             logger.error(f"Failed to fetch the page, status code: {response.status_code}")
@@ -99,7 +99,7 @@ class LmuMovieCrawler:
             logger.info(f"Successfully parsed movie: {title} ({year})")
 
         logger.info(f"Found {len(screenings)} movies in total")
-        return screenings[0:3]
+        return screenings
 
 if __name__ == "__main__":
     crawler = LmuMovieCrawler()

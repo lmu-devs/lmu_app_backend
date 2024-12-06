@@ -5,9 +5,10 @@ from sqlalchemy.orm import Session, joinedload, contains_eager
 
 from api.v1.core.translation_utils import create_translation_order_case
 from shared.enums.language_enums import LanguageEnum
+from shared.tables.cinema.cinema_table import CinemaTable, CinemaTranslationTable
 from shared.tables.university_table import UniversityTable, UniversityTranslationTable
 from shared.tables.cinema import MovieTable, MovieScreeningTable, MovieTranslationTable, MovieTrailerTable, MovieTrailerTranslationTable
-from ..schemas.movie_schema import Movie, MovieScreening
+from ..schemas.cinema_schema import Movie, MovieScreening
 
 class MovieService:
     def __init__(self, db: Session):
@@ -43,6 +44,12 @@ class MovieService:
         .options(contains_eager(MovieScreeningTable.university)
                 .contains_eager(UniversityTable.translations))
         
+        # Join and load cinema with its translations
+        .join(MovieScreeningTable.cinema)
+        .outerjoin(CinemaTable.translations)
+        .options(contains_eager(MovieScreeningTable.cinema)
+                .contains_eager(CinemaTable.translations))
+        
         # Load location
         .options(joinedload(MovieScreeningTable.location))
         
@@ -61,7 +68,8 @@ class MovieService:
             MovieScreeningTable.date,
             create_translation_order_case(MovieTranslationTable, language),
             create_translation_order_case(UniversityTranslationTable, language),
-            create_translation_order_case(MovieTrailerTranslationTable, language)
+            create_translation_order_case(MovieTrailerTranslationTable, language),
+            create_translation_order_case(CinemaTranslationTable, language)
         )
 
     

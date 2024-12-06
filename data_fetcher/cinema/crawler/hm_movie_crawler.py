@@ -6,10 +6,12 @@ from typing import List
 import requests
 from bs4 import BeautifulSoup
 
+from data_fetcher.cinema.constants.location_constants import \
+    CinemaLocationConstants
+from data_fetcher.cinema.constants.url_constants import HM_CINEMA_URL
 from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.enums.university_enums import UniversityEnum
-from data_fetcher.cinema.constants.location_constants import CinemaLocationConstants
-from data_fetcher.cinema.constants.url_constants import HM_CINEMA_URL
+
 logger = logging.getLogger(__name__)
 
 class HmCinemaCrawler:
@@ -73,7 +75,7 @@ class HmCinemaCrawler:
                         paragraphs = text_container.find_all('p')
                         for p in paragraphs:
                             description_parts.append(p.get_text(strip=True))
-                    description = ' '.join(description_parts)
+                    overview = ' '.join(description_parts)
 
                     # Extract runtime
                     film_data = showcase.find('ul', class_='film-info-filmdaten')
@@ -108,9 +110,11 @@ class HmCinemaCrawler:
                         is_ov = True
                         title = title.replace('[OV]', '').strip()
                     elif '[OmU]' in title:
+                        is_ov = True
                         subtitles = 'OmU'
                         title = title.replace('[OmU]', '').strip()
                     elif '[OmeU]' in title:
+                        is_ov = True
                         subtitles = 'OmeU'
                         title = title.replace('[OmeU]', '').strip()
                     
@@ -118,7 +122,7 @@ class HmCinemaCrawler:
                     title = re.sub(r'\[.*?\]', '', title).strip()
                     
                     # Check if it's a special screening with free entrance
-                    if any(text in description for text in ['Gratis Eintritt', 'Freier Eintritt', 'gratis', 'kostenlos']):
+                    if any(text in note for text in ['Gratis Eintritt', 'Freier Eintritt', 'gratis', 'kostenlos']):
                         self.price = 0.0
 
                     location = CinemaLocationConstants[self.university_id]
@@ -137,7 +141,7 @@ class HmCinemaCrawler:
                         university_id=self.university_id,
                         external_url=self.external_link,
                         custom_poster_url=custom_poster_url,
-                        description=description,
+                        overview=overview,
                         runtime=runtime,
                         note=note
                     )

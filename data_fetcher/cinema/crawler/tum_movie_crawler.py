@@ -4,10 +4,10 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from data_fetcher.cinema.constants.url_constants import TUM_CINEMA_URL
 from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.university_enums import UniversityEnum
-from data_fetcher.cinema.constants.url_constants import TUM_CINEMA_URL
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
@@ -26,9 +26,9 @@ class TumMovieCrawler:
     def _parse_date(self,date_str) -> datetime:
         """Convert date string to datetime"""
         try:
-            # Convert date string to datetime
-            date_obj = datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %z')
-            return date_obj
+            # Remove timezone part and parse
+            date_str = date_str.rsplit(' ', 1)[0]  # Remove last part (the +0100)
+            return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S')
         except ValueError as e:
             logger.error(f"Failed to parse date {date_str}: {e}")
             return None
@@ -169,12 +169,12 @@ class TumMovieCrawler:
                 latitude=self.latitude,
                 custom_poster_url=custom_poster_url,
                 tagline=tagline,
-                description=description
+                overview=description
             ))
             logger.info(f"Successfully parsed movie: {title}")
         
         logger.info(f"Found {len(movies)} movies in total")
-        return movies[0:3]
+        return movies
 
 if __name__ == "__main__":
     crawler = TumMovieCrawler()
