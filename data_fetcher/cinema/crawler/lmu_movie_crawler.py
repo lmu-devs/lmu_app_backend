@@ -9,15 +9,15 @@ from data_fetcher.cinema.constants.location_constants import \
 from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.university_enums import UniversityEnum
-
+from data_fetcher.cinema.constants.url_constants import LMU_CINEMA_URL
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
 
 class LmuMovieCrawler:
     def __init__(self):
-        self.base_url = "https://u-kino.de/programm/"
+        self.base_url = LMU_CINEMA_URL
         self.price = 3.5
-        self.external_link = "https://u-kino.de/programm/"
+        self.external_link = LMU_CINEMA_URL
         self.university_id = UniversityEnum.LMU
         self.is_ov = True
         

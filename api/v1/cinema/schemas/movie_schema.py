@@ -27,7 +27,7 @@ class Movie(BaseModel):
     id: uuid.UUID
     title: str
     overview: str
-    tagline: str
+    tagline: str | None
     release_year: date | None
     budget: int | None
     ratings: List[MovieRating]

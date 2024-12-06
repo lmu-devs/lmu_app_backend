@@ -9,17 +9,17 @@ from bs4 import BeautifulSoup
 from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.enums.university_enums import UniversityEnum
 from data_fetcher.cinema.constants.location_constants import CinemaLocationConstants
-
+from data_fetcher.cinema.constants.url_constants import HM_CINEMA_URL
 logger = logging.getLogger(__name__)
 
 class HmCinemaCrawler:
     def __init__(self):
         self.university_id = UniversityEnum.HM
-        self.base_url = "https://www.unifilm.de/studentenkinos/muenchen_hm"
+        self.base_url = HM_CINEMA_URL
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
-        self.external_link = "https://www.unifilm.de/studentenkinos/muenchen_hm"
+        self.external_link = HM_CINEMA_URL
         self.price = 2.0
         self.is_edge_case = True
 

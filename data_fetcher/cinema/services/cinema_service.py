@@ -4,6 +4,8 @@ from shared.tables.cinema.cinema_table import (CinemaLocationTable,
                                                CinemaTranslationTable)
 from shared.enums.university_enums import UniversityEnum
 from shared.core.logging import get_cinema_fetcher_logger
+from data_fetcher.cinema.constants.url_constants import (LMU_CINEMA_URL,TUM_CINEMA_URL,HM_CINEMA_URL)
+from data_fetcher.cinema.constants.location_constants import CinemaLocationConstants
 
 logger = get_cinema_fetcher_logger(__name__)
 
@@ -31,12 +33,16 @@ class CinemaService:
             title="LMU Kino",
             description=[
                 {
-                    "emoji": "🎥",
-                    "description": "Test"
+                    "emoji": "🍿",
+                    "description": "Eigene Snacks erlaubt"
                 },
                 {
-                    "emoji": "🎥",
-                    "description": "Test2"
+                    "emoji": "🎟️",
+                    "description": "Keine Vorverkauf- und Reservierungsmöglichkeit"
+                },
+                {
+                    "emoji": "☁️",
+                    "description": "Erste Besucher erhalten ein Kissen"
                 }
             ],
         ),
@@ -46,12 +52,16 @@ class CinemaService:
             title="LMU Cinema",
             description=[
                 {
-                    "emoji": "🎥",
-                    "description": "Test"
+                    "emoji": "🍿",
+                    "description": "Bring you own snacks"
                 },
                 {
-                    "emoji": "🎥",
-                    "description": "Test2"
+                    "emoji": "🎟️",
+                    "description": "No presale, and reservation"
+                },
+                {
+                    "emoji": "☁️",
+                    "description": "Free pillow for first visitors"
                 }
             ],
         )
@@ -126,31 +136,26 @@ class CinemaService:
     def lmu_cinemas(self) -> CinemaTable:
         return CinemaTable( 
             id=self.lmu_cinema_id,
-            external_link="https://www.lmu.de/cinema/",
-            location=CinemaLocationTable(
-                address="Max-Joseph-Platz 11, 80539 München",
-                latitude=48.1351,
-                longitude=11.5761,
-            ),
+            external_link=LMU_CINEMA_URL,
+            instagram_link="https://www.instagram.com/das.ukino/",
+            location=CinemaLocationTable(**vars(CinemaLocationConstants[UniversityEnum.LMU])),
             translations=self.lmu_translations
         )
         
     def tum_cinemas(self) -> CinemaTable:
         return CinemaTable(
             id=self.tum_cinema_id,
-            external_link="https://www.tum.de/cinema/",
+            external_link=TUM_CINEMA_URL,
+            instagram_link="https://www.instagram.com/dertufilm/",
             translations=self.tum_translations
         )
         
     def hm_cinemas(self) -> CinemaTable:
         return CinemaTable(
             id=self.hm_cinema_id,
-            external_link="https://www.hm.edu/cinema/",
-            location=CinemaLocationTable(
-                address="Max-Joseph-Platz 11, 80539 München",
-                latitude=48.1351,
-                longitude=11.5761,
-            ),
+            external_link=HM_CINEMA_URL,
+            instagram_link="https://www.instagram.com/hm__kino/",
+            location=CinemaLocationTable(**vars(CinemaLocationConstants[UniversityEnum.HM])),
             translations=self.hm_translations
         )
     

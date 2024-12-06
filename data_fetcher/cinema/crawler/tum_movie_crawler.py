@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 from data_fetcher.cinema.models.screening_model import ScreeningCrawl
 from shared.core.logging import get_cinema_fetcher_logger
 from shared.enums.university_enums import UniversityEnum
+from data_fetcher.cinema.constants.url_constants import TUM_CINEMA_URL
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
@@ -15,7 +16,7 @@ logger = get_cinema_fetcher_logger(__name__)
 class TumMovieCrawler:
     def __init__(self):
         self.university_id = UniversityEnum.TUM.value
-        self.base_url = "https://www.tu-film.de"
+        self.base_url = TUM_CINEMA_URL
         self.rss_url = f"{self.base_url}/programm/index/upcoming.rss"
         self.booking_url = f"{self.base_url}/pages/view/kinoheld"
         self.price = 3.3
