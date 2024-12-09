@@ -40,15 +40,15 @@ def create_app():
     app.mount(path=f"{eat_prefix}/images", app= StaticFiles(directory="/app/shared/assets/canteens"), name="images")
     
     # Include routers
-    app.include_router(canteen_router.router,   prefix=eat_prefix, tags=["canteen"])
-    app.include_router(menu_router.router,      prefix=eat_prefix, tags=["canteen"])
-    app.include_router(dish_router.router,      prefix=eat_prefix, tags=["canteen"])
-    app.include_router(taste_router.router,     prefix=eat_prefix, tags=["canteen"])
+    app.include_router(canteen_router.router,   prefix=eat_prefix, tags=["food"])
+    app.include_router(menu_router.router,      prefix=eat_prefix, tags=["food"])
+    app.include_router(dish_router.router,      prefix=eat_prefix, tags=["food"])
+    app.include_router(taste_router.router,     prefix=eat_prefix, tags=["food"])
     app.include_router(user_router.router,      prefix=prefix, tags=["user"])
     app.include_router(log_router.router,       prefix=prefix, tags=["log"])
     app.include_router(feedback_router.router,  prefix=prefix, tags=["feedback"])
     app.include_router(wishlist_router.router,  prefix=prefix, tags=["wishlist"])
-    app.include_router(cinema_router.router,     prefix=cinema_prefix, tags=["movie"])
+    app.include_router(cinema_router.router,     prefix=cinema_prefix, tags=["cinema"])
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,

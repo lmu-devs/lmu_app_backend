@@ -12,7 +12,7 @@ class ScreeningCrawl:
         latitude:       float   | None = None,
         year:           int     | None = None,
         tagline:        str     | None = None,
-        overview:    str     | None = None,
+        overview:       str     | None = None,
         is_ov:          bool    | None = None, # OV = Original Version
         aka_name:       str     | None = None, 
         price:          float   | None = None, # 0 when "Free Entrance"
@@ -22,7 +22,7 @@ class ScreeningCrawl:
         booking_url:    str     | None = None,
         runtime:        int     | None = None,
         note:           str     | None = None,
-        custom_poster_url:  str     | None = None,
+        custom_poster_url: str  | None = None,
         
     ):
         self.is_edge_case = is_edge_case

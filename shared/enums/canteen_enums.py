@@ -17,13 +17,13 @@ class CanteenEnum(Enum):
     # STUBISTRO_MARTINSRIED = "stubistro-martinsried"
     # STUCAFE_ADALBERTSTR = "stucafe-adalbertstr"
     # STUCAFE_AKADEMIE_WEIHENSTEPHAN = "stucafe-akademie-weihenstephan"
-    # STUCAFE_WEIHENSTEPHAN_MAXIMUS = "stucafe-weihenstephan-maximus"
     # STUCAFE_BOLTZMANNSTR = "stucafe-boltzmannstr"
     # STUCAFE_GARCHING = "stucafe-garching"
     # STUCAFE_KARLSTR = "stucafe-karlstr"
     # IPP_BISTRO = "ipp-bistro"
     
     ## TUM API not working
+    # STUCAFE_WEIHENSTEPHAN_MAXIMUS = "stucafe-weihenstephan-maximus"
     # FMI_BISTRO = "fmi-bistro"
     # STUCAFE_PASING = "stucafe-pasing"
     # MEDIZINER_MENSA = "mediziner-mensa"

@@ -67,7 +67,7 @@ async def fetch_scheduled_data(db: Session):
                 db.merge(trailer_translation)
             
             db.commit()
-            logger.info(f"Successfully added screening {screening.cinema_id.value} for {movie.original_title} to database")
+            logger.info(f"Successfully added screening {screening.cinema_id} for {movie.original_title} to database")
             
         except Exception as e:
             db.rollback()
