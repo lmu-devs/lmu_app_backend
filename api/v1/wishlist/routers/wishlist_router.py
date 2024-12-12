@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -8,14 +9,14 @@ from shared.enums.language_enums import LanguageEnum
 from shared.tables.user_table import UserTable
 
 from ..pydantics.wishlist_pydantic import wishlist_to_pydantic
-from ..schemas.wishlist_scheme import (Wishlist, WishlistCreate, Wishlists,
+from ..schemas.wishlist_scheme import (Wishlist, WishlistCreate,
                                        WishlistUpdate)
 from ..services.wishlist_service import WishlistService
 
 router = APIRouter()
 logger = get_food_logger(__name__)
 
-@router.get("/wishlists", response_model=Wishlists)
+@router.get("/wishlists", response_model=List[Wishlist])
 async def get_wishlists(
     id: int | None = None,
     db: Session = Depends(get_db),
@@ -25,10 +26,9 @@ async def get_wishlists(
     wishlist_service = WishlistService(db)
     wishlists = wishlist_service.get_wishlists(language, id)
     
-    return Wishlists(wishlists=[
+    return [
         wishlist_to_pydantic(wishlist, user.id if user else None) 
-        for wishlist in wishlists
-    ])
+        for wishlist in wishlists]
     
     
 @router.post("/wishlists/toggle-like", response_model=bool)
