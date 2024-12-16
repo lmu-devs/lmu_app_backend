@@ -5,8 +5,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.food.service.simple_price_service import PriceService
-from data_fetcher.food.service.translation.dish_translation_service import \
-    DishTranslationService
 from shared.core.exceptions import (DatabaseError, DataProcessingError,
                                     ExternalAPIError)
 from shared.core.logging import get_food_fetcher_logger
@@ -15,14 +13,14 @@ from shared.enums.language_enums import LanguageEnum
 from shared.tables.food.dish_table import (DishPriceTable, DishTable,
                                            DishTranslationTable)
 from shared.tables.food.menu_table import MenuDayTable, MenuDishAssociation
-
+from shared.services.translation_service import TranslationService
 logger = get_food_fetcher_logger(__name__)
 
 class MenuFetcher:
     
     def __init__(self, db: Session):
         self.db = db
-        self.dish_translation_service = DishTranslationService()
+        self.translation_service = TranslationService()
         self.target_languages = [LanguageEnum.GERMAN]
         
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
@@ -157,10 +155,7 @@ class MenuFetcher:
                             title=dish_name_de
                         )
                         
-                        translations = self.dish_translation_service.create_missing_translations(
-                            dish_obj=dish_obj,
-                            target_languages=self.target_languages,
-                        )
+                        translations = self.translation_service.create_missing_translations(dish_obj)
                         
                         self.db.add_all(translations)
 

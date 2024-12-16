@@ -69,3 +69,6 @@ def get_food_fetcher_logger(module_name: str):
 
 def get_cinema_fetcher_logger(module_name: str):
     return setup_logger(module_name, "movie_fetcher", "movie_fetcher")
+
+def get_translation_logger(module_name: str):
+    return setup_logger(module_name, "translation", "translation")
