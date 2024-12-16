@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     PGADMIN_DEFAULT_EMAIL: str
     PGADMIN_DEFAULT_PASSWORD: str
     
-    class Config:
+    class ConfigDict:
         env_file = ".env"
 
 @lru_cache()

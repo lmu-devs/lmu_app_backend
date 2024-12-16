@@ -17,5 +17,5 @@ class Menus(RootModel):
     def sort_menu_days(cls, v):
         return sorted(v, key=lambda x: x.date)
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
