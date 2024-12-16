@@ -13,11 +13,26 @@ class TranslationService:
         settings = get_settings()
         self.translator = deepl.Translator(settings.DEEPL_API_KEY)
         
-    def translate_text(self, text: str, target_lang: str, source_lang: str = LanguageEnum.GERMAN.value) -> Optional[str]:
+    def translate_text(self, text: str, target_lang: str, source_lang: str = LanguageEnum.GERMAN) -> Optional[str]:
         """
         Translate text using DeepL API
         """
         try:
+            # convert LanguageEnum.value 
+            source_lang = source_lang.value
+            target_lang = target_lang.value
+            
+            # convert target_lang to deepl language code, only if source_lang is English
+                # https://developers.deepl.com/docs/resources/supported-languages
+            print("splitting")
+            source_lang = source_lang.split("-")[0] if source_lang != LanguageEnum.ENGLISH_US.value else source_lang
+            target_lang = target_lang.split("-")[0] if target_lang != LanguageEnum.ENGLISH_US.value else target_lang
+                
+            source_lang = source_lang.upper()
+            target_lang = target_lang.upper()
+            
+            print(f"source_lang: {source_lang}, target_lang: {target_lang}")
+            
             result = self.translator.translate_text(text, 
                                                  source_lang=source_lang,
                                                  target_lang=target_lang)
