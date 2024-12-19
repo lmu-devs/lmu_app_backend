@@ -4,5 +4,5 @@ pytest:
 
 restart:
 	docker compose down
-	docker compose up -d
+	sudo docker compose up
 

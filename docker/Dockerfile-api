@@ -13,4 +13,4 @@ COPY ./shared /app/shared
 COPY ./api /app/api
 
 
-CMD ["uvicorn", "api.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "api.src.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

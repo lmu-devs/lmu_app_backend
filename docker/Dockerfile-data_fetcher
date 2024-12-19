@@ -8,9 +8,9 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Only copy data_fetcher and shared folders
-COPY ./data_fetcher /app/data_fetcher
-COPY ./shared /app/shared
+COPY ./data_fetcher /app/data_fetcher/src
+COPY ./shared /app/shared/src
 
 
 # run data_fetcher/main.py
-CMD ["python", "data_fetcher/main.py"]
+CMD ["python", "data_fetcher/src/main.py"]

@@ -1,0 +1,44 @@
+from datetime import datetime
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
+
+from api.src.v1.core import Image, Rating
+from shared.src.enums import LanguageEnum
+from shared.src.tables import WishlistStatus
+
+
+class WishlistTranslation(BaseModel):
+    title: str
+    description: str
+    language: LanguageEnum
+
+class WishlistCreate(BaseModel):
+    status: WishlistStatus
+    release_date: Optional[datetime] = None
+    prototype_url: Optional[str] = None
+    images: List[Image] = Field(default_factory=list)
+    translations: List[WishlistTranslation] = Field(default_factory=list)
+
+
+class WishlistUpdate(WishlistCreate):
+    pass
+
+
+class Wishlist(BaseModel):
+    id: int
+    title: str
+    description: str
+    status: WishlistStatus
+    release_date: Optional[datetime]
+    prototype_url: Optional[str]
+    rating: Rating
+    images: List[Image]
+    created_at: datetime
+    updated_at: datetime
+
+
+class Wishlists(BaseModel):
+    wishlists: List[Wishlist]
+    
+    

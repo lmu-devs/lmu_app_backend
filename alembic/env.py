@@ -2,17 +2,14 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
-from shared.database import Base
+from shared.src.core.database import Base
 from shared.settings import get_settings
 
 # Import models
 from shared.tables.food.canteen_table import CanteenTable
 from shared.tables.food.dish_table import DishTable
-from shared.tables.image_table import ImageTable
 from shared.tables.wishlist_table import WishlistTable
 from shared.tables.food.menu_table import MenuDayTable, MenuDishAssociation
-from shared.tables.wishlist_table import WishlistTable, WishlistImageTable, WishlistTranslationTable, WishlistLikeTable, WishlistStatus
-
 
 # Get settings instance
 settings = get_settings()
