@@ -3,9 +3,9 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from api.src.v1.core import Image, Rating
 from shared.src.enums import LanguageEnum
 from shared.src.tables import WishlistStatus
+from shared.src.schemas import Image, Rating
 
 
 class WishlistTranslation(BaseModel):

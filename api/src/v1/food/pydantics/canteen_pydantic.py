@@ -1,21 +1,21 @@
+from shared.src.schemas import (Canteen, Image, OpeningHours, Rating,
+                                WeekdayEnum)
 from shared.src.tables import CanteenTable
-from ..schemas import Canteen, Weekday, OpeningHours, Image
-from ...core.schemas import Rating
-from ...core.pydantics.location_pydantic import location_to_pydantic
 
+from ...core.pydantics.location_pydantic import location_to_pydantic
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> Canteen:
     location = location_to_pydantic(canteen.location)
 
     day_mapping = {
-        'mon': Weekday.MONDAY,
-        'tue': Weekday.TUESDAY,
-        'wed': Weekday.WEDNESDAY,
-        'thu': Weekday.THURSDAY,
-        'fri': Weekday.FRIDAY,
-        'sat': Weekday.SATURDAY,
-        'sun': Weekday.SUNDAY
+        'mon': WeekdayEnum.MONDAY,
+        'tue': WeekdayEnum.TUESDAY,
+        'wed': WeekdayEnum.WEDNESDAY,
+        'thu': WeekdayEnum.THURSDAY,
+        'fri': WeekdayEnum.FRIDAY,
+        'sat': WeekdayEnum.SATURDAY,
+        'sun': WeekdayEnum.SUNDAY
     }
 
     opening_hours = []

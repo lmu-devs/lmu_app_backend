@@ -2,8 +2,8 @@ import uuid
 from typing import Optional
 
 from shared.src.tables import WishlistTable
+from shared.src.schemas import Rating, Image
 from ..schemas import Wishlist
-from ...core import Rating, Image
 
 
 def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:

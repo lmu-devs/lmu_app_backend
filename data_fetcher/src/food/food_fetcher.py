@@ -102,7 +102,7 @@ async def create_food_fetcher():
     
 
     db = next(get_db())
-    fetch_scheduled_data(db, days_amount=7)
+    # fetch_scheduled_data(db, days_amount=7)
     CanteenFetcher(db).update_canteen_database()
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)

@@ -2,19 +2,18 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.schemas import Image, Location, OpeningHours, Rating
+from shared.src.schemas.location_scheme import Location
+from shared.src.schemas.opening_hour_scheme import OpeningHours
 from shared.src.tables import CanteenTypeEnum
+from shared.src.enums import CanteenEnum
 
 
 class Canteen(BaseModel):
-    id: str
+    id: CanteenEnum
     name: str
     type: CanteenTypeEnum
     location: Location
-    rating: Rating
     opening_hours: OpeningHours
-    images: List[Image]
     
 class Canteens(RootModel):
     root: List[Canteen]
-

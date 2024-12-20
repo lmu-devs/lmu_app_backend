@@ -1,8 +1,8 @@
-from sqlalchemy import (Column, Date, DateTime, ForeignKey, ForeignKeyConstraint, Integer, String, func)
+from sqlalchemy import (Column, Date, DateTime, Enum, ForeignKey, ForeignKeyConstraint, Integer, String, func)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
-
+from shared.src.enums import CanteenEnum
 
 class MenuDishAssociation(Base):
     __tablename__ = "menu_dish_associations"
@@ -32,7 +32,7 @@ class MenuDayTable(Base):
     __tablename__ = "menu_days"
 
     date = Column(Date, primary_key=True)
-    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
+    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     

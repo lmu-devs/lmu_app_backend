@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from shared.src.enums import RatingSourceEnum
 from shared.src.schemas.location_scheme import Location
-from ...core import Image
+from shared.src.schemas import Image
 from ...core.schemas.university_scheme import University
 
 

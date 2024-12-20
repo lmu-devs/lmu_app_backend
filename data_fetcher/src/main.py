@@ -8,7 +8,7 @@ from shared.src.core.settings import get_settings
 
 from data_fetcher.src.university.university_fetcher import create_university_fetcher
 from data_fetcher.src.cinema.cinema_fetcher import create_movie_fetcher
-
+from data_fetcher.src.food.food_fetcher import create_food_fetcher
 logger_main = get_main_fetcher_logger(__name__)
 
 # ------ Needed for stopping docker container ------ #
@@ -30,9 +30,9 @@ async def main():
         Database(settings=settings)
         
         tasks = [
-            asyncio.create_task(create_university_fetcher()),
+            # asyncio.create_task(create_university_fetcher()),
             # asyncio.create_task(create_movie_fetcher()),
-            # asyncio.create_task(create_food_fetcher())
+            asyncio.create_task(create_food_fetcher())
         ]
         
         await asyncio.gather(*tasks)

@@ -1,1 +1,1 @@
-from translation_service import TranslationService
+from shared.src.services.translation_service import TranslationService
