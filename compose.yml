@@ -75,7 +75,6 @@ services:
     networks:
       - frontend
       - backend
-    command: python data_fetcher/main.py
     volumes:
       - .:/app
     environment:
