@@ -10,6 +10,8 @@ from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import CanteenLikeTable, CanteenTable
 
+from api.src.v1.core.service.like_service import BaseLikeService
+
 logger = get_food_logger(__name__)
 
 
@@ -18,6 +20,7 @@ class CanteenService:
     def __init__(self, db: Session) -> None:
         """Initialize the CanteenService with a database session."""
         self.db = db
+        self.like_service = BaseLikeService(db)
     
     def get_canteen(self, canteen_id: str) -> CanteenTable:
         """Retrieve a canteen from the database by its ID."""
@@ -55,41 +58,11 @@ class CanteenService:
 
 
     def get_like(self, canteen_id: int, user_id: str) -> CanteenLikeTable:
-        """Get the like status of a canteen by a user"""
-        try:
-            stmt = select(CanteenLikeTable).where(
-                CanteenLikeTable.canteen_id == canteen_id,
-                CanteenLikeTable.user_id == user_id
-            )
-            canteen_like = self.db.execute(stmt).scalar_one_or_none()
-            return canteen_like
-        except SQLAlchemyError as e:
-            logger.error(f"Failed to fetch canteen like status: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch canteen like status",
-                extra={
-                    "canteen_id": canteen_id,
-                    "user_id": user_id,
-                    "original_error": str(e)
-                }
-            ) from e
+        return self.like_service.get_like(CanteenLikeTable, canteen_id, user_id)
 
 
     def toggle_like(self, canteen_id: str, user_id: uuid.UUID) -> bool:
-        """Toggle the like status of a canteen by a user"""
-        existing_like = self.get_like(canteen_id, user_id)
-
-        if existing_like:
-            # If the user already liked the canteen, remove the like
-            self.db.delete(existing_like)
-            self.db.commit()
-            return False
-        else:
-            # If the user has not liked the canteen yet, add a new like
-            new_like = CanteenLikeTable(canteen_id=canteen_id, user_id=user_id)
-            self.db.add(new_like)
-            self.db.commit()
-            return True
+        return self.like_service.toggle_like(CanteenLikeTable, canteen_id, user_id)
 
 
     def get_user_liked(self, user_id: uuid.UUID, canteens: List[CanteenTable]) -> Dict[str, bool]:

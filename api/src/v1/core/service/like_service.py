@@ -1,8 +1,10 @@
 import uuid
+
 from typing import Type, Optional, Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_main_logger
 
