@@ -12,15 +12,16 @@ from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
                                DishTranslationTable, MenuDayTable,
                                MenuDishAssociation)
 
+from ...core.service.like_service import LikeService
 from ...core.translation_utils import apply_translation_query
-from ...core.service.like_service import BaseLikeService
+
 logger = get_food_logger(__name__)
 
 class DishService:
     def __init__(self, db: Session):
         """Initialize the DishService with a database session."""
         self.db = db
-        self.like_service = BaseLikeService(db)
+        self.like_service = LikeService(db)
     def get_dishes(
         self, 
         dish_id: Optional[int] = None, 

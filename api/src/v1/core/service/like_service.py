@@ -1,16 +1,16 @@
 import uuid
+from typing import Any, Optional, Type
 
-from typing import Type, Optional, Any
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_main_logger
 
 logger = get_main_logger(__name__)
 
-class BaseLikeService:
+class LikeService:
     def __init__(self, db: Session):
         self.db = db
 

@@ -5,12 +5,11 @@ from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
+from api.src.v1.core.service.like_service import LikeService
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import CanteenLikeTable, CanteenTable
-
-from api.src.v1.core.service.like_service import BaseLikeService
 
 logger = get_food_logger(__name__)
 
@@ -20,7 +19,7 @@ class CanteenService:
     def __init__(self, db: Session) -> None:
         """Initialize the CanteenService with a database session."""
         self.db = db
-        self.like_service = BaseLikeService(db)
+        self.like_service = LikeService(db)
     
     def get_canteen(self, canteen_id: str) -> CanteenTable:
         """Retrieve a canteen from the database by its ID."""

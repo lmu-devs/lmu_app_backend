@@ -5,20 +5,20 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, contains_eager
 
+from api.src.v1.core.service.like_service import LikeService
+from api.src.v1.core.translation_utils import apply_translation_query
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import WishlistImageTable, WishlistLikeTable, WishlistTable, WishlistTranslationTable
-
-from api.src.v1.core.service.like_service import BaseLikeService
-from api.src.v1.core.translation_utils import apply_translation_query
+from shared.src.tables import (WishlistImageTable, WishlistLikeTable,
+                               WishlistTable, WishlistTranslationTable)
 
 logger = get_food_logger(__name__)
 
 class WishlistService:
     def __init__(self, db: Session):
         self.db = db
-        self.like_service = BaseLikeService(db)
+        self.like_service = LikeService(db)
     def get_wishlists(self, language: LanguageEnum = LanguageEnum.GERMAN, wishlist_id: Optional[int] = None) -> WishlistTable:
         try:
             query = (
