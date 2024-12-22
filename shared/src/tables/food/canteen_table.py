@@ -65,9 +65,8 @@ class OpeningHoursTable(Base):
 class CanteenLikeTable(Base):
     __tablename__ = "canteen_likes"
 
-    id = Column(Integer, primary_key=True, index=True)
-    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), ForeignKey('canteens.id', ondelete='CASCADE'), nullable=False)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

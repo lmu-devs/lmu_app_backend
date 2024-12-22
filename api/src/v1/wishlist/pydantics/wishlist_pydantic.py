@@ -22,7 +22,7 @@ def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] =
         like_count=len(wishlist.likes),
         is_liked=user_likes_wishlist
     )
-    print(wishlist.images.__repr__())
+    
     images = images_table_to_pydantic(wishlist.images)
 
     return Wishlist(

@@ -12,13 +12,13 @@ from shared.src.tables import (WishlistImageTable, WishlistLikeTable,
                                WishlistTable, WishlistTranslationTable)
 
 from ...core import apply_translation_query
-
+from ...core.service.like_service import BaseLikeService
 logger = get_food_logger(__name__)
 
 class WishlistService:
     def __init__(self, db: Session):
         self.db = db
-    
+        self.like_service = BaseLikeService(db)
     def get_wishlists(self, language: LanguageEnum = LanguageEnum.GERMAN, wishlist_id: Optional[int] = None) -> WishlistTable:
         try:
             query = (
@@ -65,12 +65,12 @@ class WishlistService:
 
     def create_wishlist(self, wishlist_data: dict) -> WishlistTable:
         try:
+            # Create wishlist
+            new_wishlist = WishlistTable(**wishlist_data)
+            
             # Extract nested data
             images_data = wishlist_data.pop("images", [])
             translations = wishlist_data.pop("translations", [])
-            
-            # Create wishlist
-            new_wishlist = WishlistTable(**wishlist_data)
             
             # Add images and translations
             self._set_images(new_wishlist, images_data)
@@ -91,13 +91,14 @@ class WishlistService:
         try:
             wishlist = self.get_wishlists(wishlist_id=wishlist_id)[0]
             
-            # Extract nested data
-            images_data = wishlist_data.pop("images", None)
-            translations = wishlist_data.pop("translations", None)
             
             # Update basic fields
             for key, value in wishlist_data.items():
                 setattr(wishlist, key, value)
+            
+            # Extract nested data
+            images_data = wishlist_data.pop("images", None)
+            translations = wishlist_data.pop("translations", None)
             
             # Update images and translations if provided
             if images_data is not None:
@@ -129,24 +130,4 @@ class WishlistService:
             )
 
     def toggle_like(self, wishlist_id: int, user_id: uuid.UUID) -> bool:
-        try:
-            existing_like = self.db.query(WishlistLikeTable).filter(
-                WishlistLikeTable.wishlist_id == wishlist_id,
-                WishlistLikeTable.user_id == user_id
-            ).first()
-
-            if existing_like:
-                self.db.delete(existing_like)
-                self.db.commit()
-                return False
-            else:
-                new_like = WishlistLikeTable(wishlist_id=wishlist_id, user_id=user_id)
-                self.db.add(new_like)
-                self.db.commit()
-                return True
-        except SQLAlchemyError as e:
-            self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to toggle wishlist like",
-                extra={"original_error": str(e)}
-            ) 
+            return self.like_service.toggle_like(WishlistLikeTable, wishlist_id, user_id)

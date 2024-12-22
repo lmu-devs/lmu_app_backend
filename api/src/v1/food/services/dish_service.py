@@ -13,14 +13,14 @@ from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
                                MenuDishAssociation)
 
 from ...core.translation_utils import apply_translation_query
-
+from ...core.service.like_service import BaseLikeService
 logger = get_food_logger(__name__)
 
 class DishService:
     def __init__(self, db: Session):
         """Initialize the DishService with a database session."""
         self.db = db
-
+        self.like_service = BaseLikeService(db)
     def get_dishes(
         self, 
         dish_id: Optional[int] = None, 
@@ -83,54 +83,9 @@ class DishService:
                 detail="Failed to fetch dishes",
                 extra={"original_error": str(e)}
             )
-    
 
-
-    def get_like(self, dish_id: int, user_id: uuid.UUID) -> DishLikeTable:
-        """Get the like status of a dish by a user"""
-        try:
-            stmt = (
-                select(DishLikeTable)
-                .where(
-                    DishLikeTable.dish_id == dish_id,
-                    DishLikeTable.user_id == user_id
-                )
-            )
-            
-            result = self.db.execute(stmt)
-            dish_like = result.scalar_one_or_none()
-            
-            
-            return dish_like
-        
-        except SQLAlchemyError as e:
-            logger.error(f"Failed to fetch dish like: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch dish like",
-                extra={"original_error": str(e)}
-            )
-
-
-    def toggle_like(self, dish_id: int, user_id: uuid.UUID) -> bool:
-        """Toggle the like status of a dish"""
-        existing_like = self.get_like(dish_id, user_id)
-
-
-        if existing_like:
-            # If the user already liked the dish, remove the like
-            self.db.delete(existing_like)
-            self.db.commit()
-            return False
-        else:
-            # If the user has not liked the dish yet, add a new like
-            new_like = DishLikeTable(dish_id=dish_id, user_id=user_id)
-            self.db.add(new_like)
-            self.db.commit()
-            return True
-
-        
-
-        
+    def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+        return self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
 
 
     def get_dates(self, dish_id: int):
