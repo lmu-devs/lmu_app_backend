@@ -10,6 +10,7 @@ from shared.src.schemas import Image, Rating
 
 class WishlistTranslation(BaseModel):
     title: str
+    description_short: str
     description: str
     language: LanguageEnum
 
@@ -29,6 +30,7 @@ class Wishlist(BaseModel):
     id: int
     title: str
     description: str
+    description_short: str
     status: WishlistStatus
     release_date: Optional[datetime]
     prototype_url: Optional[str]

@@ -38,7 +38,7 @@ async def get_canteens(
     canteens = canteen_service.get_all_active_canteens()
     if current_user:
         likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
-        food_logger.info(f"Fetched {len(canteens)} active canteens with likes_canteens: {likes_canteens}")
+        food_logger.info(f"Fetched {len(canteens)} active canteens")
         return Canteens([
             canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
             for canteen in canteens

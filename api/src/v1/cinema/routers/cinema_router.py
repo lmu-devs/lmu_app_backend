@@ -16,12 +16,13 @@ router = APIRouter()
 
 @router.get("/movies", response_model=List[Movie], description="Get all movies")
 async def get_movie(
-    movie_id: Optional[uuid.UUID] = None,
+    id: Optional[uuid.UUID] = None,
     db: Session = Depends(get_db),
-    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
+    language: LanguageEnum = Depends(get_language)
 ):
     movie_service = MovieService(db)
-    movies = movie_service.get_movies(movie_id)
+    movies = movie_service.get_movies(language, id)
     return movies_to_pydantic(movies)
 
 @router.get("/screenings", response_model=List[MovieScreening], description="Get all movie screenings")

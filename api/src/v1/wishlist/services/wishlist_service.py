@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session, contains_eager
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import WishlistImageTable, WishlistLikeTable, WishlistTable, WishlistTranslationTable
+from shared.src.tables import (WishlistImageTable, WishlistLikeTable,
+                               WishlistTable, WishlistTranslationTable)
 
 from ...core import apply_translation_query
 
@@ -48,6 +49,20 @@ class WishlistService:
                 extra={"original_error": str(e)}
             )
 
+    def _set_translations(self, wishlist: WishlistTable, translations: list) -> None:
+        wishlist.translations = [
+            WishlistTranslationTable(
+                language=t["language"],
+                title=t["title"],
+                description=t["description"],
+                description_short=t["description_short"],
+                wishlist=wishlist
+            ) for t in translations
+        ]
+
+    def _set_images(self, wishlist: WishlistTable, images: list) -> None:
+        wishlist.images = [WishlistImageTable(**image) for image in images]
+
     def create_wishlist(self, wishlist_data: dict) -> WishlistTable:
         try:
             # Extract nested data
@@ -55,27 +70,12 @@ class WishlistService:
             translations = wishlist_data.pop("translations", [])
             
             # Create wishlist
-            new_wishlist = WishlistTable(
-                status=wishlist_data["status"],
-                release_date=wishlist_data.get("release_date"),
-                prototype_url=wishlist_data.get("prototype_url")
-            )
-
+            new_wishlist = WishlistTable(**wishlist_data)
             
-            # Add images
-            for image in images_data:
-                new_wishlist.images.append(WishlistImageTable(**image))
+            # Add images and translations
+            self._set_images(new_wishlist, images_data)
+            self._set_translations(new_wishlist, translations)
             
-            # Add translations
-            for translation in translations:
-                new_wishlist.translations.append(
-                WishlistTranslationTable(
-                        language=translation["language"],
-                        title=translation["title"],
-                        description=translation["description"],
-                        wishlist=new_wishlist
-                    )
-                )
             self.db.add(new_wishlist)
             self.db.commit()
             self.db.refresh(new_wishlist)
@@ -99,24 +99,11 @@ class WishlistService:
             for key, value in wishlist_data.items():
                 setattr(wishlist, key, value)
             
-            # Update images if provided
+            # Update images and translations if provided
             if images_data is not None:
-                wishlist.images = []
-                for image in images_data:
-                    wishlist.images.append(WishlistImageTable(**image))
-        
-            # Update translations if provided
+                self._set_images(wishlist, images_data)
             if translations is not None:
-                wishlist.translations = []
-                for translation in translations:
-                    wishlist.translations.append(
-                        WishlistTranslationTable(
-                            language=translation["language"],
-                            title=translation["title"],
-                            description=translation["description"],
-                            wishlist=wishlist
-                        )
-                    )
+                self._set_translations(wishlist, translations)
             
             self.db.commit()
             self.db.refresh(wishlist)

@@ -2,8 +2,9 @@ import uuid
 from typing import List
 
 from shared.src.tables import MenuDayTable
-from ..schemas import MenuDay, Menus
-from .dish_pydantic import dish_to_pydantic
+
+from api.src.v1.food.schemas import MenuDay, Menus
+from api.src.v1.food.pydantics import dish_to_pydantic
 
 
 def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> MenuDay:

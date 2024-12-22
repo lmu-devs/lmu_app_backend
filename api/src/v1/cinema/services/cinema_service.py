@@ -15,19 +15,39 @@ class MovieService:
     def _get_movie(self, movie_id: uuid.UUID) -> Movie:
         return self.db.query(MovieTable).filter(MovieTable.id == movie_id).first()
     
-    def get_movies(self, movie_id: Optional[uuid.UUID] = None) -> List[Movie]:
-        if movie_id:
-            return [self._get_movie(movie_id)]
-        return self.db.query(MovieTable).all()
-    
-    def get_movie_screenings(self, language: LanguageEnum = LanguageEnum.GERMAN) -> List[MovieScreening]:
-        stmt = select(MovieScreeningTable)
+    def get_movies(self, language: LanguageEnum, movie_id: Optional[uuid.UUID] = None) -> List[Movie]:
+        stmt = self._get_movies_query(language, movie_id)
         
-        return self.db.execute(stmt).scalars().all()
+        return self.db.execute(stmt).scalars().unique().all()
     
-
+    def _get_movies_query(self, language: LanguageEnum, movie_id: Optional[uuid.UUID] = None):
+        query = (select(MovieTable)
+        .join(MovieTable.translations)
+        .options(contains_eager(MovieTable.translations))
+        
+        # Join and load trailers with translations
+        .outerjoin(MovieTable.trailers)
+        .outerjoin(MovieTrailerTable.translations)
+        .options(
+            contains_eager(MovieTable.trailers)
+            .contains_eager(MovieTrailerTable.translations)
+        )
+        )
+        
+        if movie_id:
+            query = query.filter(MovieTable.id == movie_id)
+        
+        return query.order_by(
+            create_translation_order_case(MovieTranslationTable, language),
+            create_translation_order_case(MovieTrailerTranslationTable, language)
+        )
+        
+        
+    def get_movie_screenings(self, language: LanguageEnum):
+        query = self._get_movie_screenings_query(language)
+        return self.db.execute(query).scalars().unique().all()
     
-    def get_movie_screenings_query(self, language: LanguageEnum):
+    def _get_movie_screenings_query(self, language: LanguageEnum):
         
         query =  (select(MovieScreeningTable)
         # Join and load movie with its translations
@@ -71,7 +91,5 @@ class MovieService:
         )
 
     
-    def get_movie_screenings(self, language: LanguageEnum):
-        query = self.get_movie_screenings_query(language)
-        return self.db.execute(query).scalars().unique().all()
+
     

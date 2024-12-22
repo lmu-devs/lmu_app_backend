@@ -36,6 +36,9 @@ class WishlistImageTable(ImageTable, Base):
     wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), nullable=False)
     
     wishlist = relationship("WishlistTable", back_populates="images")
+    
+    def __repr__(self):
+        return f"WishlistImageTable(id={self.id}, url={self.url}, name={self.name}, created_at={self.created_at}, updated_at={self.updated_at})"
 
 
 class WishlistLikeTable(Base):
@@ -56,6 +59,7 @@ class WishlistTranslationTable(LanguageTable, Base):
     wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), primary_key=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    description_short = Column(String, nullable=False)
     
     wishlist = relationship("WishlistTable", back_populates="translations")
     

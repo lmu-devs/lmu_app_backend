@@ -1,9 +1,6 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 class Image(BaseModel):
     url: str
     name: str
-    
-class Images(BaseModel):
-    images: List[Image]

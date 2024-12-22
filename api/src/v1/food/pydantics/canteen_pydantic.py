@@ -1,11 +1,10 @@
-from shared.src.enums.opening_hours_enum import OpeningHoursTypeEnum
-from shared.src.schemas import (Image, OpeningHour, OpeningHours,
-                                Rating)
-from shared.src.tables import CanteenTable, CanteenStatusTable
-
-
-from ..schemas import CanteenResponse
-from ...core.pydantics.location_pydantic import location_to_pydantic
+from api.src.v1.core.pydantics import (images_table_to_pydantic,
+                                       location_to_pydantic)
+from api.src.v1.food.schemas.canteen_scheme import (CanteenResponse,
+                                                    CanteenStatus)
+from shared.src.enums import OpeningHoursTypeEnum
+from shared.src.schemas import OpeningHour, OpeningHours, Rating
+from shared.src.tables import CanteenTable
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
@@ -34,32 +33,24 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
         lecture_free_serving_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_SERVING_HOURS] or None
     )
     
-    like_count_value = canteen.like_count
+    status = CanteenStatus(
+        is_lecture_free=canteen.status.is_lecture_free,
+        is_closed=canteen.status.is_closed,
+        is_temporary_closed=canteen.status.is_temporary_closed
+    )
     
     rating = Rating(
-        like_count=like_count_value, 
+        like_count=canteen.like_count, 
         is_liked=user_likes_canteen
-        )
+    )
     
-    images = []
-    for image in canteen.images:
-        image_dto = Image(
-            url=image.url,
-            name=image.name
-        )
-        images.append(image_dto)
-        
-    status : CanteenStatusTable = canteen.status
-    print(status.__repr__())
-        
+    images = images_table_to_pydantic(canteen.images)
 
     return CanteenResponse(
         id=canteen.id,
         name=canteen.name,
         type=canteen.type,
-        is_lecture_free=status.is_lecture_free,
-        is_closed=status.is_closed,
-        is_temporary_closed=status.is_temporary_closed,
+        status=status,
         rating=rating,
         location=location,
         opening_hours=opening_hours,

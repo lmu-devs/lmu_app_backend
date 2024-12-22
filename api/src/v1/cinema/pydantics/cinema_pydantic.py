@@ -27,13 +27,11 @@ def movie_trailers_to_pydantic(trailers: List[MovieTrailerTable]) -> List[MovieT
         trailer_translations: MovieTrailerTranslationTable = trailer.translations[0] if trailer.translations else None
         title = trailer_translations.title if trailer_translations else "not translated"
         key = trailer_translations.key if trailer_translations else "not translated"
-        url = None
-        thumbnail_url = None
         
-        url = f"https://www.youtube.com/watch?v={key}"
-        thumbnail_url = f"https://img.youtube.com/vi/{key}/hqdefault.jpg"
+        url = f"https://www.youtube.com/watch?v={key}" if key else None
+        thumbnail_url = f"https://img.youtube.com/vi/{key}/hqdefault.jpg" if key else None
         
-        thumbnail = image_to_pydantic(thumbnail_url, f"YouTube Thumbnail for {title}")
+        thumbnail = image_to_pydantic(thumbnail_url, f"YouTube Thumbnail for {title}") if thumbnail_url else None
         
         trailers_pydantic.append(
             MovieTrailer(
@@ -58,8 +56,8 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
     tagline = movie_translations.tagline if movie_translations else "not translated"
     poster = image_to_pydantic(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
     backdrop = image_to_pydantic(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
-    trailers = movie_trailers_to_pydantic(movie.trailers)
-    ratings = movie_ratings_to_pydantic(movie.ratings)
+    trailers = movie_trailers_to_pydantic(movie.trailers) if movie.trailers else []
+    ratings = movie_ratings_to_pydantic(movie.ratings) if movie.ratings else []
     
     return Movie(
         id=movie.id,

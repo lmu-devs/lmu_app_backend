@@ -10,11 +10,9 @@ from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants im
 from data_fetcher.src.food.service.canteen_opening_status_service import \
     CanteenOpeningStatusService
 from data_fetcher.src.food.service.simple_price_service import PriceService
-from shared.src.core.exceptions import (DatabaseError, DataProcessingError,
-                                        ExternalAPIError)
+from shared.src.core.exceptions import DatabaseError, DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
-from shared.src.enums import (CanteenEnum, DishCategoryEnum, LanguageEnum,
-                              WeekdayEnum)
+from shared.src.enums import (CanteenEnum, DishCategoryEnum, LanguageEnum, WeekdayEnum)
 from shared.src.services import LectureFreePeriodService, TranslationService
 from shared.src.tables import (DishPriceTable, DishTable, DishTranslationTable,
                                MenuDayTable, MenuDishAssociation)
@@ -87,16 +85,9 @@ class MenuFetcher:
         
         try:
             dish_amount = 0
-            week = data.get('number')
-            year = data.get('year')
             
-            if not week or not year:
-                logger.error(f"Week or year data is missing: {data}")
-                raise ValueError("Week or year data is missing")
+            logger.info(f"Storing menu data for canteen {canteen_id} for week {data.get('week')} of year {data.get('year')}")
             
-            logger.info(f"Storing menu data for canteen {canteen_id} for week {week} of year {year}")
-            
-            # Get all days from the API response
             days = data.get('days', [])
             
             # Process each weekday
@@ -199,10 +190,12 @@ class MenuFetcher:
                     )
                     self.db.add(association)
                     
-            translations = self.translation_service.create_missing_translations(dish_obj)
-            self.db.add_all(translations)
+                    # Add missing translations for existing and new dishes
+                    translations = self.translation_service.create_missing_translations(dish_obj)
+                    self.db.add_all(translations)
+                    
             self.db.commit()
-            logger.info(f"Menu data stored successfully. {dish_amount} dishes added.")
+            logger.info(f"Menu dishes added & updated successfully. {dish_amount} dishes added.")
         except IntegrityError as e:
             logger.error(f"Database integrity error while storing menu data: {str(e)}")
             raise DatabaseError(
@@ -236,7 +229,6 @@ class MenuFetcher:
                 if menu_data:
                     self.store_menu_data(menu_data, canteen_id)
                 current_date += timedelta(days=7)
-            logger.info("Menu data updated successfully!")
         except Exception as e:
             logger.error(f"Failed to update menu database: {str(e)}")
             raise DataProcessingError(

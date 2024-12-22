@@ -4,8 +4,8 @@ from typing import Dict
 from shared.src.tables import DishTable
 from shared.src.schemas import Rating
 
-from ..pydantics import canteen_to_pydantic
-from ..schemas import Dish, DishDate, DishDates, DishPrice
+from api.src.v1.food.pydantics import canteen_to_pydantic
+from api.src.v1.food.schemas import Dish, DishDate, DishDates, DishPrice
 
 
 def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:

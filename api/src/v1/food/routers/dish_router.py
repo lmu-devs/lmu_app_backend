@@ -1,5 +1,5 @@
+from uuid import UUID
 from typing import Annotated, List
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
@@ -21,10 +21,9 @@ food_logger = get_food_logger(__name__)
 # Gets dish data
 @router.get("/dishes", response_model=Dishes, description="Get all dishes or a specific dish by ID. Authenticated users can also get liked dishes.")
 async def get_dish(
-    id: Annotated[int, Query(
+    id: Annotated[UUID, Query(
         description="Specific dish ID to fetch",
-        gt=0,
-        example=11,
+        example="0d557344-d228-5032-8b0c-bca7cefc0934",
         title="Dish ID"
     )] = None,
     only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
@@ -44,11 +43,10 @@ async def get_dish(
 # Gets list of multiple canteens where dish is available in past and future dates
 @router.get("/dishes/dates", response_model=DishDates, description="Get all canteens where a dish is available in past and future dates")
 async def read_dish_dates(
-    dish_id: Annotated[int, Query(
+    dish_id: Annotated[UUID, Query(
         ..., 
         description="Specific dish ID find dates for",
-        gt=0,
-        example=11,
+        example="0d557344-d228-5032-8b0c-bca7cefc0934",
         title="Dish ID"
     )],
     db: Session = Depends(get_db),
@@ -71,7 +69,7 @@ async def read_dish_dates(
 
 @router.post("/dishes/toggle-like", response_model=bool, description="Authenticated user can toggle like for a dish. Returns True if the dish was liked, False if it was unliked.")
 def toggle_like(
-    dish_id: int, 
+    dish_id: UUID, 
     db: Session = Depends(get_db), 
     current_user: UserTable = Depends(APIKey.verify_user_api_key)
     ):
