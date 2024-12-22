@@ -11,16 +11,16 @@ from data_fetcher.src.cinema.cinema_fetcher import create_movie_fetcher
 from data_fetcher.src.food.food_fetcher import create_food_fetcher
 logger_main = get_main_fetcher_logger(__name__)
 
-# ------ Needed for stopping docker container ------ #
-def signal_handler(signum, frame):
-    global running_eat
-    global running_movie
-    logger_main.info("Received shutdown signal. Stopping gracefully...")
+# # ------ Needed for stopping docker container ------ #
+# def signal_handler(signum, frame):
+#     global running_eat
+#     global running_movie
+#     logger_main.info("Received shutdown signal. Stopping gracefully...")
 
-# Register the signal handler
-signal.signal(signal.SIGTERM, signal_handler)
-signal.signal(signal.SIGINT, signal_handler)
-# ------ Needed for stopping docker container ------ #
+# # Register the signal handler
+# signal.signal(signal.SIGTERM, signal_handler)
+# signal.signal(signal.SIGINT, signal_handler)
+# # ------ Needed for stopping docker container ------ #
 
 async def main():
     logger_main.info("================================================")

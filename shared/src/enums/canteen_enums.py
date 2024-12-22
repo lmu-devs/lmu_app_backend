@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class CanteenTypeEnum(str, Enum):
     MENSA = "MENSA"
     STUBISTRO = "STUBISTRO"
@@ -58,6 +59,14 @@ class CanteenEnum(str, Enum):
     ESPRESSOBAR_GARCHING_APE = "espressobar-garching-ape"
     ESPRESSOBAR_GARCHING = "espressobar-garching"
     ESPRESSOBAR_WEIHENSTEPHAN = "espressobar-weihenstephan"
+    
+    
+    def get_active_canteens():
+        return [CanteenEnum.MENSA_LEOPOLDSTR, CanteenEnum.MENSA_ARCISSTR]
+    
+    @classmethod
+    def get_active_canteens_values(cls):
+        return [canteen.value for canteen in cls.get_active_canteens()]
     
     
     ## Sort out

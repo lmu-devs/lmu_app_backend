@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import CanteenTable, DishLikeTable, DishTable, DishTranslationTable, MenuDayTable, MenuDishAssociation
+from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
+                               DishTranslationTable, MenuDayTable,
+                               MenuDishAssociation)
 
 from ...core.translation_utils import apply_translation_query
 
@@ -144,7 +146,7 @@ class DishService:
                     MenuDayTable,
                     and_(
                         MenuDishAssociation.menu_day_date == MenuDayTable.date,
-                        MenuDishAssociation.menu_day_canteen_id == MenuDayTable.canteen_id
+                        MenuDishAssociation.canteen_id == MenuDayTable.canteen_id
                     )
                 )
                 .join(

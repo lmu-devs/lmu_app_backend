@@ -2,7 +2,8 @@ import uuid
 from typing import Dict
 
 from shared.src.tables import DishTable
-from ...core.schemas.rating_scheme import Rating
+from shared.src.schemas import Rating
+
 from ..pydantics import canteen_to_pydantic
 from ..schemas import Dish, DishDate, DishDates, DishPrice
 

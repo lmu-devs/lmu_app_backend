@@ -10,7 +10,7 @@ from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
 from shared.src.tables import CanteenLikeTable, DishTable, DishTranslationTable, MenuDayTable, MenuDishAssociation, UserTable
 
-from ...core.translation_utils import create_translation_order_case
+from api.src.v1.core.translation_utils import create_translation_order_case
 
 logger = get_food_logger(__name__)
 class MenuService:
@@ -39,7 +39,7 @@ class MenuService:
                 .outerjoin(DishTable.translations)
             )
             
-            # Apply translation query - modify to use the already joined translations
+            #Apply translation query - modify to use the already joined translations
             stmt = (
                 stmt
                 .options(

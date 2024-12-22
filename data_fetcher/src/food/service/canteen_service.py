@@ -1,20 +1,23 @@
 from typing import List, Tuple
+
 from sqlalchemy.orm import Session
 
+from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
+from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
+from data_fetcher.src.food.service.images_service import ImageService
 from shared.src.core.database import Database, get_db
 from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
-from shared.src.tables import CanteenImageTable, CanteenTable, OpeningHoursTable, CanteenLocationTable
-from shared.src.enums import OpeningHoursTypeEnum
-
-from data_fetcher.src.food.service.images_service import ImageService
-from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
+from shared.src.enums import OpeningHoursTypeEnum, CanteenEnum
+from shared.src.tables import (CanteenImageTable, CanteenLocationTable,
+                               CanteenStatusTable, CanteenTable,
+                               OpeningHoursTable)
 
 logger = get_food_fetcher_logger(__name__)
 
 
-class CanteenFetcher:
+class CanteenService:
     
     def __init__(self, db: Session):
         self.db = db
@@ -25,6 +28,14 @@ class CanteenFetcher:
         
         for canteen in CanteensConstants.canteens:
             try:
+                
+                status_obj = CanteenStatusTable(
+                    canteen_id=canteen.id,
+                    is_closed=CanteenOpeningStatusService.is_closed(),
+                    is_temporary_closed=CanteenOpeningStatusService.is_temp_closed(),
+                    is_lecture_free=CanteenOpeningStatusService.is_lecture_free(),
+                )
+                
                 location_obj = CanteenLocationTable(
                     canteen_id=canteen.id,
                     address=canteen.location.address,
@@ -43,9 +54,11 @@ class CanteenFetcher:
                 
                 self.db.merge(canteen_obj)
                 self.db.merge(location_obj)
+                self.db.merge(status_obj)
                 self.db.commit()
                 
             except Exception as e:
+                self.db.rollback()
                 message = f"Error while storing canteen data: {str(e)}"
                 logger.error(message)
                 raise DataProcessingError(message)
@@ -62,7 +75,11 @@ class CanteenFetcher:
         image_count = 0
         for location, url in files:
             # Check if the canteen's ID is in the image URL
-            if str(canteen_table.id) in url:
+            canteen_id = canteen_table.id
+            # find exact enum value for the canteen
+            enum_value = CanteenEnum(canteen_id).value
+            
+            if enum_value in url:
                 image_count = image_count + 1
                 new_image = CanteenImageTable(
                     canteen_id=canteen_table.id,
@@ -122,7 +139,7 @@ def main():
     Database(settings=settings)
     db = next(get_db())
     try:
-        canteen_service = CanteenFetcher(db)
+        canteen_service = CanteenService(db)
         canteen_service.update_canteen_database()
     finally:
         db.close()

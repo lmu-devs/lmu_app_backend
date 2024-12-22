@@ -1,17 +1,17 @@
+import asyncio
 from datetime import datetime, timedelta
 
 import requests
 import schedule
 from sqlalchemy.orm import Session
-import asyncio
 
+from shared.src.core.database import get_db
 from shared.src.core.error_handlers import handle_error
 from shared.src.core.logging import get_food_fetcher_logger
-from shared.src.core.database import get_db
 from shared.src.enums import CanteenEnum
 
 from ..state import running_eat
-from .service.canteen_service import CanteenFetcher
+from .service.canteen_service import CanteenService
 from .service.menu_service import MenuFetcher
 
 logger = get_food_fetcher_logger(__name__)
@@ -61,19 +61,17 @@ logger = get_food_fetcher_logger(__name__)
 
 
 def fetch_scheduled_data(db: Session, days_amount: int = 21):
-    """Fetches data for the next 14 days for all canteens"""
-    logger.info("Attempting to fetch data for next 14 days...")
+    """Fetches data for the next 21 days for all canteens"""
     
     try:
-        CanteenFetcher(db).update_canteen_database()
+        CanteenService(db).update_canteen_database()
 
         date_from = datetime.now().date()
 
-        logger.info(f"Fetching data for {days_amount} days")
-        logger.info(f"Date from: {date_from}")
+        logger.info(f"Fetching menu data for {days_amount} days, starting from {date_from}")
 
         # Update menu for each canteen
-        for canteen in CanteenEnum:
+        for canteen in CanteenEnum.get_active_canteens():
             try:
                 menu_service = MenuFetcher(db)
                 menu_service.update_menu_database(
@@ -102,8 +100,8 @@ async def create_food_fetcher():
     
 
     db = next(get_db())
-    # fetch_scheduled_data(db, days_amount=7)
-    CanteenFetcher(db).update_canteen_database()
+    fetch_scheduled_data(db, days_amount=20)
+    # CanteenService(db).update_canteen_database()
     
     schedule.every().day.at("08:08").do(fetch_scheduled_data)
     

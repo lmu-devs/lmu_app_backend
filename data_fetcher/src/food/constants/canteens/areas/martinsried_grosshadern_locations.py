@@ -1,7 +1,7 @@
 from datetime import time
+
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.schemas import OpeningHour, OpeningHours, WeekdayEnum
-
 
 martinsried_grosshadern_opening_hours = {
     CanteenEnum.MENSA_MARTINSRIED: OpeningHours(

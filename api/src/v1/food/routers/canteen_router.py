@@ -3,8 +3,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from shared.src.core.logging import get_food_logger
 from shared.src.core.database import get_db
+from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable
 
@@ -19,7 +19,11 @@ food_logger = get_food_logger(__name__)
 
 @router.get("/canteens", response_model=Canteens)
 async def get_canteens(
-    canteen_id: Optional[str] = Query(None, description="Optional canteen_id to fetch", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenEnum]),
+    canteen_id: Optional[str] = Query(
+        None, 
+        description="Optional canteen_id to fetch", 
+        example="mensa-leopoldstr", 
+        enum=CanteenEnum.get_active_canteens_values()),
     db: Session = Depends(get_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):

@@ -2,6 +2,7 @@ import os
 
 from typing import List, Tuple
 
+
 class ImageService:
     
     def generate_image_urls(directory_path: str, image_url_prefix: str) -> List[Tuple[str, str]]:

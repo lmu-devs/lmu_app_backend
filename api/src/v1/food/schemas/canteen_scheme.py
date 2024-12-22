@@ -1,20 +1,17 @@
 from typing import List
 
-from pydantic import BaseModel, RootModel
+from pydantic import RootModel
 
-from shared.src.schemas import Image, Location, OpeningHours, Rating
-from shared.src.tables import CanteenTypeEnum
+from shared.src.schemas import Image, Rating, Canteen
 
 
-class Canteen(BaseModel):
-    id: str
-    name: str
-    type: CanteenTypeEnum
-    location: Location
+class CanteenResponse(Canteen):
+    is_lecture_free: bool
+    is_closed: bool
+    is_temporary_closed: bool
     rating: Rating
-    opening_hours: OpeningHours
     images: List[Image]
     
 class Canteens(RootModel):
-    root: List[Canteen]
+    root: List[CanteenResponse]
 

@@ -18,6 +18,7 @@ def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> M
     return MenuDay(
         date=menu_day.date,
         canteen_id=menu_day.canteen_id,
+        is_closed=menu_day.is_closed,
         dishes=dishes_dto
     )
 

@@ -1,9 +1,10 @@
-from sqlalchemy import (UUID, Column, DateTime, Enum, ForeignKey, Integer,
-                        String, Time, func)
+from sqlalchemy import (UUID, Boolean, Column, DateTime, Enum, ForeignKey,
+                        Integer, String, Time, func)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
-from shared.src.enums import CanteenEnum, CanteenTypeEnum, OpeningHoursTypeEnum, WeekdayEnum
+from shared.src.enums import (CanteenEnum, CanteenTypeEnum,
+                              OpeningHoursTypeEnum, WeekdayEnum)
 from shared.src.tables.image_table import ImageTable
 from shared.src.tables.location_table import LocationTable
 
@@ -20,13 +21,26 @@ class CanteenTable(Base):
     menu_days = relationship("MenuDayTable", back_populates="canteen", cascade="all, delete-orphan")
     likes = relationship("CanteenLikeTable", back_populates="canteen", cascade="all, delete-orphan")
     images = relationship("CanteenImageTable", back_populates="canteen", cascade="all, delete-orphan")
-
+    status = relationship("CanteenStatusTable", back_populates="canteen", uselist=False)
     def __repr__(self):
         return f"<Canteen(id='{self.id}', name='{self.name}')>"
     
     @property
     def like_count(self):
         return len(self.likes)
+    
+class CanteenStatusTable(Base):
+    __tablename__ = "canteen_status"
+
+    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True, nullable=False)
+    is_closed = Column(Boolean, nullable=False)
+    is_temporary_closed = Column(Boolean, nullable=False)
+    is_lecture_free = Column(Boolean, nullable=False)
+
+    canteen = relationship("CanteenTable", back_populates="status")
+    
+    def __repr__(self):
+        return f"<CanteenStatus(canteen_id='{self.canteen_id}', is_closed='{self.is_closed}', is_temporary_closed='{self.is_temporary_closed}', is_lecture_free='{self.is_lecture_free}')>"
 
 class CanteenLocationTable(LocationTable, Base):
     __tablename__ = "canteen_locations"

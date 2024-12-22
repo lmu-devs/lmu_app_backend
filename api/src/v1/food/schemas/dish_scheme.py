@@ -1,10 +1,11 @@
 from datetime import date
 from typing import List, Optional
-
+from uuid import UUID
 from pydantic import BaseModel
 
 from shared.src.schemas import Rating
-from ..schemas import Canteen
+
+from ..schemas import CanteenResponse
 
 
 class DishPrice(BaseModel):
@@ -14,7 +15,7 @@ class DishPrice(BaseModel):
     unit: str
     
 class Dish(BaseModel):
-    id: int
+    id: UUID
     title: str
     dish_type: str
     dish_category: str
@@ -29,7 +30,7 @@ class Dishes(BaseModel):
 
 class DishDate(BaseModel):
     date: date
-    canteens: List[Canteen]
+    canteens: List[CanteenResponse]
 
 class DishDates(BaseModel):
     dates: List[DishDate]

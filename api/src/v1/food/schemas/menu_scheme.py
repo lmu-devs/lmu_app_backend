@@ -8,6 +8,7 @@ from ..schemas import Dish
 class MenuDay(BaseModel):
     date: date
     canteen_id: str
+    is_closed: bool
     dishes: List[Dish]
     
 class Menus(RootModel):
