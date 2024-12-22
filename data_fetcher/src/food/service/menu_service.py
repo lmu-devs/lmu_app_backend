@@ -216,7 +216,7 @@ class MenuFetcher:
         
         try:
             # Store all menu days without dishes
-            self.store_menu_days(canteen_id, date_from, date_to)
+            self.store_menu_days(canteen_id, date_from-timedelta(days=7), date_to)
             
             # Get the first day (Monday) of the week for date_from
             current_date = date_from - timedelta(days=date_from.weekday())

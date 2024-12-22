@@ -65,12 +65,12 @@ class WishlistService:
 
     def create_wishlist(self, wishlist_data: dict) -> WishlistTable:
         try:
-            # Create wishlist
-            new_wishlist = WishlistTable(**wishlist_data)
-            
             # Extract nested data
             images_data = wishlist_data.pop("images", [])
             translations = wishlist_data.pop("translations", [])
+            
+            # Create wishlist
+            new_wishlist = WishlistTable(**wishlist_data)
             
             # Add images and translations
             self._set_images(new_wishlist, images_data)
@@ -91,14 +91,13 @@ class WishlistService:
         try:
             wishlist = self.get_wishlists(wishlist_id=wishlist_id)[0]
             
+            # Extract nested data
+            images_data = wishlist_data.pop("images", None)
+            translations = wishlist_data.pop("translations", None)
             
             # Update basic fields
             for key, value in wishlist_data.items():
                 setattr(wishlist, key, value)
-            
-            # Extract nested data
-            images_data = wishlist_data.pop("images", None)
-            translations = wishlist_data.pop("translations", None)
             
             # Update images and translations if provided
             if images_data is not None:
