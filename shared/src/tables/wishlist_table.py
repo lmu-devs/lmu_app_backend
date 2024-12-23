@@ -8,6 +8,7 @@ from shared.src.tables.language_table import LanguageTable
 
 
 class WishlistStatus(str, enum.Enum):
+    NONE = "NONE"
     HIDDEN = "HIDDEN"
     DEVELOPMENT = "DEVELOPMENT"
     BETA = "BETA"
