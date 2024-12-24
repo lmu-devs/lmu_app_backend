@@ -22,7 +22,7 @@ class FeedbackTable(Base):
     type = Column(String, nullable=False)
     rating = Column(String, nullable=True)
     message = Column(String, nullable=True)
-    screen = Column(String, nullable=True)
+    screen = Column(String, nullable=False)
     tags = Column(ARRAY(String), nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
