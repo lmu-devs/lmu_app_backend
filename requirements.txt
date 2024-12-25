@@ -31,3 +31,4 @@ asyncpg
 holidays
 gradio_client
 blurhash-python
+pillow

@@ -52,6 +52,28 @@ class FileManagementService:
             for char in filename
         )
         return safe_filename
+    
+    @staticmethod
+    def delete_file(file_path: str) -> bool:
+        """
+        Safely delete a file
+        
+        Args:
+            file_path: Path to the file to delete
+            
+        Returns:
+            bool: True if file was deleted successfully, False if file doesn't exist
+            
+        Raises:
+            Exception: If deletion fails for any other reason
+        """
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                return True
+            return False
+        except Exception as e:
+            raise Exception(f"Failed to delete file {file_path}: {str(e)}")
 
 
 if __name__ == "__main__":
