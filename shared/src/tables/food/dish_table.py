@@ -3,7 +3,8 @@ from sqlalchemy import ARRAY, UUID, Column, Float, ForeignKey, Integer, String, 
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
-from shared.src.tables.language_table import LanguageTable
+from shared.src.tables.language_table import LanguageTable 
+from shared.src.tables.image_table import ImageTable
 
 
 class DishTable(Base):
@@ -22,7 +23,8 @@ class DishTable(Base):
     prices = relationship("DishPriceTable", back_populates="dish", cascade="all, delete-orphan")
     likes = relationship("DishLikeTable", back_populates="dish", cascade="all, delete-orphan")
     translations = relationship("DishTranslationTable", back_populates="dish", cascade="all, delete-orphan")
-
+    images = relationship("DishImageTable", back_populates="dish", cascade="all, delete-orphan")
+    
     def __repr__(self):
         return f"<Dish(id='{self.id}', type='{self.dish_type}')>"
     
@@ -51,6 +53,13 @@ class DishPriceTable(Base):
     def __repr__(self):
         return f"<Price(id='{self.id}', category='{self.category}', base_price='{self.base_price}', price_per_unit='{self.price_per_unit}', unit='{self.unit}')>"
 
+
+class DishImageTable(ImageTable, Base):
+    __tablename__ = "dish_images"
+
+    dish_id = Column(UUID(as_uuid=True), ForeignKey("dishes.id", ondelete='CASCADE'), nullable=False, primary_key=True)
+
+    dish = relationship("DishTable", back_populates="images")
 
 # Table to represent the many-to-many relationship between dishes and users
 class DishLikeTable(Base):

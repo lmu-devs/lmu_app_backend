@@ -2,14 +2,17 @@ from typing import List, Tuple
 
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
-from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
-from data_fetcher.src.food.service.images_service import ImageService
+from data_fetcher.src.food.constants.canteens.canteens_constants import \
+    CanteensConstants
+from data_fetcher.src.food.service.canteen_images_service import \
+    CanteenImageService
+from data_fetcher.src.food.service.canteen_opening_status_service import \
+    CanteenOpeningStatusService
 from shared.src.core.database import Database, get_db
 from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
-from shared.src.enums import OpeningHoursTypeEnum, CanteenEnum
+from shared.src.enums import CanteenEnum, OpeningHoursTypeEnum
 from shared.src.tables import (CanteenImageTable, CanteenLocationTable,
                                CanteenStatusTable, CanteenTable,
                                OpeningHoursTable)
@@ -116,8 +119,8 @@ class CanteenService:
         """Helper method to store images for a canteen."""
         directory_path = "shared/src/assets/canteens/"
         settings = get_settings()
-        image_url_prefix = f"{settings.API_BASE_URL}{settings.API_V1_PREFIX_FOOD}/images/"
-        files = ImageService.generate_image_urls(directory_path, image_url_prefix)
+        image_url_prefix = f"{settings.IMAGES_BASE_URL_CANTEENS}/"
+        files = CanteenImageService.generate_image_urls(directory_path, image_url_prefix)
         self._set_canteen_images(canteen_obj, files)
 
     def update_canteen_database(self):

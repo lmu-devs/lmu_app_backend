@@ -1,6 +1,6 @@
-import deepl
-
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar
+
+import deepl
 from sqlalchemy import String
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm.relationships import RelationshipProperty
@@ -184,3 +184,23 @@ class TranslationService:
         except Exception as e:
             logger.error(f"Failed to create translations for table {obj.__tablename__} object {obj.id}: {str(e)}")
             raise
+
+    def get_translation(self, obj: T, language: LanguageEnum) -> Optional[TransT]:
+        """
+        Get translation for a specific language from an object's translations
+        
+        Args:
+            obj: The object containing translations
+            language: The target language to get translation for
+            
+        Returns:
+            Translation object if found, None otherwise
+        """
+        try:
+            return next(
+                (t for t in obj.translations if t.language == language.value),
+                None
+            )
+        except Exception as e:
+            logger.error(f"Failed to get {language.value} translation for {obj.__class__.__name__} {obj.id}: {str(e)}")
+            return None
