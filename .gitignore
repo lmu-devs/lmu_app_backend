@@ -1,3 +1,6 @@
+# Assets
+shared/src/assets/dishes/
+
 .venv
 venv
 logs/

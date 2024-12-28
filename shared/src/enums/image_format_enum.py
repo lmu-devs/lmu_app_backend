@@ -2,7 +2,7 @@ import os
 from enum import Enum
 
 
-class ImageFormat(Enum):
+class ImageFormatEnum(Enum):
     PNG = "PNG"
     WEBP = "WEBP"
     JPEG = "JPEG"
@@ -14,7 +14,7 @@ class ImageFormat(Enum):
         return self.value.lower()
     
     @classmethod
-    def from_filename(cls, filename: str) -> "ImageFormat":
+    def from_filename(cls, filename: str) -> "ImageFormatEnum":
         """Get format from filename extension"""
         ext = os.path.splitext(filename)[1].upper().lstrip('.')
         try:

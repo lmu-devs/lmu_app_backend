@@ -3,12 +3,12 @@ from typing import Optional
 
 from PIL import Image
 
-from shared.src.enums.image_format_enum import ImageFormat
+from shared.src.enums.image_format_enum import ImageFormatEnum
 
 
 class ImageService:
     @staticmethod
-    def _get_save_parameters(format: ImageFormat, quality: Optional[int] = None) -> dict:
+    def _get_save_parameters(format: ImageFormatEnum, quality: Optional[int] = None) -> dict:
         """
         Get the appropriate save parameters for different image formats
         
@@ -21,12 +21,12 @@ class ImageService:
         """
         save_params = {}
         if quality is not None:
-            if format == ImageFormat.PNG:
+            if format == ImageFormatEnum.PNG:
                 save_params["optimize"] = True
             else:
                 save_params["quality"] = quality
                 
-            if format == ImageFormat.WEBP:
+            if format == ImageFormatEnum.WEBP:
                 save_params["method"] = 6  # Highest compression method for WebP
         
         return save_params
@@ -34,7 +34,7 @@ class ImageService:
     @staticmethod
     def convert_image(
         input_path: str, 
-        output_format: ImageFormat,
+        output_format: ImageFormatEnum,
         quality: Optional[int] = None,
         output_path: Optional[str] = None
     ) -> str:
@@ -50,7 +50,7 @@ class ImageService:
         try:
             with Image.open(input_path) as img:
                 # Convert RGBA to RGB if saving as JPEG
-                if output_format in [ImageFormat.JPEG, ImageFormat.JPG] and img.mode == "RGBA":
+                if output_format in [ImageFormatEnum.JPEG, ImageFormatEnum.JPG] and img.mode == "RGBA":
                     background = Image.new("RGB", img.size, (255, 255, 255))
                     background.paste(img, mask=img.split()[3])
                     img = background
@@ -89,7 +89,7 @@ class ImageService:
         try:
             # Get original format
             with Image.open(input_path) as img:
-                format = ImageFormat(img.format)  # Convert string to ImageFormat enum
+                format = ImageFormatEnum(img.format)  # Convert string to ImageFormat enum
                 return ImageService.convert_image(
                     input_path=input_path,
                     output_format=format,
@@ -116,7 +116,7 @@ class ImageService:
             quality: Optional quality setting (0-100) for compression
         """
         try:
-            format = ImageFormat.from_filename(input_path)
+            format = ImageFormatEnum.from_filename(input_path)
             
             with Image.open(input_path) as img:
                 # Calculate new size maintaining aspect ratio

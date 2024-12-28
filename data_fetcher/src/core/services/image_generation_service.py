@@ -1,4 +1,4 @@
-# https://huggingface.co/ginipick/text3d
+# https://huggingface.co/spaces/ginipick/text3d
 
 from gradio_client import Client
 
@@ -22,4 +22,4 @@ class ImageGenerationService:
 
 if __name__ == "__main__":
     service = ImageGenerationService()
-    print(service.generate_image("Simplified 3D Banana", height=512, width=512, steps=12, scales=3.5, seed=123456))
+    print(service.generate_image("Delicious and Simplified 3D Pasta all'arrabiata placed in a pastel green pasta bowl, white background", height=512, width=512, steps=12, scales=3.5, seed=123456))

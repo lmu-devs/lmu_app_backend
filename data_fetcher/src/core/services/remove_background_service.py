@@ -11,7 +11,7 @@ class RemoveBackgroundService:
         result = self.client.predict(
             file=handle_file(image_url),
             mask="Default",
-            model="isnet-general-use",
+            model="u2net",
             x=3,
             y=3,
             api_name="/inference"

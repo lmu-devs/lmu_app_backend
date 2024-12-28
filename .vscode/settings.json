@@ -1,5 +1,12 @@
 {
   "files.watcherExclude": {
     "**/target": true
-  }
+  },
+  "editor.formatOnSave": true,
+  "isort.args": [
+    "--profile=black",
+    "--line-length=120",
+    "--multi-line=3",
+    "--lines-after-imports=2"
+  ]
 }
