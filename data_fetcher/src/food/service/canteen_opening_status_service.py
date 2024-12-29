@@ -17,9 +17,7 @@ class CanteenOpeningStatusService:
     def is_closed(cls, check_date: date = None) -> bool:
         if check_date is None:
             check_date = date.today()
-        if cls._lecture_free_period_service.is_christmas_break(check_date):
-            return True
-        if cls._public_holiday_service.is_public_holiday(check_date):
+        if cls._public_holiday_service.is_university_holiday(check_date):
             return True
         return False
     
