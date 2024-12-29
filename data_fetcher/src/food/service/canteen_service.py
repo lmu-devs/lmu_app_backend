@@ -1,4 +1,3 @@
-from typing import List, Tuple
 
 from sqlalchemy.orm import Session
 
@@ -12,10 +11,11 @@ from shared.src.core.database import Database, get_db
 from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
-from shared.src.enums import CanteenEnum, OpeningHoursTypeEnum
-from shared.src.tables import (CanteenImageTable, CanteenLocationTable,
+from shared.src.enums import OpeningHoursTypeEnum
+from shared.src.tables import (CanteenLocationTable,
                                CanteenStatusTable, CanteenTable,
                                OpeningHoursTable)
+from shared.src.schemas import Canteen
 
 logger = get_food_fetcher_logger(__name__)
 
@@ -28,9 +28,8 @@ class CanteenService:
     def store_canteen_data(self):
         """Store canteen data including locations, opening hours, and images."""
         logger.info("Storing canteen data...")
-        
-        for canteen in CanteensConstants.canteens:
-            try:
+        try:
+            for canteen in CanteensConstants.canteens:
                 
                 status_obj = CanteenStatusTable(
                     canteen_id=canteen.id,
@@ -50,52 +49,26 @@ class CanteenService:
                     id=canteen.id,
                     name=canteen.name,
                     type=canteen.type,
+                    location=location_obj,
+                    status=status_obj,
                 )
                 
                 self._store_opening_hours(canteen)
-                self._store_images(canteen_obj)
-                
                 self.db.merge(canteen_obj)
-                self.db.merge(location_obj)
-                self.db.merge(status_obj)
-                self.db.commit()
                 
-            except Exception as e:
-                self.db.rollback()
-                message = f"Error while storing canteen data: {str(e)}"
-                logger.error(message)
-                raise DataProcessingError(message)
-
-    def _set_canteen_images(self, canteen_table: CanteenTable, files: List[Tuple[str, str]]):
-        """
-        Set or update the images associated with this canteen.
-        """
-
-        # Remove existing images
-        self.db.query(CanteenImageTable).filter(CanteenImageTable.canteen_id == canteen_table.id).delete()
-
-        # Add new images
-        image_count = 0
-        for location, url in files:
-            # Check if the canteen's ID is in the image URL
-            canteen_id = canteen_table.id
-            # find exact enum value for the canteen
-            enum_value = CanteenEnum(canteen_id).value
-            
-            if enum_value in url:
-                image_count = image_count + 1
-                new_image = CanteenImageTable(
-                    canteen_id=canteen_table.id,
-                    url=url,
-                    name=f"{location} Image {image_count}",
-                )
-                self.db.add(new_image)
+            image_service = CanteenImageService(self.db)
+            image_service.update_all_canteen_images()
+            self.db.commit()
                 
-        logger.info(f"Added {image_count} canteen images for {canteen_table.name}")
+        except Exception as e:
+            self.db.rollback()
+            message = f"Error while storing canteen data: {str(e)}"
+            logger.error(message)
+            raise DataProcessingError(message)
 
 
 
-    def _store_opening_hours(self, canteen):
+    def _store_opening_hours(self, canteen: Canteen):
         """Helper method to store opening hours for a canteen."""
         opening_hours_mapping = {
             OpeningHoursTypeEnum.OPENING_HOURS: canteen.opening_hours.opening_hours,
@@ -114,14 +87,7 @@ class CanteenService:
                         start_time=hour.start_time,
                         end_time=hour.end_time
                     ))
-
-    def _store_images(self, canteen_obj: CanteenTable):
-        """Helper method to store images for a canteen."""
-        directory_path = "shared/src/assets/canteens/"
-        settings = get_settings()
-        image_url_prefix = f"{settings.IMAGES_BASE_URL_CANTEENS}/"
-        files = CanteenImageService.generate_image_urls(directory_path, image_url_prefix)
-        self._set_canteen_images(canteen_obj, files)
+        
 
     def update_canteen_database(self):
         """Main method to update the entire canteen database."""

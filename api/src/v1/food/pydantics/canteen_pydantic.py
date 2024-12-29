@@ -3,13 +3,19 @@ from api.src.v1.core.pydantics import (images_table_to_pydantic,
 from api.src.v1.food.schemas.canteen_scheme import (CanteenResponse,
                                                     CanteenStatus)
 from shared.src.enums import OpeningHoursTypeEnum
-from shared.src.schemas import OpeningHour, OpeningHours, Rating
+from shared.src.schemas import OpeningHour, ActiveOpeningHours, Rating
 from shared.src.tables import CanteenTable
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
     location = location_to_pydantic(canteen.location)
 
+    status = CanteenStatus(
+        is_lecture_free=canteen.status.is_lecture_free,
+        is_closed=canteen.status.is_closed,
+        is_temporary_closed=canteen.status.is_temporary_closed
+    )
+    
     # Group opening hours by type
     opening_hours_dict = {
         OpeningHoursTypeEnum.OPENING_HOURS: [],
@@ -26,18 +32,16 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
         )
         opening_hours_dict[hour.type].append(opening_hour)
     
-    opening_hours = OpeningHours(
-        opening_hours=opening_hours_dict[OpeningHoursTypeEnum.OPENING_HOURS] or None,
-        serving_hours=opening_hours_dict[OpeningHoursTypeEnum.SERVING_HOURS] or None,
-        lecture_free_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_HOURS] or None,
-        lecture_free_serving_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_SERVING_HOURS] or None
-    )
-    
-    status = CanteenStatus(
-        is_lecture_free=canteen.status.is_lecture_free,
-        is_closed=canteen.status.is_closed,
-        is_temporary_closed=canteen.status.is_temporary_closed
-    )
+    if canteen.status.is_lecture_free:
+        opening_hours = ActiveOpeningHours(
+            opening_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_HOURS] or [],
+            serving_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_SERVING_HOURS] or [],
+        )
+    else:
+        opening_hours = ActiveOpeningHours(
+            opening_hours=opening_hours_dict[OpeningHoursTypeEnum.OPENING_HOURS] or [],
+            serving_hours=opening_hours_dict[OpeningHoursTypeEnum.SERVING_HOURS] or [],
+        )
     
     rating = Rating(
         like_count=canteen.like_count, 

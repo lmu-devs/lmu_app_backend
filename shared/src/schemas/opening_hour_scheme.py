@@ -13,13 +13,11 @@ class OpeningHour(BaseModel):
     
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
-# class ActiveOpeningHours(BaseModel):
-#     opening_hours: List[OpeningHour] | None
-#     serving_hours: List[OpeningHour] | None
-
-class OpeningHours(BaseModel):
+class ActiveOpeningHours(BaseModel):
     opening_hours: List[OpeningHour] | None
     serving_hours: List[OpeningHour] | None
+
+class OpeningHours(ActiveOpeningHours):
     lecture_free_hours: List[OpeningHour] | None
     lecture_free_serving_hours: List[OpeningHour] | None    
     
