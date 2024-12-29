@@ -14,7 +14,11 @@ class ImageTable:
     @declared_attr
     def url(cls):
         return Column(String, nullable=False)
-        
+    
+    @declared_attr
+    def blurhash(cls):
+        return Column(String, nullable=True)
+    
     @declared_attr
     def name(cls):
         return Column(String, nullable=False) 

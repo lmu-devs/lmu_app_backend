@@ -1,21 +1,21 @@
+import requests
+
 from datetime import date, datetime, timedelta
 from uuid import NAMESPACE_DNS, UUID, uuid5
-
-import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import \
-    CanteenOpeningHoursConstants
-from data_fetcher.src.food.service.canteen_opening_status_service import \
-    CanteenOpeningStatusService
-from data_fetcher.src.food.service.simple_price_service import PriceService
 from shared.src.core.exceptions import DatabaseError, DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.enums import (CanteenEnum, DishCategoryEnum, LanguageEnum, WeekdayEnum)
 from shared.src.services import LectureFreePeriodService, TranslationService
 from shared.src.tables import (DishPriceTable, DishTable, DishTranslationTable,
                                MenuDayTable, MenuDishAssociation)
+
+from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import CanteenOpeningHoursConstants
+from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
+from data_fetcher.src.food.service.dish_images_service import DishImageService
+from data_fetcher.src.food.service.simple_price_service import PriceService
 
 logger = get_food_fetcher_logger(__name__)
 
@@ -24,6 +24,7 @@ class MenuFetcher:
     def __init__(self, db: Session):
         self.db = db
         self.translation_service = TranslationService()
+        self.dish_image_service = DishImageService()
         
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         """Fetch menu data from TUM API, returns None if no data is available."""
@@ -193,7 +194,8 @@ class MenuFetcher:
                     # Add missing translations for existing and new dishes
                     translations = self.translation_service.create_missing_translations(dish_obj)
                     self.db.add_all(translations)
-                    
+                    # image = self.dish_image_service.generate_dish_image_table(dish_obj)
+                    # self.db.add(image)
             self.db.commit()
             logger.info(f"Menu dishes added & updated successfully. {dish_amount} dishes added.")
         except IntegrityError as e:

@@ -86,6 +86,6 @@ class CanteenImageTable(ImageTable, Base):
     canteen = relationship("CanteenTable", back_populates="images")
     
     def __repr__(self):
-        return f"<CanteenImage(canteen_id='{self.canteen_id}')>"
+        return f"<CanteenImage(canteen_id='{self.canteen_id}', name='{self.name}', url='{self.url}', blurhash='{self.blurhash}')>"
 
 

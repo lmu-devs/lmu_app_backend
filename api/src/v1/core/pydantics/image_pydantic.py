@@ -14,7 +14,8 @@ def image_to_pydantic(url: str, name: str) -> Image:
 def image_table_to_pydantic(image: ImageTable) -> Image:
     return Image(
         url=image.url,
-        name=image.name
+        name=image.name,
+        blurhash=image.blurhash if image.blurhash else None,
     )
     
 def images_table_to_pydantic(images: ImageTable) -> List[Image]:

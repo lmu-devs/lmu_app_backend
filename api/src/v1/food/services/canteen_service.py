@@ -5,11 +5,12 @@ from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from api.src.v1.core.service.like_service import LikeService
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import CanteenLikeTable, CanteenTable
+
+from api.src.v1.core.service.like_service import LikeService
 
 logger = get_food_logger(__name__)
 

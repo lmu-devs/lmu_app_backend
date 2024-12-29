@@ -48,11 +48,6 @@ class LectureFreePeriodService:
         
         return start_date, end_date
 
-    def is_christmas_break(self, check_date: date) -> bool:
-        """Check if date falls within Christmas break (Dec 24 - Jan 6)"""
-        day = check_date.day
-        month = check_date.month
-        return (month == 12 and day >= 24) or (month == 1 and day <= 6)
 
     def is_lecture_free(self, check_date: date = None) -> bool:
         """
@@ -66,16 +61,6 @@ class LectureFreePeriodService:
         """
         if check_date is None:
             check_date = date.today()
-
-        # Check public holidays first (includes Easter and Pentecost)
-        if self.public_holiday_service.is_public_holiday(check_date):
-            logger.info(f"{check_date} is lecture-free (public holiday: {self.public_holiday_service.get_holiday_name(check_date)})")
-            return True
-
-        # Check Christmas break
-        if self.is_christmas_break(check_date):
-            logger.info(f"{check_date} is lecture-free (Christmas break)")
-            return True
 
         # Determine current semester
         if 4 <= check_date.month <= 9:  # Summer semester period

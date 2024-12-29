@@ -11,3 +11,5 @@ build:
 run:
 	sudo docker compose up
 
+up:
+	docker compose up

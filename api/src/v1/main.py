@@ -37,7 +37,8 @@ def create_app():
     app.add_exception_handler(APIException, api_error_handler)
     
     # Add static files
-    app.mount(path=f"{eat_prefix}/images", app= StaticFiles(directory="/app/shared/src/assets/canteens"), name="images")
+    app.mount(path=f"{eat_prefix}/images/canteens", app= StaticFiles(directory="/app/shared/src/assets/canteens"), name="images")
+    app.mount(path=f"{eat_prefix}/images/dishes", app= StaticFiles(directory="/app/shared/src/assets/dishes"), name="images")
     
     # Include routers
     app.include_router(canteen_router.router, prefix=eat_prefix, tags=["food"])

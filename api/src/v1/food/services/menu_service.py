@@ -34,8 +34,8 @@ class MenuService:
             stmt = (
                 select(MenuDayTable)
                 .join(MenuDayTable.canteen)
-                .join(MenuDayTable.dish_associations)
-                .join(MenuDishAssociation.dish)
+                .outerjoin(MenuDayTable.dish_associations)
+                .outerjoin(MenuDishAssociation.dish)
                 .outerjoin(DishTable.translations)
             )
             
