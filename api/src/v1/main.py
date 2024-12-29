@@ -2,25 +2,25 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from shared.src.core.database import Database
 from shared.src.core.error_handlers import api_error_handler
 from shared.src.core.exceptions import APIException
 from shared.src.core.logging import get_food_logger
-from shared.src.core.database import Database
 from shared.src.core.settings import get_settings
 
 from .cinema.routers import cinema_router
 from .feedback.routers import feedback_router
-from .food.routers import menu_router, taste_router, canteen_router, dish_router
+from .food.routers import canteen_router, dish_router, menu_router, taste_router
 from .log.routers import log_router
 from .user.routers import user_router
 from .wishlist.routers import wishlist_router
+
 
 api_logger = get_food_logger(__name__)
 
 
 def create_app():
     settings = get_settings()
-    base_url = settings.API_BASE_URL
     prefix = settings.API_V1_PREFIX
     eat_prefix = settings.API_V1_PREFIX_FOOD
     cinema_prefix = settings.API_V1_PREFIX_CINEMA
@@ -38,8 +38,8 @@ def create_app():
     app.add_exception_handler(APIException, api_error_handler)
     
     # Add static files
-    app.mount(path=f"{base_url}/images/canteens", app= StaticFiles(directory="/app/shared/src/assets/canteens"), name="images")
-    app.mount(path=f"{base_url}/images/dishes", app= StaticFiles(directory="/app/shared/src/assets/dishes"), name="images")
+    app.mount(path="/images/canteens", app=StaticFiles(directory="/app/shared/src/assets/canteens"), name="canteen_images")
+    app.mount(path="/images/dishes", app=StaticFiles(directory="/app/shared/src/assets/dishes"), name="dish_images")
     
     # Include routers
     app.include_router(canteen_router.router, prefix=eat_prefix, tags=["food"])
