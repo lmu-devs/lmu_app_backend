@@ -20,6 +20,7 @@ api_logger = get_food_logger(__name__)
 
 def create_app():
     settings = get_settings()
+    base_url = settings.API_BASE_URL
     prefix = settings.API_V1_PREFIX
     eat_prefix = settings.API_V1_PREFIX_FOOD
     cinema_prefix = settings.API_V1_PREFIX_CINEMA
@@ -37,8 +38,8 @@ def create_app():
     app.add_exception_handler(APIException, api_error_handler)
     
     # Add static files
-    app.mount(path=f"{eat_prefix}/images/canteens", app= StaticFiles(directory="/app/shared/src/assets/canteens"), name="images")
-    app.mount(path=f"{eat_prefix}/images/dishes", app= StaticFiles(directory="/app/shared/src/assets/dishes"), name="images")
+    app.mount(path=f"{base_url}/images/canteens", app= StaticFiles(directory="/app/shared/src/assets/canteens"), name="images")
+    app.mount(path=f"{base_url}/images/dishes", app= StaticFiles(directory="/app/shared/src/assets/dishes"), name="images")
     
     # Include routers
     app.include_router(canteen_router.router, prefix=eat_prefix, tags=["food"])
