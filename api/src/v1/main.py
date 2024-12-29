@@ -40,6 +40,7 @@ def create_app():
     # Add static files
     app.mount(path="/images/canteens", app=StaticFiles(directory="/app/shared/src/assets/canteens"), name="canteen_images")
     app.mount(path="/images/dishes", app=StaticFiles(directory="/app/shared/src/assets/dishes"), name="dish_images")
+    app.mount(path="/images/wishlist", app=StaticFiles(directory="/app/shared/src/assets/wishlists"), name="dish_images")
     
     # Include routers
     app.include_router(canteen_router.router, prefix=eat_prefix, tags=["food"])
