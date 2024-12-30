@@ -26,11 +26,10 @@ class UserService:
         return user
 
 
-    def store_user(self, user_data) -> UserTable:
+    def store_user(self) -> UserTable:
         """Store user data in the database"""
-        logger.info(f"Storing user data of one user with device_id: {user_data['device_id']}")
+        logger.info(f"Storing user data of one user")
         new_user = UserTable(
-            device_id=user_data['device_id'],
             api_key=APIKey.generate_user_key()
         )
         self.db.add(new_user)
@@ -39,15 +38,12 @@ class UserService:
         return new_user
 
 
-    def create_user(self, device_id: str) -> UserTable:
+    def create_user(self) -> UserTable:
         """Prepare and store user data in the database"""
-        logger.info(f"Updating user data with device_id: {device_id}")
+        logger.info(f"Creating new user")
         try:
-            user_data = {
-                'device_id': device_id,
-            }
-            new_user = self.store_user(user_data)
-            logger.info(f"User data for device_id {device_id} updated successfully!\n")
+            new_user = self.store_user()
+            logger.info(f"User data updated successfully!\n")
             return new_user
         except Exception as e:
             logger.error(f"Error while updating user database: {str(e)}\n")

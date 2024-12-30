@@ -52,6 +52,7 @@ def create_app():
     app.include_router(feedback_router.router, prefix=prefix, tags=["feedback"])
     app.include_router(wishlist_router.router, prefix=prefix, tags=["wishlist"])
     app.include_router(cinema_router.router, prefix=cinema_prefix, tags=["cinema"])
+    
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,

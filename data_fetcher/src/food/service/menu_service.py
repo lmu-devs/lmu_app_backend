@@ -25,6 +25,7 @@ class MenuFetcher:
         self.db = db
         self.translation_service = TranslationService()
         self.dish_image_service = DishImageService()
+        self.lecture_free_service = LectureFreePeriodService()
         
     def fetch_menu_data(self, canteen_id: str, week: str, year: int):
         """Fetch menu data from TUM API, returns None if no data is available."""
@@ -53,15 +54,13 @@ class MenuFetcher:
             logger.warning(f"Connection error fetching menu data: {str(e)}")
             return None
         
-    def store_menu_days(self, canteen_id: str, date_from: date, date_to: date):
+    def store_menu_days(self, canteen_id: CanteenEnum, date_from: date, date_to: date):
         """Store menu days for a specific canteen within a date range"""
-        lecture_free_service = LectureFreePeriodService()
-        canteen_enum = CanteenEnum(canteen_id)
-        opening_hours = CanteenOpeningHoursConstants.get_opening_hours(canteen_enum)
+        opening_hours = CanteenOpeningHoursConstants.get_opening_hours(canteen_id)
         
         current_date = date_from
         while current_date < date_to:
-            is_lecture_free = lecture_free_service.is_lecture_free(current_date)
+            is_lecture_free = self.lecture_free_service.is_lecture_free(current_date)
             weekday = WeekdayEnum(current_date.strftime("%A").upper())
             
             should_create = False
@@ -85,10 +84,9 @@ class MenuFetcher:
     def store_menu_data(self, data: dict, canteen_id: str):
         
         try:
-            dish_amount = 0
-            
             logger.info(f"Storing menu data for canteen {canteen_id} for week {data.get('week')} of year {data.get('year')}")
             
+            dish_amount = 0
             days = data.get('days', [])
             
             # Process each weekday
@@ -212,14 +210,11 @@ class MenuFetcher:
             )
 
 
-    def update_menu_database(self, canteen_id: str, date_from: date, date_to: date):
+    def update_menu_database(self, canteen_id: CanteenEnum, date_from: date, date_to: date):
         """Update menu data for a specific canteen within a date range"""
         logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to- timedelta(days=1)}...")
         
         try:
-            # Store all menu days without dishes
-            self.store_menu_days(canteen_id, date_from-timedelta(days=7), date_to)
-            
             # Get the first day (Monday) of the week for date_from
             current_date = date_from - timedelta(days=date_from.weekday())
             
@@ -237,11 +232,6 @@ class MenuFetcher:
                 detail="Failed to update menu database",
                 extra={"error": str(e)}
             )
-
-
-    def get_last_week_of_year(self, year):
-        last_day = date(year, 12, 31)
-        return last_day.isocalendar()[1]
     
     
     def _map_dish_type_to_category(self, dish_type: str):

@@ -16,14 +16,12 @@ router = APIRouter()
 user_logger = get_user_logger(__name__)
 
 @router.post("/users", response_model=User, description="Create a new user and return the user object. Returns the user object if the user already exists. Requires system API key.")
-def create_user(device_id: str, db: Session = Depends(get_db), api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key)):
-    existing_user = db.query(UserTable).filter(UserTable.device_id == device_id).first()
-    if existing_user:
-        user = user_to_pydantic(existing_user)
-        return user
-    
-    new_user = UserService(db).create_user(device_id)
-    user_logger.info(f"Created new user with device_id: {device_id}")
+def create_user( 
+    db: Session = Depends(get_db), 
+    api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key)
+    ):
+    new_user = UserService(db).create_user()
+    user_logger.info(f"Created new user")
     return user_to_pydantic(new_user)
 
 
