@@ -27,8 +27,6 @@ class CanteenEnum(str, Enum):
     
     STUCAFE_AKADEMIE_WEIHENSTEPHAN = "stucafe-akademie-weihenstephan"
     STUCAFE_KARLSTR = "stucafe-karlstr"
-    STUCAFE_CONNOLLYSTR = "stucafe-connollystr"
-    
 
     
     ## TUM API not working
