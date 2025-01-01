@@ -27,6 +27,7 @@ class CanteenEnum(str, Enum):
     
     STUCAFE_AKADEMIE_WEIHENSTEPHAN = "stucafe-akademie-weihenstephan"
     STUCAFE_KARLSTR = "stucafe-karlstr"
+    STUCAFE_CONNOLLYSTR = "stucafe-connollystr"
     
 
     
@@ -34,7 +35,7 @@ class CanteenEnum(str, Enum):
     STUBISTRO_SCHILLERSTR = "stubistro-schillerstr"
     STUBISTRO_OETTINGENSTR = "stubistro-oettingenstr"
     STUBISTRO_ADALBERTSTR = "stubistro-adalbertstr"
-    STUBISTRO_OLYMPIACAMPUS = "stubistro-olympiacampus"
+    STUBISTRO_OLYMPIACAMPUS = "stubistro-olympiacampus" # = stucafe-connollystr
     STUBISTRO_EICHINGER_PLATZ = "stubistro-eichinger-platz"
     STUBISTRO_GARCHING_BOLTZMANN15 = "stubistro-garching-boltzmann15"
     STUBISTRO_GARCHING_BOLTZMANN19 = "stubistro-garching-boltzmann19"
@@ -62,7 +63,13 @@ class CanteenEnum(str, Enum):
     
     
     def get_active_canteens():
-        return [CanteenEnum.MENSA_LEOPOLDSTR, CanteenEnum.MENSA_ARCISSTR]
+        return [CanteenEnum.MENSA_LEOPOLDSTR, CanteenEnum.MENSA_ARCISSTR, CanteenEnum.MENSA_GARCHING, 
+                CanteenEnum.MENSA_LOTHSTR, CanteenEnum.MENSA_MARTINSRIED, CanteenEnum.MENSA_PASING, 
+                CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.STUBISTRO_ARCISSTR, CanteenEnum.STUBISTRO_GOETHESTR, 
+                CanteenEnum.STUBISTRO_BUTENANDSTR, CanteenEnum.STUBISTRO_ROSENHEIM, CanteenEnum.STUBISTRO_SCHELLINGSTR, 
+                CanteenEnum.STUBISTRO_MARTINSRIED, CanteenEnum.STUBISTRO_ADALBERTSTR, CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN,
+                CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
+                ]
     
     @classmethod
     def get_active_canteens_values(cls):

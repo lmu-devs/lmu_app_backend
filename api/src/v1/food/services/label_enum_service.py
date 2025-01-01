@@ -1,94 +1,106 @@
 taste_profile = {
-    "version":1,
-    "presets": [
-        {
-          "enum_name": "VEGETARIAN",
-          "text": {
-            "DE": "Vegetarisch",
-            "EN": "Vegetarian"
-          },
-          "emoji_abbreviation": "🥕",
-          "exclude": [
-            "POULTRY",
-            "BEEF",
-            "VEAL",
-            "PORK",
-            "LAMB",
-            "WILD_MEAT",
-            "FISH",
-            "SHELLFISH",
-            "GELATIN"
-          ]
-        },
-        {
-          "enum_name": "VEGAN",
-          "text": {
-            "DE": "Vegan",
-            "EN": "Vegan"
-          },
-          "emoji_abbreviation": "🌱",
-          "exclude": [
-            "POULTRY",
-            "BEEF",
-            "VEAL",
-            "PORK",
-            "LAMB",
-            "WILD_MEAT",
-            "FISH",
-            "SHELLFISH",
-            "MILK",
-            "LACTOSE",
-            "CHICKEN_EGGS",
-            "GELATIN"
-          ]
-        },
-        {
-          "enum_name": "PESCETARIAN",
-          "text": {
-            "DE": "Pescetarisch",
-            "EN": "Pescetarian"
-          },
-          "emoji_abbreviation": "🐠",
-          "exclude": [
-            "POULTRY",
-            "BEEF",
-            "VEAL",
-            "PORK",
-            "LAMB",
-            "WILD_MEAT",
-            "GELATIN"
-          ]
-        },
-        {
-          "enum_name": "GLUTENFREE",
-          "text": {
-            "DE": "Glutenfrei",
-            "EN": "Gluten-Free"
-          },
-          "emoji_abbreviation": "🌾",
-          "exclude": [
-            "GLUTEN",
-            "WHEAT",
-            "RYE",
-            "CEREAL",
-            "BARLEY",
-            "OAT",
-            "SPELT",
-            "HYBRIDS"
-          ]
-        },
-      {
-         "enum_name":"LACTOSEFREE",
-        "text":{
-            "DE":"Lactosefrei",
-            "EN":"Lactose-Free"
-          },
-         "emoji_abbreviation":"🥛",
-         "exclude":[
-            "MILK",
-            "LACTOSE"
-         ]
-      },
+   "preferences_presets": 
+      [
+         {
+            "enum_name": "ALL",
+            "text": {
+               "DE": "Alles",
+               "EN": "All"
+            },
+            "emoji_abbreviation": "🥩",
+            "exclude": []
+         },
+         {
+            "enum_name": "PESCETARIAN",
+            "text": {
+               "DE": "Pescetarisch",
+               "EN": "Pescetarian"
+            },
+            "emoji_abbreviation": "🐠",
+            "exclude": [
+               "POULTRY",
+               "BEEF",
+               "VEAL",
+               "PORK",
+               "LAMB",
+               "WILD_MEAT",
+               "GELATIN"
+            ]
+         },
+         {
+            "enum_name": "VEGETARIAN",
+            "text": {
+               "DE": "Vegetarisch",
+               "EN": "Vegetarian"
+            },
+            "emoji_abbreviation": "🥕",
+            "exclude": [
+               "POULTRY",
+               "BEEF",
+               "VEAL",
+               "PORK",
+               "LAMB",
+               "WILD_MEAT",
+               "FISH",
+               "SHELLFISH",
+               "GELATIN"
+            ]
+         },
+         {
+            "enum_name": "VEGAN",
+            "text": {
+               "DE": "Vegan",
+               "EN": "Vegan"
+            },
+            "emoji_abbreviation": "🌱",
+            "exclude": [
+               "POULTRY",
+               "BEEF",
+               "VEAL",
+               "PORK",
+               "LAMB",
+               "WILD_MEAT",
+               "FISH",
+               "SHELLFISH",
+               "MILK",
+               "LACTOSE",
+               "CHICKEN_EGGS",
+               "GELATIN"
+            ]
+         },
+      ],
+   "alergies_presets": 
+      [
+         {
+            "enum_name": "GLUTENFREE",
+            "text": {
+               "DE": "Glutenfrei",
+               "EN": "Gluten-Free"
+            },
+            "emoji_abbreviation": "🌾",
+            "exclude": [
+               "GLUTEN",
+               "WHEAT",
+               "RYE",
+               "CEREAL",
+               "BARLEY",
+               "OAT",
+               "SPELT",
+               "HYBRIDS"
+            ]
+         },
+         {
+            "enum_name":"LACTOSEFREE",
+         "text":{
+               "DE":"Lactosefrei",
+               "EN":"Lactose-Free"
+            },
+            "emoji_abbreviation":"🥛",
+            "exclude":[
+               "MILK",
+               "LACTOSE"
+            ]
+         },
       # {
       #    "enum_name":"HALAL",
       #    "name":"Halal",
@@ -106,21 +118,12 @@ taste_profile = {
       #       "MOLLUSCS"
       #    ]
       # }
-   ],
+      ],
    "sorted_labels":[
       {
          "enum_category":"MEAT",
          "name":"Fleisch",
          "items":[
-            {
-               "enum_name":"POULTRY",
-               "text":{
-                  "DE":"Geflügel",
-                  "EN":"Poultry"
-               },
-               "emoji_abbreviation":"🐔",
-               "text_abbreviation":""
-            },
             {
                "enum_name":"BEEF",
                "text":{
@@ -131,12 +134,12 @@ taste_profile = {
                "text_abbreviation":""
             },
             {
-               "enum_name":"VEAL",
+               "enum_name":"LAMB",
                "text":{
-                  "DE":"Kalbsfleisch",
-                  "EN":"Veal"
+                  "DE":"Lammfleisch",
+                  "EN":"Lamb"
                },
-               "emoji_abbreviation":"🐂",
+               "emoji_abbreviation":"🐑",
                "text_abbreviation":""
             },
             {
@@ -149,12 +152,21 @@ taste_profile = {
                "text_abbreviation":""
             },
             {
-               "enum_name":"LAMB",
+               "enum_name":"POULTRY",
                "text":{
-                  "DE":"Lammfleisch",
-                  "EN":"Lamb"
+                  "DE":"Geflügel",
+                  "EN":"Poultry"
                },
-               "emoji_abbreviation":"🐑",
+               "emoji_abbreviation":"🐔",
+               "text_abbreviation":""
+            },
+            {
+               "enum_name":"VEAL",
+               "text":{
+                  "DE":"Kalbsfleisch",
+                  "EN":"Veal"
+               },
+               "emoji_abbreviation":"🐂",
                "text_abbreviation":""
             },
             {
@@ -197,13 +209,13 @@ taste_profile = {
          "name":"Milchprodukte",
          "items":[
             {
-               "enum_name":"MILK",
+               "enum_name":"CHICKEN_EGGS",
                "text":{
-                  "DE":"Milch",
-                  "EN":"Milk"
+                  "DE":"Eier",
+                  "EN":"Egg"
                },
-               "emoji_abbreviation":"🥛",
-               "text_abbreviation":"G"
+               "emoji_abbreviation":"🥚",
+               "text_abbreviation":"C"
             },
             {
                "enum_name":"LACTOSE",
@@ -215,14 +227,14 @@ taste_profile = {
                "text_abbreviation":"La"
             },
             {
-               "enum_name":"CHICKEN_EGGS",
+               "enum_name":"MILK",
                "text":{
-                  "DE":"Eier",
-                  "EN":"Egg"
+                  "DE":"Milch",
+                  "EN":"Milk"
                },
-               "emoji_abbreviation":"🥚",
-               "text_abbreviation":"C"
-            }
+               "emoji_abbreviation":"🥛",
+               "text_abbreviation":"G"
+            },
          ]
       },
       {
@@ -230,22 +242,13 @@ taste_profile = {
          "name":"Gluten",
          "items":[
             {
-               "enum_name":"GLUTEN",
+               "enum_name":"BARLEY",
                "text":{
-                  "DE":"Gluten",
-                  "EN":"Gluten Containing Cereals"
-               },
-               "emoji_abbreviation":"🥖",
-               "text_abbreviation":"A"
-            },
-            {
-               "enum_name":"WHEAT",
-               "text":{
-                  "DE":"Weizen",
-                  "EN":"Wheat"
+                  "DE":"Gerste",
+                  "EN":"Barley"
                },
                "emoji_abbreviation":"",
-               "text_abbreviation":"GlW"
+               "text_abbreviation":"GlG"
             },
             {
                "enum_name":"CEREAL",
@@ -257,22 +260,13 @@ taste_profile = {
                "text_abbreviation":""
             },
             {
-               "enum_name":"RYE",
+               "enum_name":"GLUTEN",
                "text":{
-                  "DE":"Roggen",
-                  "EN":"Rye"
+                  "DE":"Gluten",
+                  "EN":"Gluten Containing Cereals"
                },
-               "emoji_abbreviation":"",
-               "text_abbreviation":"GlR"
-            },
-            {
-               "enum_name":"BARLEY",
-               "text":{
-                  "DE":"Gerste",
-                  "EN":"Barley"
-               },
-               "emoji_abbreviation":"",
-               "text_abbreviation":"GlG"
+               "emoji_abbreviation":"🥖",
+               "text_abbreviation":"A"
             },
             {
                "enum_name":"OAT",
@@ -284,6 +278,15 @@ taste_profile = {
                "text_abbreviation":"GlH"
             },
             {
+               "enum_name":"RYE",
+               "text":{
+                  "DE":"Roggen",
+                  "EN":"Rye"
+               },
+               "emoji_abbreviation":"",
+               "text_abbreviation":"GlR"
+            },
+            {
                "enum_name":"SPELT",
                "text":{
                   "DE":"Dinkel",
@@ -291,22 +294,22 @@ taste_profile = {
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"GlD"
-            }
+            },
+            {
+               "enum_name":"WHEAT",
+               "text":{
+                  "DE":"Weizen",
+                  "EN":"Wheat"
+               },
+               "emoji_abbreviation":"",
+               "text_abbreviation":"GlW"
+            },
          ]
       },
       {
          "enum_category":"NUTS",
          "name":"Nüsse",
          "items":[
-            {
-               "enum_name":"PEANUTS",
-               "text":{
-                  "DE":"Erdnüsse",
-                  "EN":"Peanut"
-               },
-               "emoji_abbreviation":"🥜",
-               "text_abbreviation":"E"
-            },
             {
                "enum_name":"ALMONDS",
                "text":{
@@ -315,6 +318,15 @@ taste_profile = {
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"ScM"
+            },
+            {
+               "enum_name":"CASHEWS",
+               "text":{
+                  "DE":"Cashewnüsse",
+                  "EN":"Cashews"
+               },
+               "emoji_abbreviation":"",
+               "text_abbreviation":"ScC"
             },
             {
                "enum_name":"HAZELNUTS",
@@ -326,22 +338,22 @@ taste_profile = {
                "text_abbreviation":"ScH"
             },
             {
-               "enum_name":"WALNUTS",
+               "enum_name":"MACADAMIA",
                "text":{
-                  "DE":"Walnüsse",
-                  "EN":"Walnuts"
+                  "DE":"Macadamianüsse",
+                  "EN":"Macadamias"
                },
                "emoji_abbreviation":"",
-               "text_abbreviation":"ScW"
+               "text_abbreviation":"ScMa"
             },
             {
-               "enum_name":"CASHEWS",
+               "enum_name":"PEANUTS",
                "text":{
-                  "DE":"Cashewnüsse",
-                  "EN":"Cashews"
+                  "DE":"Erdnüsse",
+                  "EN":"Peanut"
                },
-               "emoji_abbreviation":"",
-               "text_abbreviation":"ScC"
+               "emoji_abbreviation":"🥜",
+               "text_abbreviation":"E"
             },
             {
                "enum_name":"PECAN",
@@ -362,15 +374,6 @@ taste_profile = {
                "text_abbreviation":"ScP"
             },
             {
-               "enum_name":"MACADAMIA",
-               "text":{
-                  "DE":"Macadamianüsse",
-                  "EN":"Macadamias"
-               },
-               "emoji_abbreviation":"",
-               "text_abbreviation":"ScMa"
-            },
-            {
                "enum_name":"SESAME",
                "text":{
                   "DE":"Sesam",
@@ -378,13 +381,31 @@ taste_profile = {
                },
                "emoji_abbreviation":"",
                "text_abbreviation":"K"
-            }
+            },
+            {
+               "enum_name":"WALNUTS",
+               "text":{
+                  "DE":"Walnüsse",
+                  "EN":"Walnuts"
+               },
+               "emoji_abbreviation":"",
+               "text_abbreviation":"ScW"
+            },
          ]
       },
       {
          "enum_category":"ADDITIVES",
          "name":"Zusatzstoffe",
          "items":[
+            {
+               "enum_name":"DYESTUFF",
+               "text":{
+                  "DE":"Farbstoffe",
+                  "EN":"Dyestuff"
+               },
+               "emoji_abbreviation":"🎨",
+               "text_abbreviation":"1"
+            },
             {
                "enum_name":"SWEETENERS",
                "text":{
@@ -402,15 +423,6 @@ taste_profile = {
                },
                "emoji_abbreviation":"🔬",
                "text_abbreviation":"4"
-            },
-            {
-               "enum_name":"DYESTUFF",
-               "text":{
-                  "DE":"Farbstoffe",
-                  "EN":"Dyestuff"
-               },
-               "emoji_abbreviation":"🎨",
-               "text_abbreviation":"1"
             },
             {
                "enum_name":"PRESERVATIVES",
@@ -580,24 +592,24 @@ taste_profile = {
                "emoji_abbreviation":"🧄",
                "text_abbreviation":""
             },
-            {
-               "enum_name":"BAVARIA",
-               "text":{
-                  "DE":"Zertifizierte Qualität Bayern",
-                  "EN":"Certified Quality Bavaria"
-               },
-               "emoji_abbreviation":"🥨",
-               "text_abbreviation":""
-            },
-            {
-               "enum_name":"MSC",
-               "text":{
-                  "DE":"Marine Stewardship Council",
-                  "EN":"Marine Stewardship Council"
-               },
-               "emoji_abbreviation":"🎣",
-               "text_abbreviation":""
-            }
+            # {
+            #    "enum_name":"BAVARIA",
+            #    "text":{
+            #       "DE":"Zertifizierte Qualität Bayern",
+            #       "EN":"Certified Quality Bavaria"
+            #    },
+            #    "emoji_abbreviation":"🥨",
+            #    "text_abbreviation":""
+            # },
+            # {
+            #    "enum_name":"MSC",
+            #    "text":{
+            #       "DE":"Marine Stewardship Council",
+            #       "EN":"Marine Stewardship Council"
+            #    },
+            #    "emoji_abbreviation":"🎣",
+            #    "text_abbreviation":""
+            # }
          ]
       }
    ]
