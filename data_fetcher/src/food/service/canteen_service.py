@@ -34,7 +34,7 @@ class CanteenService:
                 status_obj = CanteenStatusTable(
                     canteen_id=canteen.id,
                     is_closed=CanteenOpeningStatusService.is_closed(),
-                    is_temporary_closed=CanteenOpeningStatusService.is_temp_closed(),
+                    is_temporary_closed=CanteenOpeningStatusService.is_temp_closed(canteen.opening_hours),
                     is_lecture_free=CanteenOpeningStatusService.is_lecture_free(),
                 )
                 

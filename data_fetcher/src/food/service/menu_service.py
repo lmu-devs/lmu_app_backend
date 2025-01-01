@@ -1,21 +1,20 @@
-import requests
-
 from datetime import date, datetime, timedelta
 from uuid import NAMESPACE_DNS, UUID, uuid5
+
+import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
-
-from shared.src.core.exceptions import DatabaseError, DataProcessingError
-from shared.src.core.logging import get_food_fetcher_logger
-from shared.src.enums import (CanteenEnum, DishCategoryEnum, LanguageEnum, WeekdayEnum)
-from shared.src.services import LectureFreePeriodService, TranslationService
-from shared.src.tables import (DishPriceTable, DishTable, DishTranslationTable,
-                               MenuDayTable, MenuDishAssociation)
 
 from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import CanteenOpeningHoursConstants
 from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
 from data_fetcher.src.food.service.dish_images_service import DishImageService
 from data_fetcher.src.food.service.simple_price_service import PriceService
+from shared.src.core.exceptions import DatabaseError, DataProcessingError
+from shared.src.core.logging import get_food_fetcher_logger
+from shared.src.enums import CanteenEnum, DishCategoryEnum, LanguageEnum, WeekdayEnum
+from shared.src.services import LectureFreePeriodService, TranslationService
+from shared.src.tables import DishPriceTable, DishTable, DishTranslationTable, MenuDayTable, MenuDishAssociation
+
 
 logger = get_food_fetcher_logger(__name__)
 
@@ -65,9 +64,9 @@ class MenuFetcher:
             
             should_create = False
             if is_lecture_free and opening_hours.lecture_free_hours:
-                should_create = any(oh.day == weekday for oh in opening_hours.lecture_free_hours)
-            else:
-                should_create = any(oh.day == weekday for oh in opening_hours.opening_hours)
+                should_create = any(oh.day == weekday for oh in opening_hours.lecture_free_hours or [])
+            elif opening_hours.opening_hours:
+                should_create = any(oh.day == weekday for oh in opening_hours.opening_hours or [])
             
             if should_create:
                 menu_day_obj = self.db.merge(MenuDayTable(

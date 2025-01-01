@@ -1,5 +1,6 @@
 from datetime import date
 
+from shared.src.schemas.opening_hour_scheme import OpeningHours
 from shared.src.services.lecture_free_period_service import \
     LectureFreePeriodService
 from shared.src.services.public_holiday_service import PublicHolidayService
@@ -22,5 +23,7 @@ class CanteenOpeningStatusService:
         return False
     
     @classmethod
-    def is_temp_closed(cls) -> bool:
-        return False
+    def is_temp_closed(cls, opening_hours: OpeningHours) -> bool:
+        if opening_hours.opening_hours or opening_hours.lecture_free_hours:
+            return False
+        return True
