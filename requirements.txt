@@ -32,3 +32,4 @@ holidays
 gradio_client
 blurhash-python
 pillow
+python-telegram-bot

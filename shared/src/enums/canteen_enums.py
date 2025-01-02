@@ -62,11 +62,11 @@ class CanteenEnum(str, Enum):
     
     def get_active_canteens():
         return [CanteenEnum.MENSA_LEOPOLDSTR, CanteenEnum.MENSA_ARCISSTR, CanteenEnum.MENSA_GARCHING, 
-                CanteenEnum.MENSA_LOTHSTR, CanteenEnum.MENSA_MARTINSRIED, CanteenEnum.MENSA_PASING, 
-                CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.STUBISTRO_ARCISSTR, CanteenEnum.STUBISTRO_GOETHESTR, 
-                CanteenEnum.STUBISTRO_BUTENANDSTR, CanteenEnum.STUBISTRO_ROSENHEIM, CanteenEnum.STUBISTRO_SCHELLINGSTR, 
-                CanteenEnum.STUBISTRO_MARTINSRIED, CanteenEnum.STUBISTRO_ADALBERTSTR, CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN,
-                CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
+                # CanteenEnum.MENSA_LOTHSTR, CanteenEnum.MENSA_MARTINSRIED, CanteenEnum.MENSA_PASING, 
+                # CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.STUBISTRO_ARCISSTR, CanteenEnum.STUBISTRO_GOETHESTR, 
+                # CanteenEnum.STUBISTRO_BUTENANDSTR, CanteenEnum.STUBISTRO_ROSENHEIM, CanteenEnum.STUBISTRO_SCHELLINGSTR, 
+                # CanteenEnum.STUBISTRO_MARTINSRIED, CanteenEnum.STUBISTRO_ADALBERTSTR, CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN,
+                # CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
                 ]
     
     @classmethod
