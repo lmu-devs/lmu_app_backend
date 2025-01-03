@@ -18,7 +18,7 @@ class FeedbackService:
                 id=uuid.uuid4(),
                 user_id=user_id,
                 type=feedback_data['type'],
-                rating=feedback_data['rating'],
+                rating=feedback_data.get('rating'),
                 message=feedback_data.get('message'),
                 screen=feedback_data['screen'],
                 tags=feedback_data.get('tags', [])
