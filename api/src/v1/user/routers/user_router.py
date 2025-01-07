@@ -19,8 +19,13 @@ user_logger = get_user_logger(__name__)
 def create_user( 
     db: Session = Depends(get_db), 
     api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key),
-    device_id: str | None = Query(None, description="Device ID of the user")
+    device_id: str | None = Query(None, description="Device ID of the user, if provided, the user will be created with a deterministic API key based on the device ID")
     ):
+    existing_user = db.query(UserTable).filter(UserTable.device_id == device_id).first()
+    if existing_user:
+        user = user_to_pydantic(existing_user)
+        return user
+    
     new_user = UserService(db, device_id).create_user()
     user_logger.info(f"Created new user")
     return user_to_pydantic(new_user)

@@ -31,7 +31,7 @@ class UserService:
         """Store user data in the database"""
         logger.info(f"Storing user data of one user")
         new_user = UserTable(
-            api_key=APIKey.generate_user_key(),
+            api_key=APIKey.generate_user_key(self.device_id),
             device_id=self.device_id
         )
         self.db.add(new_user)
