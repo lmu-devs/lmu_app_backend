@@ -1,7 +1,7 @@
 import pytest
 from shared.src.enums import LanguageEnum
 from shared.src.services import TranslationService
-from shared.src.tables import DishTable, DishTranslationTable, WishlistTable, WishlistTranslationTable
+from shared.src.tables import DishTable, DishTranslationTable, WishlistTable, WishlistTranslationTable, WishlistStatus
 
 @pytest.fixture
 def translation_service():
@@ -10,7 +10,7 @@ def translation_service():
 def test_wishlist_translations(translation_service):
     # Create test wishlist with one translation
     wishlist = WishlistTable(
-        status="DEVELOPMENT",
+        status=WishlistStatus.DEVELOPMENT,
         translations=[
             WishlistTranslationTable(
                 language=LanguageEnum.ENGLISH_US.value,
