@@ -1,5 +1,9 @@
+from typing import AsyncGenerator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
 
 Base = declarative_base()
 
@@ -13,13 +17,11 @@ class Database:
             cls._instance = super().__new__(cls)
             cls._instance.__init__(settings)
             
-            # Create all tables when database is first initialized
-            Base.metadata.create_all(bind=cls._instance.engine)
-            
         return cls._instance
 
     def __init__(self, settings=None):
         if not hasattr(self, 'engine'):
+            # Sync engine and session
             self.engine = create_engine(
                 f'postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}'
             )
@@ -29,10 +31,32 @@ class Database:
                 autoflush=False,
             )
 
+            # Async engine and session
+            self.async_engine = create_async_engine(
+                f'postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}',
+                echo=False,
+            )
+            self.AsyncSessionLocal = async_sessionmaker(
+                bind=self.async_engine,
+                class_=AsyncSession,
+                expire_on_commit=False,
+            )
+
+# Keep the existing sync dependency
 def get_db():
-    """Get a database session dependency."""
+    """Get a synchronous database session dependency."""
     db = Database().SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+# Add the async dependency
+async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
+    """Get an async database session dependency."""
+    async with Database().AsyncSessionLocal() as session:
+        session.run_sync(Base.metadata.create_all)
+        try:
+            yield session
+        finally:
+            await session.close()

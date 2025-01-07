@@ -8,7 +8,7 @@ from api.src.v1.wishlist.schemas import Wishlist
 from api.src.v1.core.pydantics import images_table_to_pydantic
 
 
-def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:
+async def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:
     
     title = wishlist.translations[0].title if wishlist.translations else "not translated"
     description = wishlist.translations[0].description if wishlist.translations else "not translated"
