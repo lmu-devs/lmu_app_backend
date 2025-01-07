@@ -4,6 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_feedback_logger
+from shared.src.services.telegram_service import TelegramService
 from shared.src.tables import FeedbackTable
 
 logger = get_feedback_logger(__name__)
@@ -11,8 +12,8 @@ logger = get_feedback_logger(__name__)
 class FeedbackService:
     def __init__(self, db: Session):
         self.db = db
-
-    def create_feedback(self, user_id: uuid.UUID, feedback_data: dict) -> FeedbackTable:
+        self.telegram_service = TelegramService()
+    async def create_feedback(self, user_id: uuid.UUID, feedback_data: dict) -> FeedbackTable:
         try:
             new_feedback = FeedbackTable(
                 id=uuid.uuid4(),
@@ -38,3 +39,12 @@ class FeedbackService:
                 detail="Failed to create feedback",
                 extra={"original_error": str(e)}
             ) 
+            
+    async def send_telegram_notification(self, feedback: FeedbackTable):
+        await self.telegram_service.send_feedback_notification(
+            feedback_type=feedback.type,
+            rating=feedback.rating,
+            screen=feedback.screen,
+            message=feedback.message,
+            tags=feedback.tags
+        )

@@ -211,7 +211,7 @@ class MenuFetcher:
 
     def update_menu_database(self, canteen_id: CanteenEnum, date_from: date, date_to: date):
         """Update menu data for a specific canteen within a date range"""
-        logger.info(f"Updating menu data for canteen {canteen_id} from {date_from} to {date_to- timedelta(days=1)}...")
+        logger.info(f"Updating menu data for canteen {canteen_id.value} from {date_from} to {date_to- timedelta(days=1)}...")
         
         try:
             # Get the first day (Monday) of the week for date_from
@@ -221,7 +221,7 @@ class MenuFetcher:
             while current_date < date_to:
                 year = current_date.year
                 week = current_date.strftime("%V")
-                menu_data = self.fetch_menu_data(canteen_id, week, year)
+                menu_data = self.fetch_menu_data(canteen_id.value, week, year)
                 if menu_data:
                     self.store_menu_data(menu_data, canteen_id)
                 current_date += timedelta(days=7)
