@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from fastapi.security.api_key import APIKey as APIKeyHeader
 from sqlalchemy.orm import Session
 
@@ -18,9 +18,10 @@ user_logger = get_user_logger(__name__)
 @router.post("/users", response_model=User, description="Create a new user and return the user object. Returns the user object if the user already exists. Requires system API key.")
 def create_user( 
     db: Session = Depends(get_db), 
-    api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key)
+    api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key),
+    device_id: str | None = Query(None, description="Device ID of the user")
     ):
-    new_user = UserService(db).create_user()
+    new_user = UserService(db, device_id).create_user()
     user_logger.info(f"Created new user")
     return user_to_pydantic(new_user)
 

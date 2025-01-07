@@ -10,9 +10,10 @@ from ..schemas.user_scheme import UserUpdate
 logger = get_user_logger(__name__)
 
 class UserService:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, device_id: str | None):
         """Initialize the UserService with a database session."""
         self.db = db
+        self.device_id = device_id
         
     def get_user(self, user_id: int) -> UserTable | None:
         """Get user from database by user_id"""
@@ -30,7 +31,8 @@ class UserService:
         """Store user data in the database"""
         logger.info(f"Storing user data of one user")
         new_user = UserTable(
-            api_key=APIKey.generate_user_key()
+            api_key=APIKey.generate_user_key(),
+            device_id=self.device_id
         )
         self.db.add(new_user)
         self.db.commit()

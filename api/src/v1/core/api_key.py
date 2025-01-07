@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 
 from fastapi import Depends, Security
@@ -59,8 +60,14 @@ class APIKey:
         return True
 
     @staticmethod
-    def generate_user_key() -> str:
-        return secrets.token_urlsafe(48)
+    def generate_user_key(device_id: str | None) -> str:
+        if device_id:
+            # Generate deterministic token based on device id
+            hash_input = f"{device_id}{get_settings().SYSTEM_API_KEY}"
+            hash_object = hashlib.sha256(hash_input.encode())
+            return hash_object.hexdigest()
+        else:
+            return secrets.token_urlsafe(48)
 
     @staticmethod
     async def verify_user_api_key(
@@ -84,3 +91,7 @@ class APIKey:
         user: UserTable = db.query(UserTable).filter(UserTable.api_key == api_key_header).first()
         logger.info(f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}")
         return user
+
+
+if __name__ == "__main__":
+    print(APIKey.generate_user_key(None))

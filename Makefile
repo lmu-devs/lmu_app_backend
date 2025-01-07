@@ -1,7 +1,6 @@
 pytest:
 	python -m pytest
 
-
 restart:
 	docker compose restart
 
@@ -13,3 +12,4 @@ run:
 
 up:
 	docker compose up
+
