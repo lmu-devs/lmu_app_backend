@@ -1,11 +1,10 @@
 import asyncio
-from typing import Optional
 
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
-from shared.src.core.database import get_async_db, get_db
+from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable

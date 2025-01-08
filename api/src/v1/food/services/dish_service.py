@@ -1,19 +1,25 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import and_, select
+from sqlalchemy import Result, and_, select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
-                               DishTranslationTable, MenuDayTable,
-                               MenuDishAssociation)
+from shared.src.tables import (
+    CanteenTable,
+    DishLikeTable,
+    DishTable,
+    DishTranslationTable,
+    MenuDayTable,
+    MenuDishAssociation,
+)
 
 from ...core.service.like_service import LikeService
 from ...core.translation_utils import apply_translation_query
+
 
 logger = get_food_logger(__name__)
 
@@ -89,7 +95,7 @@ class DishService:
         return await self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
 
 
-    def get_dates(self, dish_id: int):
+    async def get_dates(self, dish_id: int):
         """Get all dates, canteen IDs, and canteen information for a specific dish."""
         try:
             stmt = (
@@ -109,11 +115,20 @@ class DishService:
                     CanteenTable,
                     MenuDayTable.canteen_id == CanteenTable.id
                 )
+                .options(
+                    selectinload(CanteenTable.location),
+                    selectinload(CanteenTable.opening_hours),
+                    selectinload(CanteenTable.images),
+                    selectinload(CanteenTable.status),
+                    selectinload(CanteenTable.likes),
+                    
+                )
                 .where(MenuDishAssociation.dish_id == dish_id)
                 .order_by(MenuDishAssociation.menu_day_date)
             )
             
-            dish_dates = self.db.execute(stmt).all()
+            result = await self.db.execute(stmt)
+            dish_dates = result.all()
             
             if not dish_dates:
                 raise NotFoundError(

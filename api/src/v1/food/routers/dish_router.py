@@ -50,17 +50,16 @@ async def read_dish_dates(
         example="0d557344-d228-5032-8b0c-bca7cefc0934",
         title="Dish ID"
     )],
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft)
     ):
     
-    dish_dates = DishService(db).get_dates(dish_id)
+    dish_dates = await DishService(db).get_dates(dish_id)
     
     user_likes_canteen = None
     
     if current_user:
-        canteens: List[CanteenTable] = [row[2] for row in dish_dates]
-        user_likes_canteen = CanteenService(db).get_user_liked(current_user.id, canteens)
+        user_likes_canteen = await CanteenService(db).get_user_liked(current_user.id)
     
     food_logger.info(f"Fetched dish dates {dish_id} with user_id: {current_user.id if current_user else None} and user_likes_canteen: {user_likes_canteen}")
     

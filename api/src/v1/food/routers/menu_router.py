@@ -2,9 +2,9 @@ from datetime import date, timedelta
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.src.core.database import get_db
+from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_food_logger
 from shared.src.core.timezone import TimezoneManager
 from shared.src.enums import CanteenEnum, LanguageEnum
@@ -44,7 +44,7 @@ async def get_menu(
         description="Filter menus by liked canteens"
     ),
     language: LanguageEnum = Depends(get_language),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_async_db)
 ):
     if date_from is None:
         date_from = TimezoneManager.now_date()
@@ -53,8 +53,8 @@ async def get_menu(
     user_id = current_user.id if current_user else None
     
     
-    menu_service = MenuService(db)
-    menu_days = menu_service.get_days(
+    service = MenuService(db)
+    menu_days = await service.get_days(
         canteen_id, 
         date_from,
         date_to,
