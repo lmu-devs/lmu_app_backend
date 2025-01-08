@@ -2,8 +2,9 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.src.core.database import get_db
+from shared.src.core.database import get_db, get_async_db
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable
@@ -51,12 +52,12 @@ async def get_canteens(
 
 
 @router.post("/canteens/toggle-like", response_model=bool, description="Authenticated user can toggle like for a canteen. Returns True if the canteen was liked, False if it was unliked.")
-def toggle_like(
+async def toggle_like(
     canteen_id: str = Query(..., description="Canteen ID to toggle like", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenEnum]),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: UserTable = Depends(APIKey.verify_user_api_key)
 ) -> bool:
     canteen_service = CanteenService(db)
-    result = canteen_service.toggle_like(canteen_id, current_user.id)
+    result = await canteen_service.toggle_like(canteen_id, current_user.id)
     food_logger.info(f"Toggled like for canteen {canteen_id} by user {current_user.id}. Result: {result}")
     return result

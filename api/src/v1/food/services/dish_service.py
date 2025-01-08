@@ -85,8 +85,8 @@ class DishService:
                 extra={"original_error": str(e)}
             )
 
-    def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
-        return self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
+    async def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+        return await self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
 
 
     def get_dates(self, dish_id: int):

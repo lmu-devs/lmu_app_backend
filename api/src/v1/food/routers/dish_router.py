@@ -2,9 +2,10 @@ from uuid import UUID
 from typing import Annotated, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.logging import get_food_logger
-from shared.src.core.database import get_db
+from shared.src.core.database import get_db, get_async_db
 from shared.src.enums import LanguageEnum
 from shared.src.tables import CanteenTable, UserTable
 
@@ -68,13 +69,13 @@ async def read_dish_dates(
 
 
 @router.post("/dishes/toggle-like", response_model=bool, description="Authenticated user can toggle like for a dish. Returns True if the dish was liked, False if it was unliked.")
-def toggle_like(
+async def toggle_like(
     dish_id: UUID, 
-    db: Session = Depends(get_db), 
+    db: AsyncSession = Depends(get_async_db), 
     current_user: UserTable = Depends(APIKey.verify_user_api_key)
     ):
 
-    like_status = DishService(db).toggle_like(dish_id, current_user.id)
+    like_status = await DishService(db).toggle_like(dish_id, current_user.id)
     food_logger.info(f"Toggled like for dish {dish_id} by user {current_user.id}. Result: {like_status}")
     return like_status
 

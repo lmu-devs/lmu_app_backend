@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from sqlalchemy import and_, select
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Session
 
 from shared.src.core.exceptions import DatabaseError, NotFoundError
@@ -17,7 +18,7 @@ logger = get_food_logger(__name__)
 
 
 class CanteenService:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: AsyncSession) -> None:
         """Initialize the CanteenService with a database session."""
         self.db = db
         self.like_service = LikeService(db)
@@ -61,8 +62,8 @@ class CanteenService:
         return self.like_service.get_like(CanteenLikeTable, canteen_id, user_id)
 
 
-    def toggle_like(self, canteen_id: str, user_id: uuid.UUID) -> bool:
-        return self.like_service.toggle_like(CanteenLikeTable, canteen_id, user_id)
+    async def toggle_like(self, canteen_id: str, user_id: uuid.UUID) -> bool:
+        return await self.like_service.toggle_like(CanteenLikeTable, canteen_id, user_id)
 
 
     def get_user_liked(self, user_id: uuid.UUID, canteens: List[CanteenTable]) -> Dict[str, bool]:
