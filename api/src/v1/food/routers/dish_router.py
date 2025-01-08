@@ -29,12 +29,12 @@ async def get_dish(
     )] = None,
     only_liked_dishes: bool = Query(None, description="Filter dishes by liked status"),
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language)
     ):
     
     user_id = current_user.id if current_user else None
-    dishes = DishService(db).get_dishes(id, user_id, only_liked_dishes, language)
+    dishes = await DishService(db).get_dishes(id, user_id, only_liked_dishes, language)
     food_logger.info(f"Fetched dishes {id} with user_id: {user_id} and only_liked_dishes: {only_liked_dishes} with language: {language}")
     
     return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
@@ -55,9 +55,7 @@ async def read_dish_dates(
     ):
     
     dish_dates = await DishService(db).get_dates(dish_id)
-    
-    user_likes_canteen = None
-    
+
     if current_user:
         user_likes_canteen = await CanteenService(db).get_user_liked(current_user.id)
     

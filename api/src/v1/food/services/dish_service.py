@@ -3,7 +3,8 @@ from typing import List, Optional
 
 from sqlalchemy import Result, and_, select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
@@ -24,11 +25,12 @@ from ...core.translation_utils import apply_translation_query
 logger = get_food_logger(__name__)
 
 class DishService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         """Initialize the DishService with a database session."""
         self.db = db
         self.like_service = LikeService(db)
-    def get_dishes(
+        
+    async def get_dishes(
         self, 
         dish_id: Optional[int] = None, 
         user_id: Optional[uuid.UUID] = None,
@@ -42,9 +44,14 @@ class DishService:
         Otherwise, return all dishes.
         """
         try:
-            # Base query with translations
+            # Base query with translations and eager loading
             stmt = (
                 select(DishTable)
+                .options(
+                    selectinload(DishTable.likes),
+                    selectinload(DishTable.prices),
+                    selectinload(DishTable.images)
+                )
             )
             
             stmt = apply_translation_query(base_query=stmt, model=DishTable, translation_model=DishTranslationTable, language=language)
@@ -54,14 +61,12 @@ class DishService:
                 stmt = stmt.where(DishTable.id == dish_id)
                 
             if user_id and only_liked:
-                # Return only dishes liked by the user
                 stmt = (
                     stmt
                     .join(DishLikeTable)
                     .where(DishLikeTable.user_id == user_id)
                 )
             elif user_id:
-                # Left join with DishLikeTable to get like status for the user
                 stmt = (
                     stmt
                     .outerjoin(
@@ -73,8 +78,8 @@ class DishService:
                     )
                 )
 
-            dishes = self.db.execute(stmt).unique().scalars().all()
-            
+            result: Result = await self.db.execute(stmt)
+            dishes = result.scalars().unique().all()
 
             if not dishes:
                 raise NotFoundError(
