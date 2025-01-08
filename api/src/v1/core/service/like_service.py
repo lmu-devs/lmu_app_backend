@@ -3,18 +3,19 @@ from typing import Any, Optional, Type
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_main_logger
 
+    
 logger = get_main_logger(__name__)
 
 class LikeService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def get_like(
+    async def get_like(
         self, 
         like_table: Type[Any],
         entity_id: Any, 
@@ -43,7 +44,7 @@ class LikeService:
                 )
             )
             
-            result = self.db.execute(stmt)
+            result = await self.db.execute(stmt)
             return result.scalar_one_or_none()
             
         except SQLAlchemyError as e:
@@ -53,7 +54,7 @@ class LikeService:
                 extra={"original_error": str(e)}
             )
 
-    def toggle_like(
+    async def toggle_like(
         self,
         like_table: Type[Any],
         entity_id: Any,
@@ -66,12 +67,12 @@ class LikeService:
         Returns:
             bool: True if liked, False if unliked
         """
-        existing_like = self.get_like(like_table, entity_id, user_id, entity_id_column)
+        existing_like = await self.get_like(like_table, entity_id, user_id, entity_id_column)
 
         try:
             if existing_like:
-                self.db.delete(existing_like)
-                self.db.commit()
+                await self.db.delete(existing_like)
+                await self.db.commit()
                 return False
             else:
                 if entity_id_column is None:
@@ -82,11 +83,11 @@ class LikeService:
                     'user_id': user_id
                 })
                 self.db.add(new_like)
-                self.db.commit()
+                await self.db.commit()
                 return True
                 
         except SQLAlchemyError as e:
-            self.db.rollback()
+            await self.db.rollback()
             logger.error(f"Failed to toggle like status: {str(e)}")
             raise DatabaseError(
                 detail="Failed to toggle like status",

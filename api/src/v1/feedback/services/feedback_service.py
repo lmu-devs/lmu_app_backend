@@ -1,16 +1,16 @@
 import uuid
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_feedback_logger
 from shared.src.services.telegram_service import TelegramService
-from shared.src.tables import FeedbackTable
+from shared.src.tables import FeedbackTable, FeedbackType
 
 logger = get_feedback_logger(__name__)
 
 class FeedbackService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
         self.telegram_service = TelegramService()
     async def create_feedback(self, user_id: uuid.UUID, feedback_data: dict) -> FeedbackTable:
@@ -26,15 +26,14 @@ class FeedbackService:
             )
             
             self.db.add(new_feedback)
-            self.db.commit()
-            self.db.refresh(new_feedback)
+            await self.db.commit()
             
             logger.info(f"Created new feedback for user {user_id}, screen: {feedback_data['screen']}, rating: {feedback_data['rating']}")
             return new_feedback
             
         except SQLAlchemyError as e:
             logger.error(f"Failed to create feedback: {str(e)}")
-            self.db.rollback()
+            await self.db.rollback()
             raise DatabaseError(
                 detail="Failed to create feedback",
                 extra={"original_error": str(e)}
@@ -42,7 +41,7 @@ class FeedbackService:
             
     async def send_telegram_notification(self, feedback: FeedbackTable):
         await self.telegram_service.send_feedback_notification(
-            feedback_type=feedback.type,
+            feedback_type=FeedbackType(feedback.type).value ,
             rating=feedback.rating,
             screen=feedback.screen,
             message=feedback.message,
