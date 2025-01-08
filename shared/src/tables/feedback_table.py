@@ -18,7 +18,7 @@ class FeedbackTable(Base):
     __tablename__ = "feedback"
 
     id = Column(UUID(as_uuid=True), primary_key=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
     type = Column(String, nullable=False)
     rating = Column(String, nullable=True)
     message = Column(String, nullable=True)
