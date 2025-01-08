@@ -1,10 +1,11 @@
+import asyncio
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
-from shared.src.core.database import get_db, get_async_db
+from shared.src.core.database import get_async_db, get_db
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable
@@ -13,6 +14,7 @@ from ...core import APIKey
 from ..pydantics.canteen_pydantic import canteen_to_pydantic
 from ..schemas import Canteens
 from ..services import CanteenService
+
 
 router = APIRouter()
 food_logger = get_food_logger(__name__)
@@ -28,24 +30,21 @@ async def get_canteens(
     db: AsyncSession = Depends(get_async_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
-    canteen_service = CanteenService(db)
-    if canteen_id:
-        canteen = await canteen_service.get_canteen(canteen_id)
-        likes_canteen = bool(await canteen_service.get_like(canteen_id, current_user.id)) if current_user else None
-        food_logger.info(f"Fetched canteen {canteen_id} with likes_canteen: {likes_canteen}")
-        return Canteens([canteen_to_pydantic(canteen, likes_canteen)])
+    service = CanteenService(db)
     
-
-    canteens = await canteen_service.get_all_active_canteens()
     if current_user:
-        likes_canteens = await canteen_service.get_user_liked(current_user.id, canteens)
-        food_logger.info(f"Fetched {len(canteens)} active canteens")
+        canteens, likes = await asyncio.gather(
+            service.get_canteens(canteen_id),
+            service.get_user_liked(current_user.id)
+        )
+        food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
         return Canteens([
-            canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
+            canteen_to_pydantic(canteen, likes.get(canteen.id, False))
             for canteen in canteens
         ])
 
-    food_logger.info(f"Fetched {len(canteens)} active canteens")
+    canteens = await service.get_canteens(canteen_id)
+    food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
     return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
 
 
