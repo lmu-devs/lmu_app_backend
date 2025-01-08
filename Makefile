@@ -13,3 +13,12 @@ run:
 up:
 	docker compose up
 
+
+alembic-auto:
+	docker compose exec api_v1 alembic revision --autogenerate -m "auto"
+
+alembic-upgrade:
+	docker compose exec api_v1 alembic upgrade head
+
+alembic-downgrade:
+	docker compose exec api_v1 alembic downgrade
