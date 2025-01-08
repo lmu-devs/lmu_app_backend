@@ -25,20 +25,20 @@ async def get_canteens(
         description="Optional canteen_id to fetch", 
         example="mensa-leopoldstr", 
         enum=CanteenEnum.get_active_canteens_values()),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
     canteen_service = CanteenService(db)
     if canteen_id:
-        canteen = canteen_service.get_canteen(canteen_id)
-        likes_canteen = bool(canteen_service.get_like(canteen_id, current_user.id)) if current_user else None
+        canteen = await canteen_service.get_canteen(canteen_id)
+        likes_canteen = bool(await canteen_service.get_like(canteen_id, current_user.id)) if current_user else None
         food_logger.info(f"Fetched canteen {canteen_id} with likes_canteen: {likes_canteen}")
         return Canteens([canteen_to_pydantic(canteen, likes_canteen)])
     
 
-    canteens = canteen_service.get_all_active_canteens()
+    canteens = await canteen_service.get_all_active_canteens()
     if current_user:
-        likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
+        likes_canteens = await canteen_service.get_user_liked(current_user.id, canteens)
         food_logger.info(f"Fetched {len(canteens)} active canteens")
         return Canteens([
             canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))

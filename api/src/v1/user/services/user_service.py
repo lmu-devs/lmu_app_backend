@@ -1,5 +1,5 @@
 from sqlalchemy import Result, select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_user_logger
@@ -12,7 +12,7 @@ from ..schemas.user_scheme import UserUpdate
 logger = get_user_logger(__name__)
 
 class UserService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         """Initialize the UserService with a database session."""
         self.db = db
     
