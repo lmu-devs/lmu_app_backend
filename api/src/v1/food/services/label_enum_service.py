@@ -8,7 +8,7 @@ def translate_taste_profile(language: LanguageEnum) -> dict:
         # Create a new dict with all fields except 'text'
         new_item = {k: v for k, v in item.items() if k != 'text'}
         # Add translated text
-        new_item['text'] = item['text'].get(language.value, item['text'].get('DE', 'not translated'))
+        new_item['text'] = item['text'].get(language.value, item['text'].get('de-DE', 'not translated'))
         return new_item
 
     # Translate preferences presets
@@ -26,7 +26,7 @@ def translate_taste_profile(language: LanguageEnum) -> dict:
     for category in taste_profile["sorted_labels"]:
         translated_category = {
             "enum_category": category["enum_category"],
-            "name": category["name"],
+            "name": category["name"].get(language.value, category["name"].get('de-DE', 'not translated')),
             "items": [translate_text(item) for item in category["items"]]
         }
         translated_profile["sorted_labels"].append(translated_category)
@@ -157,7 +157,10 @@ taste_profile = {
    "sorted_labels":[
       {
          "enum_category":"MEAT",
-         "name":"Fleisch",
+         "name":{
+            "de-DE": "Fleisch",
+            "en-US": "Meat"
+         },
          "items":[
             {
                "enum_name":"BEEF",
@@ -217,7 +220,10 @@ taste_profile = {
       },
       {
          "enum_category":"SEAFOOD",
-         "name":"Fisch",
+         "name":{
+            "de-DE": "Fisch",
+            "en-US": "Seafood"
+         },
          "items":[
             {
                "enum_name":"FISH",
@@ -241,7 +247,10 @@ taste_profile = {
       },
       {
          "enum_category":"DAIRY",
-         "name":"Milchprodukte",
+         "name":{
+            "de-DE": "Milchprodukte",
+            "en-US": "Dairy Products"
+         },
          "items":[
             {
                "enum_name":"CHICKEN_EGGS",
@@ -274,7 +283,10 @@ taste_profile = {
       },
       {
          "enum_category":"GLUTEN",
-         "name":"Gluten",
+         "name":{
+            "de-DE": "Gluten",
+            "en-US": "Gluten"
+         },
          "items":[
             {
                "enum_name":"BARLEY",
@@ -343,7 +355,10 @@ taste_profile = {
       },
       {
          "enum_category":"NUTS",
-         "name":"Nüsse",
+         "name":{
+            "de-DE": "Nüsse",
+            "en-US": "Nuts"
+         },
          "items":[
             {
                "enum_name":"ALMONDS",
@@ -430,7 +445,10 @@ taste_profile = {
       },
       {
          "enum_category":"ADDITIVES",
-         "name":"Zusatzstoffe",
+         "name":{
+            "de-DE": "Zusatzstoffe",
+            "en-US": "Additives"
+         },
          "items":[
             {
                "enum_name":"DYESTUFF",
@@ -490,7 +508,10 @@ taste_profile = {
       },
       {
          "enum_category":"MISCELLANEOUS",
-         "name":"Sonstiges",
+         "name":{
+            "de-DE": "Sonstiges",
+            "en-US": "Miscellaneous"
+         },
          "items":[
             {
                "enum_name":"SOY",
