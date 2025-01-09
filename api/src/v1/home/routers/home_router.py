@@ -14,4 +14,4 @@ async def get_home(
     db: Session = Depends(get_db)
 ):
     home_service = HomeService(db)
-    return home_service.get_home_data()
+    return home_service.get_home_data().model_dump()

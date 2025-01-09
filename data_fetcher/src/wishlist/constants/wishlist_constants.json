@@ -72,6 +72,46 @@
         }
     ]
 }
+,
+{
+    "translations": [
+        {
+            "title": "Neuigkeiten",
+            "description_short": "Neues, Partys, Veranstaltungen und mehr",
+            "description": "Erhalte die neuesten News und Events der Universität direkt in der App.",
+            "language": "de-DE"
+        },
+        {
+            "title": "News",
+            "description_short": "News, Parties, Events and more",
+            "description": "Get the latest news and events from the university directly in the app.",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+,
+{
+    "translations": [
+        {
+            "title": "Erinnerungen",
+            "description_short": "für Rückmeldung, Termine, Fristen",
+            "description": "Erhalte Erinnerungen für Rückmeldungen, Termine und Fristen als Notification.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Reminders",
+            "description_short": "Re-registration, appointments, deadlines",
+            "description": "Get reminders for re-registration, appointments, and deadlines as notifications.",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
 
 
 ]
