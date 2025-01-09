@@ -104,6 +104,12 @@ class MenuFetcher:
                     dish_name_de = dish.get('name', '')
                     dish_id = self._generate_dish_id(dish_name_de)
                     
+                    missing_labels: list[str] = self._generate_missing_labels(dish_name_de)
+                    existing_labels = dish.get('labels', [])
+                    
+                    # Combine existing and missing labels using a set to avoid duplicates
+                    combined_labels = list(set(existing_labels + missing_labels))
+                    
                     # Try to get existing dish first
                     dish_obj = (
                         self.db.query(DishTable)
@@ -112,6 +118,8 @@ class MenuFetcher:
                     )
                     
                     if dish_obj:
+                        
+                        dish_obj.labels = combined_labels
                         # Updating existing dish
                         # Update price_simple only if new price is not None
                         new_price = dish.get("prices", {}).get("students")
@@ -151,7 +159,7 @@ class MenuFetcher:
                             id=self._generate_dish_id(dish_name_de),
                             dish_type=dish_type,
                             dish_category=dish_category,
-                            labels=dish.get('labels', []),
+                            labels=combined_labels,
                             price_simple=PriceService.calculate_simple_price(dish.get("prices", {}).get("students", {})),
                         )
                         dish_amount += 1
@@ -254,3 +262,47 @@ class MenuFetcher:
     def _generate_dish_id(self, title: str) -> UUID:
         """Generate a consistent UUID from a dish title."""
         return uuid5(NAMESPACE_DNS, title)
+    
+    def _generate_missing_labels(self, dish_name_de: str) -> list[str]:
+        """Generate missing labels for a dish based on its German name.
+        
+        Args:
+            dish_name_de (str): German dish name
+            
+        Returns:
+            list[str]: List of detected labels
+        """
+        dish_name_lower = dish_name_de.lower()
+        labels = set()
+        
+        # Poultry detection
+        poultry_keywords = ['huhn', 'hähnchen', 'hahn', 'chicken', 'putensteak', 'hühner', 'ente']
+        if any(keyword in dish_name_lower for keyword in poultry_keywords):
+            labels.add('POULTRY')
+        
+        # Pork detection
+        if 'schwein' in dish_name_lower:
+            labels.add('PORK')
+        
+        # Beef detection
+        if 'rind' in dish_name_lower:
+            labels.add('BEEF')
+        
+        # Wild meat detection
+        if 'hirsch' in dish_name_lower:
+            labels.add('WILD_MEAT')
+        
+        # Lamb detection
+        if 'lamm' in dish_name_lower:
+            labels.add('LAMB')
+        
+        # Veal detection
+        if 'kalb' in dish_name_lower:
+            labels.add('VEAL')
+        
+        # Shellfish detection
+        if 'tintenfisch' in dish_name_lower:
+            labels.add('SHELLFISH')
+        
+        return list(labels)
+    
