@@ -36,18 +36,18 @@ martinsried_grosshadern_opening_hours = {
         lecture_free_serving_hours=None,
     ),
 
-    CanteenEnum.STULOUNGE_MARTINSRIED: OpeningHours(
-        opening_hours=[
-            OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 30), end_time=time(16, 30)),
-            OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 30), end_time=time(16, 30)),
-            OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 30), end_time=time(16, 30)),
-            OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 30), end_time=time(16, 30)),
-            OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 30), end_time=time(15, 30)),
-        ],
-        serving_hours=None,
-        lecture_free_hours=None,
-        lecture_free_serving_hours=None,
-    ),
+    # CanteenEnum.STULOUNGE_MARTINSRIED: OpeningHours(
+    #     opening_hours=[
+    #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 30), end_time=time(16, 30)),
+    #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 30), end_time=time(16, 30)),
+    #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 30), end_time=time(16, 30)),
+    #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 30), end_time=time(16, 30)),
+    #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 30), end_time=time(15, 30)),
+    #     ],
+    #     serving_hours=None,
+    #     lecture_free_hours=None,
+    #     lecture_free_serving_hours=None,
+    # ),
 
     CanteenEnum.ESPRESSOBAR_MARTINSRIED: OpeningHours(
         opening_hours=[
@@ -87,10 +87,10 @@ martinsried_grosshadern_opening_hours = {
         lecture_free_serving_hours=None,
     ),
     
-    CanteenEnum.STULOUNGE_BUTENANDSTR: OpeningHours(
-        opening_hours=None,
-        serving_hours=None,
-        lecture_free_hours=None,
-        lecture_free_serving_hours=None,
-    ),
+    # CanteenEnum.STULOUNGE_BUTENANDSTR: OpeningHours(
+    #     opening_hours=None,
+    #     serving_hours=None,
+    #     lecture_free_hours=None,
+    #     lecture_free_serving_hours=None,
+    # ),
 }

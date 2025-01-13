@@ -1,6 +1,6 @@
 from typing import AsyncGenerator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
@@ -60,3 +60,10 @@ async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
             yield session
         finally:
             await session.close()
+            
+def table_creation():
+    engine = Database().engine
+    inspector = inspect(engine)
+    print("Registered tables:", inspector.get_table_names())
+
+            

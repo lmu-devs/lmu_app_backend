@@ -1,11 +1,13 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
+from typing import List
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
-import requests
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import CanteenOpeningHoursConstants
+from data_fetcher.src.food.crawler.entities import Dish, Menu
+from data_fetcher.src.food.crawler.food_crawler import FoodCrawler
 from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
 from data_fetcher.src.food.service.dish_images_service import DishImageService
 from data_fetcher.src.food.service.simple_price_service import PriceService
@@ -25,33 +27,7 @@ class MenuFetcher:
         self.translation_service = TranslationService()
         self.dish_image_service = DishImageService()
         self.lecture_free_service = LectureFreePeriodService()
-        
-    def fetch_menu_data(self, canteen_id: str, week: str, year: int):
-        """Fetch menu data from TUM API, returns None if no data is available."""
-        url = f"https://tum-dev.github.io/eat-api/{canteen_id}/{year}/{week}.json"
-        
-        try:
-            response = requests.get(url)
-            
-            # Handle 404 (no data available) gracefully
-            if response.status_code == 404:
-                logger.debug(f"No menu data available for {canteen_id} (week {week}/{year})")
-                return None
-            
-            response.raise_for_status()
-            logger.info(f"Successfully fetched menu data from TUM API: {response.status_code}")
-            return response.json()
-            
-        except requests.exceptions.HTTPError as e:
-            logger.warning(
-                f"HTTP error fetching menu data for {canteen_id} (week {week}/{year}): "
-                f"status {e.response.status_code if e.response else 'unknown'}"
-            )
-            return None
-            
-        except requests.exceptions.RequestException as e:
-            logger.warning(f"Connection error fetching menu data: {str(e)}")
-            return None
+        self.food_crawler = FoodCrawler()    
         
     def store_menu_days(self, canteen_id: CanteenEnum, date_from: date, date_to: date):
         """Store menu days for a specific canteen within a date range"""
@@ -80,34 +56,34 @@ class MenuFetcher:
         self.db.commit()
         logger.info(f"Menu days stored successfully for {canteen_id} from {date_from} to {date_to}")
 
-    def store_menu_data(self, data: dict, canteen_id: str):
-        
+    def store_menus(self, canteen_id: CanteenEnum):
         try:
-            logger.info(f"Storing menu data for canteen {canteen_id} for week {data.get('week')} of year {data.get('year')}")
+            logger.info(f"Storing menu data for canteen {canteen_id}")
             
+            menus = self.food_crawler.get_menus(canteen_id)
             dish_amount = 0
-            days = data.get('days', [])
             
-            # Process each weekday
-            for day in days:
-                date = datetime.strptime(day.get('date'), '%Y-%m-%d').date()
-                
+            if menus is None:
+                logger.error(f"No menus found for canteen {canteen_id}")
+                return
+            
+            # Process each Menu object in the data
+            for menu in menus:
+                date = menu.menu_date
                 # Clear existing dish associations for this day
                 self.db.query(MenuDishAssociation).filter_by(
                     menu_day_date=date,
                     canteen_id=canteen_id
                 ).delete()
                 
-                # Process dishes only if they exist
-                dishes = day.get('dishes', [])
-                for dish in dishes:
-                    dish_name_de = dish.get('name', '')
+                # Process each dish
+                for dish in menu.dishes:
+                    dish_name_de = dish.title
                     dish_id = self._generate_dish_id(dish_name_de)
                     
+                    # Combine existing and missing labels
                     missing_labels: list[str] = self._generate_missing_labels(dish_name_de)
-                    existing_labels = dish.get('labels', [])
-                    
-                    # Combine existing and missing labels using a set to avoid duplicates
+                    existing_labels = [label.text for label in dish.labels]  # Changed to access label.text
                     combined_labels = list(set(existing_labels + missing_labels))
                     
                     # Try to get existing dish first
@@ -118,41 +94,43 @@ class MenuFetcher:
                     )
                     
                     if dish_obj:
-                        
                         dish_obj.labels = combined_labels
-                        # Updating existing dish
                         # Update price_simple only if new price is not None
-                        new_price = dish.get("prices", {}).get("students")
-                        if new_price is not None:
-                            dish_obj.price_simple = PriceService.calculate_simple_price(new_price)
+                        if dish.prices.students is not None:  # Changed to access Price object
+                            dish_obj.price_simple = PriceService.calculate_simple_price(dish.prices)
                             self.db.add(dish_obj)
                             self.db.flush()
                             
-                            prices = dish.get("prices", {})
-                            for category, price_data in prices.items():
+                            # Update prices
+                            price_mapping = {
+                                'STUDENTS': dish.prices.students,
+                                'STAFF': dish.prices.staff,
+                                'GUESTS': dish.prices.guests
+                            }
+                            
+                            for category, price_data in price_mapping.items():
                                 if price_data is not None:
                                     # Delete existing price for this category
                                     self.db.query(DishPriceTable).filter_by(
                                         dish_id=dish_obj.id,
-                                        category=category.upper()
+                                        category=category
                                     ).delete()
                                     
                                     # Add new price record
                                     price_obj = DishPriceTable(
                                         dish_id=dish_obj.id,
-                                        category=category.upper(),
-                                        base_price=price_data.get('base_price'),
-                                        price_per_unit=price_data.get('price_per_unit'),
-                                        unit=price_data.get('unit')
+                                        category=category,
+                                        base_price=price_data.base_price,
+                                        price_per_unit=price_data.price_per_unit,
+                                        unit=price_data.unit
                                     )
                                     self.db.add(price_obj)
                         else:
                             logger.warning(f"No price data for dish {dish_obj.translations[0].title} in canteen {canteen_id}")
                             
-                            
                     else:
                         # Creating new dish
-                        dish_type = dish.get('dish_type', '')
+                        dish_type = dish.dish_type
                         dish_category = self._map_dish_type_to_category(dish_type).value
                         
                         dish_obj = DishTable(
@@ -160,7 +138,7 @@ class MenuFetcher:
                             dish_type=dish_type,
                             dish_category=dish_category,
                             labels=combined_labels,
-                            price_simple=PriceService.calculate_simple_price(dish.get("prices", {}).get("students", {})),
+                            price_simple=PriceService.calculate_simple_price(dish.prices),
                         )
                         dish_amount += 1
                         self.db.add(dish_obj)
@@ -176,15 +154,21 @@ class MenuFetcher:
                         self.db.add(german_translation)
                         self.db.flush()
 
-                        prices = dish.get("prices", {})
-                        for category, price_data in prices.items():
+                        # Add prices
+                        price_mapping = {
+                            'STUDENTS': dish.prices.students,
+                            'STAFF': dish.prices.staff,
+                            'GUESTS': dish.prices.guests
+                        }
+                        
+                        for category, price_data in price_mapping.items():
                             if price_data is not None:
                                 price_obj = DishPriceTable(
                                     dish_id=dish_obj.id,
-                                    category=category.upper(),
-                                    base_price=price_data.get('base_price'),
-                                    price_per_unit=price_data.get('price_per_unit'),
-                                    unit=price_data.get('unit')
+                                    category=category,
+                                    base_price=price_data.base_price,
+                                    price_per_unit=price_data.price_per_unit,
+                                    unit=price_data.unit
                                 )
                                 self.db.add(price_obj)
                     
@@ -203,6 +187,7 @@ class MenuFetcher:
                     # self.db.add(image)
             self.db.commit()
             logger.info(f"Menu dishes added & updated successfully. {dish_amount} dishes added.")
+            
         except IntegrityError as e:
             logger.error(f"Database integrity error while storing menu data: {str(e)}")
             raise DatabaseError(
@@ -213,30 +198,6 @@ class MenuFetcher:
             logger.debug(f"Failed to process menu data: {str(e)}")
             raise DataProcessingError(
                 detail="Failed to process menu data",
-                extra={"error": str(e)}
-            )
-
-
-    def update_menu_database(self, canteen_id: CanteenEnum, date_from: date, date_to: date):
-        """Update menu data for a specific canteen within a date range"""
-        logger.info(f"Updating menu data for canteen {canteen_id.value} from {date_from} to {date_to- timedelta(days=1)}...")
-        
-        try:
-            # Get the first day (Monday) of the week for date_from
-            current_date = date_from - timedelta(days=date_from.weekday())
-            
-            # Process each week until we cover the entire date range
-            while current_date < date_to:
-                year = current_date.year
-                week = current_date.strftime("%V")
-                menu_data = self.fetch_menu_data(canteen_id.value, week, year)
-                if menu_data:
-                    self.store_menu_data(menu_data, canteen_id)
-                current_date += timedelta(days=7)
-        except Exception as e:
-            logger.error(f"Failed to update menu database: {str(e)}")
-            raise DataProcessingError(
-                detail="Failed to update menu database",
                 extra={"error": str(e)}
             )
     

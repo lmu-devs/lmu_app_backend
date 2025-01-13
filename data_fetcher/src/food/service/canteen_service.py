@@ -1,21 +1,17 @@
 
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.food.constants.canteens.canteens_constants import \
-    CanteensConstants
-from data_fetcher.src.food.service.canteen_images_service import \
-    CanteenImageService
-from data_fetcher.src.food.service.canteen_opening_status_service import \
-    CanteenOpeningStatusService
+from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
+from data_fetcher.src.food.service.canteen_images_service import CanteenImageService
+from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
 from shared.src.core.database import Database, get_db
 from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
 from shared.src.enums import OpeningHoursTypeEnum
-from shared.src.tables import (CanteenLocationTable,
-                               CanteenStatusTable, CanteenTable,
-                               OpeningHoursTable)
 from shared.src.schemas import Canteen
+from shared.src.tables import CanteenLocationTable, CanteenOpeningHoursTable, CanteenStatusTable, CanteenTable
+
 
 logger = get_food_fetcher_logger(__name__)
 
@@ -80,7 +76,7 @@ class CanteenService:
         for hours_type, hours_list in opening_hours_mapping.items():
             if hours_list:
                 for hour in hours_list:
-                    self.db.merge(OpeningHoursTable(
+                    self.db.merge(CanteenOpeningHoursTable(
                         canteen_id=canteen.id,
                         day=hour.day.value,
                         type=hours_type,

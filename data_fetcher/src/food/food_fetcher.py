@@ -22,6 +22,7 @@ def fetch_scheduled_data(db: Session, days_amount: int = 21):
     
     try:
         CanteenService(db).update_canteen_database()
+        
         menu_service = MenuFetcher(db)
 
         date_from = datetime.now().date()
@@ -35,11 +36,7 @@ def fetch_scheduled_data(db: Session, days_amount: int = 21):
         # Update menu dishes for each canteen
         for canteen in CanteenEnum.get_active_canteens():
             try:
-                menu_service.update_menu_database(
-                    canteen_id=canteen,
-                    date_from=date_from,
-                    date_to=date_to
-                )
+                menu_service.store_menus(canteen)
                 logger.info(f"Successfully updated menu for {canteen.value}")
             except Exception as e:
                 error_response = handle_error(e)
