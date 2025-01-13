@@ -83,7 +83,7 @@ class MenuFetcher:
                     
                     # Combine existing and missing labels
                     missing_labels: list[str] = self._generate_missing_labels(dish_name_de)
-                    existing_labels = [label.text for label in dish.labels]  # Changed to access label.text
+                    existing_labels = [label.name for label in dish.labels]  # Changed to access label.text
                     combined_labels = list(set(existing_labels + missing_labels))
                     
                     # Try to get existing dish first

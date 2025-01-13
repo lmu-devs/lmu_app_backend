@@ -42,9 +42,16 @@ def main():
     canteen = CanteenEnum.STUBISTRO_OETTINGENSTR
     
     menus = crawler.get_menus(canteen)
-    print(menus)
     
-
+    for menu in menus:
+        print(menu.menu_date)
+        for dish in menu.dishes:
+            print(dish.title)
+            print(dish.prices)
+            # print(dish.labels.text)
+            existing_labels = [label.name for label in dish.labels]  # Changed to access label.text
+            print(existing_labels)
+            
 
 if __name__ == "__main__":
     main()
