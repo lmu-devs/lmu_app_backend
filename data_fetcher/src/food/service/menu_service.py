@@ -181,8 +181,8 @@ class MenuFetcher:
                     self.db.add(association)
                     
                     # Add missing translations for existing and new dishes
-                    # translations = self.translation_service.create_missing_translations(dish_obj)
-                    # self.db.add_all(translations)
+                    translations = self.translation_service.create_missing_translations(dish_obj)
+                    self.db.add_all(translations)
                     # image = self.dish_image_service.generate_dish_image_table(dish_obj)
                     # self.db.add(image)
             self.db.commit()
