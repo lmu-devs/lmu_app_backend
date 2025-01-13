@@ -127,11 +127,11 @@ class CanteensConstants:
             url_id=455
         ),
         Canteen(
-            id=CanteenEnum.STUCAFE_KARLSTR,
+            id=CanteenEnum.STUBISTRO_KARLSTR,
             name="Karlstraße",
-            type=CanteenTypeEnum.STUCAFE,
-            location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_KARLSTR),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_KARLSTR),
+            type=CanteenTypeEnum.STUBISTRO,
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_KARLSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_KARLSTR),
             url_id=453
         ),
         Canteen(
@@ -369,4 +369,23 @@ class CanteensConstants:
         # ),
         
     ]
+    
+    @classmethod
+    def get_canteen(cls, canteen_enum: CanteenEnum) -> Canteen:
+        """
+        Returns a specific canteen based on its enum value.
+        
+        Args:
+            canteen_enum (CanteenEnum): The enum value of the desired canteen
+            
+        Returns:
+            Canteen: The matching canteen object
+            
+        Raises:
+            ValueError: If no canteen is found for the given enum
+        """
+        for canteen in cls.canteens:
+            if canteen.id == canteen_enum:
+                return canteen
+        raise ValueError(f"No canteen found for enum: {canteen_enum}")
     

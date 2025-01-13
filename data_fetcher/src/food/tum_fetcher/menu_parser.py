@@ -12,10 +12,13 @@ from typing import Dict, List, Optional, Pattern, Set, Tuple
 from warnings import warn
 
 import requests  # type: ignore
+from entities import Dish, Label, Menu, Price, Prices, Week
 from lxml import html  # nosec: https://github.com/TUM-Dev/eat-api/issues/19
-
-from entities import Canteen, Dish, Label, Menu, Price, Prices, Week
 from utils import util
+
+from shared.src.enums import CanteenEnum
+
+from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
 
 
 class ParsingError(Exception):
@@ -27,7 +30,7 @@ class MenuParser(ABC):
     Abstract menu parser class.
     """
 
-    canteens: Set[Canteen]
+    canteens: Set[CanteenEnum]
     _label_subclasses: Dict[str, Set[Label]]
     # we use datetime %u, so we go from 1-7
     weekday_positions: Dict[str, int] = {"mon": 1, "tue": 2, "wed": 3, "thu": 4, "fri": 5, "sat": 6, "sun": 7}
@@ -43,7 +46,7 @@ class MenuParser(ABC):
         return datetime.datetime.strptime(date_str % (year, week_number, day), date_format).date()
 
     @abstractmethod
-    def parse(self, canteen: Canteen) -> Optional[Dict[datetime.date, Menu]]:
+    def parse(self, canteen: CanteenEnum) -> Optional[Dict[datetime.date, Menu]]:
         pass
 
     @classmethod
@@ -61,28 +64,35 @@ class MenuParser(ABC):
 class StudentenwerkMenuParser(MenuParser):
     # Canteens:
     canteens = {
-        Canteen.MENSA_ARCISSTR,
-        Canteen.MENSA_GARCHING,
-        Canteen.MENSA_LEOPOLDSTR,
-        Canteen.MENSA_LOTHSTR,
-        Canteen.MENSA_MARTINSRIED,
-        Canteen.MENSA_PASING,
-        Canteen.MENSA_WEIHENSTEPHAN,
-        Canteen.STUBISTRO_ARCISSTR,
-        Canteen.STUBISTRO_GOETHESTR,
-        Canteen.STUBISTRO_BUTENANDSTR,
-        Canteen.STUBISTRO_ROSENHEIM,
-        Canteen.STUBISTRO_SCHELLINGSTR,
-        Canteen.STUBISTRO_MARTINSRIED,
-        Canteen.STUCAFE_ADALBERTSTR,
-        Canteen.STUCAFE_AKADEMIE_WEIHENSTEPHAN,
-        Canteen.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
-        Canteen.STUCAFE_BOLTZMANNSTR,
-        Canteen.STUCAFE_CONNOLLYSTR,
-        Canteen.STUCAFE_GARCHING,
-        Canteen.STUCAFE_KARLSTR,
-        Canteen.STUCAFE_PASING,
-        Canteen.STUBISTRO_OETTINGSTR,
+        CanteenEnum.MENSA_ARCISSTR,
+        CanteenEnum.MENSA_GARCHING,
+        CanteenEnum.MENSA_LEOPOLDSTR,
+        CanteenEnum.MENSA_LOTHSTR,
+        CanteenEnum.MENSA_MARTINSRIED,
+        CanteenEnum.MENSA_PASING,
+        CanteenEnum.MENSA_ROSENHEIM,
+        CanteenEnum.MENSA_WEIHENSTEPHAN,
+        
+        CanteenEnum.STUBISTRO_ADALBERTSTR,
+        CanteenEnum.STUBISTRO_AKADEMIESTR,
+        CanteenEnum.STUBISTRO_ARCISSTR,
+        CanteenEnum.STUBISTRO_BENEDIKTBEUREN,
+        CanteenEnum.STUBISTRO_EICHINGER_PLATZ,
+        CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15,
+        CanteenEnum.STUBISTRO_BUTENANDSTR,
+        CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19,
+        CanteenEnum.STUBISTRO_GOETHESTR,
+        CanteenEnum.STUBISTRO_KARLSTR,
+        CanteenEnum.STUBISTRO_MARTINSRIED,
+        CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM,
+        CanteenEnum.STUBISTRO_OETTINGENSTR,
+        CanteenEnum.STUBISTRO_OLYMPIACAMPUS,
+        CanteenEnum.STUBISTRO_SCHELLINGSTR,
+        CanteenEnum.STUBISTRO_SCHILLERSTR,
+        CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN,
+        
+        CanteenEnum.STUCAFE_LOTHSTR,
+        CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS
     }
 
     # Prices taken from: https://www.studierendenwerk-muenchen-oberbayern.de/mensa/mensa-preise/
@@ -212,8 +222,8 @@ class StudentenwerkMenuParser(MenuParser):
         return Prices(students, staff, guests)
 
     @staticmethod
-    def __get_price(canteen: Canteen, dish: Tuple[str, str, str, str, str], dish_name: str) -> Prices:
-        if canteen in [Canteen.MENSA_WEIHENSTEPHAN, Canteen.MENSA_LOTHSTR]:
+    def __get_price(canteen: CanteenEnum, dish: Tuple[str, str, str, str, str], dish_name: str) -> Prices:
+        if canteen in [CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.MENSA_LOTHSTR]:
             return StudentenwerkMenuParser.prices_mensa_weihenstephan_mensa_lothstrasse.get(dish[0], Prices())
 
         if dish[0] == "Studitopf":  # Soup or Stew
@@ -242,9 +252,10 @@ class StudentenwerkMenuParser(MenuParser):
 
     base_url: str = "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_{url_id}_-de.html"
 
-    def parse(self, canteen: Canteen) -> Optional[Dict[datetime.date, Menu]]:
+    def parse(self, canteen: CanteenEnum) -> Optional[Dict[datetime.date, Menu]]:
         menus = {}
-        page_link: str = self.base_url.format(url_id=canteen.url_id)
+        
+        page_link: str = self.base_url.format(url_id=CanteensConstants.get_canteen(canteen).url_id)
         page: requests.Response = requests.get(page_link, timeout=10.0)
         if page.ok:
             try:
@@ -263,7 +274,7 @@ class StudentenwerkMenuParser(MenuParser):
         # pylint: enable=broad-except
         return menus
 
-    def get_menu(self, page: html.Element, canteen: Canteen) -> Optional[Menu]:
+    def get_menu(self, page: html.Element, canteen: CanteenEnum) -> Optional[Menu]:
         date = self.extract_date_from_html(page)
         dishes: List[Dish] = self.__parse_dishes(page, canteen)
         menu: Menu = Menu(date, dishes)
@@ -288,7 +299,7 @@ class StudentenwerkMenuParser(MenuParser):
         return daily_menus
 
     @staticmethod
-    def __parse_dishes(menu_html: html.Element, canteen: Canteen) -> List[Dish]:
+    def __parse_dishes(menu_html: html.Element, canteen: CanteenEnum) -> List[Dish]:
         # obtain the names of all dishes in a passed menu
         dish_names: List[str] = [dish.rstrip() for dish in menu_html.xpath("//p[@class='c-menu-dish__title']/text()")]
         # make duplicates unique by adding (2), (3) etc. to the names

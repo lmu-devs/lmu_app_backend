@@ -1,10 +1,12 @@
 from typing import Dict, Optional
 
 import menu_parser
-from entities import Canteen, Week
+from entities import Week
+
+from shared.src.enums import CanteenEnum
 
 
-def get_menu_parsing_strategy(canteen: Canteen) -> Optional[menu_parser.MenuParser]:
+def get_menu_parsing_strategy(canteen: CanteenEnum) -> Optional[menu_parser.MenuParser]:
     parsers = {
         menu_parser.StudentenwerkMenuParser,
         # menu_parser.FMIBistroMenuParser,
@@ -22,9 +24,7 @@ def get_menu_parsing_strategy(canteen: Canteen) -> Optional[menu_parser.MenuPars
 
 def main():
 
-    # print(enum_json_creator.enum_to_api_representation_dict(list(Canteen)))
-
-    canteen = Canteen.get_canteen_by_str("STUBISTRO_OETTINGSTR")
+    canteen = CanteenEnum.STUBISTRO_OETTINGENSTR
     
     # get required parser
     parser = get_menu_parsing_strategy(canteen)
@@ -35,13 +35,14 @@ def main():
     # parse menu
     menus = parser.parse(canteen)
 
-    # print menu
     if menus is None:
         print("Error. Could not retrieve menu(s)")
 
-    weeks = Week.to_weeks(menus)
-    for calendar_week in weeks:
-        print(weeks[calendar_week])
+    # weeks = Week.to_weeks(menus)
+    # for calendar_week in weeks:
+    #     print(weeks[calendar_week])
+    
+    print(menus)
 
 
 if __name__ == "__main__":

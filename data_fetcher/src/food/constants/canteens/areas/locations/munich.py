@@ -98,7 +98,7 @@ munich_locations = {
         latitude=48.155054,
         longitude=11.555812
     ),
-    CanteenEnum.STUCAFE_KARLSTR: Location(
+    CanteenEnum.STUBISTRO_KARLSTR: Location(
         address="Karlstr. 6, 80333 München",
         latitude=48.142697,
         longitude=11.568428

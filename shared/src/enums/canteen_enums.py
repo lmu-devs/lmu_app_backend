@@ -27,7 +27,7 @@ class CanteenEnum(str, Enum):
     STUBISTRO_MARTINSRIED = "stubistro-martinsried"
     
     STUBISTRO_AKADEMIE_WEIHENSTEPHAN = "stubistro-akademie-weihenstephan"
-    STUCAFE_KARLSTR = "stucafe-karlstr"
+    STUBISTRO_KARLSTR = "stucafe-karlstr"
 
     
     ## TUM API not working

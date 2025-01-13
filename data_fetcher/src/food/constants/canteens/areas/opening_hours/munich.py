@@ -384,7 +384,7 @@ munich_opening_hours = {
             lecture_free_serving_hours=None,
         ),
 
-        CanteenEnum.STUCAFE_KARLSTR: OpeningHours(
+        CanteenEnum.STUBISTRO_KARLSTR: OpeningHours(
             opening_hours=[
                 OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(8, 15), end_time=time(15, 0)),
                 OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(8, 15), end_time=time(15, 0)),
