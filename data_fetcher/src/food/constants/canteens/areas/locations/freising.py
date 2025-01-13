@@ -23,9 +23,9 @@ freising_locations = {
         latitude=48.399537,
         longitude=11.723210
     ),
-    CanteenEnum.STULOUNGE_WEIHENSTEPHAN: Location(
-        address="Am Staudengarten 1, 85354 Freising",
-        latitude=48.399021,
-        longitude=11.728100
-    )
+    # CanteenEnum.STULOUNGE_WEIHENSTEPHAN: Location(
+    #     address="Am Staudengarten 1, 85354 Freising",
+    #     latitude=48.399021,
+    #     longitude=11.728100
+    # )
 }

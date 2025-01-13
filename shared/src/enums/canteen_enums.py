@@ -47,13 +47,13 @@ class CanteenEnum(str, Enum):
     STUCAFE_WEIHENSTEPHAN_MAXIMUS = "stucafe-weihenstephan-maximus"
     STUCAFE_LOTHSTR = "stucafe-lothstr"
     
-    STULOUNGE_LEOPOLDSTR = "stulounge-leopoldstr"
-    STULOUNGE_OLYMPIACAMPUS = "stulounge-olympiacampus"
-    STULOUNGE_ARCISSTR = "stulounge-arcisstr"
-    STULOUNGE_MARTINSRIED = "stulounge-martinsried"
-    STULOUNGE_BUTENANDSTR = "stulounge-butenandstr"
-    STULOUNGE_ROSENHEIM = "stulounge-rosenheim"
-    STULOUNGE_WEIHENSTEPHAN = "stulounge-weihenstephan"
+    # STULOUNGE_LEOPOLDSTR = "stulounge-leopoldstr"
+    # STULOUNGE_OLYMPIACAMPUS = "stulounge-olympiacampus"
+    # STULOUNGE_ARCISSTR = "stulounge-arcisstr"
+    # STULOUNGE_MARTINSRIED = "stulounge-martinsried"
+    # STULOUNGE_BUTENANDSTR = "stulounge-butenandstr"
+    # STULOUNGE_ROSENHEIM = "stulounge-rosenheim"
+    # STULOUNGE_WEIHENSTEPHAN = "stulounge-weihenstephan"
     
     ESPRESSOBAR_LUDWIGSTR = "espressobar-ludwigstr"
     ESPRESSOBAR_MARTINSRIED = "espressobar-martinsried"
@@ -63,13 +63,37 @@ class CanteenEnum(str, Enum):
     
     
     def get_active_canteens():
-        return [CanteenEnum.MENSA_LEOPOLDSTR, CanteenEnum.MENSA_ARCISSTR, CanteenEnum.MENSA_GARCHING, 
-                # CanteenEnum.MENSA_LOTHSTR, CanteenEnum.MENSA_MARTINSRIED, CanteenEnum.MENSA_PASING, 
-                # CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.STUBISTRO_ARCISSTR, CanteenEnum.STUBISTRO_GOETHESTR, 
-                # CanteenEnum.STUBISTRO_BUTENANDSTR, CanteenEnum.STUBISTRO_ROSENHEIM, CanteenEnum.STUBISTRO_SCHELLINGSTR, 
-                # CanteenEnum.STUBISTRO_MARTINSRIED, CanteenEnum.STUBISTRO_ADALBERTSTR, CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN,
-                # CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
-                ]
+        return [
+            CanteenEnum.MENSA_ARCISSTR,
+            CanteenEnum.MENSA_GARCHING,
+            CanteenEnum.MENSA_LEOPOLDSTR,
+            CanteenEnum.MENSA_LOTHSTR,
+            CanteenEnum.MENSA_MARTINSRIED,
+            CanteenEnum.MENSA_PASING,
+            CanteenEnum.MENSA_ROSENHEIM,
+            CanteenEnum.MENSA_WEIHENSTEPHAN,
+            
+            CanteenEnum.STUBISTRO_ADALBERTSTR,
+            CanteenEnum.STUBISTRO_AKADEMIESTR,
+            CanteenEnum.STUBISTRO_ARCISSTR,
+            CanteenEnum.STUBISTRO_BENEDIKTBEUREN,
+            CanteenEnum.STUBISTRO_EICHINGER_PLATZ,
+            CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15,
+            CanteenEnum.STUBISTRO_BUTENANDSTR,
+            CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19,
+            CanteenEnum.STUBISTRO_GOETHESTR,
+            CanteenEnum.STUBISTRO_KARLSTR,
+            CanteenEnum.STUBISTRO_MARTINSRIED,
+            CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM,
+            CanteenEnum.STUBISTRO_OETTINGENSTR,
+            CanteenEnum.STUBISTRO_OLYMPIACAMPUS,
+            CanteenEnum.STUBISTRO_SCHELLINGSTR,
+            CanteenEnum.STUBISTRO_SCHILLERSTR,
+            CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN,
+            
+            CanteenEnum.STUCAFE_LOTHSTR,
+            CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS
+        ]
     
     @classmethod
     def get_active_canteens_values(cls):

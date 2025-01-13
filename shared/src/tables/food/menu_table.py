@@ -1,5 +1,5 @@
 from sqlalchemy import (UUID, Boolean, Column, Date, DateTime, Enum, ForeignKey,
-                        ForeignKeyConstraint, Integer, func)
+                        ForeignKeyConstraint, Integer, func, String)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
@@ -12,7 +12,7 @@ class MenuDishAssociation(Base):
     id = Column(Integer, primary_key=True, index=True)
     dish_id = Column(UUID(as_uuid=True), ForeignKey('dishes.id'), nullable=False)
     menu_day_date = Column(Date, nullable=False)
-    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), nullable=False)
+    canteen_id = Column(String, nullable=False)
 
     __table_args__ = (
         ForeignKeyConstraint(
@@ -33,7 +33,7 @@ class MenuDayTable(Base):
     __tablename__ = "menu_days"
 
     date = Column(Date, primary_key=True)
-    canteen_id = Column(Enum(CanteenEnum, name="canteen_id"), ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
+    canteen_id = Column(String, ForeignKey('canteens.id', ondelete='CASCADE'), primary_key=True)
     is_closed = Column(Boolean, nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())

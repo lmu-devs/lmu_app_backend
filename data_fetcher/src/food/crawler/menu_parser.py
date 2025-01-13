@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-# pylint:disable=too-many-lines
-
 import csv
 import datetime
 import re
@@ -12,13 +9,13 @@ from typing import Dict, List, Optional, Pattern, Set, Tuple
 from warnings import warn
 
 import requests  # type: ignore
-from entities import Dish, Label, Menu, Price, Prices, Week
 from lxml import html  # nosec: https://github.com/TUM-Dev/eat-api/issues/19
-from utils import util
 
 from shared.src.enums import CanteenEnum
 
 from data_fetcher.src.food.constants.canteens.canteens_constants import CanteensConstants
+from data_fetcher.src.food.crawler.entities import Dish, Label, Menu, Price, Prices
+from data_fetcher.src.food.crawler.utils import util
 
 
 class ParsingError(Exception):
@@ -46,7 +43,7 @@ class MenuParser(ABC):
         return datetime.datetime.strptime(date_str % (year, week_number, day), date_format).date()
 
     @abstractmethod
-    def parse(self, canteen: CanteenEnum) -> Optional[Dict[datetime.date, Menu]]:
+    def parse(self, canteen: CanteenEnum) -> Optional[Menu]:
         pass
 
     @classmethod
@@ -252,8 +249,8 @@ class StudentenwerkMenuParser(MenuParser):
 
     base_url: str = "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_{url_id}_-de.html"
 
-    def parse(self, canteen: CanteenEnum) -> Optional[Dict[datetime.date, Menu]]:
-        menus = {}
+    def parse(self, canteen: CanteenEnum) -> Optional[Menu]:
+        menus = []
         
         page_link: str = self.base_url.format(url_id=CanteensConstants.get_canteen(canteen).url_id)
         page: requests.Response = requests.get(page_link, timeout=10.0)
@@ -267,11 +264,9 @@ class StudentenwerkMenuParser(MenuParser):
                     html_menu = html.fromstring(html.tostring(html_menu))
                     menu = self.get_menu(html_menu, canteen)
                     if menu:
-                        menus[menu.menu_date] = menu
-                # pylint: disable=broad-except
+                        menus.append(menu)
             except Exception as e:
                 print(f"Exception while parsing menu. Skipping current date. Exception args: {e.args}")
-        # pylint: enable=broad-except
         return menus
 
     def get_menu(self, page: html.Element, canteen: CanteenEnum) -> Optional[Menu]:

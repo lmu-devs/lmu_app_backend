@@ -111,14 +111,6 @@ class CanteensConstants:
             url_id=441
         ),
         Canteen(
-            id=CanteenEnum.STUBISTRO_MARTINSRIED,
-            name="Martinsried",
-            type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_MARTINSRIED),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_MARTINSRIED),
-            url_id=None
-        ),
-        Canteen(
             id=CanteenEnum.STUBISTRO_AKADEMIESTR,
             name="Akademiestraße",
             type=CanteenTypeEnum.STUBISTRO,
