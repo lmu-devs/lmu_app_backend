@@ -5,3 +5,4 @@ from data_fetcher.src.food.constants.canteens.areas.opening_hours.pasing import 
 from data_fetcher.src.food.constants.canteens.areas.opening_hours.rosenheim import rosenheim_opening_hours
 from data_fetcher.src.food.constants.canteens.areas.opening_hours.oberschleissheim import oberschleissheim_opening_hours
 from data_fetcher.src.food.constants.canteens.areas.opening_hours.freising import freising_opening_hours
+from data_fetcher.src.food.constants.canteens.areas.opening_hours.benediktbeuren import benediktbeuren_opening_hours

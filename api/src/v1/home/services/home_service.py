@@ -9,7 +9,7 @@ class HomeService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_submission_fee(self):
+    def get_semester_fee(self):
         return SemesterFee(
             fee=85.00,
             receiver="LMU München",
@@ -26,7 +26,7 @@ class HomeService:
     def get_home_data(self):
         # Hardcoded data for now
         return Home(
-            semester_fee=self.get_submission_fee(),
+            semester_fee=self.get_semester_fee(),
             lecture_free_time=TimePeriod(
                 start_date=datetime(2024, 10, 14), 
                 end_date=datetime(2025, 2, 7)

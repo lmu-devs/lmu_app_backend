@@ -3,6 +3,7 @@ from datetime import time
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.schemas import OpeningHour, OpeningHours, WeekdayEnum
 
+
 freising_opening_hours = {
     CanteenEnum.MENSA_WEIHENSTEPHAN: OpeningHours(
         opening_hours=[
@@ -36,7 +37,7 @@ freising_opening_hours = {
         lecture_free_serving_hours=None,
     ),
     
-    CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN: OpeningHours(
+    CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN: OpeningHours(
         opening_hours=[
             OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(8, 0), end_time=time(14, 30)),
             OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(8, 0), end_time=time(14, 30)),

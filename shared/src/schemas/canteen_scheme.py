@@ -15,6 +15,7 @@ class CanteenBase(BaseModel):
     location: Location
 class Canteen(CanteenBase):
     opening_hours: OpeningHours
+    url_id: int | None = None
     
 class Canteens(RootModel):
     root: List[Canteen]

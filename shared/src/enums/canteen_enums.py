@@ -17,15 +17,16 @@ class CanteenEnum(str, Enum):
     MENSA_MARTINSRIED = "mensa-martinsried"
     MENSA_PASING = "mensa-pasing"
     MENSA_WEIHENSTEPHAN = "mensa-weihenstephan"
+    MENSA_ROSENHEIM = "mensa-rosenheim"
     
+    STUBISTRO_AKADEMIESTR = "stubistro-akademiestr"
     STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
     STUBISTRO_ARCISSTR = "stubistro-arcisstr"
     STUBISTRO_GOETHESTR = "stubistro-goethestr"
     STUBISTRO_BUTENANDSTR = "stubistro-butenandstr"
-    STUBISTRO_ROSENHEIM = "stubistro-rosenheim"
     STUBISTRO_MARTINSRIED = "stubistro-martinsried"
     
-    STUCAFE_AKADEMIE_WEIHENSTEPHAN = "stucafe-akademie-weihenstephan"
+    STUBISTRO_AKADEMIE_WEIHENSTEPHAN = "stubistro-akademie-weihenstephan"
     STUCAFE_KARLSTR = "stucafe-karlstr"
 
     
@@ -38,6 +39,7 @@ class CanteenEnum(str, Enum):
     STUBISTRO_GARCHING_BOLTZMANN15 = "stubistro-garching-boltzmann15"
     STUBISTRO_GARCHING_BOLTZMANN19 = "stubistro-garching-boltzmann19"
     STUBISTRO_OBERSCHLEISSHEIM = "stubistro-oberschleissheim"
+    STUBISTRO_BENEDIKTBEUREN = "stubistro-benediktbeuren"
     
     STUCAFE_ARCISSTR = "stucafe-arcisstr"
     STUCAFE_LEOPOLDSTR = "stucafe-leopoldstr"
@@ -45,13 +47,13 @@ class CanteenEnum(str, Enum):
     STUCAFE_WEIHENSTEPHAN_MAXIMUS = "stucafe-weihenstephan-maximus"
     STUCAFE_LOTHSTR = "stucafe-lothstr"
     
-    # STULOUNGE_LEOPOLDSTR = "stulounge-leopoldstr"
-    # STULOUNGE_OLYMPIACAMPUS = "stulounge-olympiacampus"
-    # STULOUNGE_ARCISSTR = "stulounge-arcisstr"
-    # STULOUNGE_MARTINSRIED = "stulounge-martinsried"
-    # STULOUNGE_BUTENANDSTR = "stulounge-butenandstr"
-    # STULOUNGE_ROSENHEIM = "stulounge-rosenheim"
-    # STULOUNGE_WEIHENSTEPHAN = "stulounge-weihenstephan"
+    STULOUNGE_LEOPOLDSTR = "stulounge-leopoldstr"
+    STULOUNGE_OLYMPIACAMPUS = "stulounge-olympiacampus"
+    STULOUNGE_ARCISSTR = "stulounge-arcisstr"
+    STULOUNGE_MARTINSRIED = "stulounge-martinsried"
+    STULOUNGE_BUTENANDSTR = "stulounge-butenandstr"
+    STULOUNGE_ROSENHEIM = "stulounge-rosenheim"
+    STULOUNGE_WEIHENSTEPHAN = "stulounge-weihenstephan"
     
     ESPRESSOBAR_LUDWIGSTR = "espressobar-ludwigstr"
     ESPRESSOBAR_MARTINSRIED = "espressobar-martinsried"

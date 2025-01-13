@@ -1,6 +1,7 @@
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.schemas import Location
 
+
 munich_locations = {
     CanteenEnum.MENSA_LEOPOLDSTR: Location(
         address="Leopoldstr. 13a, 80802 München",
@@ -32,7 +33,7 @@ munich_locations = {
         latitude=48.151608,
         longitude=11.582327
     ),
-    CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN: Location(
+    CanteenEnum.STUBISTRO_AKADEMIESTR: Location(
         address="Akademiestraße 2-4, 80799 München",
         latitude=48.153099,
         longitude=11.580270
