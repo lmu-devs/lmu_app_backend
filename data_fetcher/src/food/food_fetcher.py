@@ -62,7 +62,7 @@ async def create_food_fetcher():
     fetch_scheduled_data(db, days_amount=20)
     # CanteenService(db).update_canteen_database()
     
-    schedule.every().day.at("08:08").do(fetch_scheduled_data)
+    schedule.every().day.at("09:08").do(fetch_scheduled_data)
     
     logger.info(f"Entering {__name__} loop...")
     while running_eat:

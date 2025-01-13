@@ -64,6 +64,7 @@ async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
 def table_creation():
     engine = Database().engine
     inspector = inspect(engine)
+    Base.metadata.create_all(bind=engine)
     print("Registered tables:", inspector.get_table_names())
 
             

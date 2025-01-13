@@ -84,7 +84,7 @@ class CanteensConstants:
             type=CanteenTypeEnum.STUBISTRO,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_SCHELLINGSTR),
             opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_SCHELLINGSTR),
-            url_id=None
+            url_id=416
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GOETHESTR,
@@ -204,7 +204,7 @@ class CanteensConstants:
             type=CanteenTypeEnum.STUBISTRO,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM),
             opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM),
-            url_id=416
+            url_id=419
         ),
     
         Canteen(
