@@ -22,13 +22,15 @@ class FeedbackService:
                 rating=feedback_data.get('rating'),
                 message=feedback_data.get('message'),
                 screen=feedback_data['screen'],
-                tags=feedback_data.get('tags', [])
+                tags=feedback_data.get('tags', []),
+                app_version=feedback_data.get('app_version'),
+                system_version=feedback_data.get('system_version'),
             )
             
             self.db.add(new_feedback)
             await self.db.commit()
             
-            logger.info(f"Created new feedback for user {user_id}, screen: {feedback_data['screen']}, rating: {feedback_data['rating']}")
+            logger.info(f"Created new feedback for user {user_id}, screen: {feedback_data['screen']}, rating: {feedback_data['rating']}, app_version: {feedback_data['app_version']} on {feedback_data['system_version']}")
             return new_feedback
             
         except SQLAlchemyError as e:

@@ -11,6 +11,8 @@ class FeedbackCreate(BaseModel):
     message: Optional[str] = None
     screen: str
     tags: Optional[List[str]] = None
+    app_version: Optional[str] = None
+    system_version: Optional[str] = None
 
 class Feedback(FeedbackCreate):
     id: UUID
