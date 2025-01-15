@@ -6,7 +6,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import CanteenOpeningHoursConstants
-from data_fetcher.src.food.crawler.entities import Dish, Menu
 from data_fetcher.src.food.crawler.food_crawler import FoodCrawler
 from data_fetcher.src.food.service.canteen_opening_status_service import CanteenOpeningStatusService
 from data_fetcher.src.food.service.dish_images_service import DishImageService

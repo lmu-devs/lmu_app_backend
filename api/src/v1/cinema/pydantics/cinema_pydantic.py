@@ -78,6 +78,10 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
 def movies_to_pydantic(movies: List[MovieTable]) -> List[Movie]:
     return [movie_to_pydantic(movie) for movie in movies]
 
+
+def cinemas_to_pydantic(cinemas: List[CinemaTable]) -> List[Cinema]:
+    return [cinema_to_pydantic(cinema) for cinema in cinemas]
+
 def cinema_to_pydantic(cinema: CinemaTable) -> Cinema:
     title = cinema.translations[0].title if cinema.translations else "not translated"
     descriptions = cinema.translations[0].description if cinema.translations else "not translated"

@@ -55,7 +55,8 @@ def get_db():
 async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
     """Get an async database session dependency."""
     async with Database().AsyncSessionLocal() as session:
-        session.run_sync(Base.metadata.create_all)
+        async with Database().async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
         try:
             yield session
         finally:
