@@ -1,6 +1,9 @@
 from enum import Enum
+
 from pydantic import BaseModel
+
 from shared.src.schemas.location_scheme import Location
+
 
 class PlaceEnum(str, Enum):
     CANTEEN = "canteen"
@@ -11,6 +14,7 @@ class PlaceEnum(str, Enum):
     BUILDING = "building"
     CINEMA = "cinema"
 
-class Places(BaseModel):
+class Place(BaseModel):
+    id: str
     location: Location
     type: PlaceEnum
