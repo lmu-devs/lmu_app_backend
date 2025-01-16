@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Set, Type, TypeVar
-
 import deepl
+
+from typing import Any, Dict, List, Optional, Set, Type, TypeVar
 from sqlalchemy import String
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm.relationships import RelationshipProperty

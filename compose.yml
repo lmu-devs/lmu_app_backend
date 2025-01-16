@@ -41,6 +41,7 @@ services:
     networks:
       - frontend
       - backend
+    restart: always
 
   api_v1:
     build:
