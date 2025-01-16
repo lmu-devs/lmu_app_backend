@@ -29,8 +29,8 @@ class TelegramService:
                 f"✉️ New {feedback_type} Feedback ✉️\n\n"
                 f"Rated {emoji} on {screen}"
                 f"{message_text}"
-                f"{tag_text}"
-                f"\nApp-Version: {app_version} on {system_version}",
+                f"{tag_text}\n"
+                f"App-Version: {app_version} on {system_version}"
             )
             
             await self.bot.send_message(
