@@ -13,6 +13,4 @@ class PlaceEnum(str, Enum):
 
 class Places(BaseModel):
     location: Location
-    name: str
     type: PlaceEnum
-    description: str

@@ -54,6 +54,9 @@ def get_movie_logger(module_name: str):
 def get_food_logger(module_name: str):
     return setup_logger(module_name, "food", "food_api")
 
+def get_places_logger(module_name: str):
+    return setup_logger(module_name, "places", "places_api")
+
 def get_user_logger(module_name: str):
     return setup_logger(module_name, "user", "user_api")
 

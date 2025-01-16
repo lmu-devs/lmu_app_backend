@@ -13,6 +13,7 @@ from ...core.language import get_language
 from ..pydantics.cinema_pydantic import cinemas_to_pydantic, movies_to_pydantic, screenings_to_pydantic
 from ..schemas.cinema_schema import Cinema, Movie, MovieScreening
 from ..services import MovieService, CinemaService, ScreeningService
+
 router = APIRouter()
 
 @router.get("/movies", response_model=List[Movie], description="Get all movies")
