@@ -1,12 +1,15 @@
+import hashlib
 import secrets
 
 from fastapi import Depends, Security
 from fastapi.security.api_key import APIKeyHeader
 from requests import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.exceptions import AuthenticationError, AuthorizationError
 from shared.src.core.logging import get_main_logger
-from shared.src.core.database import get_db
+from shared.src.core.database import get_db, get_async_db
 from shared.src.core.settings import get_settings
 from shared.src.tables import UserTable
 
@@ -59,15 +62,21 @@ class APIKey:
         return True
 
     @staticmethod
-    def generate_user_key() -> str:
-        return secrets.token_urlsafe(48)
+    def generate_user_key(device_id: str | None) -> str:
+        if device_id:
+            # Generate deterministic token based on device id
+            hash_input = f"{device_id}{get_settings().SYSTEM_API_KEY}"
+            hash_object = hashlib.sha256(hash_input.encode())
+            return hash_object.hexdigest()
+        else:
+            return secrets.token_urlsafe(48)
 
     @staticmethod
     async def verify_user_api_key(
         api_key_header: str = Security(user_api_key), 
-        db: Session = Depends(get_db)
+        db: AsyncSession = Depends(get_async_db)
     ) -> UserTable:
-        user: UserTable = db.query(UserTable).filter(UserTable.api_key == api_key_header).first()
+        user: UserTable = (await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))).scalar_one_or_none()
         if user is None:
             raise AuthorizationError(
                 detail="Could not validate user credentials. ",
@@ -79,8 +88,12 @@ class APIKey:
     @staticmethod
     async def verify_user_api_key_soft(
         api_key_header: str = Security(user_api_key), 
-        db: Session = Depends(get_db)
+        db: AsyncSession = Depends(get_async_db)
     ) -> UserTable:
-        user: UserTable = db.query(UserTable).filter(UserTable.api_key == api_key_header).first()
+        user: UserTable = (await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))).scalar_one_or_none()
         logger.info(f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}")
         return user
+
+
+if __name__ == "__main__":
+    print(APIKey.generate_user_key(None))

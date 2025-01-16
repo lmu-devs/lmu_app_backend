@@ -3,6 +3,7 @@ from datetime import time
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.schemas import OpeningHour, OpeningHours, WeekdayEnum
 
+
 munich_opening_hours = {
         CanteenEnum.MENSA_LEOPOLDSTR: OpeningHours(
             opening_hours=[
@@ -47,24 +48,24 @@ munich_opening_hours = {
             lecture_free_serving_hours=None,
         ),
 
-        CanteenEnum.STULOUNGE_LEOPOLDSTR: OpeningHours(
-            opening_hours=[
-                OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(15, 0)),
-                OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(15, 0)),
-                OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(15, 0)),
-                OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(15, 0)),
-                OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(14, 0)),
-            ],
-            serving_hours=None,
-            lecture_free_hours=[
-                OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(14, 0)),
-            ],
-            lecture_free_serving_hours=None,
-        ),
+        # CanteenEnum.STULOUNGE_LEOPOLDSTR: OpeningHours(
+        #     opening_hours=[
+        #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(15, 0)),
+        #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(15, 0)),
+        #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(15, 0)),
+        #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(15, 0)),
+        #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #     ],
+        #     serving_hours=None,
+        #     lecture_free_hours=[
+        #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(14, 0)),
+        #     ],
+        #     lecture_free_serving_hours=None,
+        # ),
 
         CanteenEnum.STUBISTRO_OETTINGENSTR: OpeningHours(
             opening_hours=[
@@ -132,7 +133,7 @@ munich_opening_hours = {
             lecture_free_serving_hours=None,
         ),
 
-        CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN: OpeningHours(
+        CanteenEnum.STUBISTRO_AKADEMIESTR: OpeningHours(
             opening_hours=[
                 OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(8, 0), end_time=time(14, 30)),
                 OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(8, 0), end_time=time(14, 30)),
@@ -240,18 +241,18 @@ munich_opening_hours = {
             lecture_free_serving_hours=None,
         ),
 
-        CanteenEnum.STULOUNGE_ARCISSTR: OpeningHours(
-            opening_hours=[
-                OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(15, 30)),
-                OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(15, 30)),
-                OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(15, 30)),
-                OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(15, 30)),
-                OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(15, 0)),
-            ],
-            serving_hours=None,
-            lecture_free_hours=None,
-            lecture_free_serving_hours=None,
-        ),
+        # CanteenEnum.STULOUNGE_ARCISSTR: OpeningHours(
+        #     opening_hours=[
+        #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(15, 30)),
+        #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(15, 30)),
+        #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(15, 30)),
+        #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(15, 30)),
+        #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(15, 0)),
+        #     ],
+        #     serving_hours=None,
+        #     lecture_free_hours=None,
+        #     lecture_free_serving_hours=None,
+        # ),
 
         CanteenEnum.STUBISTRO_ARCISSTR: OpeningHours(
             opening_hours=[
@@ -326,24 +327,24 @@ munich_opening_hours = {
         ),
 
 
-        CanteenEnum.STULOUNGE_OLYMPIACAMPUS: OpeningHours(
-            opening_hours=[
-                OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(16, 30)),
-                OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(16, 30)),
-                OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(16, 30)),
-                OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(16, 30)),
-                OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(15, 30)),
-            ],
-            serving_hours=None,  # No specific serving hours mentioned
-            lecture_free_hours=[
-                OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(10, 30), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(10, 30), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(10, 30), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(10, 30), end_time=time(14, 0)),
-                OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(10, 30), end_time=time(14, 0)),
-            ],
-            lecture_free_serving_hours=None,
-        ),
+        # CanteenEnum.STULOUNGE_OLYMPIACAMPUS: OpeningHours(
+        #     opening_hours=[
+        #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(9, 0), end_time=time(16, 30)),
+        #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(9, 0), end_time=time(16, 30)),
+        #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(9, 0), end_time=time(16, 30)),
+        #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(9, 0), end_time=time(16, 30)),
+        #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(9, 0), end_time=time(15, 30)),
+        #     ],
+        #     serving_hours=None,  # No specific serving hours mentioned
+        #     lecture_free_hours=[
+        #         OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(10, 30), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(10, 30), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.WEDNESDAY, start_time=time(10, 30), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.THURSDAY, start_time=time(10, 30), end_time=time(14, 0)),
+        #         OpeningHour(day=WeekdayEnum.FRIDAY, start_time=time(10, 30), end_time=time(14, 0)),
+        #     ],
+        #     lecture_free_serving_hours=None,
+        # ),
         
         CanteenEnum.MENSA_LOTHSTR: OpeningHours(
             opening_hours=[
@@ -383,7 +384,7 @@ munich_opening_hours = {
             lecture_free_serving_hours=None,
         ),
 
-        CanteenEnum.STUCAFE_KARLSTR: OpeningHours(
+        CanteenEnum.STUBISTRO_KARLSTR: OpeningHours(
             opening_hours=[
                 OpeningHour(day=WeekdayEnum.MONDAY, start_time=time(8, 15), end_time=time(15, 0)),
                 OpeningHour(day=WeekdayEnum.TUESDAY, start_time=time(8, 15), end_time=time(15, 0)),

@@ -1,9 +1,10 @@
+import asyncio
+
 from typing import Optional
-
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared.src.core.database import get_db
+from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable
@@ -12,6 +13,7 @@ from ...core import APIKey
 from ..pydantics.canteen_pydantic import canteen_to_pydantic
 from ..schemas import Canteens
 from ..services import CanteenService
+
 
 router = APIRouter()
 food_logger = get_food_logger(__name__)
@@ -24,39 +26,36 @@ async def get_canteens(
         description="Optional canteen_id to fetch", 
         example="mensa-leopoldstr", 
         enum=CanteenEnum.get_active_canteens_values()),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
-    canteen_service = CanteenService(db)
-    if canteen_id:
-        canteen = canteen_service.get_canteen(canteen_id)
-        likes_canteen = bool(canteen_service.get_like(canteen_id, current_user.id)) if current_user else None
-        food_logger.info(f"Fetched canteen {canteen_id} with likes_canteen: {likes_canteen}")
-        return Canteens([canteen_to_pydantic(canteen, likes_canteen)])
+    service = CanteenService(db)
     
-
-    canteens = canteen_service.get_all_active_canteens()
     if current_user:
-        likes_canteens = canteen_service.get_user_liked(current_user.id, canteens)
-        food_logger.info(f"Fetched {len(canteens)} active canteens")
+        canteens, likes = await asyncio.gather(
+            service.get_canteens(canteen_id),
+            service.get_user_liked(current_user.id)
+        )
+        food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
         return Canteens([
-            canteen_to_pydantic(canteen, likes_canteens.get(canteen.id, False))
+            canteen_to_pydantic(canteen, likes.get(canteen.id, False))
             for canteen in canteens
         ])
 
-    food_logger.info(f"Fetched {len(canteens)} active canteens")
+    canteens = await service.get_canteens(canteen_id)
+    food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
     return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
 
 
 
 
 @router.post("/canteens/toggle-like", response_model=bool, description="Authenticated user can toggle like for a canteen. Returns True if the canteen was liked, False if it was unliked.")
-def toggle_like(
+async def toggle_like(
     canteen_id: str = Query(..., description="Canteen ID to toggle like", example="mensa-leopoldstr", enum=[canteen.value for canteen in CanteenEnum]),
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_async_db),
     current_user: UserTable = Depends(APIKey.verify_user_api_key)
 ) -> bool:
     canteen_service = CanteenService(db)
-    result = canteen_service.toggle_like(canteen_id, current_user.id)
+    result = await canteen_service.toggle_like(canteen_id, current_user.id)
     food_logger.info(f"Toggled like for canteen {canteen_id} by user {current_user.id}. Result: {result}")
     return result

@@ -1,28 +1,36 @@
 import uuid
 from typing import List, Optional
 
-from sqlalchemy import and_, select
+from sqlalchemy import Result, and_, select
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
-                               DishTranslationTable, MenuDayTable,
-                               MenuDishAssociation)
+from shared.src.tables import (
+    CanteenTable,
+    DishLikeTable,
+    DishTable,
+    DishTranslationTable,
+    MenuDayTable,
+    MenuDishAssociation,
+)
 
 from ...core.service.like_service import LikeService
 from ...core.translation_utils import apply_translation_query
 
+
 logger = get_food_logger(__name__)
 
 class DishService:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         """Initialize the DishService with a database session."""
         self.db = db
         self.like_service = LikeService(db)
-    def get_dishes(
+        
+    async def get_dishes(
         self, 
         dish_id: Optional[int] = None, 
         user_id: Optional[uuid.UUID] = None,
@@ -36,9 +44,14 @@ class DishService:
         Otherwise, return all dishes.
         """
         try:
-            # Base query with translations
+            # Base query with translations and eager loading
             stmt = (
                 select(DishTable)
+                .options(
+                    selectinload(DishTable.likes),
+                    selectinload(DishTable.prices),
+                    selectinload(DishTable.images)
+                )
             )
             
             stmt = apply_translation_query(base_query=stmt, model=DishTable, translation_model=DishTranslationTable, language=language)
@@ -48,14 +61,12 @@ class DishService:
                 stmt = stmt.where(DishTable.id == dish_id)
                 
             if user_id and only_liked:
-                # Return only dishes liked by the user
                 stmt = (
                     stmt
                     .join(DishLikeTable)
                     .where(DishLikeTable.user_id == user_id)
                 )
             elif user_id:
-                # Left join with DishLikeTable to get like status for the user
                 stmt = (
                     stmt
                     .outerjoin(
@@ -67,8 +78,8 @@ class DishService:
                     )
                 )
 
-            dishes = self.db.execute(stmt).unique().scalars().all()
-            
+            result: Result = await self.db.execute(stmt)
+            dishes = result.scalars().unique().all()
 
             if not dishes:
                 raise NotFoundError(
@@ -85,11 +96,11 @@ class DishService:
                 extra={"original_error": str(e)}
             )
 
-    def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
-        return self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
+    async def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
+        return await self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
 
 
-    def get_dates(self, dish_id: int):
+    async def get_dates(self, dish_id: int):
         """Get all dates, canteen IDs, and canteen information for a specific dish."""
         try:
             stmt = (
@@ -109,11 +120,20 @@ class DishService:
                     CanteenTable,
                     MenuDayTable.canteen_id == CanteenTable.id
                 )
+                .options(
+                    selectinload(CanteenTable.location),
+                    selectinload(CanteenTable.opening_hours),
+                    selectinload(CanteenTable.images),
+                    selectinload(CanteenTable.status),
+                    selectinload(CanteenTable.likes),
+                    
+                )
                 .where(MenuDishAssociation.dish_id == dish_id)
                 .order_by(MenuDishAssociation.menu_day_date)
             )
             
-            dish_dates = self.db.execute(stmt).all()
+            result = await self.db.execute(stmt)
+            dish_dates = result.all()
             
             if not dish_dates:
                 raise NotFoundError(

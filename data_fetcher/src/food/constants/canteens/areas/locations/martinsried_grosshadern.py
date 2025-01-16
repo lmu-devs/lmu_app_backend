@@ -12,11 +12,11 @@ martinsried_grosshadern_locations = {
         latitude=48.109972,
         longitude=11.458483
     ),
-    CanteenEnum.STULOUNGE_MARTINSRIED: Location(
-        address="Großhadernerstr. 9,  82152 Planegg-Martinsried",
-        latitude=48.110548,
-        longitude=11.458981
-    ),
+    # CanteenEnum.STULOUNGE_MARTINSRIED: Location(
+    #     address="Großhadernerstr. 9,  82152 Planegg-Martinsried",
+    #     latitude=48.110548,
+    #     longitude=11.458981
+    # ),
     CanteenEnum.ESPRESSOBAR_MARTINSRIED: Location(
         address="Großhaderner Str. 2, 82152 Planegg-Martinsried",
         latitude=48.109025,
@@ -27,9 +27,9 @@ martinsried_grosshadern_locations = {
         latitude=48.113644,
         longitude=11.466461
     ),
-    CanteenEnum.STULOUNGE_BUTENANDSTR: Location(
-        address="Butenandtstr. 1 , 81377 München",
-        latitude=48.114105,
-        longitude=11.464837
-    ),
+    # CanteenEnum.STULOUNGE_BUTENANDSTR: Location(
+    #     address="Butenandtstr. 1 , 81377 München",
+    #     latitude=48.114105,
+    #     longitude=11.464837
+    # ),
 }

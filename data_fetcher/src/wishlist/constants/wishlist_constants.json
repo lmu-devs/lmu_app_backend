@@ -1,0 +1,117 @@
+[
+    {
+    "translations": [
+        {
+            "title": "Uni Kino",
+            "description": "Entdecke Filme und Kinos vom LMU UKino, dem TU Film sowie dem Hochschulkino direkt in der App.",
+            "description_short": "Filme und Kinos",
+            "language": "de-DE"
+        },
+        {
+            "title": "Uni Cinema",
+            "description": "Discover movies and cinemas from LMU UKino, TU Film, and Hochschulkino directly in the app.",
+            "description_short": "Movies and cinemas",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "https://www.figma.com/proto/BoTB8jgodOVZKACJZx7r0R/LMU-App?page-id=3150%3A24108&node-id=3150-24375&p=f&viewport=249%2C527%2C0.21&t=PuLjXkuI4J8SYx14-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=3150%3A24375",
+    "release_date": "2024-11-19T11:53:31.756000",
+    "images": [
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_cinema_01.webp",
+            "name": "Preview1",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_cinema_02.webp",
+            "name": "Preview2",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_cinema_03.webp",
+            "name": "Preview3",
+            "blurhash": null
+        }
+    ]
+},
+
+{
+    "translations": [
+        {
+            "title": "Roomfinder",
+            "description": "Finde Gebäude und Räume der Universität bequem und einfach über die Karte in der App.",
+            "description_short": "Räume suchen und finden",
+            "language": "de-DE"
+        },
+        {
+            "title": "Roomfinder",
+            "description": "Find university buildings and rooms easily and conveniently using the map in the app.",
+            "description_short": "Search and find rooms",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000",
+    "images": [
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_roomfinder_01.webp",
+            "name": "Preview1",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_roomfinder_02.webp",
+            "name": "Preview3",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_roomfinder_03.webp",
+            "name": "Preview2",
+            "blurhash": null
+        }
+    ]
+}
+,
+{
+    "translations": [
+        {
+            "title": "Neuigkeiten",
+            "description_short": "Neues, Partys, Veranstaltungen und mehr",
+            "description": "Erhalte die neuesten News und Events der Universität direkt in der App.",
+            "language": "de-DE"
+        },
+        {
+            "title": "News",
+            "description_short": "News, Parties, Events and more",
+            "description": "Get the latest news and events from the university directly in the app.",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+,
+{
+    "translations": [
+        {
+            "title": "Erinnerungen",
+            "description_short": "für Rückmeldung, Termine, Fristen",
+            "description": "Erhalte Erinnerungen für Rückmeldungen, Termine und Fristen als Notification.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Reminders",
+            "description_short": "Re-registration, appointments, deadlines",
+            "description": "Get reminders for re-registration, appointments, and deadlines as notifications.",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+
+
+]

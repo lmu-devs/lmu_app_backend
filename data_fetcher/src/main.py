@@ -2,7 +2,7 @@ import asyncio
 import signal
 import sys
 
-from shared.src.core.database import Database
+from shared.src.core.database import Base, Database, get_async_db, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
 
@@ -28,6 +28,8 @@ async def main():
     try:
         settings = get_settings()
         Database(settings=settings)
+        table_creation()
+        async_db = get_async_db()
         
         tasks = [
             asyncio.create_task(create_university_fetcher()),

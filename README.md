@@ -83,6 +83,6 @@ If using Docker Compose:
 docker-compose up
 ```
 
-The backend server should now be running and accessible at `http://localhost:5432` (or the port specified in your configuration).
-
-[Add any additional steps, API documentation, or usage instructions specific to the LMU App Backend]
+Swagger UI should be accessible at `http://localhost:8001/v1/docs`
+REST API should now be running and accessible at `http://localhost:8001/v1`
+PgAdmin should now be running and accessible at `http://localhost:5050`

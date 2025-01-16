@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     TMDB_API_KEY: str
     OMDB_API_KEY: str
     
+    TELEGRAM_BOT_TOKEN: str 
+    TELEGRAM_CHAT_ID: str 
+    
     # Postgres database credentials
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str

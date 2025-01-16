@@ -1,16 +1,23 @@
 from datetime import date
 from typing import List
 
-from sqlalchemy import and_, select
+from sqlalchemy import Result, and_, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, contains_eager
 
+from api.src.v1.core.translation_utils import create_translation_order_case
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import CanteenLikeTable, DishTable, DishTranslationTable, MenuDayTable, MenuDishAssociation, UserTable
+from shared.src.tables import (
+    CanteenLikeTable,
+    DishTable,
+    DishTranslationTable,
+    MenuDayTable,
+    MenuDishAssociation,
+    UserTable,
+)
 
-from api.src.v1.core.translation_utils import create_translation_order_case
 
 logger = get_food_logger(__name__)
 class MenuService:
@@ -19,7 +26,7 @@ class MenuService:
         self.db = db
         
 
-    def get_days(
+    async def get_days(
         self, 
         canteen_id: str, 
         date_from: date,
@@ -37,6 +44,8 @@ class MenuService:
                 .outerjoin(MenuDayTable.dish_associations)
                 .outerjoin(MenuDishAssociation.dish)
                 .outerjoin(DishTable.translations)
+                .outerjoin(DishTable.likes)
+                .outerjoin(DishTable.prices)
             )
             
             #Apply translation query - modify to use the already joined translations
@@ -46,7 +55,13 @@ class MenuService:
                     contains_eager(MenuDayTable.canteen),
                     contains_eager(MenuDayTable.dish_associations)
                     .contains_eager(MenuDishAssociation.dish)
-                    .contains_eager(DishTable.translations)
+                    .contains_eager(DishTable.translations),
+                    contains_eager(MenuDayTable.dish_associations)
+                    .contains_eager(MenuDishAssociation.dish)
+                    .contains_eager(DishTable.likes),
+                    contains_eager(MenuDayTable.dish_associations)
+                    .contains_eager(MenuDishAssociation.dish)
+                    .contains_eager(DishTable.prices)
                 )
             )
             
@@ -75,8 +90,8 @@ class MenuService:
                 )
                 
             # Execute query
-            result = self.db.execute(stmt)
-            menu_days = result.unique().scalars().all()
+            result: Result = await self.db.execute(stmt)
+            menu_days = result.scalars().unique().all()
             
             if not menu_days:
                 logger.warning(f"No menus found for {canteen_id} between {date_from} and {date_to}")

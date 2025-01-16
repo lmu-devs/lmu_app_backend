@@ -1,6 +1,7 @@
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.schemas import Location
 
+
 munich_locations = {
     CanteenEnum.MENSA_LEOPOLDSTR: Location(
         address="Leopoldstr. 13a, 80802 München",
@@ -12,11 +13,11 @@ munich_locations = {
         latitude=48.156404,
         longitude=11.582161
     ),
-    CanteenEnum.STULOUNGE_LEOPOLDSTR: Location(
-        address="Leopoldstr. 13a, 80802 München",
-        latitude=48.156404,
-        longitude=11.582161
-    ),
+    # CanteenEnum.STULOUNGE_LEOPOLDSTR: Location(
+    #     address="Leopoldstr. 13a, 80802 München",
+    #     latitude=48.156404,
+    #     longitude=11.582161
+    # ),
     CanteenEnum.STUBISTRO_OETTINGENSTR: Location(
         address="Oettingenstraße. 67, 80538 München",
         latitude=48.149910,
@@ -32,7 +33,7 @@ munich_locations = {
         latitude=48.151608,
         longitude=11.582327
     ),
-    CanteenEnum.STUCAFE_AKADEMIE_WEIHENSTEPHAN: Location(
+    CanteenEnum.STUBISTRO_AKADEMIESTR: Location(
         address="Akademiestraße 2-4, 80799 München",
         latitude=48.153099,
         longitude=11.580270
@@ -57,11 +58,11 @@ munich_locations = {
         latitude=48.147371,
         longitude=11.567019
     ),
-    CanteenEnum.STULOUNGE_ARCISSTR: Location(
-        address="Arcisstr. 17, 80333 München",
-        latitude=48.147371,
-        longitude=11.567019
-    ),
+    # CanteenEnum.STULOUNGE_ARCISSTR: Location(
+    #     address="Arcisstr. 17, 80333 München",
+    #     latitude=48.147371,
+    #     longitude=11.567019
+    # ),
     CanteenEnum.STUBISTRO_ARCISSTR: Location(
         address="Arcisstr. 12, 80333 München",
         latitude=48.146042,
@@ -82,11 +83,11 @@ munich_locations = {
         latitude=48.181983,
         longitude=11.552184
     ),
-    CanteenEnum.STULOUNGE_OLYMPIACAMPUS: Location(
-        address="Am Olympiacampus 11, 80809 München",
-        latitude=48.181983,
-        longitude=11.552184
-    ),
+    # CanteenEnum.STULOUNGE_OLYMPIACAMPUS: Location(
+    #     address="Am Olympiacampus 11, 80809 München",
+    #     latitude=48.181983,
+    #     longitude=11.552184
+    # ),
     CanteenEnum.MENSA_LOTHSTR: Location(
         address="Lothstr. 13d, 80335 München",
         latitude=48.153950,
@@ -97,7 +98,7 @@ munich_locations = {
         latitude=48.155054,
         longitude=11.555812
     ),
-    CanteenEnum.STUCAFE_KARLSTR: Location(
+    CanteenEnum.STUBISTRO_KARLSTR: Location(
         address="Karlstr. 6, 80333 München",
         latitude=48.142697,
         longitude=11.568428
