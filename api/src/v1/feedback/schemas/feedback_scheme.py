@@ -7,12 +7,12 @@ from shared.src.tables import FeedbackRating, FeedbackType
 
 class FeedbackCreate(BaseModel):
     type: FeedbackType
-    rating: Optional[FeedbackRating] = None
-    message: Optional[str] = None
+    rating: FeedbackRating | None = None
+    message: str | None = None
     screen: str
-    tags: Optional[List[str]] = None
-    app_version: Optional[str] = None
-    system_version: Optional[str] = None
+    tags: List[str] | None = None
+    app_version: str | None = None
+    system_version: str | None = None
 
 class Feedback(FeedbackCreate):
     id: UUID
