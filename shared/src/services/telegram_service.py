@@ -16,7 +16,10 @@ class TelegramService:
 
     async def send_feedback_notification(self, feedback_type: str, rating: str, 
                                       screen: str, message: Optional[str] = None, 
-                                      tags: Optional[List[str]] = None):
+                                      tags: Optional[List[str]] = None,
+                                      app_version: Optional[str] = None,
+                                      system_version: Optional[str] = None,
+                                      ):
         try:
             emoji = self._get_rating_emoji(rating)
             tag_text = f"\nTags: {', '.join(tags)}" if tags else ""
@@ -27,6 +30,7 @@ class TelegramService:
                 f"Rated {emoji} on {screen}"
                 f"{message_text}"
                 f"{tag_text}"
+                f"\nApp-Version: {app_version} on {system_version}",
             )
             
             await self.bot.send_message(

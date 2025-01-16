@@ -47,5 +47,7 @@ class FeedbackService:
             rating=feedback.rating,
             screen=feedback.screen,
             message=feedback.message,
-            tags=feedback.tags
+            tags=feedback.tags,
+            app_version=feedback.app_version,
+            system_version=feedback.system_version,
         )
