@@ -1,96 +1,144 @@
 services:
-  db:
-    image: postgres:16.4-bookworm
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    env_file:
-      - .env
-    container_name: db
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_PORT}
-      POSTGRES_HOST: ${POSTGRES_HOST}
-      PGDATABASE: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    restart: always
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
-      interval: 2s
-      timeout: 2s
-      retries: 5
-    networks:
-      - backend
+    db:
+        image: postgres:16.4-bookworm
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        env_file:
+            - .env
+        container_name: db
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+            POSTGRES_PORT: ${POSTGRES_PORT}
+            POSTGRES_HOST: ${POSTGRES_HOST}
+            PGDATABASE: ${POSTGRES_DB}
+        ports:
+            - '5432:5432'
+        restart: always
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+        networks:
+            - backend
 
+    db_mb:
+        image: postgres:16.4-bookworm
+        volumes:
+            - postgres_metabase_data:/var/lib/postgresql/data/
+        env_file:
+            - .env
+        container_name: db_mb
+        environment:
+            POSTGRES_DB: ${MB_DB_DBNAME}
+            POSTGRES_USER: ${MB_DB_USER}
+            POSTGRES_PASSWORD: ${MB_DB_PASSWORD}
+            POSTGRES_PORT: ${MB_DB_PORT}
+            POSTGRES_HOST: ${MB_DB_HOST}
+        ports:
+            - '5433:5432'
+        restart: always
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U ${MB_DB_USER}']
+            interval: 2s
+            timeout: 2s
+            retries: 5
+        networks:
+            - backend
 
+    pgadmin:
+        image: dpage/pgadmin4
+        container_name: pgadmin
+        env_file:
+            - .env
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+        ports:
+            - '${PGADMIN_PORT}:80'
+        depends_on:
+            - db
+        networks:
+            - frontend
+            - backend
+        restart: always
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    env_file:
-      - .env
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "${PGADMIN_PORT}:80"
-    depends_on:
-      - db
-    networks:
-      - frontend
-      - backend
-    restart: always
+    metabase:
+        image: metabase/metabase:latest
+        container_name: metabase
+        hostname: metabase
+        volumes:
+            - /dev/urandom:/dev/random:ro
+        ports:
+            - 3000:3000
+        environment:
+            MB_DB_TYPE: postgres
+            MB_DB_DBNAME: ${MB_DB_DBNAME}
+            MB_DB_PORT: ${MB_DB_PORT}
+            MB_DB_USER: ${MB_DB_USER}
+            MB_DB_PASS: ${MB_DB_PASSWORD}
+            MB_DB_HOST: ${MB_DB_HOST}
+        networks:
+            - frontend
+            - backend
+        healthcheck:
+            test: curl --fail -I http://localhost:3000/api/health || exit 1
+            interval: 15s
+            timeout: 5s
+            retries: 5
+        depends_on:
+            db_mb:
+                condition: service_healthy
 
-  api_v1:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-api
-    environment:
-      - API_VERSION=v1
-      - PYTHONPATH=/app
-    env_file:
-      - .env
-    container_name: api_v1
-    networks:
-      - backend
-      - frontend
-    volumes:
-      - .:/app
-    ports:
-      - "127.0.0.1:8001:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: always
+    api_v1:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile-api
+        environment:
+            - API_VERSION=v1
+            - PYTHONPATH=/app
+        env_file:
+            - .env
+        container_name: api_v1
+        networks:
+            - backend
+            - frontend
+        volumes:
+            - .:/app
+        ports:
+            - '127.0.0.1:8001:8000'
+        depends_on:
+            db:
+                condition: service_healthy
+        restart: always
 
-
-  data_fetcher:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile-data_fetcher
-    env_file:
-      - .env
-    container_name: data_fetcher
-    networks:
-      - frontend
-      - backend
-    volumes:
-      - .:/app
-    environment:
-      - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
-    depends_on:
-      db:
-        condition: service_healthy
-    restart: always
-
+    data_fetcher:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile-data_fetcher
+        env_file:
+            - .env
+        container_name: data_fetcher
+        networks:
+            - frontend
+            - backend
+        volumes:
+            - .:/app
+        environment:
+            - PYTHONPATH=/app
+            - PYTHONUNBUFFERED=1
+        depends_on:
+            db:
+                condition: service_healthy
+        restart: always
 
 volumes:
-  postgres_data:
+    postgres_data:
+    postgres_metabase_data:
 
 networks:
-  backend:
-    internal: true
-  frontend:
+    backend:
+        internal: true
+    frontend:
