@@ -1,15 +1,16 @@
 import re
-import requests
-
 from datetime import datetime
+
+import requests
 from bs4 import BeautifulSoup
 
 from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import UniversityEnum
+from shared.src.enums import CinemaEnums
 
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import LMU_CINEMA_URL
 from ..models.screening_model import ScreeningCrawl
+
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
@@ -19,7 +20,7 @@ class LmuMovieCrawler:
         self.base_url = LMU_CINEMA_URL
         self.price = 3.5
         self.external_link = LMU_CINEMA_URL
-        self.university_id = UniversityEnum.LMU
+        self.cinema_id = CinemaEnums.LMU.value
         self.is_ov = True
         
     def _parse_date(self, date_str) -> datetime:
@@ -81,7 +82,7 @@ class LmuMovieCrawler:
             # Check if this is an edge case
             is_edge_case = year is None or "[" in title
             
-            location = CinemaLocationConstants[self.university_id]
+            location = CinemaLocationConstants[self.cinema_id]
             
             screenings.append(ScreeningCrawl(
                 is_edge_case=is_edge_case,
@@ -94,7 +95,7 @@ class LmuMovieCrawler:
                 longitude=location.longitude,
                 latitude=location.latitude,
                 external_url=self.external_link,
-                university_id=self.university_id.value,
+                cinema_id=self.cinema_id,
                 price=self.price,
             ))
             logger.info(f"Successfully parsed movie: {title} ({year})")

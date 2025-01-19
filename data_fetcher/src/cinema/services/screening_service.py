@@ -2,16 +2,24 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
-from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import LanguageEnum, RatingSourceEnum
-from shared.src.core.settings import get_settings
-from shared.src.tables import MovieLocationTable, MovieRatingTable, MovieScreeningTable, MovieTable, MovieTrailerTable, MovieTrailerTranslationTable, MovieTranslationTable
-
 from data_fetcher.src.cinema.crawler import HmCinemaCrawler, LmuMovieCrawler, TumMovieCrawler
 from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
-from data_fetcher.src.cinema.utils.rating_util import MovieRatingNormalizer
 from data_fetcher.src.cinema.services.omdb_service import OmdbService
 from data_fetcher.src.cinema.services.tmdb_service import TmdbService
+from data_fetcher.src.cinema.utils.rating_util import MovieRatingNormalizer
+from shared.src.core.logging import get_cinema_fetcher_logger
+from shared.src.core.settings import get_settings
+from shared.src.enums import LanguageEnum, RatingSourceEnum
+from shared.src.tables import (
+    MovieLocationTable,
+    MovieRatingTable,
+    MovieScreeningTable,
+    MovieTable,
+    MovieTrailerTable,
+    MovieTrailerTranslationTable,
+    MovieTranslationTable,
+)
+
 
 settings = get_settings()
 logger = get_cinema_fetcher_logger(__name__)
@@ -49,8 +57,8 @@ class ScreeningService:
             id=screening_id,
             movie_id=movie_id,
             date=movie_data.date,
-            university_id=movie_data.university_id,
-            cinema_id=movie_data.university_id,
+            university_id=movie_data.cinema_id,
+            cinema_id=movie_data.cinema_id,
             start_time=movie_data.date,
             end_time=end_time,
             entry_time=entry_time,
@@ -89,7 +97,7 @@ class ScreeningService:
         date = movie_data.date.replace(hour=20)
         entry_time = date - timedelta(minutes=30)
         end_time = date + timedelta(minutes=movie.runtime)
-        university_id = movie_data.university_id
+        university_id = movie_data.cinema_id
         
         screening = MovieScreeningTable(
             id=screening_id,

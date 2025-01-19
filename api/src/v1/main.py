@@ -15,7 +15,7 @@ from .log.routers import log_router
 from .user.routers import user_router
 from .wishlist.routers import wishlist_router
 from .home.routers import home_router
-
+from .places.routers import places_router
 
 api_logger = get_food_logger(__name__)
 
@@ -54,6 +54,8 @@ def create_app():
     app.include_router(wishlist_router.router, prefix=prefix, tags=["wishlist"])
     app.include_router(cinema_router.router, prefix=cinema_prefix, tags=["cinema"])
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
+    app.include_router(places_router.router, prefix=prefix, tags=["places"])
+    
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,

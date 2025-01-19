@@ -32,9 +32,9 @@ async def main():
         async_db = get_async_db()
         
         tasks = [
-            asyncio.create_task(create_university_fetcher()),
+            # asyncio.create_task(create_university_fetcher()),
             asyncio.create_task(create_movie_fetcher()),
-            asyncio.create_task(create_food_fetcher())
+            # asyncio.create_task(create_food_fetcher())
         ]
         
         await asyncio.gather(*tasks)
