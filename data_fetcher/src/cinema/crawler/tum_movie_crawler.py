@@ -1,14 +1,15 @@
 import re
-import requests
-
 from datetime import datetime
+
+import requests
 from bs4 import BeautifulSoup
 
 from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import UniversityEnum
+from shared.src.enums import CinemaEnums
 
-from ..constants.url_constants import TUM_CINEMA_URL
-from ..models.screening_model import ScreeningCrawl
+from data_fetcher.src.cinema.constants.url_constants import TUM_CINEMA_URL
+from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
+
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
@@ -16,7 +17,7 @@ logger = get_cinema_fetcher_logger(__name__)
 
 class TumMovieCrawler:
     def __init__(self):
-        self.university_id = UniversityEnum.TUM.value
+        self.cinema_id = None
         self.base_url = TUM_CINEMA_URL
         self.rss_url = f"{self.base_url}/programm/index/upcoming.rss"
         self.booking_url = f"{self.base_url}/pages/view/kinoheld"
@@ -127,6 +128,9 @@ class TumMovieCrawler:
         
         return year, custom_poster_url, tagline, description
 
+    def _is_garching_in_title(self, title: str) -> bool:
+        return 'Garching' in title
+
     def crawl(self) -> list[ScreeningCrawl]:
         response = requests.get(self.rss_url)
         
@@ -142,6 +146,8 @@ class TumMovieCrawler:
         for item in soup.find_all('item'):
             base_title = item.title.text
             
+            is_garching = self._is_garching_in_title(base_title)
+            self.cinema_id = CinemaEnums.TUM_GARCHING.value if is_garching else CinemaEnums.TUM.value
             title = self._clean_title(base_title)
             date = self._parse_date(item.pubDate.text)
             external_link = item.link.text
@@ -162,7 +168,7 @@ class TumMovieCrawler:
                 external_url=external_link,
                 booking_url=self.booking_url,
                 price=price,
-                university_id=self.university_id,
+                cinema_id=self.cinema_id,
                 is_ov=is_ov,
                 subtitles=subtitles,
                 address=address,

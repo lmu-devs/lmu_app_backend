@@ -84,12 +84,12 @@ async def create_movie_fetcher():
     
 
     add_constant_cinema_data(db)
-    await fetch_scheduled_data(db)
+    # await fetch_scheduled_data(db)
     
-    async def scheduled_task():
-        await fetch_scheduled_data(db)
+    # async def scheduled_task():
+    #     await fetch_scheduled_data(db)
     
-    schedule.every().monday.at("08:08").do(scheduled_task)
+    # schedule.every().monday.at("08:08").do(scheduled_task)
     
     logger.info(f"Entering {__name__} loop...")
     while running_movie:

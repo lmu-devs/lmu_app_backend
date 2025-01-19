@@ -1,22 +1,23 @@
 import logging
 import re
-import requests
-
 from datetime import datetime
 from typing import List
+
+import requests
 from bs4 import BeautifulSoup
 
-from shared.src.enums import UniversityEnum
+from shared.src.enums import CinemaEnums
 
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import HM_CINEMA_URL
 from ..models.screening_model import ScreeningCrawl
 
+
 logger = logging.getLogger(__name__)
 
 class HmCinemaCrawler:
     def __init__(self):
-        self.university_id = UniversityEnum.HM
+        self.cinema_id = CinemaEnums.HM.value
         self.base_url = HM_CINEMA_URL
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -125,7 +126,7 @@ class HmCinemaCrawler:
                     if any(text in note for text in ['Gratis Eintritt', 'Freier Eintritt', 'gratis', 'kostenlos']):
                         self.price = 0.0
 
-                    location = CinemaLocationConstants[self.university_id]
+                    location = CinemaLocationConstants[self.cinema_id]
                     
                     # Create ScreeningCrawl object
                     screening = ScreeningCrawl(
@@ -138,7 +139,7 @@ class HmCinemaCrawler:
                         is_ov=is_ov,
                         price=self.price,
                         subtitles=subtitles,
-                        university_id=self.university_id,
+                        cinema_id=self.cinema_id,
                         external_url=self.external_link,
                         custom_poster_url=custom_poster_url,
                         overview=overview,

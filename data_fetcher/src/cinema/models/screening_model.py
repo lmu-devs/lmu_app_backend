@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 class ScreeningCrawl:
     def __init__(
         self, 
@@ -15,7 +16,7 @@ class ScreeningCrawl:
         is_ov:          bool    | None = None, # OV = Original Version
         aka_name:       str     | None = None, 
         price:          float   | None = None, # 0 when "Free Entrance"
-        university_id:  str     | None = None,
+        cinema_id:      str     | None = None,
         subtitles:      str     | None = None, # OmdU = Original German with Subtitles, OmeU = Original English with Subtitles, OmU = Original Multilingual with Subtitles
         external_url:   str     | None = None,
         booking_url:    str     | None = None,
@@ -35,7 +36,7 @@ class ScreeningCrawl:
         self.address = address
         self.longitude = longitude
         self.latitude = latitude
-        self.university_id = university_id
+        self.cinema_id = cinema_id
         self.is_ov = is_ov
         self.subtitles = subtitles
         self.external_url = external_url

@@ -6,3 +6,4 @@ from .university_enums import *
 from .opening_hours_enum import *
 from .weekday_enum import *
 from .image_format_enum import *
+from .cinema_enums import *

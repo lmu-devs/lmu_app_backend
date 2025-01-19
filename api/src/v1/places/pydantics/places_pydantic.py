@@ -11,9 +11,11 @@ async def places_to_pydantic(places: List[CanteenLocationTable | CinemaLocationT
         if isinstance(place, CanteenLocationTable):
             place_type = PlaceEnum.CANTEEN
             id = place.canteen_id
+            print(f"canteen: {place_type}, {id}")
         elif isinstance(place, CinemaLocationTable):
             place_type = PlaceEnum.CINEMA
             id = place.cinema_id
+            print(f"cinema: {place_type}, {id}")
         else:
             raise ValueError(f"Invalid place type: {type(place)}")
         
