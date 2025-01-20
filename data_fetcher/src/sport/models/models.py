@@ -1,0 +1,158 @@
+from datetime import datetime, time
+from enum import Enum
+from typing import Dict, List, Optional
+
+from pydantic import BaseModel, Field
+
+from shared.src.core.logging import get_sport_fetcher_logger
+from shared.src.enums.weekday_enum import WeekdayEnum
+
+
+logger = get_sport_fetcher_logger(__name__)
+
+
+
+class TimeSlot(BaseModel):
+    day: WeekdayEnum
+    start_time: time
+    end_time: time
+
+    @classmethod
+    def from_pattern(cls, day_pattern: List[int], time_patterns: List[str]) -> List['TimeSlot']:
+        """Create TimeSlots from the ZHS day and time patterns"""
+        zhs_to_weekday = {
+            1: WeekdayEnum.MONDAY,
+            2: WeekdayEnum.TUESDAY,
+            3: WeekdayEnum.WEDNESDAY,
+            4: WeekdayEnum.THURSDAY,
+            5: WeekdayEnum.FRIDAY,
+            6: WeekdayEnum.SATURDAY,
+            7: WeekdayEnum.SUNDAY
+        }
+
+        slots = []
+        for day_idx, is_active in enumerate(day_pattern, start=1):
+            if is_active and time_patterns[day_idx-1]:
+                try:
+                    # Handle both : and . as time separators
+                    time_str = time_patterns[day_idx-1].strip()
+                    if not time_str or time_str == '--':
+                        continue
+                        
+                    start, end = time_str.split('-')
+                    # Parse start time
+                    start = start.strip()
+                    if ':' in start:
+                        start_time = datetime.strptime(start, '%H:%M').time()
+                    else:
+                        start_time = datetime.strptime(start, '%H.%M').time()
+                    
+                    # Parse end time
+                    end = end.strip()
+                    if ':' in end:
+                        end_time = datetime.strptime(end, '%H:%M').time()
+                    else:
+                        end_time = datetime.strptime(end, '%H.%M').time()
+                    
+                    slots.append(cls(
+                        day=zhs_to_weekday[day_idx],
+                        start_time=start_time,
+                        end_time=end_time
+                    ))
+                except (ValueError, IndexError) as e:
+                    logger.warning(f"Could not parse time slot: {time_patterns[day_idx-1]} - {str(e)}")
+                    continue
+        return slots
+
+class Price(BaseModel):
+    student: float
+    employee: float
+    external: float
+
+    @classmethod
+    def from_price_string(cls, price: str) -> 'Price':
+        """Create Price from ZHS price string"""
+        # Handle special cases
+        if not price or 'nur mit' in price or 'entgeltfrei' in price:
+            return cls(student=0.0, employee=0.0, external=0.0)
+            
+        try:
+            # Remove HTML and euro symbol
+            price = price.replace('&nbsp;', '').replace('€', '').strip()
+            if price == '--':
+                return cls(student=0.0, employee=0.0, external=0.0)
+                
+            # Split and parse prices
+            prices = price.split('/')
+            if len(prices) != 3:
+                return cls(student=0.0, employee=0.0, external=0.0)
+                
+            # Convert prices, handling both . and , as decimal separator
+            prices = [p.strip().replace(',', '.') for p in prices]
+            return cls(
+                student=float(prices[0]),
+                employee=float(prices[1]),
+                external=float(prices[2])
+            )
+        except (ValueError, IndexError) as e:
+            logger.warning(f"Could not parse price: {price} - {str(e)}")
+            return cls(student=0.0, employee=0.0, external=0.0)
+
+class TimeFrame(BaseModel):
+    start_date: datetime
+    end_date: datetime
+
+    @classmethod
+    def from_duration_string(cls, duration: str) -> 'TimeFrame':
+        """Create TimeFrame from ZHS duration string"""
+        try:
+            if not duration or duration == '--':
+                # Return a default timeframe if no duration is specified
+                return cls(
+                    start_date=datetime.now(),
+                    end_date=datetime.now()
+                )
+                
+            start, end = duration.split('-')
+            return cls(
+                start_date=datetime.strptime(start.strip(), '%d.%m.%Y'),
+                end_date=datetime.strptime(end.strip(), '%d.%m.%Y')
+            )
+        except (ValueError, IndexError) as e:
+            logger.warning(f"Could not parse duration: {duration} - {str(e)}")
+            return cls(
+                start_date=datetime.now(),
+                end_date=datetime.now()
+            )
+
+class Course(BaseModel):
+    id: str
+    name: str
+    time_slots: List[TimeSlot]
+    duration: TimeFrame
+    instructor: str
+    price: Price
+    location_code: int
+    category_id: int
+    status_code: int = Field(..., description="Usually 5, meaning might be related to course status")
+    is_available: bool = False
+    link: Optional[str] = None
+
+class SportCourse(BaseModel):
+    title: str
+    courses: List[Course]
+
+    @classmethod
+    def from_course_list(cls, courses: List[Course]) -> List['SportCourse']:
+        """Group courses by their title"""
+        course_dict: Dict[str, List[Course]] = {}
+        
+        for course in courses:
+            if course.title not in course_dict:
+                course_dict[course.title] = []
+            course_dict[course.title].append(course)
+        
+        return [
+            cls(title=title, courses=course_list)
+            for title, course_list in course_dict.items()
+        ]

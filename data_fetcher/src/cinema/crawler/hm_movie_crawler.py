@@ -1,8 +1,8 @@
-import logging
 import re
 from datetime import datetime
 from typing import List
 
+from shared.src.core.logging import get_cinema_fetcher_logger
 import requests
 from bs4 import BeautifulSoup
 
@@ -13,7 +13,7 @@ from ..constants.url_constants import HM_CINEMA_URL
 from ..models.screening_model import ScreeningCrawl
 
 
-logger = logging.getLogger(__name__)
+logger = get_cinema_fetcher_logger(__name__)
 
 class HmScreeningCrawler:
     def __init__(self):
