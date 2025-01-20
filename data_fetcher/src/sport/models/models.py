@@ -1,5 +1,4 @@
 from datetime import datetime, time
-from enum import Enum
 from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
@@ -84,15 +83,17 @@ class Price(BaseModel):
                 
             # Split and parse prices
             prices = price.split('/')
-            if len(prices) != 3:
-                return cls(student=0.0, employee=0.0, external=0.0)
-                
+            
             # Convert prices, handling both . and , as decimal separator
-            prices = [p.strip().replace(',', '.') for p in prices]
+            # and handling '--' as 0.0
+            def parse_price(p: str) -> float:
+                p = p.strip()
+                return 0.0 if p == '--' else float(p.replace(',', '.'))
+                
             return cls(
-                student=float(prices[0]),
-                employee=float(prices[1]),
-                external=float(prices[2])
+                student=parse_price(prices[0]),
+                employee=parse_price(prices[1]) if len(prices) > 1 else 0.0,
+                external=parse_price(prices[2]) if len(prices) > 2 else 0.0
             )
         except (ValueError, IndexError) as e:
             logger.warning(f"Could not parse price: {price} - {str(e)}")
@@ -106,13 +107,22 @@ class TimeFrame(BaseModel):
     def from_duration_string(cls, duration: str) -> 'TimeFrame':
         """Create TimeFrame from ZHS duration string"""
         try:
-            if not duration or duration == '--':
+            if not duration or duration == '--' or duration == '???':
                 # Return a default timeframe if no duration is specified
                 return cls(
                     start_date=datetime.now(),
                     end_date=datetime.now()
                 )
                 
+            # Handle single date case (e.g., "25.01.2025")
+            if duration.count('-') == 0:
+                date = datetime.strptime(duration.strip(), '%d.%m.%Y')
+                return cls(
+                    start_date=date,
+                    end_date=date
+                )
+                
+            # Handle normal range case (e.g., "14.10.2024-08.02.2025")
             start, end = duration.split('-')
             return cls(
                 start_date=datetime.strptime(start.strip(), '%d.%m.%Y'),
