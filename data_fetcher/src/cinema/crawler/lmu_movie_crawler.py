@@ -15,7 +15,7 @@ from ..models.screening_model import ScreeningCrawl
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
 
-class LmuMovieCrawler:
+class LmuScreeningCrawler:
     def __init__(self):
         self.base_url = LMU_CINEMA_URL
         self.price = 3.5
@@ -104,7 +104,7 @@ class LmuMovieCrawler:
         return screenings
 
 if __name__ == "__main__":
-    crawler = LmuMovieCrawler()
+    crawler = LmuScreeningCrawler()
     for screening in crawler.crawl():
         print(screening.__dict__)
         print("--------------------------------\n")        

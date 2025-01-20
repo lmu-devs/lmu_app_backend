@@ -4,18 +4,17 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
-from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import CinemaEnums
-
 from data_fetcher.src.cinema.constants.url_constants import TUM_CINEMA_URL
 from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
+from shared.src.core.logging import get_cinema_fetcher_logger
+from shared.src.enums import CinemaEnums
 
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)
 
 
-class TumMovieCrawler:
+class TumScreeningCrawler:
     def __init__(self):
         self.cinema_id = None
         self.base_url = TUM_CINEMA_URL
@@ -184,7 +183,7 @@ class TumMovieCrawler:
         return movies
 
 if __name__ == "__main__":
-    crawler = TumMovieCrawler()
+    crawler = TumScreeningCrawler()
     for screening in crawler.crawl():
         print("--------------------------------\n")
         print(screening.__dict__)

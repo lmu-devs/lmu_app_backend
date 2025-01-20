@@ -15,7 +15,7 @@ from ..models.screening_model import ScreeningCrawl
 
 logger = logging.getLogger(__name__)
 
-class HmCinemaCrawler:
+class HmScreeningCrawler:
     def __init__(self):
         self.cinema_id = CinemaEnums.HM.value
         self.base_url = HM_CINEMA_URL
@@ -182,7 +182,7 @@ class HmCinemaCrawler:
     
 
 if __name__ == "__main__":
-    crawler = HmCinemaCrawler()
+    crawler = HmScreeningCrawler()
     for screening in crawler.crawl():
         print("--------------------------------\n")
         print(screening.__dict__)

@@ -36,6 +36,7 @@
     ]
 },
 
+
 {
     "translations": [
         {
@@ -73,6 +74,8 @@
     ]
 }
 ,
+
+
 {
     "translations": [
         {
@@ -88,11 +91,13 @@
             "language": "en-US"
         }
     ],
-    "status": "DEVELOPMENT",
+    "status": "NONE",
     "prototype_url": "",
     "release_date": "2024-11-19T11:53:31.756000"
 }
 ,
+
+
 {
     "translations": [
         {
@@ -112,6 +117,73 @@
     "prototype_url": "",
     "release_date": "2024-11-19T11:53:31.756000"
 }
+,
+
+
+{
+    "translations": [
+        {
+            "title": "Auslandssemester",
+            "description_short": "Termine, Infos, Möglichkeiten",
+            "description": "Erhalte Infos zu allen Ländern, Unis mit Ranking, geschätzte Kosten und alles weitere zum Auslandssemester. Zusätzlich gibts Infos über den Ablauf, die Bewerbung und die Vorbereitung.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Study Exchange",
+            "description_short": "Dates, Infos, Opportunities",
+            "description": "Get infos about all countries, universities with ranking, estimated costs and everything else about study exchange. Additionally, get infos about the process, application and preparation.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+,
+
+
+{
+    "translations": [
+        {
+            "title": "Auslandssemester",
+            "description_short": "Termine, Infos, Möglichkeiten",
+            "description": "Erhalte Infos zu allen Ländern, Unis mit Ranking, geschätzte Kosten und alles weitere zum Auslandssemester. Zusätzlich gibts Infos über den Ablauf, die Bewerbung und die Vorbereitung.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Study Exchange",
+            "description_short": "Dates, Infos, Opportunities",
+            "description": "Get infos about all countries, universities with ranking, estimated costs and everything else about study exchange. Additionally, get infos about the process, application and preparation.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+,
+
+
+{
+    "translations": [
+        {
+            "title": "Hochschul Sport",
+            "description_short": "ZHS, Sport, Kurse",
+            "description": "Übersicht über alle Hochschul Sportangebote und Kurse. Erinnerung zur Anmeldung oder automatische Anmeldung bei Kursen. (Keine Garantie für Platz)",
+            "language": "de-DE"
+        },
+        {
+            "title": "University Sport",
+            "description_short": "ZHS, Sport, Courses",
+            "description": "Overview of all university sport offers and courses. Reminder for registration or automatic registration for courses. (No guarantee for a place)",
+            "language": "en-US"
+        }
+    ],
+    "status": "BETA",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000"
+}
+
 
 
 ]

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
-from data_fetcher.src.cinema.crawler import HmCinemaCrawler, LmuMovieCrawler, TumMovieCrawler
+from data_fetcher.src.cinema.crawler import HmScreeningCrawler, LmuScreeningCrawler, TumScreeningCrawler
 from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
 from data_fetcher.src.cinema.services.omdb_service import OmdbService
 from data_fetcher.src.cinema.services.tmdb_service import TmdbService
@@ -203,9 +203,9 @@ class ScreeningService:
         logger.info("Starting movie fetch process")
         
         crawled_movies: list[ScreeningCrawl] = []
-        crawled_movies.extend(LmuMovieCrawler().crawl())
-        crawled_movies.extend(TumMovieCrawler().crawl())
-        crawled_movies.extend(HmCinemaCrawler().crawl())
+        crawled_movies.extend(LmuScreeningCrawler().crawl())
+        crawled_movies.extend(TumScreeningCrawler().crawl())
+        crawled_movies.extend(HmScreeningCrawler().crawl())
             
         processed_movies = []
 

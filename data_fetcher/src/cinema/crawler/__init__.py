@@ -1,3 +1,3 @@
-from .hm_movie_crawler import HmCinemaCrawler
-from .lmu_movie_crawler import LmuMovieCrawler
-from .tum_movie_crawler import TumMovieCrawler
+from .hm_movie_crawler import HmScreeningCrawler
+from .lmu_movie_crawler import LmuScreeningCrawler
+from .tum_movie_crawler import TumScreeningCrawler

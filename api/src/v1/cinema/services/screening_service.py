@@ -28,7 +28,7 @@ class ScreeningService:
         self.language = language
         
     async def get_movie_screenings(self):
-        query = self._get_movie_screenings_query(self.language)
+        query = self._get_movie_screenings_query()
         result = await self.db.execute(query)
         return result.scalars().unique().all()
     
