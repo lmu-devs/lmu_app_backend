@@ -86,7 +86,7 @@ class Price(BaseModel):
             
         try:
             # Remove HTML and euro symbol
-            price = price.replace('&nbsp;', '').replace('€', '').strip()
+            price = price.replace('€', '').strip()
             if price == '--':
                 return cls(student=0.0, employee=0.0, external=0.0)
                 

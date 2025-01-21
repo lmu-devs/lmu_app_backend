@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from data_fetcher.src.sport.models.models import Course, Price, SportCourse, TimeFrame, TimeSlot
+from data_fetcher.src.sport.models.sport_models import Course, Price, SportCourse, TimeFrame, TimeSlot
 from shared.src.core.logging import get_sport_fetcher_logger
 
 
