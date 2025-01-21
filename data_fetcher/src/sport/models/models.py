@@ -1,5 +1,5 @@
 from datetime import datetime, time
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
@@ -17,28 +17,30 @@ class TimeSlot(BaseModel):
     end_time: time
 
     @classmethod
-    def from_pattern(cls, day_pattern: List[int], time_patterns: List[str]) -> List['TimeSlot']:
+    def from_pattern(cls, day_patterns: List[int], time_patterns: List[str], tage_data: List[List[int]]) -> List['TimeSlot']:
         """Create TimeSlots from the ZHS day and time patterns
         
         Args:
-            day_pattern: List where numbers 1-7 indicate weekdays (1=Monday, 2=Tuesday, etc.)
+            day_patterns: List where numbers reference indices in tage_data
             time_patterns: List of time strings in format "HH:MM-HH:MM" or "HH.MM-HH.MM"
+            tage_data: List of day patterns from ZHS data where each pattern is [Mo,Di,Mi,Do,Fr,Sa,So]
         """
         slots = []
         
-        # Find which days are active (non-zero numbers in the array)
-        active_days = [d for d in day_pattern if d > 0]
-        
-        for day_num in active_days:
-            try:
-                # Get the corresponding time pattern
-                # If multiple days, use corresponding time pattern, otherwise use first
-                time_idx = active_days.index(day_num)
-                time_str = time_patterns[time_idx].strip() if time_idx < len(time_patterns) else time_patterns[0].strip()
+        for pattern_idx in day_patterns:
+            if pattern_idx <= 0 or pattern_idx >= len(tage_data):
+                continue
                 
-                if not time_str or time_str == '--':
-                    continue
-                    
+            # Get the weekday pattern (array of 7 integers where 1 indicates active day)
+            weekday_pattern = tage_data[pattern_idx][1:]  # Skip first element (name)
+            
+            # Get the corresponding time pattern
+            time_str = time_patterns[0].strip()  # Default to first time pattern
+            if not time_str or time_str == '--':
+                continue
+                
+            try:
+                # Parse the time string
                 start, end = time_str.split('-')
                 
                 # Parse start time
@@ -55,15 +57,17 @@ class TimeSlot(BaseModel):
                 else:
                     end_time = datetime.strptime(end, '%H.%M').time()
                 
-                # Convert day number to WeekdayEnum (1 = Monday, etc.)
-                weekday_idx = day_num - 1  # Convert to 0-based index
-                slots.append(cls(
-                    day=WeekdayEnum[list(WeekdayEnum)[weekday_idx].name],
-                    start_time=start_time,
-                    end_time=end_time
-                ))
+                # Create a TimeSlot for each active day in the pattern
+                for day_idx, is_active in enumerate(weekday_pattern):
+                    if is_active:
+                        slots.append(cls(
+                            day=WeekdayEnum[list(WeekdayEnum)[day_idx].name],
+                            start_time=start_time,
+                            end_time=end_time
+                        ))
+                        
             except (ValueError, IndexError) as e:
-                logger.warning(f"Could not parse time slot for day {day_num}: {time_patterns} - {str(e)}")
+                logger.warning(f"Could not parse time slot for pattern {pattern_idx}: {time_patterns} - {str(e)}")
                 continue
                 
         return slots

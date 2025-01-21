@@ -77,8 +77,8 @@ class ZhsCrawler:
             
             # Extract data from JavaScript
             data = self._extract_js_data(response.text)
-            if not data or 'kurse' not in data:
-                logger.error("Could not find course data in JS file")
+            if not data or 'kurse' not in data or 'tage' not in data:
+                logger.error("Could not find course data or tage data in JS file")
                 return []
 
             # First collect all courses
@@ -110,7 +110,7 @@ class ZhsCrawler:
                     course = Course(
                         id=course_id,
                         name=name,
-                        time_slots=TimeSlot.from_pattern(course_data[4], course_data[5]),
+                        time_slots=TimeSlot.from_pattern(course_data[4], course_data[5], data['tage']),
                         duration=TimeFrame.from_duration_string(course_data[7]),
                         instructor=course_data[8],
                         price=Price.from_price_string(course_data[9]),
