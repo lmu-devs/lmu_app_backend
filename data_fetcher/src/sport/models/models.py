@@ -18,49 +18,54 @@ class TimeSlot(BaseModel):
 
     @classmethod
     def from_pattern(cls, day_pattern: List[int], time_patterns: List[str]) -> List['TimeSlot']:
-        """Create TimeSlots from the ZHS day and time patterns"""
-        zhs_to_weekday = {
-            1: WeekdayEnum.MONDAY,
-            2: WeekdayEnum.TUESDAY,
-            3: WeekdayEnum.WEDNESDAY,
-            4: WeekdayEnum.THURSDAY,
-            5: WeekdayEnum.FRIDAY,
-            6: WeekdayEnum.SATURDAY,
-            7: WeekdayEnum.SUNDAY
-        }
-
+        """Create TimeSlots from the ZHS day and time patterns
+        
+        Args:
+            day_pattern: List where numbers 1-7 indicate weekdays (1=Monday, 2=Tuesday, etc.)
+            time_patterns: List of time strings in format "HH:MM-HH:MM" or "HH.MM-HH.MM"
+        """
         slots = []
-        for day_idx, is_active in enumerate(day_pattern, start=1):
-            if is_active and time_patterns[day_idx-1]:
-                try:
-                    # Handle both : and . as time separators
-                    time_str = time_patterns[day_idx-1].strip()
-                    if not time_str or time_str == '--':
-                        continue
-                        
-                    start, end = time_str.split('-')
-                    # Parse start time
-                    start = start.strip()
-                    if ':' in start:
-                        start_time = datetime.strptime(start, '%H:%M').time()
-                    else:
-                        start_time = datetime.strptime(start, '%H.%M').time()
-                    
-                    # Parse end time
-                    end = end.strip()
-                    if ':' in end:
-                        end_time = datetime.strptime(end, '%H:%M').time()
-                    else:
-                        end_time = datetime.strptime(end, '%H.%M').time()
-                    
-                    slots.append(cls(
-                        day=zhs_to_weekday[day_idx],
-                        start_time=start_time,
-                        end_time=end_time
-                    ))
-                except (ValueError, IndexError) as e:
-                    logger.warning(f"Could not parse time slot: {time_patterns[day_idx-1]} - {str(e)}")
+        
+        # Find which days are active (non-zero numbers in the array)
+        active_days = [d for d in day_pattern if d > 0]
+        
+        for day_num in active_days:
+            try:
+                # Get the corresponding time pattern
+                # If multiple days, use corresponding time pattern, otherwise use first
+                time_idx = active_days.index(day_num)
+                time_str = time_patterns[time_idx].strip() if time_idx < len(time_patterns) else time_patterns[0].strip()
+                
+                if not time_str or time_str == '--':
                     continue
+                    
+                start, end = time_str.split('-')
+                
+                # Parse start time
+                start = start.strip()
+                if ':' in start:
+                    start_time = datetime.strptime(start, '%H:%M').time()
+                else:
+                    start_time = datetime.strptime(start, '%H.%M').time()
+                
+                # Parse end time
+                end = end.strip()
+                if ':' in end:
+                    end_time = datetime.strptime(end, '%H:%M').time()
+                else:
+                    end_time = datetime.strptime(end, '%H.%M').time()
+                
+                # Convert day number to WeekdayEnum (1 = Monday, etc.)
+                weekday_idx = day_num - 1  # Convert to 0-based index
+                slots.append(cls(
+                    day=WeekdayEnum[list(WeekdayEnum)[weekday_idx].name],
+                    start_time=start_time,
+                    end_time=end_time
+                ))
+            except (ValueError, IndexError) as e:
+                logger.warning(f"Could not parse time slot for day {day_num}: {time_patterns} - {str(e)}")
+                continue
+                
         return slots
 
 class Price(BaseModel):
@@ -146,7 +151,6 @@ class Course(BaseModel):
     category_id: int
     status_code: int = Field(..., description="Usually 5, meaning might be related to course status")
     is_available: bool = False
-    link: Optional[str] = None
 
 class SportCourse(BaseModel):
     title: str

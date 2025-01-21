@@ -1,8 +1,8 @@
+import html
 import json
 from typing import Any, Dict, List
 
 import requests
-from bs4 import BeautifulSoup
 
 from data_fetcher.src.sport.models.models import Course, Price, SportCourse, TimeFrame, TimeSlot
 from shared.src.core.logging import get_sport_fetcher_logger
@@ -29,15 +29,9 @@ class ZhsCrawler:
 
             # Clean up JavaScript to make it valid JSON
             data_str = js_content[start:]
-            data_str = data_str.replace('&nbsp;', ' ')  # Replace HTML entities
-            data_str = data_str.replace('&#220;', 'Ü')  # Replace umlaut
-            data_str = data_str.replace('&#252;', 'ü')
-            data_str = data_str.replace('&#228;', 'ä')
-            data_str = data_str.replace('&#246;', 'ö')
-            data_str = data_str.replace('&#223;', 'ß')
-            data_str = data_str.replace('&#214;', 'Ö')
-            data_str = data_str.replace('&#206;', 'Ä')
-            data_str = data_str.replace('&euro;', '€')
+            
+            # First decode standard HTML entities
+            data_str = html.unescape(data_str)
             
             # Find the end of the JSON object
             brace_count = 0
@@ -95,7 +89,11 @@ class ZhsCrawler:
                 # Skip if course_data doesn't have enough elements
                 if len(course_data) < 13:
                     continue
-
+                
+                # Skip if course is not available
+                if course_data[0] < 0:
+                    continue
+                
                 # Extract course info
                 course_id = course_data[1]
                 title = course_data[2]  # This is the sport type/title
@@ -120,7 +118,6 @@ class ZhsCrawler:
                         category_id=course_data[12],
                         status_code=course_data[0],
                         is_available=course_data[10] != 0,  # 0 seems to indicate availability
-                        link=f"{self.base_url}/angebote/aktueller_zeitraum_0/{course_id}.html"
                     )
                     
                     # Group courses by title
@@ -152,10 +149,10 @@ if __name__ == "__main__":
     sport_courses = crawler.get_courses()
     
     # Print some course info
-    for sport in sport_courses[:25]:  # Print first 5 sport types
+    for sport in sport_courses[:8]:  # Print first 5 sport types
         print(f"\nSport: {sport.title}")
         print(f"Number of courses: {len(sport.courses)}")
-        for course in sport.courses[:2]:  # Print first 2 courses of each sport
+        for course in sport.courses[:10]:  # Print first 2 courses of each sport
             print(f"\n  Course: {course.name}")
             print(f"  Time slots:")
             for slot in course.time_slots:

@@ -4,16 +4,17 @@ from shared.src.core.database import get_db
 from shared.src.core.logging import get_main_fetcher_logger
 
 from ..state import running_sport
+from .services.sport_service import add_sport_to_database
 
 
 logger = get_main_fetcher_logger(__name__)
 
-async def create_university_fetcher():
+async def create_sport_fetcher():
     logger.info("================================================")
     logger.info(f"Setting up {__name__}...")
     
     db = next(get_db())
-    # add_university_to_database(db)
+    add_sport_to_database(db)
     
     
     while running_sport:
