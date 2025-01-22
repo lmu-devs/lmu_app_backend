@@ -31,10 +31,12 @@ class SportService:
             .outerjoin(SportTypeTable.sport_courses)
             .outerjoin(SportCourseTable.translations)
             .outerjoin(SportCourseTable.time_slots)
+            .outerjoin(SportCourseTable.location)
             .options(
                 contains_eager(SportTypeTable.translations),
                 contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.translations),
                 contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.time_slots),
+                contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.location),
             )
         )
         

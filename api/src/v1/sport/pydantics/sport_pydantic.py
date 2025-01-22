@@ -1,7 +1,9 @@
 from typing import List
+
 from api.src.v1.sport.schemas.sport_schema import Price, SportCourse, SportType, TimeSlot
 from shared.src.schemas import Location
-from shared.src.tables.sport import SportCourseTable, SportTypeTable, SportCourseTimeSlotTable
+from shared.src.tables.sport import SportCourseTable, SportCourseTimeSlotTable, SportTypeTable
+from ...core.pydantics import location_to_pydantic
 
 
 async def sport_types_to_pydantic(sports: List[SportTypeTable]) -> List[SportType]:
@@ -27,11 +29,9 @@ async def course_to_pydantic(course: SportCourseTable) -> SportCourse:
         external_price=course.external_price
     )
     
-    location = Location(
-        address=str(course.location_code),
-        latitude=course.location_code,
-        longitude=course.location_code
-    )
+    location = None
+    if course.location:
+        location = location_to_pydantic(course.location)
     
     timeslots = await timeslots_to_pydantic(course.time_slots)
     

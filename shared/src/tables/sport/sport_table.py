@@ -55,7 +55,7 @@ class SportCourseTable(Base):
     sport_type = relationship("SportTypeTable", back_populates="sport_courses")
     translations = relationship("SportCourseTranslationTable", back_populates="sport_course")
     time_slots = relationship("SportCourseTimeSlotTable", back_populates="sport_course")
-    location = relationship("SportCourseLocationTable", back_populates="sport_course")
+    location = relationship("SportCourseLocationTable", uselist=False, back_populates="sport_course")
 class SportCourseTranslationTable(LanguageTable, Base):
     __tablename__ = "sport_course_translation"
     

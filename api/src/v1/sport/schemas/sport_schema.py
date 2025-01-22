@@ -25,7 +25,7 @@ class SportCourse(BaseModel):
     instructor: str
     time_slots: List[TimeSlot]
     price: Price
-    location: Location
+    location: Location | None = None
     
     
 class SportType(BaseModel):
