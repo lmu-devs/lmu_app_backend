@@ -5,6 +5,7 @@ from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, Float, ForeignKey,
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
+from shared.src.tables.location_table import LocationTable
 from shared.src.enums import WeekdayEnum
 from shared.src.tables import LanguageTable
 
@@ -41,7 +42,6 @@ class SportCourseTable(Base):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
     instructor = Column(String)
-    location_code = Column(Integer)
     category_id = Column(Integer)
     status_code = Column(Integer)
     is_available = Column(Boolean, default=False)
@@ -55,7 +55,7 @@ class SportCourseTable(Base):
     sport_type = relationship("SportTypeTable", back_populates="sport_courses")
     translations = relationship("SportCourseTranslationTable", back_populates="sport_course")
     time_slots = relationship("SportCourseTimeSlotTable", back_populates="sport_course")
-
+    location = relationship("SportCourseLocationTable", back_populates="sport_course")
 class SportCourseTranslationTable(LanguageTable, Base):
     __tablename__ = "sport_course_translation"
     
@@ -77,4 +77,11 @@ class SportCourseTimeSlotTable(Base):
     # Relationship
     sport_course = relationship("SportCourseTable", back_populates="time_slots")
     
+class SportCourseLocationTable(LocationTable, Base):
+    __tablename__ = "sport_course_location"
+    
+    sport_course_id = Column(String, ForeignKey('sport_course.id', ondelete='CASCADE'), primary_key=True)
+    
+    # Relationships
+    sport_course = relationship("SportCourseTable", back_populates="location")
     

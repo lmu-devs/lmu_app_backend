@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from data_fetcher.src.sport.models.sport_models import Course, Price, SportCourse, TimeFrame, TimeSlot
+from data_fetcher.src.sport.models.sport_models import Course, Price, SportCourse, SportCourseLocation, TimeFrame, TimeSlot
 from shared.src.core.logging import get_sport_fetcher_logger
 
 
@@ -105,7 +105,8 @@ class ZhsCrawler:
                     for keyword in exclude_keywords
                 ):
                     continue
-
+                print(course_data[6])
+                print(data['orte'][course_data[6][0]])
                 try:
                     course = Course(
                         id=course_id,
@@ -114,7 +115,7 @@ class ZhsCrawler:
                         duration=TimeFrame.from_duration_string(course_data[7]),
                         instructor=course_data[8],
                         price=Price.from_price_string(course_data[9]),
-                        location_code=course_data[6][0],  # Take first location code
+                        location=SportCourseLocation.from_pattern(data['orte'][course_data[6][0]]),
                         category_id=course_data[12],
                         status_code=course_data[0],
                         is_available=course_data[10] != 0,  # 0 seems to indicate availability
@@ -160,3 +161,4 @@ if __name__ == "__main__":
             print(f"  Duration: {course.duration.start_date.date()} to {course.duration.end_date.date()}")
             print(f"  Price: {course.price.student}€ (Student)")
             print(f"  Available: {course.is_available}")
+            print(f"  Location: {course.location.address}")

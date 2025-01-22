@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 
 from shared.src.core.logging import get_sport_fetcher_logger
 from shared.src.enums.weekday_enum import WeekdayEnum
+from shared.src.schemas import Location
 
 
 logger = get_sport_fetcher_logger(__name__)
@@ -143,6 +144,22 @@ class TimeFrame(BaseModel):
                 start_date=datetime.now(),
                 end_date=datetime.now()
             )
+            
+
+class SportCourseLocation(Location):
+    
+    @classmethod
+    def from_pattern(cls, location_data: list[str, float, float]) -> 'SportCourseLocation':
+        if not location_data or len(location_data) < 3:
+            return None
+        # Skip if any required field is empty or invalid
+        if not location_data[0] or not location_data[1] or not location_data[2]:
+            return None
+        return cls(
+            address=location_data[0],
+            latitude=location_data[1],
+            longitude=location_data[2]
+        )
 
 class Course(BaseModel):
     id: str
@@ -151,7 +168,7 @@ class Course(BaseModel):
     duration: TimeFrame
     instructor: str
     price: Price
-    location_code: int
+    location: SportCourseLocation | None = None
     category_id: int
     status_code: int = Field(..., description="Usually 5, meaning might be related to course status")
     is_available: bool = False
@@ -174,3 +191,4 @@ class SportCourse(BaseModel):
             cls(title=title, courses=course_list)
             for title, course_list in course_dict.items()
         ]
+        

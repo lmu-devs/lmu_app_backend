@@ -7,6 +7,7 @@ from data_fetcher.src.sport.models.sport_models import SportCourse
 from shared.src.core.logging import get_sport_fetcher_logger
 from shared.src.enums import LanguageEnum
 from shared.src.tables.sport.sport_table import (
+    SportCourseLocationTable,
     SportCourseTable,
     SportCourseTimeSlotTable,
     SportCourseTranslationTable,
@@ -43,6 +44,7 @@ def _clear_existing_data(db: Session) -> None:
         db.query(SportCourseTimeSlotTable).delete()
         db.query(SportCourseTranslationTable).delete()
         db.query(SportCourseTable).delete()
+        db.query(SportCourseLocationTable).delete()
         # Then delete parent tables
         db.query(SportTypeTranslationTable).delete()
         db.query(SportTypeTable).delete()
@@ -91,7 +93,6 @@ def _add_sport_courses(db: Session, sport_courses: List[SportCourse]) -> None:
                     start_date=course.duration.start_date,
                     end_date=course.duration.end_date,
                     instructor=course.instructor,
-                    location_code=course.location_code,
                     category_id=course.category_id,
                     status_code=course.status_code,
                     is_available=course.is_available,
@@ -108,6 +109,16 @@ def _add_sport_courses(db: Session, sport_courses: List[SportCourse]) -> None:
                     title=course.name
                 )
                 db.add(course_translation)
+                
+                # Add location if it exists
+                if course.location:
+                    location = SportCourseLocationTable(
+                        sport_course_id=course.id,
+                        address=course.location.address,
+                        latitude=course.location.latitude,
+                        longitude=course.location.longitude
+                    )
+                db.add(location)
                 
                 # Add time slots
                 for slot in course.time_slots:
