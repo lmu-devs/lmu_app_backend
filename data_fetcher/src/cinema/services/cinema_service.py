@@ -2,7 +2,7 @@ from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.enums import CinemaEnums, LanguageEnum
 from shared.src.tables import CinemaLocationTable, CinemaTable, CinemaTranslationTable
 
-from ..models.cinema_description import CinemaDescription
+from ..models.cinema_description_model import CinemaDescription
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import HM_CINEMA_URL, LMU_CINEMA_URL, TUM_CINEMA_URL
 

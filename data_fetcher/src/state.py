@@ -2,3 +2,4 @@
 running_eat = True 
 running_movie = True
 running_university = True
+running_sport = True

@@ -227,6 +227,9 @@ class StudentenwerkMenuParser(MenuParser):
             price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
         else:
             price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.CLASSIC
+            
+        if "suppe" in dish_name.lower():
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
 
         if dish[0] != "Studitopf" and dish[4] == "0":  # Non-Vegetarian
             if "Fi" in dish[2]:
