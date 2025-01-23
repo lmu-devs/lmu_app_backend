@@ -28,7 +28,7 @@ class MovieService:
         return result.scalar_one_or_none()
     
     async def get_movies(self, movie_id: Optional[uuid.UUID] = None) -> List[Movie]:
-        stmt = self._get_movies_query(self.language, movie_id)
+        stmt = self._get_movies_query(movie_id)
         result = await self.db.execute(stmt)
         return result.scalars().unique().all()
     

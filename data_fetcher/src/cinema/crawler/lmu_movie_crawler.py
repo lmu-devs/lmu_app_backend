@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import CinemaEnums
+from shared.src.enums import CinemaEnum, UniversityEnum
 
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import LMU_CINEMA_URL
@@ -20,7 +20,8 @@ class LmuScreeningCrawler:
         self.base_url = LMU_CINEMA_URL
         self.price = 3.5
         self.external_link = LMU_CINEMA_URL
-        self.cinema_id = CinemaEnums.LMU.value
+        self.cinema_id = CinemaEnum.LMU
+        self.university_id = UniversityEnum.LMU
         self.is_ov = True
         
     def _parse_date(self, date_str) -> datetime:
@@ -96,6 +97,7 @@ class LmuScreeningCrawler:
                 latitude=location.latitude,
                 external_url=self.external_link,
                 cinema_id=self.cinema_id,
+                university_id=self.university_id,
                 price=self.price,
             ))
             logger.info(f"Successfully parsed movie: {title} ({year})")

@@ -181,7 +181,19 @@
     ],
     "status": "DEVELOPMENT",
     "prototype_url": "",
-    "release_date": "2024-11-19T11:53:31.756000"
+    "release_date": "2024-11-19T11:53:31.756000",
+    "images": [
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_sport_01.webp",
+            "name": "Sport Wishlist Features 1",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_sport_02.webp",
+            "name": "Sport Wishlist Features 2",
+            "blurhash": null
+        }
+    ]
 }
 
 

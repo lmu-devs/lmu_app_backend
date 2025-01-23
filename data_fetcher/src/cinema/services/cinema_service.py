@@ -1,20 +1,20 @@
 from shared.src.core.logging import get_cinema_fetcher_logger
-from shared.src.enums import CinemaEnums, LanguageEnum
+from shared.src.enums import CinemaEnum, LanguageEnum
 from shared.src.tables import CinemaLocationTable, CinemaTable, CinemaTranslationTable
 
-from ..models.cinema_description_model import CinemaDescription
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import HM_CINEMA_URL, LMU_CINEMA_URL, TUM_CINEMA_URL
+from ..models.cinema_description_model import CinemaDescription
 
 
 logger = get_cinema_fetcher_logger(__name__)
 
 class CinemaService:
     
-    lmu_cinema_id = CinemaEnums.LMU.value
-    hm_cinema_id = CinemaEnums.HM.value
-    tum_cinema_id = CinemaEnums.TUM.value
-    tum_garching_cinema_id = CinemaEnums.TUM_GARCHING.value
+    lmu_cinema_id = CinemaEnum.LMU.value
+    hm_cinema_id = CinemaEnum.HM.value
+    tum_cinema_id = CinemaEnum.TUM.value
+    tum_garching_cinema_id = CinemaEnum.TUM_GARCHING.value
     
     
     def get_all_cinema_tables(self) -> list[CinemaTable]:

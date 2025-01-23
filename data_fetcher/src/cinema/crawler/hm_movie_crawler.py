@@ -2,11 +2,11 @@ import re
 from datetime import datetime
 from typing import List
 
-from shared.src.core.logging import get_cinema_fetcher_logger
 import requests
 from bs4 import BeautifulSoup
 
-from shared.src.enums import CinemaEnums
+from shared.src.core.logging import get_cinema_fetcher_logger
+from shared.src.enums import CinemaEnum, UniversityEnum
 
 from ..constants.location_constants import CinemaLocationConstants
 from ..constants.url_constants import HM_CINEMA_URL
@@ -17,7 +17,8 @@ logger = get_cinema_fetcher_logger(__name__)
 
 class HmScreeningCrawler:
     def __init__(self):
-        self.cinema_id = CinemaEnums.HM.value
+        self.cinema_id = CinemaEnum.HM
+        self.university_id = UniversityEnum.HM
         self.base_url = HM_CINEMA_URL
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -140,6 +141,7 @@ class HmScreeningCrawler:
                         price=self.price,
                         subtitles=subtitles,
                         cinema_id=self.cinema_id,
+                        university_id=self.university_id,
                         external_url=self.external_link,
                         custom_poster_url=custom_poster_url,
                         overview=overview,

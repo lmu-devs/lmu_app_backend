@@ -17,6 +17,7 @@ class ScreeningCrawl:
         aka_name:       str     | None = None, 
         price:          float   | None = None, # 0 when "Free Entrance"
         cinema_id:      str     | None = None,
+        university_id:  str     | None = None,
         subtitles:      str     | None = None, # OmdU = Original German with Subtitles, OmeU = Original English with Subtitles, OmU = Original Multilingual with Subtitles
         external_url:   str     | None = None,
         booking_url:    str     | None = None,
@@ -37,6 +38,7 @@ class ScreeningCrawl:
         self.longitude = longitude
         self.latitude = latitude
         self.cinema_id = cinema_id
+        self.university_id = university_id
         self.is_ov = is_ov
         self.subtitles = subtitles
         self.external_url = external_url

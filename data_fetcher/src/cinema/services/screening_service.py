@@ -75,7 +75,7 @@ class ScreeningService:
         
         return movie, [translation], screening, [], [], []
     
-    def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], movie_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
+    def _create_movie_model(self, tmdb_data: Dict[Any, Any], omdb_data: Dict[Any, Any], screening_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
         """Create MovieTable and related instances from API data"""
         tmdb_base_data = tmdb_data[LanguageEnum.ENGLISH_US]
     
@@ -94,29 +94,29 @@ class ScreeningService:
         # Create screenings
         # TODO: make this dynamic
         screening_id = uuid.uuid4()
-        date = movie_data.date.replace(hour=20)
+        date = screening_data.date.replace(hour=20)
         entry_time = date - timedelta(minutes=30)
         end_time = date + timedelta(minutes=movie.runtime)
-        university_id = movie_data.cinema_id
+        cinema_id = screening_data.cinema_id
         
         screening = MovieScreeningTable(
             id=screening_id,
             movie_id=movie_id,
             date=date,
-            university_id=university_id,
-            cinema_id=university_id,
+            university_id=screening_data.university_id,
+            cinema_id=cinema_id,
             start_time=date,
             end_time=end_time,
             entry_time=entry_time,
-            price=movie_data.price,
-            is_ov=movie_data.is_ov,
-            subtitles=movie_data.subtitles,
-            external_link=movie_data.external_url,
+            price=screening_data.price,
+            is_ov=screening_data.is_ov,
+            subtitles=screening_data.subtitles,
+            external_link=screening_data.external_url,
             location=MovieLocationTable(
                 screening_id=screening_id,
-                address=movie_data.address,
-                longitude=movie_data.longitude,
-                latitude=movie_data.latitude
+                address=screening_data.address,
+                longitude=screening_data.longitude,
+                latitude=screening_data.latitude
             )
         )
 
@@ -203,9 +203,9 @@ class ScreeningService:
         logger.info("Starting movie fetch process")
         
         crawled_movies: list[ScreeningCrawl] = []
-        crawled_movies.extend(LmuScreeningCrawler().crawl())
+        # crawled_movies.extend(LmuScreeningCrawler().crawl())
         crawled_movies.extend(TumScreeningCrawler().crawl())
-        crawled_movies.extend(HmScreeningCrawler().crawl())
+        # crawled_movies.extend(HmScreeningCrawler().crawl())
             
         processed_movies = []
 
