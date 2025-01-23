@@ -1,16 +1,25 @@
 import asyncio
+
 import schedule
-
-from sqlalchemy.orm import Session
 from psycopg2.errors import UniqueViolation
+from sqlalchemy.orm import Session
 
-from shared.src.tables import MovieTable, MovieTranslationTable, MovieScreeningTable, MovieRatingTable, MovieTrailerTable, MovieTrailerTranslationTable, MovieLocationTable
-from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.core.database import get_db
+from shared.src.core.logging import get_cinema_fetcher_logger
+from shared.src.tables import (
+    MovieLocationTable,
+    MovieRatingTable,
+    MovieScreeningTable,
+    MovieTable,
+    MovieTrailerTable,
+    MovieTrailerTranslationTable,
+    MovieTranslationTable,
+)
 
 from ..state import running_movie
 from .services.cinema_service import CinemaService
 from .services.screening_service import ScreeningService
+
 
 logger = get_cinema_fetcher_logger(__name__)
 
@@ -77,7 +86,7 @@ async def fetch_scheduled_data(db: Session):
             continue
 
 
-async def create_movie_fetcher():
+async def create_cinema_fetcher():
     logger.info("================================================")
     logger.info(f"Setting up {__name__}...")
     db = next(get_db())

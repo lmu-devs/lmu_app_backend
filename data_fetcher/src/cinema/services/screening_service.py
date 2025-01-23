@@ -203,9 +203,9 @@ class ScreeningService:
         logger.info("Starting movie fetch process")
         
         crawled_movies: list[ScreeningCrawl] = []
-        # crawled_movies.extend(LmuScreeningCrawler().crawl())
+        crawled_movies.extend(LmuScreeningCrawler().crawl())
         crawled_movies.extend(TumScreeningCrawler().crawl())
-        # crawled_movies.extend(HmScreeningCrawler().crawl())
+        crawled_movies.extend(HmScreeningCrawler().crawl())
             
         processed_movies = []
 

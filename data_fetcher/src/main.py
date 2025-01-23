@@ -2,14 +2,14 @@ import asyncio
 import signal
 import sys
 
+from data_fetcher.src.cinema.cinema_fetcher import create_cinema_fetcher
+from data_fetcher.src.food.food_fetcher import create_food_fetcher
+from data_fetcher.src.sport.sport_fetcher import create_sport_fetcher
+from data_fetcher.src.university.university_fetcher import create_university_fetcher
 from shared.src.core.database import Base, Database, get_async_db, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
 
-from data_fetcher.src.university.university_fetcher import create_university_fetcher
-from data_fetcher.src.cinema.cinema_fetcher import create_movie_fetcher
-from data_fetcher.src.food.food_fetcher import create_food_fetcher
-from data_fetcher.src.sport.sport_fetcher import create_sport_fetcher
 
 logger_main = get_main_fetcher_logger(__name__)
 
@@ -35,9 +35,9 @@ async def main():
         
         tasks = [
             asyncio.create_task(create_university_fetcher()),
-            asyncio.create_task(create_movie_fetcher()),
-            # asyncio.create_task(create_food_fetcher()),
-            # asyncio.create_task(create_sport_fetcher())
+            asyncio.create_task(create_cinema_fetcher()),
+            asyncio.create_task(create_food_fetcher()),
+            asyncio.create_task(create_sport_fetcher())
         ]
         
         await asyncio.gather(*tasks)
