@@ -30,7 +30,7 @@ class RoomfinderService:
 
     def _update_cities(self) -> None:
         """Updates cities table with data from 1_city.json"""
-        with open('data_fetcher/src/explore/constants/1_city.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/1_city.json') as f:
             city_data = json.load(f)
             cities = City.from_json_list(city_data)
             
@@ -43,7 +43,7 @@ class RoomfinderService:
 
     def _update_streets(self) -> None:
         """Updates streets table with data from 2_street.json"""
-        with open('data_fetcher/src/explore/constants/2_street.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/2_street.json') as f:
             street_data = json.load(f)
             streets = Street.from_json_list(street_data)
             
@@ -57,7 +57,7 @@ class RoomfinderService:
 
     def _update_buildings(self) -> None:
         """Updates buildings and building_locations tables with data from 3_building.json"""
-        with open('data_fetcher/src/explore/constants/3_building.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/3_building.json') as f:
             building_data = json.load(f)
             buildings = Building.from_json_list(building_data)
             
@@ -77,7 +77,7 @@ class RoomfinderService:
 
     def _update_building_parts(self) -> None:
         """Updates building_parts table with data from 4_building_part.json"""
-        with open('data_fetcher/src/explore/constants/4_building_part.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/4_building_part.json') as f:
             building_part_data = json.load(f)
             building_parts = BuildingPart.from_json_list(building_part_data)
             
@@ -91,7 +91,7 @@ class RoomfinderService:
 
     def _update_floors(self) -> None:
         """Updates floors table with data from 5_floor.json"""
-        with open('data_fetcher/src/explore/constants/5_floor.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/5_floor.json') as f:
             floor_data = json.load(f)
             floors = Floor.from_json_list(floor_data)
             
@@ -109,7 +109,7 @@ class RoomfinderService:
 
     def _update_rooms(self) -> None:
         """Updates rooms table with data from 6_room.json"""
-        with open('data_fetcher/src/explore/constants/6_room.json') as f:
+        with open('data_fetcher/src/roomfinder/constants/6_room.json') as f:
             room_data = json.load(f)
             rooms = Room.from_json_list(room_data)
             
@@ -125,18 +125,18 @@ class RoomfinderService:
 
 
 if __name__ == "__main__":
-    with open('data_fetcher/src/explore/constants/1_city.json') as f:
+    with open('data_fetcher/src/roomfinder/constants/1_city.json') as f:
         city_data = json.load(f)
         cities = City.from_json_list(city_data)
     
         print(cities)
         
-    with open('data_fetcher/src/explore/constants/2_street.json') as f:
+    with open('data_fetcher/src/roomfinder/constants/2_street.json') as f:
         street_data = json.load(f)
         streets = Street.from_json_list(street_data)
         print(streets)
 
-    with open('data_fetcher/src/explore/constants/3_building.json') as f:
+    with open('data_fetcher/src/roomfinder/constants/3_building.json') as f:
         building_data = json.load(f)
         buildings = Building.from_json_list(building_data)
         print(buildings)
