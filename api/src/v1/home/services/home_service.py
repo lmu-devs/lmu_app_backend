@@ -23,7 +23,7 @@ class HomeService:
             )
         
     
-    def get_home_data(self):
+    async def get_home_data(self):
         # Hardcoded data for now
         return Home(
             semester_fee=self.get_semester_fee(),
