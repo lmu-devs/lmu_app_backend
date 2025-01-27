@@ -1,10 +1,9 @@
 import json
-from typing import List
 
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.explore.models import Building, BuildingPart, City, Floor, Room, Street
-from shared.src.tables.explore import (
+from data_fetcher.src.roomfinder.models import Building, BuildingPart, City, Floor, Room, Street
+from shared.src.tables.roomfinder import (
     BuildingLocationTable,
     BuildingPartTable,
     BuildingTable,
@@ -15,7 +14,7 @@ from shared.src.tables.explore import (
 )
 
 
-class ExploreService:
+class RoomfinderService:
     def __init__(self, db: Session):
         self.db = db
 
