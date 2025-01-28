@@ -12,8 +12,8 @@ from shared.src.enums import LanguageEnum
 # from ..services.room_service import RoomService
 
 
-# router = APIRouter()
-# logger = get_places_logger(__name__)
+router = APIRouter()
+logger = get_places_logger(__name__)
 
 # @router.get("/roomfinder", response_model=List[RoomType], description="Get all roomfinder data")
 # async def get_roomfinder(
