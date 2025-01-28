@@ -1,17 +1,28 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables.roomfinder.building_table import BuildingTable
-from data_fetcher.src.roomfinder.models.street_model import Street
-from data_fetcher.src.roomfinder.models.building_part_model import BuildingPart
+from api.src.v1.roomfinder.models.building_part_model import BuildingParts
+from shared.src.models.location_model import Location
 
 class Building(BaseModel):
-    code: str
-    building_parts: List[BuildingPart]
-    display_name: str
-    lat: float
-    lng: float
+    id: str
+    title: str
+    location: Location
+    building_parts: BuildingParts
 
     @classmethod
-    def from_db(cls, data: BuildingTable) -> "Building":
-        return cls(**data)
+    def from_table(cls, data: BuildingTable) -> "Building":
+        return Building(
+            id=data.id,
+            title=data.display_name,
+            location=Location.from_table(data.location),
+            building_parts=BuildingParts.from_table(data.building_parts),
+        )
+
+class Buildings(RootModel):
+    root: List[Building]
+
+    @classmethod
+    def from_table(cls, data: List[BuildingTable]) -> "Buildings":
+        return Buildings(root=[Building.from_table(building) for building in data])

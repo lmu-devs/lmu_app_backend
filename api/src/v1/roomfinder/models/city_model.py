@@ -10,5 +10,5 @@ class City(BaseModel):
     streets: List[Street]
 
     @classmethod
-    def from_db(cls, data: CityTable) -> "City":
+    def from_table(cls, data: CityTable) -> "City":
         return cls(**data)

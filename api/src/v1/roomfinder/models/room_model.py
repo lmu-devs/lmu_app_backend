@@ -1,14 +1,27 @@
-from typing import Dict, List
+from typing import List
+from pydantic import BaseModel, RootModel
 
-from pydantic import BaseModel
 from shared.src.tables.roomfinder.room_table import RoomTable
 
 class Room(BaseModel):
-    code: str
+    id: str
     name: str
-    posX: int
-    posY: int
+    pos_x: int
+    pos_y: int
 
     @classmethod
-    def from_db(cls, data: RoomTable) -> "Room":
-        return cls(**data)
+    def from_table(cls, data: RoomTable) -> "Room":
+        return Room(
+            id=data.id,
+            name=data.name,
+            pos_x=data.pos_x,
+            pos_y=data.pos_y,
+        )
+
+
+class Rooms(RootModel):
+    root: List[Room]
+
+    @classmethod
+    def from_table(cls, data: List[RoomTable]) -> "Rooms":
+        return Rooms(root=[Room.from_table(room) for room in data])
