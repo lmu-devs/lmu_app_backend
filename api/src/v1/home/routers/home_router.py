@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.logging import get_food_logger
 from shared.src.core.database import get_async_db
-from ..schemas.home_scheme import Home
+from ..models.home_model import Home
 from ..services.home_service import HomeService
 
 router = APIRouter()

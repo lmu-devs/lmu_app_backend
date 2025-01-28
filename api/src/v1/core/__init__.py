@@ -1,4 +1,4 @@
-from .schemas import *
+from .models import *
 from .pydantics import *
 from .api_key import *
 from .language import *

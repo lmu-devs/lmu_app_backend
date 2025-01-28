@@ -13,7 +13,7 @@ from shared.src.tables import UserTable
 from ...core import APIKey
 from ...core.language import get_language
 from ..pydantics import menu_days_to_pydantic
-from ..schemas import Menus
+from ..models import Menus
 from ..services import MenuService
 
 router = APIRouter()

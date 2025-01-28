@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from shared.src.enums import RatingSourceEnum
 from shared.src.models.location_model import Location
 from shared.src.models.image_model import Image
-from ...core.schemas.university_scheme import University
+from ...core.models.university_scheme import University
 
 
 class MovieRating(BaseModel):

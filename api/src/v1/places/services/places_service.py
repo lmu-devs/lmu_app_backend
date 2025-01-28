@@ -1,7 +1,7 @@
 from sqlalchemy import literal, select, union_all
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.src.v1.places.schemas.places_scheme import Place, PlaceEnum
+from api.src.v1.places.models.places_model import Place, PlaceEnum
 from shared.src.tables import CanteenLocationTable, CinemaLocationTable, BuildingLocationTable
 
 

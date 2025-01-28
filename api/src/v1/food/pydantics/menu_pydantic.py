@@ -3,7 +3,7 @@ from typing import List
 
 from shared.src.tables import MenuDayTable
 
-from api.src.v1.food.schemas import MenuDay, Menus
+from api.src.v1.food.models import MenuDay, Menus
 from api.src.v1.food.pydantics import dish_to_pydantic
 
 

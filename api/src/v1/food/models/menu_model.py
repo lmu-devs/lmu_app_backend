@@ -2,7 +2,7 @@ from datetime import date
 from typing import List
 from pydantic import BaseModel, RootModel, field_validator
 
-from ..schemas import Dish
+from . import Dish
 
 
 class MenuDay(BaseModel):

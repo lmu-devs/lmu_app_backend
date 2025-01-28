@@ -5,7 +5,7 @@ from shared.src.tables import DishTable
 from shared.src.models import Rating
 
 from api.src.v1.food.pydantics import canteen_to_pydantic
-from api.src.v1.food.schemas import Dish, DishDate, DishDates, DishPrice
+from api.src.v1.food.models import Dish, DishDate, DishDates, DishPrice
 
 
 def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:

@@ -1,7 +1,7 @@
 from shared.src.enums import UniversityEnum
 from shared.src.tables import UniversityTable, UniversityTranslationTable
 
-from ..schemas import University
+from ..models import University
 
 
 def university_to_pydantic(university: UniversityTable) -> University:

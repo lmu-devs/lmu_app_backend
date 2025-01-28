@@ -13,7 +13,7 @@ from ...core import APIKey
 from ...core.language import get_language
 
 from ..pydantics.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
-from ..schemas import DishDates, Dishes
+from ..models import DishDates, Dishes
 from ..services import CanteenService, DishService
 
 router = APIRouter()

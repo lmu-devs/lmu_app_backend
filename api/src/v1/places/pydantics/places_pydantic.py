@@ -1,9 +1,8 @@
 from typing import List
 
 from shared.src.tables import CanteenLocationTable, CinemaLocationTable, BuildingLocationTable
-from api.src.v1.places.schemas.places_scheme import Place, PlaceEnum
-from api.src.v1.core.pydantics.location_pydantic import location_to_pydantic
-
+from api.src.v1.places.models.places_model import Place, PlaceEnum
+from shared.src.models.location_model import Location
 
 async def places_to_pydantic(places: List[any]) -> List[Place]:
     places_pydantic = []
@@ -26,7 +25,7 @@ async def places_to_pydantic(places: List[any]) -> List[Place]:
         places_pydantic.append(
             Place(
                 id=id,
-                location=location_to_pydantic(place),
+                location=Location.from_table(place.location),
                 type=place_type
             )
         )

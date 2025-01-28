@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from shared.src.models import Rating
 
-from ..schemas import CanteenResponse
+from . import CanteenResponse
 
 
 class DishPrice(BaseModel):

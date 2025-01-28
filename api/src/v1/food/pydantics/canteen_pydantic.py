@@ -1,14 +1,15 @@
-from api.src.v1.core.pydantics import (images_table_to_pydantic,
-                                       location_to_pydantic)
-from api.src.v1.food.schemas.canteen_scheme import (CanteenResponse,
+from shared.src.models.location_model import Location
+
+from api.src.v1.food.models.canteen_model import (CanteenResponse,
                                                     CanteenStatus)
 from shared.src.enums import OpeningHoursTypeEnum
+from shared.src.models.image_model import Images
 from shared.src.models import OpeningHour, ActiveOpeningHours, Rating
 from shared.src.tables import CanteenTable
 
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
-    location = location_to_pydantic(canteen.location)
+    location = Location.from_table(canteen.location)
 
     status = CanteenStatus(
         is_lecture_free=canteen.status.is_lecture_free,
@@ -48,7 +49,7 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
         is_liked=user_likes_canteen
     )
     
-    images = images_table_to_pydantic(canteen.images)
+    images = Images.from_table(canteen.images)
 
     return CanteenResponse(
         id=canteen.id,

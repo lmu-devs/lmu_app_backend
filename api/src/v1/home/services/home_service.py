@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from api.src.v1.home.schemas.home_scheme import Home, Link, SemesterFee, TimePeriod
+from api.src.v1.home.models.home_model import Home, Link, SemesterFee, TimePeriod
 from shared.src.core.logging import get_food_logger
 
 logger = get_food_logger(__name__)

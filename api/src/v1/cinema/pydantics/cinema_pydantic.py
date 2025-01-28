@@ -1,10 +1,13 @@
 from typing import List
 
+
+
+from shared.src.models.location_model import Location
+from shared.src.models.image_model import Image
 from shared.src.tables import (MovieRatingTable, MovieScreeningTable, MovieTable,
                            MovieTrailerTable, MovieTrailerTranslationTable,
                            MovieTranslationTable, CinemaTable)
-from ...core.pydantics import (image_to_pydantic, location_to_pydantic,
-                                       university_to_pydantic)
+from ...core.pydantics import university_to_pydantic
 from ..schemas.cinema_schema import (Cinema, Movie, MovieRating, MovieScreening,
                                     MovieTrailer)
 
@@ -31,7 +34,7 @@ def movie_trailers_to_pydantic(trailers: List[MovieTrailerTable]) -> List[MovieT
         url = f"https://www.youtube.com/watch?v={key}" if key else None
         thumbnail_url = f"https://img.youtube.com/vi/{key}/hqdefault.jpg" if key else None
         
-        thumbnail = image_to_pydantic(thumbnail_url, f"YouTube Thumbnail for {title}") if thumbnail_url else None
+        thumbnail = Image.from_params(thumbnail_url, f"YouTube Thumbnail for {title}") if thumbnail_url else None
         
         trailers_pydantic.append(
             MovieTrailer(
@@ -54,8 +57,8 @@ def movie_to_pydantic(movie: MovieTable) -> Movie:
     title = movie_translations.title if movie_translations else "not translated"
     overview = movie_translations.overview if movie_translations else "not translated"
     tagline = movie_translations.tagline if movie_translations else "not translated"
-    poster = image_to_pydantic(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
-    backdrop = image_to_pydantic(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
+    poster = Image.from_params(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
+    backdrop = Image.from_params(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
     trailers = movie_trailers_to_pydantic(movie.trailers) if movie.trailers else []
     ratings = movie_ratings_to_pydantic(movie.ratings) if movie.ratings else []
     
@@ -85,7 +88,7 @@ def cinemas_to_pydantic(cinemas: List[CinemaTable]) -> List[Cinema]:
 def cinema_to_pydantic(cinema: CinemaTable) -> Cinema:
     title = cinema.translations[0].title if cinema.translations else "not translated"
     descriptions = cinema.translations[0].description if cinema.translations else "not translated"
-    location = location_to_pydantic(cinema.location) if cinema.location else None
+    location = Location.from_table(cinema.location) if cinema.location else None
     return Cinema(
         id=cinema.id,
         title=title,
@@ -99,7 +102,7 @@ def cinema_to_pydantic(cinema: CinemaTable) -> Cinema:
 def screenings_to_pydantic(screenings: List[MovieScreeningTable]) -> List[MovieScreening]:
     screenings_pydantic = []
     for screening in screenings:
-        location = location_to_pydantic(screening.location)
+        location = Location.from_table(screening.location)
         university = university_to_pydantic(screening.university)
         movie = movie_to_pydantic(screening.movie)
         cinema = cinema_to_pydantic(screening.cinema)

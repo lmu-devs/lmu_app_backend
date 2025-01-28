@@ -3,7 +3,6 @@ from typing import List
 from api.src.v1.sport.models.sport_model import Price, SportCourse, SportType, TimeSlot
 from shared.src.models import Location
 from shared.src.tables.sport import SportCourseTable, SportCourseTimeSlotTable, SportTypeTable
-from ...core.pydantics import location_to_pydantic
 
 
 async def sport_types_to_pydantic(sports: List[SportTypeTable]) -> List[SportType]:
@@ -31,7 +30,7 @@ async def course_to_pydantic(course: SportCourseTable) -> SportCourse:
     
     location = None
     if course.location:
-        location = location_to_pydantic(course.location)
+        location = Location.from_table(course.location)
     
     timeslots = await timeslots_to_pydantic(course.time_slots)
     

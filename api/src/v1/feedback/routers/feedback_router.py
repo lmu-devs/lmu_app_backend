@@ -6,7 +6,7 @@ from shared.src.core.database import get_async_db
 from shared.src.tables import UserTable
 
 from api.src.v1.core.api_key import APIKey
-from api.src.v1.feedback.schemas.feedback_scheme import Feedback, FeedbackCreate
+from api.src.v1.feedback.models.feedback_model import Feedback, FeedbackCreate
 from api.src.v1.feedback.services.feedback_service import FeedbackService
 
 router = APIRouter()
