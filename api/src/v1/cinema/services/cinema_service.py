@@ -1,25 +1,17 @@
-import uuid
 from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, contains_eager, joinedload
+from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
 from shared.src.tables import (
     CinemaTable,
     CinemaTranslationTable,
-    MovieScreeningTable,
-    MovieTable,
-    MovieTrailerTable,
-    MovieTrailerTranslationTable,
-    MovieTranslationTable,
-    UniversityTable,
-    UniversityTranslationTable,
 )
 
 from ...core.translation_utils import create_translation_order_case
-from ..schemas.cinema_schema import Cinema, Movie, MovieScreening
+from ..models import Cinema
 
 class CinemaService:
     def __init__(self, db: AsyncSession, language: LanguageEnum):

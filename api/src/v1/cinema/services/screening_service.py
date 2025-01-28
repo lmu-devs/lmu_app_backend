@@ -1,9 +1,6 @@
-import uuid
-from typing import List, Optional
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, contains_eager, joinedload
+from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
 from shared.src.tables import (
@@ -19,7 +16,6 @@ from shared.src.tables import (
 )
 
 from ...core.translation_utils import create_translation_order_case
-from ..schemas.cinema_schema import Movie, MovieScreening
 
 
 class ScreeningService:
