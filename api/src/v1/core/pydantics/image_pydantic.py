@@ -1,6 +1,6 @@
 from typing import List
 
-from shared.src.schemas import Image
+from shared.src.models import Image
 from shared.src.tables import ImageTable
 
 

@@ -2,7 +2,7 @@ import uuid
 from typing import Dict
 
 from shared.src.tables import DishTable
-from shared.src.schemas import Rating
+from shared.src.models import Rating
 
 from api.src.v1.food.pydantics import canteen_to_pydantic
 from api.src.v1.food.schemas import Dish, DishDate, DishDates, DishPrice

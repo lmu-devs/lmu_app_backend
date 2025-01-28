@@ -3,8 +3,8 @@ from typing import List
 from pydantic import BaseModel, RootModel
 
 from shared.src.enums import CanteenEnum
-from shared.src.schemas.location_scheme import Location
-from shared.src.schemas.opening_hour_scheme import OpeningHours
+from shared.src.models.location_model import Location
+from shared.src.models.opening_hour_model import OpeningHours
 from shared.src.enums import CanteenTypeEnum
 
 

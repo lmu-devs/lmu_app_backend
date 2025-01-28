@@ -5,8 +5,8 @@ from typing import List
 from pydantic import BaseModel
 
 from shared.src.enums import RatingSourceEnum
-from shared.src.schemas.location_scheme import Location
-from shared.src.schemas import Image
+from shared.src.models.location_model import Location
+from shared.src.models.image_model import Image
 from ...core.schemas.university_scheme import University
 
 

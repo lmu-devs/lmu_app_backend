@@ -1,7 +1,7 @@
 from datetime import time
 
 from shared.src.enums.canteen_enums import CanteenEnum
-from shared.src.schemas import OpeningHour, OpeningHours, WeekdayEnum
+from shared.src.models import OpeningHour, OpeningHours, WeekdayEnum
 
 pasing_opening_hours = {
     CanteenEnum.MENSA_PASING: OpeningHours(

@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.schemas import Rating, CanteenBase, Image, ActiveOpeningHours
+from shared.src.models import Rating, CanteenBase, Image, ActiveOpeningHours
 
 
 class CanteenStatus(BaseModel):

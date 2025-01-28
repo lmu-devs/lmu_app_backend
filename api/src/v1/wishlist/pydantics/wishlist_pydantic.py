@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 
 from shared.src.tables import WishlistTable
-from shared.src.schemas import Rating
+from shared.src.models import Rating
 
 from api.src.v1.wishlist.schemas import Wishlist
 from api.src.v1.core.pydantics import images_table_to_pydantic

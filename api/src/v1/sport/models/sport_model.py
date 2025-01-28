@@ -5,7 +5,7 @@ from datetime import date, datetime, time
 from typing import List
 
 from shared.src.enums import WeekdayEnum
-from shared.src.schemas import Location
+from shared.src.models import Location
 
 class TimeSlot(BaseModel):
     day: WeekdayEnum

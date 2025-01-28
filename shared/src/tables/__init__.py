@@ -7,3 +7,4 @@ from .cinema import *
 from .university_table import *
 from .feedback_table import *
 from .sport import *
+from .roomfinder import *

@@ -1,6 +1,6 @@
 from shared.src.tables import LocationTable
 
-from shared.src.schemas import Location
+from shared.src.models import Location
 
 
 def location_to_pydantic(location: LocationTable) -> Location:

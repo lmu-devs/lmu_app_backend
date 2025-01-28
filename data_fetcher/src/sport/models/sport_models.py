@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from shared.src.core.logging import get_sport_fetcher_logger
 from shared.src.enums.weekday_enum import WeekdayEnum
-from shared.src.schemas import Location
+from shared.src.models import Location
 
 
 logger = get_sport_fetcher_logger(__name__)

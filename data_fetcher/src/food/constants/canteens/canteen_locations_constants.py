@@ -1,5 +1,5 @@
-from shared.src.schemas.location_scheme import Location
-from shared.src.enums.canteen_enums import CanteenEnum
+from shared.src.models import Location
+from shared.src.enums import CanteenEnum
 from data_fetcher.src.food.constants.canteens.areas.locations import munich_locations, martinsried_grosshadern_locations, garching_locations, pasing_locations, rosenheim_locations, oberschleissheim_locations, freising_locations, benediktbeuren_locations
 
 class CanteenLocationsConstants:

@@ -2,7 +2,7 @@ from enum import Enum
 
 from pydantic import BaseModel
 
-from shared.src.schemas.location_scheme import Location
+from shared.src.models import Location
 
 
 class PlaceEnum(str, Enum):

@@ -4,7 +4,7 @@ from data_fetcher.src.food.constants.canteens.areas.opening_hours import (
     oberschleissheim_opening_hours, pasing_opening_hours,
     rosenheim_opening_hours, benediktbeuren_opening_hours)
 from shared.src.enums.canteen_enums import CanteenEnum
-from shared.src.schemas import OpeningHours
+from shared.src.models import OpeningHours
 
 
 class CanteenOpeningHoursConstants:

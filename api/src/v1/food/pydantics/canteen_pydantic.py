@@ -3,7 +3,7 @@ from api.src.v1.core.pydantics import (images_table_to_pydantic,
 from api.src.v1.food.schemas.canteen_scheme import (CanteenResponse,
                                                     CanteenStatus)
 from shared.src.enums import OpeningHoursTypeEnum
-from shared.src.schemas import OpeningHour, ActiveOpeningHours, Rating
+from shared.src.models import OpeningHour, ActiveOpeningHours, Rating
 from shared.src.tables import CanteenTable
 
 

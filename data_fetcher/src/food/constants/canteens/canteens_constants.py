@@ -1,7 +1,7 @@
 from data_fetcher.src.food.constants.canteens.canteen_locations_constants import CanteenLocationsConstants
 from data_fetcher.src.food.constants.canteens.canteen_opening_hours_constants import CanteenOpeningHoursConstants
 from shared.src.enums import CanteenEnum, CanteenTypeEnum
-from shared.src.schemas import Canteen
+from shared.src.models import Canteen
 
 
 class CanteensConstants:
