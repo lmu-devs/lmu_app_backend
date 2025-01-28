@@ -2,7 +2,7 @@ from typing import List
 import uuid
 
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import MovieScreeningTable
 from shared.src.models.location_model import Location
@@ -52,9 +52,9 @@ class MovieScreening(BaseModel):
     
     
     
-class MovieScreenings(BaseModel):
-    screenings: List[MovieScreening]
+class MovieScreenings(RootModel):
+    root: List[MovieScreening] | list = []
     
     @classmethod
     def from_table(cls, screenings: List[MovieScreeningTable]) -> 'MovieScreenings':
-        return MovieScreenings(screenings=[MovieScreening.from_table(screening) for screening in screenings])
+        return MovieScreenings(root=[MovieScreening.from_table(screening) for screening in screenings])

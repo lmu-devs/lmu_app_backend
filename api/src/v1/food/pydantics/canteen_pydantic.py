@@ -10,12 +10,10 @@ from shared.src.tables import CanteenTable
 
 def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
     location = Location.from_table(canteen.location)
+    rating = Rating.from_params(like_count=canteen.like_count, is_liked=user_likes_canteen)
+    images = Images.from_table(canteen.images)
+    status = CanteenStatus.from_table(canteen.status)
 
-    status = CanteenStatus(
-        is_lecture_free=canteen.status.is_lecture_free,
-        is_closed=canteen.status.is_closed,
-        is_temporary_closed=canteen.status.is_temporary_closed
-    )
     
     # Group opening hours by type
     opening_hours_dict = {
@@ -26,11 +24,7 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
     }
     
     for hour in canteen.opening_hours:
-        opening_hour = OpeningHour(
-            day=hour.day,
-            start_time=hour.start_time,
-            end_time=hour.end_time
-        )
+        opening_hour = OpeningHour.from_table(hour)
         opening_hours_dict[hour.type].append(opening_hour)
     
     if canteen.status.is_lecture_free:
@@ -43,13 +37,7 @@ def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) 
             opening_hours=opening_hours_dict[OpeningHoursTypeEnum.OPENING_HOURS] or [],
             serving_hours=opening_hours_dict[OpeningHoursTypeEnum.SERVING_HOURS] or [],
         )
-    
-    rating = Rating(
-        like_count=canteen.like_count, 
-        is_liked=user_likes_canteen
-    )
-    
-    images = Images.from_table(canteen.images)
+
 
     return CanteenResponse(
         id=canteen.id,

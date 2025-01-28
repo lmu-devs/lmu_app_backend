@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import ImageTable
 
@@ -25,11 +25,11 @@ class Image(BaseModel):
         )
 
         
-class Images(BaseModel):
-    images: List[Image]
+class Images(RootModel):
+    root: List[Image]
     
     @classmethod
     def from_table(cls, images: ImageTable) -> 'Images':
         return Images(
-            images=[Image.from_table(image) for image in images]
+            root=[Image.from_table(image) for image in images]
         )

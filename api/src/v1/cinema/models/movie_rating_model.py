@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import MovieRatingTable
 from shared.src.enums import RatingSourceEnum
@@ -18,9 +18,9 @@ class MovieRating(BaseModel):
         )
 
         
-class MovieRatings(BaseModel):
-    ratings: List[MovieRating]
+class MovieRatings(RootModel):
+    root: List[MovieRating] | list = []
     
     @classmethod
     def from_table(cls, ratings: List[MovieRatingTable]) -> 'MovieRatings':
-        return MovieRatings(ratings=[MovieRating.from_table(rating) for rating in ratings])
+        return MovieRatings(root=[MovieRating.from_table(rating) for rating in ratings])

@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 
 from shared.src.tables import MovieTable, MovieTranslationTable
@@ -35,8 +35,8 @@ class Movie(BaseModel):
         tagline = movie_translations.tagline if movie_translations else "not translated"
         poster = Image.from_params(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
         backdrop = Image.from_params(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
-        trailers = MovieTrailers.from_table(movie.trailers) if movie.trailers else []
-        ratings = MovieRatings.from_table(movie.ratings) if movie.ratings else []
+        trailers = MovieTrailers.from_table(movie.trailers)
+        ratings = MovieRatings.from_table(movie.ratings)
         
         return Movie(
             id=movie.id,
@@ -54,10 +54,9 @@ class Movie(BaseModel):
         )
 
 
-
-class Movies(BaseModel):
-    movies: List[Movie]
+class Movies(RootModel):
+    root: List[Movie] | list = []
     
     @classmethod
     def from_table(cls, movies: List[MovieTable]) -> 'Movies':
-        return Movies(movies=[Movie.movie_to_pydantic(movie) for movie in movies])
+        return Movies(root=[Movie.from_table(movie) for movie in movies])
