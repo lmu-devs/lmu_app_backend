@@ -48,30 +48,33 @@ class DishImageService:
         return prompt
 
         
-    def _generate_image_with_transparent_background(self, prompt: str, filename: str):
-        image_path = self.image_generation_service.generate_image(prompt, height=512, width=512, steps=12, scales=4.5, seed=12345)
-        image_path = self.remove_background_service.remove_background(image_path)
-        return self.file_management_service.save_file_from_path(image_path, filename=filename)
+    async def _generate_image_with_transparent_background(self, prompt: str, filename: str):
+        image_path = await self.image_generation_service.generate_image(prompt, height=512, width=512, steps=12, scales=4.5, seed=12345)
+        image_path = await self.remove_background_service.remove_background(image_path)
+        return await self.file_management_service.save_file_from_path(image_path, filename=filename)
     
     def _generate_image_url(self, filepath: str) -> str:
         filename = os.path.basename(filepath)
         return f"{self.settings.IMAGES_BASE_URL_DISHES}/{filename}"
     
-    def generate_dish_image_table(self, dish_obj: DishTable) -> DishImageTable:
-        dish_translation : DishTranslationTable = self.translation_service.get_translation(dish_obj, LanguageEnum.ENGLISH_US)
+    async def generate_dish_image_table(self, dish_obj: DishTable) -> DishImageTable:
+        dish_translation = next((t for t in dish_obj.translations if t.language == LanguageEnum.ENGLISH_US), None)
+        if not dish_translation:
+            raise ValueError(f"No English translation found for dish {dish_obj.id}")
+            
         dish_translation_title = dish_translation.title
         file_name = FileManagementService.generate_save_file_name(dish_translation_title)
         prompt = self._get_dish_prompt(dish_translation_title, dish_obj.dish_type, dish_obj.labels)
-        generated_image_path = self._generate_image_with_transparent_background(prompt, f"{file_name}-{dish_obj.id}.png")
-        image_path = self.image_service.convert_image(generated_image_path, ImageFormatEnum.WEBP)
-        image_path = self.image_service.resize_image(image_path, max_size=(48*6, 48*6))
+        generated_image_path = await self._generate_image_with_transparent_background(prompt, f"{file_name}-{dish_obj.id}.png")
+        image_path = await self.image_service.convert_image(generated_image_path, ImageFormatEnum.WEBP)
+        image_path = await self.image_service.resize_image(image_path, max_size=(48*6, 48*6))
         
-        self.file_management_service.delete_file(generated_image_path)
+        await self.file_management_service.delete_file(generated_image_path)
         return DishImageTable(
             dish_id=dish_obj.id,
             url=self._generate_image_url(image_path),
             name=dish_translation_title,
-            blurhash=BlurhashService.encode_image(image_path),
+            blurhash=await BlurhashService.encode_image(image_path),
         )
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 from shared.src.enums import CinemaEnum
-from shared.src.schemas import Location
+from shared.src.models import Location
 
 
 CinemaLocationConstants = {

@@ -9,7 +9,7 @@ from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
 from shared.src.enums import OpeningHoursTypeEnum
-from shared.src.schemas import Canteen
+from shared.src.models import Canteen
 from shared.src.tables import CanteenLocationTable, CanteenOpeningHoursTable, CanteenStatusTable, CanteenTable
 
 

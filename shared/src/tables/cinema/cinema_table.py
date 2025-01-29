@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from shared.src.core.database import Base
 from shared.src.tables.language_table import LanguageTable
 from shared.src.tables.location_table import LocationTable
+from shared.src.tables.image_table import ImageTable
 
 
 class CinemaTable(Base):
@@ -16,15 +17,15 @@ class CinemaTable(Base):
     location = relationship("CinemaLocationTable", back_populates="cinema", uselist=False, cascade="all, delete-orphan")
     translations = relationship("CinemaTranslationTable", back_populates="cinema", cascade="all, delete-orphan")
     screenings = relationship("MovieScreeningTable", back_populates="cinema")
-    # images = relationship("CinemaImageTable", back_populates="cinema")
+    images = relationship("CinemaImageTable", back_populates="cinema")
     
     
-# class CinemaImageTable(ImageTable, Base):
-#     __tablename__ = "cinema_images"
+class CinemaImageTable(ImageTable, Base):
+    __tablename__ = "cinema_images"
 
-#     cinema_id = Column(String, ForeignKey('cinemas.id', ondelete='CASCADE'), nullable=False)
+    cinema_id = Column(String, ForeignKey('cinemas.id', ondelete='CASCADE'), nullable=False)
 
-#     cinema = relationship("CinemaTable", back_populates="images")
+    cinema = relationship("CinemaTable", back_populates="images")
 
 class CinemaLocationTable(LocationTable, Base):
     __tablename__ = "cinema_locations"

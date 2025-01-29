@@ -3,13 +3,12 @@ from typing import List
 
 from shared.src.tables import MenuDayTable
 
-from api.src.v1.food.schemas import MenuDay, Menus
-from api.src.v1.food.pydantics import dish_to_pydantic
+from api.src.v1.food.models import MenuDay, Menus, Dish
 
 
 def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> MenuDay:
     dishes_dto = [
-        dish_to_pydantic(
+        Dish.from_table(
             association.dish,
             user_id=user_id
         )

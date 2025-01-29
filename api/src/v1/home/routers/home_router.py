@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.logging import get_food_logger
-from shared.src.core.database import get_db
-from ..schemas.home_scheme import Home
+from shared.src.core.database import get_async_db
+from ..models.home_model import Home
 from ..services.home_service import HomeService
 
 router = APIRouter()
@@ -11,7 +11,7 @@ logger = get_food_logger(__name__)
 
 @router.get("/home", response_model=Home, description="Get home screen data")
 async def get_home(
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_async_db)
 ):
     home_service = HomeService(db)
-    return home_service.get_home_data().model_dump()
+    return await home_service.get_home_data()

@@ -6,10 +6,8 @@ from shared.src.core.database import Base
 from shared.src.core.settings import get_settings
 
 # Import models
-from shared.src.tables.food.canteen_table import CanteenTable
-from shared.src.tables.food.dish_table import DishTable
-from shared.src.tables.wishlist_table import WishlistTable
-from shared.src.tables.food.menu_table import MenuDayTable, MenuDishAssociation
+from shared.src.tables import *
+
 
 # Get settings instance
 settings = get_settings()

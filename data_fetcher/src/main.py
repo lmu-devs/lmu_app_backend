@@ -4,6 +4,7 @@ import sys
 
 from data_fetcher.src.cinema.cinema_fetcher import create_cinema_fetcher
 from data_fetcher.src.food.food_fetcher import create_food_fetcher
+from data_fetcher.src.roomfinder.explore_fetcher import create_roomfinder_fetcher
 from data_fetcher.src.sport.sport_fetcher import create_sport_fetcher
 from data_fetcher.src.university.university_fetcher import create_university_fetcher
 from shared.src.core.database import Base, Database, get_async_db, table_creation
@@ -34,10 +35,11 @@ async def main():
         async_db = get_async_db()
         
         tasks = [
-            asyncio.create_task(create_university_fetcher()),
-            asyncio.create_task(create_cinema_fetcher()),
-            asyncio.create_task(create_food_fetcher()),
-            asyncio.create_task(create_sport_fetcher())
+            # asyncio.create_task(create_university_fetcher()),
+            # asyncio.create_task(create_cinema_fetcher()),
+            # asyncio.create_task(create_food_fetcher()),
+            # asyncio.create_task(create_sport_fetcher()),
+            asyncio.create_task(create_roomfinder_fetcher())
         ]
         
         await asyncio.gather(*tasks)

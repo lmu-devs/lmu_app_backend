@@ -12,8 +12,9 @@ from shared.src.tables import CanteenTable, UserTable
 from ...core import APIKey
 from ...core.language import get_language
 
-from ..pydantics.dish_pydantic import dish_dates_to_pydantic, dish_to_pydantic
-from ..schemas import DishDates, Dishes
+from api.src.v1.food.models.dish_model import Dish, Dishes
+from api.src.v1.food.models.dish_date_model import DishDates
+from ..pydantics.dish_dates_pydantic import dish_dates_to_pydantic
 from ..services import CanteenService, DishService
 
 router = APIRouter()
@@ -37,7 +38,7 @@ async def get_dish(
     dishes = await DishService(db).get_dishes(id, user_id, only_liked_dishes, language)
     food_logger.info(f"Fetched dishes {id} with user_id: {user_id} and only_liked_dishes: {only_liked_dishes} with language: {language}")
     
-    return Dishes(dishes=[dish_to_pydantic(dish, user_id) for dish in dishes])
+    return Dishes([Dish.from_table(dish, user_id) for dish in dishes])
 
 
 

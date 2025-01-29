@@ -11,7 +11,7 @@ from shared.src.tables import UserTable
 
 from ...core import APIKey
 from ..pydantics.canteen_pydantic import canteen_to_pydantic
-from ..schemas import Canteens
+from ..models import Canteens
 from ..services import CanteenService
 
 

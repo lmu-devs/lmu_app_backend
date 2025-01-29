@@ -1,5 +1,5 @@
 from shared.src.enums.canteen_enums import CanteenEnum
-from shared.src.schemas import Location
+from shared.src.models import Location
 
 martinsried_grosshadern_locations = {
     CanteenEnum.MENSA_MARTINSRIED: Location(

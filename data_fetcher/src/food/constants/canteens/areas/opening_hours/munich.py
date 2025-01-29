@@ -1,7 +1,7 @@
 from datetime import time
 
 from shared.src.enums.canteen_enums import CanteenEnum
-from shared.src.schemas import OpeningHour, OpeningHours, WeekdayEnum
+from shared.src.models import OpeningHour, OpeningHours, WeekdayEnum
 
 
 munich_opening_hours = {

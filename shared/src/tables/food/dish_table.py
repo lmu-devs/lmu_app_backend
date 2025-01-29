@@ -68,6 +68,8 @@ class DishLikeTable(Base):
     id = Column(Integer, primary_key=True, index=True)
     dish_id = Column(UUID(as_uuid=True), ForeignKey('dishes.id', ondelete='CASCADE'), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationships
     dish = relationship("DishTable", back_populates="likes")

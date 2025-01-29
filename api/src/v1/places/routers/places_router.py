@@ -8,7 +8,7 @@ from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_places_logger
 from shared.src.tables import UserTable
 
-from ..schemas.places_scheme import Place
+from ..models.places_model import Place
 from ..services.places_service import PlacesService
 
 

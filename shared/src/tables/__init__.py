@@ -2,8 +2,9 @@ from .food import *
 from .feedback_table import *
 from .location_table import *
 from .user_table import *
-from .wishlist_table import *
+from .wishlist import *
 from .cinema import *
 from .university_table import *
 from .feedback_table import *
 from .sport import *
+from .roomfinder import *

@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from shared.src.enums import LanguageEnum
 from shared.src.tables import WishlistStatus
-from shared.src.schemas import Image, Rating
+from shared.src.models import Image, Rating
 
 
 class WishlistTranslation(BaseModel):

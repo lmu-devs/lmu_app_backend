@@ -14,7 +14,7 @@ from shared.src.tables import (
 )
 
 from ...core.translation_utils import create_translation_order_case
-from ..schemas.cinema_schema import Movie
+from ..models import Movie
 
 
 class MovieService:

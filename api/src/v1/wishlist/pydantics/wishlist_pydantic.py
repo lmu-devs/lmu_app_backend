@@ -2,10 +2,9 @@ import uuid
 from typing import Optional
 
 from shared.src.tables import WishlistTable
-from shared.src.schemas import Rating
-
+from shared.src.models import Rating
+from shared.src.models.image_model import Images
 from api.src.v1.wishlist.schemas import Wishlist
-from api.src.v1.core.pydantics import images_table_to_pydantic
 
 
 async def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:
@@ -23,7 +22,7 @@ async def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.U
         is_liked=user_likes_wishlist
     )
     
-    images = images_table_to_pydantic(wishlist.images)
+    images = Images.from_table(wishlist.images)
 
     return Wishlist(
         id=wishlist.id,
