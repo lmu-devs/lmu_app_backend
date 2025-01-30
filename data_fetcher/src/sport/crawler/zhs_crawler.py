@@ -105,8 +105,7 @@ class ZhsCrawler:
                     for keyword in exclude_keywords
                 ):
                     continue
-                print(course_data[6])
-                print(data['orte'][course_data[6][0]])
+
                 try:
                     course = Course(
                         id=course_id,
