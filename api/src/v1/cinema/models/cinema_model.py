@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import CinemaTable
 from shared.src.models.location_model import Location
@@ -32,9 +32,9 @@ class Cinema(BaseModel):
         )
 
 
-class Cinemas(BaseModel):
-    cinemas: List[Cinema]
+class Cinemas(RootModel):
+    root: List[Cinema]
     
     @classmethod
     def from_table(cls, cinemas: List[CinemaTable]) -> 'Cinemas':
-        return Cinemas(cinemas=[Cinema.from_table(cinema) for cinema in cinemas])
+        return Cinemas(root=[Cinema.from_table(cinema) for cinema in cinemas])
