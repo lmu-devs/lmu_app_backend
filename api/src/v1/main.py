@@ -18,6 +18,8 @@ from .home.routers import home_router
 from .places.routers import places_router
 from .sport.routers import sport_router
 from .roomfinder.routers import roomfinder_router
+from .timeline.routers import timeline_router
+
 
 api_logger = get_food_logger(__name__)
 
@@ -59,6 +61,7 @@ def create_app():
     app.include_router(places_router.router, prefix=prefix, tags=["places"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
     app.include_router(roomfinder_router.router, prefix=prefix, tags=["roomfinder"])
+    app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
