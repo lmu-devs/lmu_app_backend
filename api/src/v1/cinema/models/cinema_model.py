@@ -12,14 +12,14 @@ class Cinema(BaseModel):
     external_link: str | None
     instagram_link: str | None
     location: Location | None
-    # images: Images | None
+    images: Images | None
     
     @classmethod
     def from_table(cls, cinema: CinemaTable) -> 'Cinema':
         title = cinema.translations[0].title if cinema.translations else "not translated"
         descriptions = cinema.translations[0].description if cinema.translations else "not translated"
         location = Location.from_table(cinema.location) if cinema.location else None
-        # images = Images.from_table(cinema.images) if cinema.images else None
+        images = Images.from_table(cinema.images) if cinema.images else None
         
         return Cinema(
             id=cinema.id,
@@ -28,7 +28,7 @@ class Cinema(BaseModel):
             external_link=cinema.external_link,
             instagram_link=cinema.instagram_link,
             location=location,
-            # images=images,
+            images=images,
         )
 
 

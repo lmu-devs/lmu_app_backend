@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     IMAGES_BASE_URL: str = f"{API_BASE_URL}/images"
     IMAGES_BASE_URL_CANTEENS: str = f"{IMAGES_BASE_URL}/canteens"
     IMAGES_BASE_URL_DISHES: str = f"{IMAGES_BASE_URL}/dishes"
+    IMAGES_BASE_URL_CINEMAS: str = f"{IMAGES_BASE_URL}/cinemas"
     
     # API key for authentication our api
     SYSTEM_API_KEY: str

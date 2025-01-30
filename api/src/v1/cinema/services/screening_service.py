@@ -57,9 +57,11 @@ class ScreeningService:
         .join(MovieScreeningTable.cinema)
         .outerjoin(CinemaTable.translations)
         .outerjoin(CinemaTable.location)
+        .outerjoin(CinemaTable.images)
         .options(
             contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.translations),
-            contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.location)
+            contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.location),
+            contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.images)
         )
         
         # Screening location

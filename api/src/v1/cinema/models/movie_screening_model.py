@@ -22,13 +22,11 @@ class MovieScreening(BaseModel):
     external_link: str | None
     note: str | None
     movie: Movie
-    location: Location
     university: University
     cinema: Cinema
     
     @classmethod
     def from_table(cls, screening: MovieScreeningTable) -> 'MovieScreening':
-        location = Location.from_table(screening.location)
         university = University.from_table(screening.university)
         movie = Movie.from_table(screening.movie)
         cinema = Cinema.from_table(screening.cinema)
@@ -38,7 +36,6 @@ class MovieScreening(BaseModel):
             entry_time=screening.entry_time,
             start_time=screening.start_time,
             end_time=screening.end_time,
-            location=location,
             university=university,
             movie=movie,
             cinema=cinema,
