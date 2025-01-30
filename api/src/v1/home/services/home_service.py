@@ -38,10 +38,11 @@ class HomeService:
             links=[
                 Link(title="Moodle", url="https://moodle.lmu.de/"),
                 Link(title="LSF", url="https://lsf.verwaltung.uni-muenchen.de"),
+                Link(title="Raumfinder", url="https://www.lmu.de/raumfinder/#/"),
                 Link(title="Immatrikulation", url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/rds?state=change&type=1&moduleParameter=studentReportsMenu&nextdir=change&next=menu.vm&xml=menu&purge=y&subdir=qissos/reports&menuid=qissosreportsPublish&breadcrumb=qissosreports&breadCrumbSource=menu"),
                 Link(title="LMU-Mail", url="https://mailbox.portal.uni-muenchen.de/webmail/webmail/ui/MainPage.html"),
                 Link(title="Beitragskonto", url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/rds?state=gebkonto&asi=a$Lx1jxFA$kMP5tPiuVP"),
                 Link(title="Benutzerkonto", url="https://www.portal.uni-muenchen.de/benutzerkonto/#!/"),
-                Link(title="Raumfinder", url="https://www.lmu.de/raumfinder/#/"),
             ]
         )
+    
