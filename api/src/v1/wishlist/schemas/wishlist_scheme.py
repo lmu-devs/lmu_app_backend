@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from shared.src.enums import LanguageEnum
 from shared.src.tables import WishlistStatus
-from shared.src.models import Image, Rating
+from shared.src.models import Images, Rating
 
 
 class WishlistTranslation(BaseModel):
@@ -18,7 +18,7 @@ class WishlistCreate(BaseModel):
     status: WishlistStatus
     release_date: Optional[datetime] = None
     prototype_url: Optional[str] = None
-    images: List[Image] = Field(default_factory=list)
+    images: Images = Field(default_factory=Images)
     translations: List[WishlistTranslation] = Field(default_factory=list)
 
 
@@ -35,7 +35,7 @@ class Wishlist(BaseModel):
     release_date: Optional[datetime]
     prototype_url: Optional[str]
     rating: Rating
-    images: List[Image]
+    images: Images
     created_at: datetime
     updated_at: datetime
 

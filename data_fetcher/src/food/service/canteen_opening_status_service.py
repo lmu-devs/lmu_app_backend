@@ -1,6 +1,6 @@
 from datetime import date
 
-from models.opening_hour_model import OpeningHours
+from shared.src.models.opening_hour_model import OpeningHours
 from shared.src.services.lecture_free_period_service import \
     LectureFreePeriodService
 from shared.src.services.public_holiday_service import PublicHolidayService
