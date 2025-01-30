@@ -45,7 +45,7 @@ def create_app():
     # Add static files
     app.mount(path="/images/canteens", app=StaticFiles(directory="/app/shared/src/assets/canteens"), name="canteen_images")
     app.mount(path="/images/dishes", app=StaticFiles(directory="/app/shared/src/assets/dishes"), name="dish_images")
-    app.mount(path="/images/wishlist", app=StaticFiles(directory="/app/shared/src/assets/wishlists"), name="dish_images")
+    app.mount(path="/images/wishlist", app=StaticFiles(directory="/app/shared/src/assets/wishlists"), name="wishlist_images")
     app.mount(path="/images/cinemas", app=StaticFiles(directory="/app/shared/src/assets/cinemas"), name="cinema_images")
     
     # Include routers
