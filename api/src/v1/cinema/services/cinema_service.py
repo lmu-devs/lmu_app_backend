@@ -26,10 +26,12 @@ class CinemaService:
     def _get_cinemas_query(self, cinema_id: Optional[str] = None):
         query = (select(CinemaTable)
         .outerjoin(CinemaTable.images)
+        .outerjoin(CinemaTable.location)
         .join(CinemaTable.translations)
         .options(
             contains_eager(CinemaTable.translations),
-            contains_eager(CinemaTable.images)
+            contains_eager(CinemaTable.images),
+            contains_eager(CinemaTable.location)
                 )
         )
         if cinema_id:
