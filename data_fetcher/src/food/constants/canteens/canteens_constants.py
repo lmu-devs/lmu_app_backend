@@ -184,7 +184,7 @@ class CanteensConstants:
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15,
-            name="Garching Boltzmannstraße 15",
+            name="Garching Boltzmannstr 15",
             type=CanteenTypeEnum.STUBISTRO,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15),
             opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15),
@@ -192,7 +192,7 @@ class CanteensConstants:
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19,
-            name="Garching Boltzmannstraße 19",
+            name="Garching Boltzmannstr 19",
             type=CanteenTypeEnum.STUBISTRO,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19),
             opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19),
@@ -233,7 +233,7 @@ class CanteensConstants:
         ),
         Canteen(
             id=CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
-            name="Weihenstephan Maximustraße",
+            name="Weihenstephan Maximus",
             type=CanteenTypeEnum.STUCAFE,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS),
             opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS),

@@ -106,7 +106,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=lmu_cinema_id,
             language=LanguageEnum.GERMAN.value,
-            title="LMU Kino",
+            title="U Kino",
             description=[
                 CinemaDescription(
                     emoji="🍿",
@@ -125,7 +125,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=lmu_cinema_id,
             language=LanguageEnum.ENGLISH_US.value,
-            title="LMU Cinema",
+            title="U Kino",
             description=[
                 CinemaDescription(
                     emoji="🍿",
@@ -147,7 +147,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=tum_cinema_id,
             language=LanguageEnum.GERMAN.value,
-            title="TUM Kino",
+            title="TU Film",
             description=[
                 CinemaDescription(
                     emoji="🍿",
@@ -166,7 +166,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=tum_cinema_id,
             language=LanguageEnum.ENGLISH_US.value,
-            title="TUM Cinema",
+            title="TU Film",
             description=[
                 CinemaDescription(
                     emoji="🍿",
@@ -188,7 +188,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=tum_garching_cinema_id,
             language=LanguageEnum.GERMAN.value,
-            title="TUM Kino",
+            title="TU Film Garching",
             description=[
                 CinemaDescription(
                     emoji="🍿",
@@ -207,7 +207,7 @@ class CinemaService:
         CinemaTranslationTable(
             cinema_id=tum_garching_cinema_id,
             language=LanguageEnum.ENGLISH_US.value,
-            title="TUM Cinema",
+            title="TU Film Garching",
             description=[
                 CinemaDescription(
                     emoji="🍿",
