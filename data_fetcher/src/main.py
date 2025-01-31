@@ -36,9 +36,9 @@ async def main():
         
         tasks = [
             asyncio.create_task(create_university_fetcher()),
-            # asyncio.create_task(create_cinema_fetcher()),
-            # asyncio.create_task(create_food_fetcher()),
-            # asyncio.create_task(create_sport_fetcher()),
+            asyncio.create_task(create_cinema_fetcher()),
+            asyncio.create_task(create_food_fetcher()),
+            asyncio.create_task(create_sport_fetcher()),
             asyncio.create_task(create_roomfinder_fetcher())
         ]
         
