@@ -20,7 +20,7 @@ async def create_sport_fetcher():
     async def scheduled_task():
         add_sport_to_database(db)
         
-    schedule.every().hour.at(":01").do(scheduled_task)
+    schedule.every().hour.at(":55").do(scheduled_task)
     
     while running_sport:
         schedule.run_pending()

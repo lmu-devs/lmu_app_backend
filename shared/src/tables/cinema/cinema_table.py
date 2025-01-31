@@ -1,10 +1,10 @@
-from sqlalchemy import (ARRAY, JSON, Column, ForeignKey, String)
+from sqlalchemy import ARRAY, JSON, Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
+from shared.src.tables.image_table import ImageTable
 from shared.src.tables.language_table import LanguageTable
 from shared.src.tables.location_table import LocationTable
-from shared.src.tables.image_table import ImageTable
 
 
 class CinemaTable(Base):
@@ -16,8 +16,8 @@ class CinemaTable(Base):
     
     location = relationship("CinemaLocationTable", back_populates="cinema", uselist=False, cascade="all, delete-orphan")
     translations = relationship("CinemaTranslationTable", back_populates="cinema", cascade="all, delete-orphan")
+    images = relationship("CinemaImageTable", back_populates="cinema", cascade="all, delete-orphan")
     screenings = relationship("MovieScreeningTable", back_populates="cinema")
-    images = relationship("CinemaImageTable", back_populates="cinema")
     
     
 class CinemaImageTable(ImageTable, Base):
