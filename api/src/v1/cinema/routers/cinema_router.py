@@ -1,7 +1,7 @@
 import uuid
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.database import get_async_db
@@ -37,6 +37,16 @@ async def get_movie_screenings(
     screening_service = ScreeningService(db, language)
     screenings = await screening_service.get_movie_screenings()
     return MovieScreenings.from_table(screenings)
+
+@router.post("/screenings/toggle-like", response_model=bool, description="Authenticated user can toggle like for a movie screening. Returns True if the movie screening was liked, False if it was unliked.")
+async def toggle_like(
+    id: uuid.UUID = Query(..., description="Screening ID to toggle like"),
+    db: AsyncSession = Depends(get_async_db),
+    user: UserTable = Depends(APIKey.verify_user_api_key),
+    language: LanguageEnum = Depends(get_language)
+) -> bool:
+    screening_service = ScreeningService(db, language)
+    return await screening_service.toggle_like(id, user.id)
 
 
 @router.get("/cinemas", response_model=Cinemas, description="Get cinemas")

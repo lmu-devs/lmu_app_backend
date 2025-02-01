@@ -11,8 +11,8 @@ from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.core.settings import get_settings
 from shared.src.enums import LanguageEnum, RatingSourceEnum
 from shared.src.tables import (
-    MovieLocationTable,
     MovieRatingTable,
+    MovieScreeningLocationTable,
     MovieScreeningTable,
     MovieTable,
     MovieTrailerTable,
@@ -26,10 +26,16 @@ logger = get_cinema_fetcher_logger(__name__)
 
 class ScreeningService:
     
+    def _generate_movie_id(self, title: str, date: datetime) -> uuid.UUID:
+        """Generate a consistent UUID from a movie title and date."""
+        unique_string = f"{title}_{date.strftime('%Y-%m-%d')}"
+        return uuid.uuid5(uuid.NAMESPACE_DNS, unique_string)
+    
     def _create_edge_case_movie_model(self, movie_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
         """Create MovieTable and related instances from API data"""
         
-        movie_id = uuid.uuid4()
+        movie_id = self._generate_movie_id(movie_data.title, movie_data.date)
+        
         movie = MovieTable(
             id=movie_id,
             runtime=movie_data.runtime,
@@ -57,14 +63,14 @@ class ScreeningService:
             id=screening_id,
             movie_id=movie_id,
             date=movie_data.date,
-            university_id=movie_data.cinema_id,
+            university_id=movie_data.university_id,
             cinema_id=movie_data.cinema_id,
             start_time=movie_data.date,
             end_time=end_time,
             entry_time=entry_time,
             price=movie_data.price,
             note=movie_data.note,
-            location=MovieLocationTable(
+            location=MovieScreeningLocationTable(
                 screening_id=screening_id,
                 address=movie_data.address,
                 longitude=movie_data.longitude,
@@ -79,7 +85,7 @@ class ScreeningService:
         """Create MovieTable and related instances from API data"""
         tmdb_base_data = tmdb_data[LanguageEnum.ENGLISH_US]
     
-        movie_id = uuid.uuid4()
+        movie_id = self._generate_movie_id(tmdb_base_data["original_title"], screening_data.date)
         movie = MovieTable(
             id=movie_id,
             original_title=tmdb_base_data["original_title"],
@@ -112,7 +118,7 @@ class ScreeningService:
             is_ov=screening_data.is_ov,
             subtitles=screening_data.subtitles,
             external_link=screening_data.external_url,
-            location=MovieLocationTable(
+            location=MovieScreeningLocationTable(
                 screening_id=screening_id,
                 address=screening_data.address,
                 longitude=screening_data.longitude,

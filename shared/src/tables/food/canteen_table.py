@@ -1,7 +1,7 @@
 from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, Time, func
 from sqlalchemy.orm import relationship
 
-from shared.src.core.database import Base
+from shared.src.core.database import Base   
 from shared.src.enums import CanteenTypeEnum, OpeningHoursTypeEnum, WeekdayEnum
 from shared.src.tables.image_table import ImageTable
 from shared.src.tables.location_table import LocationTable

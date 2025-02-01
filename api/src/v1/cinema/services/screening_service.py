@@ -1,7 +1,9 @@
+import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
+from api.src.v1.core.service.like_service import LikeService
 from shared.src.enums import LanguageEnum
 from shared.src.tables import (
     CinemaTable,
@@ -11,6 +13,7 @@ from shared.src.tables import (
     MovieTrailerTable,
     MovieTrailerTranslationTable,
     MovieTranslationTable,
+    MovieScreeningLikeTable,
     UniversityTable,
     UniversityTranslationTable,
 )
@@ -22,11 +25,15 @@ class ScreeningService:
     def __init__(self, db: AsyncSession, language: LanguageEnum):
         self.db = db
         self.language = language
+        self.like_service = LikeService(db)
         
     async def get_movie_screenings(self):
         query = self._get_movie_screenings_query()
         result = await self.db.execute(query)
         return result.scalars().unique().all()
+    
+    async def toggle_like(self, screening_id: str, user_id: uuid.UUID) -> bool:
+        return await self.like_service.toggle_like(MovieScreeningLikeTable, screening_id, user_id)
     
     def _get_movie_screenings_query(self):
         query = (select(MovieScreeningTable)

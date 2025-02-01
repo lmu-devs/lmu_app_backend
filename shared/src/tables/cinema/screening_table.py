@@ -1,13 +1,12 @@
 import uuid
 
-from sqlalchemy import (UUID, Boolean, Column, DateTime, Enum, Float,
-                        ForeignKey, String, UniqueConstraint)
+from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, Float, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.enums import UniversityEnum
+from shared.src.tables.like_table import LikeTable
 from shared.src.tables.location_table import LocationTable
-
 
 
 class MovieScreeningTable(Base):
@@ -31,18 +30,32 @@ class MovieScreeningTable(Base):
     movie = relationship("MovieTable", back_populates="screenings")
     university = relationship("UniversityTable", back_populates="screenings")
     cinema = relationship("CinemaTable", back_populates="screenings")
-    location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
+    location = relationship("MovieScreeningLocationTable", back_populates="screening", uselist=False)
+    likes = relationship("MovieScreeningLikeTable", back_populates="screening")
     
     __table_args__ = (
         UniqueConstraint('date', 'movie_id', name='uix_date_movie_id'),
     )
     
-class MovieLocationTable(LocationTable, Base):
-    __tablename__ = "movie_locations"
+    @property
+    def like_count(self):
+        return len(self.likes)
+    
+class MovieScreeningLocationTable(LocationTable, Base):
+    __tablename__ = "movie_screening_locations"
     
     screening_id = Column(UUID(as_uuid=True), ForeignKey("movie_screenings.id", ondelete='CASCADE'), primary_key=True)
     
     screening = relationship("MovieScreeningTable", back_populates="location")
     
     
+class MovieScreeningLikeTable(LikeTable, Base):
+    __tablename__ = "movie_screening_likes"
+    
+    movie_screening_id = Column(UUID(as_uuid=True), ForeignKey("movie_screenings.id", ondelete='CASCADE'), primary_key=True)
+    
+    screening = relationship("MovieScreeningTable", back_populates="likes")
+    
+    
+
 

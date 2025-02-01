@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.tables.location_table import LocationTable
+from shared.src.tables.like_table import LikeTable
 from shared.src.enums import WeekdayEnum
 from shared.src.tables import LanguageTable
 
@@ -51,18 +52,18 @@ class SportCourseTable(Base):
     employee_price = Column(Float)
     external_price = Column(Float)
     
-    # Relationships
     sport_type = relationship("SportTypeTable", back_populates="sport_courses")
     translations = relationship("SportCourseTranslationTable", back_populates="sport_course")
     time_slots = relationship("SportCourseTimeSlotTable", back_populates="sport_course")
     location = relationship("SportCourseLocationTable", uselist=False, back_populates="sport_course")
+    likes = relationship("SportCourseLikeTable", back_populates="sport_course")
+    
 class SportCourseTranslationTable(LanguageTable, Base):
     __tablename__ = "sport_course_translation"
     
     sport_course_id = Column(String, ForeignKey("sport_course.id"), primary_key=True, nullable=False)
     title = Column(String, nullable=False)
     
-    # Relationship
     sport_course = relationship("SportCourseTable", back_populates="translations")
 
 class SportCourseTimeSlotTable(Base):
@@ -74,7 +75,6 @@ class SportCourseTimeSlotTable(Base):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
     
-    # Relationship
     sport_course = relationship("SportCourseTable", back_populates="time_slots")
     
 class SportCourseLocationTable(LocationTable, Base):
@@ -82,6 +82,13 @@ class SportCourseLocationTable(LocationTable, Base):
     
     sport_course_id = Column(String, ForeignKey('sport_course.id', ondelete='CASCADE'), primary_key=True)
     
-    # Relationships
     sport_course = relationship("SportCourseTable", back_populates="location")
+    
+class SportCourseLikeTable(LikeTable, Base):
+    __tablename__ = "sport_course_likes"
+    
+    sport_course_id = Column(String, ForeignKey('sport_course.id', ondelete='CASCADE'), primary_key=True)
+    
+    sport_course = relationship("SportCourseTable", back_populates="likes")
+    
     

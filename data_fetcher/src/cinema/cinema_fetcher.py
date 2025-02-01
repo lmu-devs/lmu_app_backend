@@ -7,8 +7,8 @@ from sqlalchemy.orm import Session
 from shared.src.core.database import get_db
 from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.tables import (
-    MovieLocationTable,
     MovieRatingTable,
+    MovieScreeningLocationTable,
     MovieScreeningTable,
     MovieTable,
     MovieTrailerTable,
@@ -36,7 +36,7 @@ def clear_cinema_tables(db: Session):
     """Clear all cinema-related tables in the correct order"""
     logger.info("Clearing movies, screenings, ratings, trailers, trailer translations and locations data...")
     
-    db.query(MovieLocationTable).delete()
+    db.query(MovieScreeningLocationTable).delete()
     db.query(MovieTrailerTranslationTable).delete()
     db.query(MovieTrailerTable).delete()
     db.query(MovieRatingTable).delete()

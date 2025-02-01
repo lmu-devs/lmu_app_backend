@@ -35,6 +35,7 @@ async def course_to_pydantic(course: SportCourseTable) -> SportCourse:
     timeslots = await timeslots_to_pydantic(course.time_slots)
     
     return SportCourse(
+        id=course.id,
         title=title,
         is_available=course.is_available,
         start_date=course.start_date,

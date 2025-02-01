@@ -18,6 +18,7 @@ class Price(BaseModel):
     external_price: float
 
 class SportCourse(BaseModel):
+    id: str
     title: str
     is_available: bool
     start_date: datetime
