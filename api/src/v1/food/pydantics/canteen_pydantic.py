@@ -1,16 +1,16 @@
-from shared.src.models.location_model import Location
-
-from api.src.v1.food.models.canteen_model import (CanteenResponse,
-                                                    CanteenStatus)
+from api.src.v1.food.models.canteen_model import CanteenResponse, CanteenStatus
 from shared.src.enums import OpeningHoursTypeEnum
+from shared.src.models import ActiveOpeningHours, OpeningHour, Rating
 from shared.src.models.image_model import Images
-from shared.src.models import OpeningHour, ActiveOpeningHours, Rating
+from shared.src.models.location_model import Location
 from shared.src.tables import CanteenTable
 
 
-def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
+def canteen_to_pydantic(canteen: CanteenTable) -> CanteenResponse:
     location = Location.from_table(canteen.location)
-    rating = Rating.from_params(like_count=canteen.like_count, is_liked=user_likes_canteen)
+    # If user_id was provided, check if there are any likes for this user
+    is_liked = bool(canteen.likes)
+    rating = Rating.from_params(like_count=canteen.like_count, is_liked=is_liked)
     images = Images.from_table(canteen.images)
     status = CanteenStatus.from_table(canteen.status)
 

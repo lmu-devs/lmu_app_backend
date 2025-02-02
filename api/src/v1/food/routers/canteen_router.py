@@ -1,6 +1,6 @@
 import asyncio
-
 from typing import Optional
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,8 +10,8 @@ from shared.src.enums import CanteenEnum
 from shared.src.tables import UserTable
 
 from ...core import APIKey
-from ..pydantics.canteen_pydantic import canteen_to_pydantic
 from ..models import Canteens
+from ..pydantics.canteen_pydantic import canteen_to_pydantic
 from ..services import CanteenService
 
 
@@ -27,22 +27,13 @@ async def get_canteens(
         example="mensa-leopoldstr", 
         enum=CanteenEnum.get_active_canteens_values()),
     db: AsyncSession = Depends(get_async_db),
-    current_user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
+    user: Optional[UserTable] = Depends(APIKey.verify_user_api_key_soft)
 ):
     service = CanteenService(db)
     
-    if current_user:
-        canteens, likes = await asyncio.gather(
-            service.get_canteens(canteen_id),
-            service.get_user_liked(current_user.id)
-        )
-        food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
-        return Canteens([
-            canteen_to_pydantic(canteen, likes.get(canteen.id, False))
-            for canteen in canteens
-        ])
+    user_id = user.id if user else None
+    canteens = await service.get_canteens_with_likes(user_id, canteen_id)
 
-    canteens = await service.get_canteens(canteen_id)
     food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
     return Canteens([canteen_to_pydantic(canteen) for canteen in canteens])
 

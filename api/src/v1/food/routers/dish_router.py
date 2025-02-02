@@ -38,7 +38,7 @@ async def get_dish(
     dishes = await DishService(db).get_dishes(id, user_id, only_liked_dishes, language)
     food_logger.info(f"Fetched dishes {id} with user_id: {user_id} and only_liked_dishes: {only_liked_dishes} with language: {language}")
     
-    return Dishes([Dish.from_table(dish, user_id) for dish in dishes])
+    return Dishes([Dish.from_table(dish) for dish in dishes])
 
 
 
