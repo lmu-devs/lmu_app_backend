@@ -1,5 +1,5 @@
 import uuid
-from typing import Any, Optional, Type
+from typing import Any, List, Type
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -8,49 +8,36 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_main_logger
 
-    
+
 logger = get_main_logger(__name__)
 
 class LikeService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_like(
+    async def get_likes(
         self, 
         like_table: Type[Any],
-        entity_id: Any, 
-        user_id: uuid.UUID,
-        entity_id_column: str = None
-    ) -> Optional[Any]:
+        user_id: uuid.UUID
+    ) -> List[Any]:
         """
-        Generic method to get a like status
+        Generic method to get all like statuses for a user.
         
         Args:
-            like_table: The like table class (e.g., WishlistLikeTable)
-            entity_id: ID of the entity (wishlist_id, dish_id, etc.)
+            like_table: The like table class (e.g., CanteenLikeTable, SportCourseLikeTable)
             user_id: User ID
-            entity_id_column: Name of the entity ID column (defaults to table name without 'likes' + '_id')
+            
+        Returns:
+            List of like instances.
         """
         try:
-            if entity_id_column is None:
-                # Automatically generate column name (e.g., "wishlist_likes" -> "wishlist_id")
-                entity_id_column = f"{like_table.__tablename__[:-6]}_id"
-
-            stmt = (
-                select(like_table)
-                .where(
-                    getattr(like_table, entity_id_column) == entity_id,
-                    like_table.user_id == user_id
-                )
-            )
-            
+            stmt = select(like_table).where(like_table.user_id == user_id)
             result = await self.db.execute(stmt)
-            return result.scalar_one_or_none()
-            
+            return result.scalars().all()
         except SQLAlchemyError as e:
-            logger.error(f"Failed to fetch like status: {str(e)}")
+            logger.error(f"Failed to fetch likes: {str(e)}")
             raise DatabaseError(
-                detail="Failed to fetch like status",
+                detail="Failed to fetch likes",
                 extra={"original_error": str(e)}
             )
 
@@ -67,7 +54,13 @@ class LikeService:
         Returns:
             bool: True if liked, False if unliked
         """
-        existing_like = await self.get_like(like_table, entity_id, user_id, entity_id_column)
+        existing_like = await self.db.execute(
+            select(like_table).where(
+                getattr(like_table, entity_id_column or f"{like_table.__tablename__[:-6]}_id") == entity_id,
+                like_table.user_id == user_id
+            )
+        )
+        existing_like = existing_like.scalar_one_or_none()
 
         try:
             if existing_like:

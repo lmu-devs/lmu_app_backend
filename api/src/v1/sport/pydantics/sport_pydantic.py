@@ -1,7 +1,7 @@
 from typing import List
 
 from api.src.v1.sport.models.sport_model import Price, SportCourse, SportType, TimeSlot
-from shared.src.models import Location
+from shared.src.models import Location, Rating
 from shared.src.tables.sport import SportCourseTable, SportCourseTimeSlotTable, SportTypeTable
 
 
@@ -28,6 +28,11 @@ async def course_to_pydantic(course: SportCourseTable) -> SportCourse:
         external_price=course.external_price
     )
     
+    rating = Rating.from_params(
+        like_count=course.like_count,
+        is_liked=bool(course.likes)
+    )
+    
     location = None
     if course.location:
         location = Location.from_table(course.location)
@@ -43,7 +48,8 @@ async def course_to_pydantic(course: SportCourseTable) -> SportCourse:
         instructor=course.instructor,
         time_slots=timeslots,
         price=price,
-        location=location
+        location=location,
+        rating=rating
     )
 
 

@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -21,11 +22,14 @@ logger = get_places_logger(__name__)
 @router.get("/sports", response_model=List[SportType], description="Get sports data")
 async def get_sports(
     db: AsyncSession = Depends(get_async_db),
+    language: LanguageEnum = Depends(get_language),
+    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    sport_service = SportService(db, LanguageEnum.GERMAN)
-    sports = await sport_service.get_sports()
-    sports = await sport_types_to_pydantic(sports)
-    return sports
+    sport_service = SportService(db, language)
+    
+    user_id = user.id if user else None
+    sports = await sport_service.get_sports(user_id)
+    return await sport_types_to_pydantic(sports)
 
 @router.post("/sports/toggle-like", response_model=bool, description="Toggle like for a sport course")
 async def toggle_like(

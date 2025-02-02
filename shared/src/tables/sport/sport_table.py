@@ -58,6 +58,10 @@ class SportCourseTable(Base):
     location = relationship("SportCourseLocationTable", uselist=False, back_populates="sport_course")
     likes = relationship("SportCourseLikeTable", back_populates="sport_course")
     
+    @property
+    def like_count(self):
+        return len(self.likes)
+    
 class SportCourseTranslationTable(LanguageTable, Base):
     __tablename__ = "sport_course_translation"
     

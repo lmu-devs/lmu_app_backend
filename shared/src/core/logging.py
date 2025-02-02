@@ -63,6 +63,9 @@ def get_user_logger(module_name: str):
 def get_feedback_logger(module_name: str):
     return setup_logger(module_name, "feedback", "feedback_api")
 
+def get_sport_logger(module_name: str):
+    return setup_logger(module_name, "sport", "sport_api")
+
 # Data Fetcher Loggers
 def get_main_fetcher_logger(module_name: str):
     return setup_logger(module_name, "main_fetcher", "main_fetcher")

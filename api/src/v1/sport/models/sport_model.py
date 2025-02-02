@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from datetime import date, datetime, time
 from typing import List
 
+from shared.src.models import Location, Rating
 from shared.src.enums import WeekdayEnum
-from shared.src.models import Location
 
 class TimeSlot(BaseModel):
     day: WeekdayEnum
@@ -27,6 +27,7 @@ class SportCourse(BaseModel):
     time_slots: List[TimeSlot]
     price: Price
     location: Location | None = None
+    rating: Rating
     
     
 class SportType(BaseModel):
