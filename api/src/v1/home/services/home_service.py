@@ -27,13 +27,13 @@ class HomeService:
         # Hardcoded data for now
         return Home(
             semester_fee=self.get_semester_fee(),
-            lecture_free_time=TimePeriod(
+            lecture_time=TimePeriod(
                 start_date=datetime(2024, 10, 14), 
                 end_date=datetime(2025, 2, 7)
             ),
-            lecture_time=TimePeriod(
-                start_date=datetime(2025, 2, 7), 
-                end_date=datetime(2025, 4, 23)
+            lecture_free_time=TimePeriod(
+                start_date=datetime(2025, 2, 8), 
+                end_date=datetime(2025, 4, 22)
             ),
             links=[
                 Link(title="Moodle", url="https://moodle.lmu.de/"),
