@@ -4,8 +4,9 @@ import uuid
 from datetime import datetime
 from pydantic import BaseModel, RootModel
 
+
 from shared.src.tables import MovieScreeningTable
-from shared.src.models.location_model import Location
+from shared.src.models import Rating
 from ...core.models.university_scheme import University
 from .movie_model import Movie
 from .cinema_model import Cinema
@@ -24,12 +25,14 @@ class MovieScreening(BaseModel):
     movie: Movie
     university: University
     cinema: Cinema
+    rating: Rating
     
     @classmethod
     def from_table(cls, screening: MovieScreeningTable) -> 'MovieScreening':
         university = University.from_table(screening.university)
         movie = Movie.from_table(screening.movie)
         cinema = Cinema.from_table(screening.cinema)
+        rating = Rating.from_params(screening.like_count, bool(screening.likes))
         
         return MovieScreening(
             id=screening.id,
@@ -45,6 +48,7 @@ class MovieScreening(BaseModel):
             external_link=screening.external_link,
             booking_link=screening.booking_link,
             note=screening.note,
+            rating=rating
         )
     
     

@@ -31,11 +31,13 @@ async def get_movie(
 @router.get("/screenings", response_model=MovieScreenings, description="Get all movie screenings")
 async def get_movie_screenings(
     db: AsyncSession = Depends(get_async_db),
-    current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
+    user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     language: LanguageEnum = Depends(get_language)
 ):
     screening_service = ScreeningService(db, language)
-    screenings = await screening_service.get_movie_screenings()
+    
+    user_id = user.id if user else None
+    screenings = await screening_service.get_movie_screenings(user_id)
     return MovieScreenings.from_table(screenings)
 
 @router.post("/screenings/toggle-like", response_model=bool, description="Authenticated user can toggle like for a movie screening. Returns True if the movie screening was liked, False if it was unliked.")
@@ -43,9 +45,8 @@ async def toggle_like(
     id: uuid.UUID = Query(..., description="Screening ID to toggle like"),
     db: AsyncSession = Depends(get_async_db),
     user: UserTable = Depends(APIKey.verify_user_api_key),
-    language: LanguageEnum = Depends(get_language)
 ) -> bool:
-    screening_service = ScreeningService(db, language)
+    screening_service = ScreeningService(db)
     return await screening_service.toggle_like(id, user.id)
 
 
@@ -56,6 +57,6 @@ async def get_cinemas(
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     language: LanguageEnum = Depends(get_language),
 ):
-    cinema_service = CinemaService(db, language)
+    cinema_service = CinemaService(db)
     cinemas = await cinema_service.get_cinemas(id)
     return Cinemas.from_table(cinemas)
