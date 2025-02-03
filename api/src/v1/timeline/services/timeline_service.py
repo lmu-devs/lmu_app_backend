@@ -118,11 +118,11 @@ class TimelineService:
         # Mock semesters
         return [
                 Semester(timeframe=Timeframe(start=datetime(2024, 10, 1), end=datetime(2025, 3, 31)), type=SemesterTypeEnum.WINTER),
-                Semester(timeframe=Timeframe(start=datetime(2025, 4, 1), end=datetime(2025, 9, 31)), type=SemesterTypeEnum.SUMMER),
+                Semester(timeframe=Timeframe(start=datetime(2025, 4, 1), end=datetime(2025, 9, 30)), type=SemesterTypeEnum.SUMMER),
                 Semester(timeframe=Timeframe(start=datetime(2025, 10, 1), end=datetime(2026, 3, 31)), type=SemesterTypeEnum.WINTER),
-                Semester(timeframe=Timeframe(start=datetime(2026, 4, 1), end=datetime(2026, 9, 31)), type=SemesterTypeEnum.SUMMER),
+                Semester(timeframe=Timeframe(start=datetime(2026, 4, 1), end=datetime(2026, 9, 30)), type=SemesterTypeEnum.SUMMER),
                 Semester(timeframe=Timeframe(start=datetime(2026, 10, 1), end=datetime(2027, 3, 31)), type=SemesterTypeEnum.WINTER),
-                Semester(timeframe=Timeframe(start=datetime(2027, 4, 1), end=datetime(2027, 9, 31)), type=SemesterTypeEnum.SUMMER),
+                Semester(timeframe=Timeframe(start=datetime(2027, 4, 1), end=datetime(2027, 9, 30)), type=SemesterTypeEnum.SUMMER),
                 Semester(timeframe=Timeframe(start=datetime(2027, 10, 1), end=datetime(2028, 3, 31)), type=SemesterTypeEnum.WINTER),
             ]
         
