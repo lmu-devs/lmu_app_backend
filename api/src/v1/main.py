@@ -29,6 +29,7 @@ def create_app():
     prefix = settings.API_V1_PREFIX
     eat_prefix = settings.API_V1_PREFIX_FOOD
     cinema_prefix = settings.API_V1_PREFIX_CINEMA
+    roomfinder_prefix = settings.API_V1_PREFIX_ROOMFINDER
     
     app = FastAPI(
         title="lmu-dev-api", 
@@ -61,7 +62,7 @@ def create_app():
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
     app.include_router(places_router.router, prefix=prefix, tags=["places"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
-    app.include_router(roomfinder_router.router, prefix=prefix, tags=["roomfinder"])
+    app.include_router(roomfinder_router.router, prefix=roomfinder_prefix, tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)

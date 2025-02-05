@@ -4,7 +4,7 @@ from shared.src.models import Location
 
 CinemaLocationConstants = {
     CinemaEnum.LMU.value: Location(
-        address="Hörsaal B052,Max-Joseph-Platz 11, München",
+        address="Hörsaal B052, Max-Joseph-Platz 11, München",
         latitude=48.1351,
         longitude=11.5761,
     ),

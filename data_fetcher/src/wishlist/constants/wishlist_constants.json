@@ -1,5 +1,5 @@
 [
-    {
+{
     "translations": [
         {
             "title": "Uni Kino",
@@ -14,8 +14,8 @@
             "language": "en-US"
         }
     ],
-    "status": "DEVELOPMENT",
-    "prototype_url": "https://www.figma.com/proto/BoTB8jgodOVZKACJZx7r0R/LMU-App?page-id=3150%3A24108&node-id=3150-24375&p=f&viewport=249%2C527%2C0.21&t=PuLjXkuI4J8SYx14-1&scaling=scale-down&content-scaling=fixed&starting-point-node-id=3150%3A24375",
+    "status": "BETA",
+    "prototype_url": "",
     "release_date": "2024-11-19T11:53:31.756000",
     "images": [
         {
@@ -180,7 +180,7 @@
             "language": "en-US"
         }
     ],
-    "status": "DEVELOPMENT",
+    "status": "BETA",
     "prototype_url": "",
     "release_date": "2024-11-19T11:53:31.756000",
     "images": [

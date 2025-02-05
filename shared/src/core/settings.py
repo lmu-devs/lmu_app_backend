@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/v1"
     API_V1_PREFIX_FOOD: str = f"{API_V1_PREFIX}/food"
     API_V1_PREFIX_CINEMA: str = f"{API_V1_PREFIX}/cinema"
-    
+    API_V1_PREFIX_ROOMFINDER: str = f"{API_V1_PREFIX}/roomfinder"
     # Base URL for the images
     IMAGES_BASE_URL: str = f"{API_BASE_URL}/images"
     IMAGES_BASE_URL_CANTEENS: str = f"{IMAGES_BASE_URL}/canteens"

@@ -24,7 +24,7 @@ class MenuFetcher:
     def __init__(self, db: Session):
         self.db = db
         self.translation_service = TranslationService()
-        self.dish_image_service = DishImageService()
+        # self.dish_image_service = DishImageService()
         self.lecture_free_service = LectureFreePeriodService()
         self.food_crawler = FoodCrawler()    
         
@@ -94,8 +94,8 @@ class MenuFetcher:
                     
                     if dish_obj:
                         dish_obj.labels = combined_labels
-                        # Update price_simple only if new price is not None
-                        if dish.prices.students is not None:  # Changed to access Price object
+                        # Update prices whenever they exist, regardless of previous state
+                        if dish.prices.students is not None:
                             dish_obj.price_simple = PriceService.calculate_simple_price(dish.prices)
                             self.db.add(dish_obj)
                             self.db.flush()
@@ -109,21 +109,28 @@ class MenuFetcher:
                             
                             for category, price_data in price_mapping.items():
                                 if price_data is not None:
-                                    # Delete existing price for this category
-                                    self.db.query(DishPriceTable).filter_by(
-                                        dish_id=dish_obj.id,
-                                        category=category
-                                    ).delete()
-                                    
-                                    # Add new price record
-                                    price_obj = DishPriceTable(
-                                        dish_id=dish_obj.id,
-                                        category=category,
-                                        base_price=price_data.base_price,
-                                        price_per_unit=price_data.price_per_unit,
-                                        unit=price_data.unit
+                                    # Update or create price record
+                                    price_obj = (
+                                        self.db.query(DishPriceTable)
+                                        .filter_by(dish_id=dish_obj.id, category=category)
+                                        .first()
                                     )
-                                    self.db.add(price_obj)
+                                    
+                                    if price_obj:
+                                        # Update existing price
+                                        price_obj.base_price = price_data.base_price
+                                        price_obj.price_per_unit = price_data.price_per_unit
+                                        price_obj.unit = price_data.unit
+                                    else:
+                                        # Create new price record
+                                        price_obj = DishPriceTable(
+                                            dish_id=dish_obj.id,
+                                            category=category,
+                                            base_price=price_data.base_price,
+                                            price_per_unit=price_data.price_per_unit,
+                                            unit=price_data.unit
+                                        )
+                                        self.db.add(price_obj)
                         else:
                             logger.warning(f"No price data for dish {dish_obj.translations[0].title} in canteen {canteen_id}")
                             
