@@ -21,6 +21,18 @@ class CanteenService:
     def __init__(self, db: Session):
         self.db = db
         
+    def delete_all_canteen_data(self):
+        """Delete all canteen data from the database."""
+        logger.info("Deleting all canteen data...")
+        try:
+            self.db.query(CanteenLocationTable).delete()
+            self.db.query(CanteenStatusTable).delete()
+            self.db.query(CanteenOpeningHoursTable).delete()
+            self.db.commit()
+        except Exception as e:
+            logger.error(f"Error while deleting canteen data: {str(e)}")
+            self.db.rollback()
+            
     def store_canteen_data(self):
         """Store canteen data including locations, opening hours, and images."""
         logger.info("Storing canteen data...")
@@ -90,6 +102,7 @@ class CanteenService:
         logger.info("=" * 62)
         logger.info("Updating canteen data...")
         try:
+            self.delete_all_canteen_data()
             self.store_canteen_data()
             logger.info("Canteen data updated successfully!")
             logger.info("=" * 62 + "\n")

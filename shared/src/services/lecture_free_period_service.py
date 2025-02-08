@@ -30,7 +30,7 @@ class LectureFreePeriodService:
         Winter semester: Starts on first workday of second-to-last full week of October
         Summer semester: Starts on first workday of second-to-last or third-to-last full week of April
         
-        Winter semester duration: 17 weeks
+        Winter semester duration: 16 weeks
         Summer semester duration: 14 weeks
         """
         if semester == Semester.WINTER:
@@ -38,7 +38,7 @@ class LectureFreePeriodService:
             last_day = date(year, 11, 1) - timedelta(days=1)
             last_monday = last_day - timedelta(days=(last_day.weekday()))
             start_date = last_monday - timedelta(weeks=1)
-            end_date = start_date + timedelta(weeks=17)
+            end_date = start_date + timedelta(weeks=16)
         else:  # SUMMER
             # Find the last Monday of April
             last_day = date(year, 5, 1) - timedelta(days=1)
@@ -78,7 +78,9 @@ class LectureFreePeriodService:
 
 if __name__ == "__main__":
     service = LectureFreePeriodService()
+    print(service._get_semester_dates(2024, Semester.WINTER))
+    print(service._get_semester_dates(2025, Semester.SUMMER))
     today = date.today()
-    another_date = date(2024, 12, 25)
+    another_date = date(2025, 2, 11)
     print(f"Is today ({today}) lecture-free? {service.is_lecture_free()}") 
     print(f"Is another date ({another_date}) lecture-free? {service.is_lecture_free(another_date)}") 

@@ -25,9 +25,9 @@ class PriceService:
         total_price = base_price + (price_per_unit or 0)
 
         # Thresholds
-        if total_price <= 1:
+        if total_price <= 0.5:
             return "€"  # Cheap
-        elif total_price <= 2:
+        elif total_price <= 1.6:
             return "€€"  # Moderate
         else:
             return "€€€"  # Expensive
