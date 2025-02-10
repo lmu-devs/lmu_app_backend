@@ -101,3 +101,10 @@ docs/_build/
 ._*
 .Spotlight-V100
 .Trashes
+
+
+# Nginx Proxy Manager
+nginx/data/*
+!nginx/data/.gitkeep
+nginx/letsencrypt/*
+!nginx/letsencrypt/.gitkeep

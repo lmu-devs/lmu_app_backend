@@ -134,6 +134,23 @@ services:
                 condition: service_healthy
         restart: always
 
+    nginx:
+        container_name: nginx
+        image: 'jc21/nginx-proxy-manager:2.12.3'
+        restart: unless-stopped
+        ports:
+            - '80:80' # Public HTTP Port
+            - '443:443' # Public HTTPS Port
+            - '81:81' # Admin Web Interface Port
+        volumes:
+            - ./nginx/data:/data
+            - ./nginx/letsencrypt:/etc/letsencrypt
+            - ./nginx/snippets:/snippets:ro
+        environment:
+            TZ: 'Europe/Berlin'
+        networks:
+            - frontend
+
 volumes:
     postgres_data:
     postgres_metabase_data:
