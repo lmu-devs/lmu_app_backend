@@ -9,9 +9,9 @@ CinemaLocationConstants = {
         longitude=11.573568,
     ),
     CinemaEnum.HM.value: Location(
-        address="Hörsaal B052, Theresienstraße 37-39, München",
-        latitude=48.147902,
-        longitude=11.573249,
+        address="Hörsaal E0.103 - Lothstraße 64, München",
+        latitude=48.153710,
+        longitude=11.554946,
     ),
     CinemaEnum.TUM.value: Location(
         address="Carl-von-Linde-Hörsaal 1200 - Stadt, Arcisstraße 21, München",
