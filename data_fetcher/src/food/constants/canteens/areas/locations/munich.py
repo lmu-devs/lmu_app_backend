@@ -5,13 +5,13 @@ from shared.src.models import Location
 munich_locations = {
     CanteenEnum.MENSA_LEOPOLDSTR: Location(
         address="Leopoldstr. 13a, 80802 München",
-        latitude=48.156404,
-        longitude=11.582161
+        latitude=48.15632028888637,
+        longitude=11.582507004053339
     ),
     CanteenEnum.STUCAFE_LEOPOLDSTR: Location(
         address="Leopoldstr. 13a, 80802 München",
-        latitude=48.156404,
-        longitude=11.582161
+        latitude=48.156580923447166,
+        longitude=11.581929225099229
     ),
     # CanteenEnum.STULOUNGE_LEOPOLDSTR: Location(
     #     address="Leopoldstr. 13a, 80802 München",
@@ -30,8 +30,8 @@ munich_locations = {
     ),
     CanteenEnum.ESPRESSOBAR_LUDWIGSTR: Location(
         address="Ludwigstr. 28, 80539 München",
-        latitude=48.151608,
-        longitude=11.582327
+        latitude=48.1509446875566,
+        longitude=11.582763147212601
     ),
     CanteenEnum.STUBISTRO_AKADEMIESTR: Location(
         address="Akademiestraße 2-4, 80799 München",

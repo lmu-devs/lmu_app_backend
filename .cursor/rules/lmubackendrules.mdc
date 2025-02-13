@@ -1,0 +1,14 @@
+---
+description: general backend infos
+globs: 
+---
+
+## Backend Stack
+- fastapi
+- postgres
+- docker compose
+
+
+## Hosting
+- digital ocean
+- dns over cloudflare
