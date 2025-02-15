@@ -44,6 +44,11 @@ class CinemaService:
                     cinema_id=self.lmu_cinema_id,
                     url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/lmu_01.webp",
                     name="LMU Kino"
+                ),
+                CinemaImageTable(
+                    cinema_id=self.lmu_cinema_id,
+                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/lmu_02.webp",
+                    name="LMU Kino 2"
                 )
             ],
             translations=self.lmu_translations
