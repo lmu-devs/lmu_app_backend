@@ -5,7 +5,7 @@ import sys
 from data_fetcher.src.cinema.cinema_fetcher import create_cinema_fetcher
 from data_fetcher.src.food.food_fetcher import create_food_fetcher
 from data_fetcher.src.links.links_collector import LinkCollector
-from data_fetcher.src.sport.sport_fetcher import create_sport_fetcher
+from data_fetcher.src.sport.sport_collector import SportCollector
 from data_fetcher.src.university.university_fetcher import create_university_fetcher
 from shared.src.core.database import Database, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
@@ -18,7 +18,8 @@ class DataCollectorApp:
     def __init__(self):
         self.settings = get_settings()
         self.collectors = [
-            LinkCollector(),
+            # LinkCollector(),
+            SportCollector(),
         ]
         
     async def setup(self):

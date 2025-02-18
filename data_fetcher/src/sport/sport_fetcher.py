@@ -1,4 +1,5 @@
 import asyncio
+
 import schedule
 
 from shared.src.core.database import get_db
