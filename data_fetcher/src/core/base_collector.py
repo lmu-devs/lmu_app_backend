@@ -30,6 +30,7 @@ class BaseCollector(ABC):
         db = next(get_db())
         try:
             await self._collect_data(db)
+            self.logger.info(f"✅ collected data for {self.name}")
         finally:
             db.close()
 
