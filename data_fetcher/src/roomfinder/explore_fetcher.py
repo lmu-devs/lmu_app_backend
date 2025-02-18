@@ -16,7 +16,7 @@ def fetch_scheduled_data(db: Session):
     service = RoomfinderService(db)
     service.update_database()
     
-    logger.info("Successfully updated explore data")
+    logger.info(f"Successfully updated {__name__}")
     logger.info("================================================\n")
 
 async def create_roomfinder_fetcher():
