@@ -2,28 +2,29 @@ import asyncio
 import signal
 import sys
 
+from data_fetcher.src.cinema.cinema_collector import CinemaCollector
+from data_fetcher.src.food.food_collector import FoodCollector
+from data_fetcher.src.links.links_collector import LinkCollector
+from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
+from data_fetcher.src.sport.sport_collector import SportCollector
+from data_fetcher.src.university.university_collector import UniversityCollector
 from shared.src.core.database import Database, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
 
-from data_fetcher.src.cinema.cinema_collector import CinemaCollector
-from data_fetcher.src.links.links_collector import LinkCollector
-from data_fetcher.src.sport.sport_collector import SportCollector
-from data_fetcher.src.university.university_collector import UniversityCollector
-from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
-from data_fetcher.src.food.food_collector import FoodCollector
 
 logger = get_main_fetcher_logger(__name__)
 
 class DataCollectorApp:
     def __init__(self):
         self.settings = get_settings()
+        self.is_running = True
         self.collectors = [
-            # LinkCollector(),
-            CinemaCollector(),
-            # SportCollector(),
-            # UniversityCollector(),
+            LinkCollector(),
+            UniversityCollector(),
             # RoomfinderCollector(),
+            # CinemaCollector(),
+            # SportCollector(),
             # FoodCollector(),
         ]
         
@@ -36,7 +37,7 @@ class DataCollectorApp:
         """Setup graceful shutdown handlers"""
         def signal_handler(signum, frame):
             logger.info("Received shutdown signal. Stopping gracefully...")
-            # Here you can set your running flags to False
+            self.is_running = False
             
         signal.signal(signal.SIGTERM, signal_handler)
         signal.signal(signal.SIGINT, signal_handler)
@@ -54,7 +55,12 @@ class DataCollectorApp:
                 for collector in self.collectors
             ]
             
-            await asyncio.gather(*tasks)
+            while self.is_running:
+                await asyncio.sleep(60)
+            
+            # Cancel all tasks on shutdown
+            for task in tasks:
+                task.cancel()
             
         except Exception as e:
             logger.error(f"An error occurred: {e}", exc_info=True)

@@ -1,6 +1,0 @@
-# Global flag to control the main loop
-running_eat = True 
-running_movie = True
-running_university = True
-running_sport = True
-running_explore = True
