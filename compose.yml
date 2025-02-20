@@ -132,7 +132,7 @@ services:
         depends_on:
             db:
                 condition: service_healthy
-        restart: always
+        restart: on-failure
 
     nginx:
         container_name: nginx

@@ -1,268 +1,91 @@
+from sqlalchemy.orm import Session
+
+from psycopg2.errors import UniqueViolation
+
+from data_fetcher.src.cinema.services.screening_service import ScreeningService
 from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.core.settings import get_settings
-from shared.src.enums import CinemaEnum, LanguageEnum
-from shared.src.tables import CinemaImageTable, CinemaLocationTable, CinemaTable, CinemaTranslationTable
+from shared.src.tables import (
+    MovieLocationTable,
+    MovieRatingTable,
+    MovieScreeningTable,
+    MovieTable,
+    MovieTrailerTable,
+    MovieTrailerTranslationTable,
+    MovieTranslationTable,
+)
 
-from ..constants.location_constants import CinemaLocationConstants
-from ..constants.url_constants import HM_CINEMA_URL, LMU_CINEMA_URL, TUM_CINEMA_URL
-from ..models.cinema_description_model import CinemaDescription
+from ..constants.cinema_constants import lmu_cinema, hm_cinema, tum_cinema, tum_garching_cinema
 
 
 logger = get_cinema_fetcher_logger(__name__)
 
 class CinemaService:
-    def __init__(self):
+    def __init__(self, db: Session):
         self.settings = get_settings()
+        self.db = db
         
-    lmu_cinema_id = CinemaEnum.LMU.value
-    hm_cinema_id = CinemaEnum.HM.value
-    tum_cinema_id = CinemaEnum.TUM.value
-    tum_garching_cinema_id = CinemaEnum.TUM_GARCHING.value
-    
-    
-    def get_all_cinema_tables(self) -> list[CinemaTable]:
         
-        cinemas = []
+    def add_constant_cinema_data(self):
+        cinemas = [lmu_cinema, hm_cinema, tum_cinema, tum_garching_cinema]
         
-        cinemas.append(self.lmu_cinema())
-        cinemas.append(self.hm_cinema())
-        cinemas.append(self.tum_cinema())
-        cinemas.append(self.tum_garching_cinema())
+        for cinema in cinemas:
+            self.db.merge(cinema)
+        self.db.commit()
+        logger.info(f"Successfully added {len(cinemas)} cinemas to database")
+    
+    
+    def clear_cinema_tables(self):
+        """Clear all cinema-related tables in the correct order"""
+        logger.info("Clearing movies, screenings, ratings, trailers, trailer translations and locations data...")
         
-        logger.info(f"Successfully created {len(cinemas)} cinemas")
-        return cinemas
-    
-    
-    def lmu_cinema(self) -> CinemaTable:
-        return CinemaTable( 
-            id=self.lmu_cinema_id,
-            external_link=LMU_CINEMA_URL,
-            instagram_link="https://www.instagram.com/das.ukino/",
-            location=CinemaLocationTable(**vars(CinemaLocationConstants[self.lmu_cinema_id])),
-            images=[
-                CinemaImageTable(
-                    cinema_id=self.lmu_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/lmu_01.webp",
-                    name="LMU Kino"
-                ),
-                CinemaImageTable(
-                    cinema_id=self.lmu_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/lmu_02.webp",
-                    name="LMU Kino 2"
-                )
-            ],
-            translations=self.lmu_translations
-        )
+        self.db.query(MovieLocationTable).delete()
+        self.db.query(MovieTrailerTranslationTable).delete()
+        self.db.query(MovieTrailerTable).delete()
+        self.db.query(MovieRatingTable).delete()
+        self.db.query(MovieScreeningTable).delete()
+        self.db.query(MovieTranslationTable).delete()
+        self.db.query(MovieTable).delete()
         
-    def hm_cinema(self) -> CinemaTable:
-        return CinemaTable(
-            id=self.hm_cinema_id,
-            external_link=HM_CINEMA_URL,
-            instagram_link="https://www.instagram.com/hm__kino/",
-            location=CinemaLocationTable(**vars(CinemaLocationConstants[self.hm_cinema_id])),
-            images=[
-                CinemaImageTable(
-                    cinema_id=self.hm_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/hm_01.webp",
-                    name="HM Kino"
-                ),
-                CinemaImageTable(
-                    cinema_id=self.hm_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/hm_02.webp",
-                    name="HM Kino 2"
-                )
-            ],
-            translations=self.hm_translations
-        )
+        self.db.commit()
+        logger.info("Successfully cleared all tables")
+
+    
+    async def fetch_scheduled_data(self):
+        self.clear_cinema_tables()
+        screening_service = ScreeningService()
+        processed_movies = await screening_service.fetch_and_process_movies()
         
-    def tum_cinema(self) -> CinemaTable:
-        return CinemaTable(
-            id=self.tum_cinema_id,
-            external_link=TUM_CINEMA_URL,
-            instagram_link="https://www.instagram.com/dertufilm/",
-            location=CinemaLocationTable(**vars(CinemaLocationConstants[self.tum_cinema_id])),
-            images=[
-                CinemaImageTable(
-                    cinema_id=self.tum_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/tum_01.webp",
-                    name="TUM Kino"
-                ),
-                CinemaImageTable(
-                    cinema_id=self.tum_cinema_id,
-                    url=f"{self.settings.IMAGES_BASE_URL_CINEMAS}/tum_02.webp",
-                    name="TUM Kino 2"
-                )
-            ],
-            translations=self.tum_translations
-        )
-        
-    def tum_garching_cinema(self) -> CinemaTable:
-        return CinemaTable(
-            id=self.tum_garching_cinema_id,
-            external_link=TUM_CINEMA_URL,
-            instagram_link="https://www.instagram.com/dertufilm/",
-            location=CinemaLocationTable(**vars(CinemaLocationConstants[self.tum_garching_cinema_id])),
-            translations=self.tum_garching_translations
-        )
-    
-    
-    
-    lmu_translations = [
-        CinemaTranslationTable(
-            cinema_id=lmu_cinema_id,
-            language=LanguageEnum.GERMAN.value,
-            title="U Kino",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Keine Vorverkauf- und Reservierungsmöglichkeit"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="☁️",
-                    description="Erste Besucher erhalten ein Kissen"
-                ).model_dump()
-            ],
-        ),
-        CinemaTranslationTable(
-            cinema_id=lmu_cinema_id,
-            language=LanguageEnum.ENGLISH_US.value,
-            title="U Kino",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Bring you own snacks"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="No presale, and reservation"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="☁️",
-                    description="Free pillow for first visitors"
-                ).model_dump()
-            ],
-        )
-    ]
-    
-    tum_translations = [
-        CinemaTranslationTable(
-            cinema_id=tum_cinema_id,
-            language=LanguageEnum.GERMAN.value,
-            title="TU Film",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Online vorverkauf"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫",
-                    description="Offen für Alle"
-                ).model_dump()
-            ],
-        ),
-        CinemaTranslationTable(
-            cinema_id=tum_cinema_id,
-            language=LanguageEnum.ENGLISH_US.value,
-            title="TU Film",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Own snacks allowed"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Online presale"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫",
-                    description="Open for non-students"
-                ).model_dump()
-            ],
-        )
-    ]
-    
-    tum_garching_translations = [
-        CinemaTranslationTable(
-            cinema_id=tum_garching_cinema_id,
-            language=LanguageEnum.GERMAN.value,
-            title="TU Film Garching",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Online vorverkauf"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫",
-                    description="Offen für Alle"
-                ).model_dump()
-            ],
-        ),
-        CinemaTranslationTable(
-            cinema_id=tum_garching_cinema_id,
-            language=LanguageEnum.ENGLISH_US.value,
-            title="TU Film Garching",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Own snacks allowed"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Online presale"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫",
-                    description="Open for non-students"
-                ).model_dump()
-            ],
-        )
-    ]
-    
-    
-    hm_translations = [
-        CinemaTranslationTable(
-            cinema_id=hm_cinema_id,
-            language=LanguageEnum.GERMAN.value,
-            title="HM Kino",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="(Vor)verkauf vor Ort"
-                ).model_dump()
-            ],
-        ),
-        CinemaTranslationTable(
-            cinema_id=hm_cinema_id,
-            language=LanguageEnum.ENGLISH_US.value,
-            title="HM Cinema",
-            description=[
-                CinemaDescription(
-                    emoji="🍿",
-                    description="Own snacks allowed"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️",
-                    description="Offline presale"
-                ).model_dump()
-            ],
-        )
-    ]
+        for movie, translations, screening, ratings, trailers, trailer_translations in processed_movies:
+            try:
+                self.db.merge(movie)
+                self.db.flush()
+                
+                for translation in translations:
+                    self.db.merge(translation)
+                
+                self.db.merge(screening)
+                
+                for rating in ratings:
+                    self.db.merge(rating)
+                
+                for trailer in trailers:
+                    self.db.merge(trailer)
+                
+                for trailer_translation in trailer_translations:
+                    self.db.merge(trailer_translation)
+                
+                self.db.commit()
+                logger.info(f"Successfully added screening {screening.cinema_id} for {movie.original_title} to database")
+                
+            except Exception as e:
+                self.db.rollback()
+                # Check if it's a unique violation error
+                if isinstance(e.__cause__, UniqueViolation):
+                    logger.info(f"Movie {movie.original_title} already exists in database, skipping...")
+                else:
+                    logger.error(f"Error adding movie {movie.original_title} to database: {e}")
+                continue
     
 
     

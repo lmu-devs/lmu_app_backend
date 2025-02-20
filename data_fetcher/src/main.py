@@ -2,53 +2,71 @@ import asyncio
 import signal
 import sys
 
-from data_fetcher.src.cinema.cinema_fetcher import create_cinema_fetcher
-from data_fetcher.src.food.food_fetcher import create_food_fetcher
-from data_fetcher.src.roomfinder.explore_fetcher import create_roomfinder_fetcher
-from data_fetcher.src.sport.sport_fetcher import create_sport_fetcher
-from data_fetcher.src.university.university_fetcher import create_university_fetcher
-from shared.src.core.database import Base, Database, get_async_db, table_creation
+from data_fetcher.src.cinema.cinema_collector import CinemaCollector
+from data_fetcher.src.food.food_collector import FoodCollector
+from data_fetcher.src.links.links_collector import LinkCollector
+from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
+from data_fetcher.src.sport.sport_collector import SportCollector
+from data_fetcher.src.university.university_collector import UniversityCollector
+from shared.src.core.database import Database, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
 
 
-logger_main = get_main_fetcher_logger(__name__)
+logger = get_main_fetcher_logger(__name__)
 
-# # ------ Needed for stopping docker container ------ #
-# def signal_handler(signum, frame):
-#     global running_eat
-#     global running_movie
-#     logger_main.info("Received shutdown signal. Stopping gracefully...")
-
-# # Register the signal handler
-# signal.signal(signal.SIGTERM, signal_handler)
-# signal.signal(signal.SIGINT, signal_handler)
-# # ------ Needed for stopping docker container ------ #
-
-async def main():
-    logger_main.info("================================================")
-    logger_main.info("data_fetcher started")
-    try:
-        settings = get_settings()
-        Database(settings=settings)
-        table_creation()
-        async_db = get_async_db()
-        
-        tasks = [
-            asyncio.create_task(create_university_fetcher()),
-            asyncio.create_task(create_cinema_fetcher()),
-            asyncio.create_task(create_food_fetcher()),
-            asyncio.create_task(create_sport_fetcher()),
-            asyncio.create_task(create_roomfinder_fetcher())
+class DataCollectorApp:
+    def __init__(self):
+        self.settings = get_settings()
+        self.is_running = True
+        self.collectors = [
+            LinkCollector(),
+            UniversityCollector(),
+            RoomfinderCollector(),
+            FoodCollector(),
+            SportCollector(),
+            CinemaCollector(),
         ]
         
-        await asyncio.gather(*tasks)
+    async def setup(self):
+        """Initialize database and other resources"""
+        Database(settings=self.settings)
+        table_creation()
+    
+    def setup_signal_handlers(self):
+        """Setup graceful shutdown handlers"""
+        def signal_handler(signum, frame):
+            logger.info("Received shutdown signal. Stopping gracefully...")
+            self.is_running = False
+            
+        signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+    
+    async def run(self):
+        """Main application runner"""
+        logger.info("=" * 50)
+        logger.info("Data Fetcher Starting")
         
-    except Exception as e:
-        logger_main.error(f"An error occurred: {e}")
-    finally:
-        logger_main.info("data_fetcher is shutting down")
-        logger_main.info("================================================\n")
+        try:
+            await self.setup()
+            
+            tasks = [
+                asyncio.create_task(collector.run())
+                for collector in self.collectors
+            ]
+            
+            await asyncio.gather(*tasks, return_exceptions=True)
+            
+        except Exception as e:
+            logger.error(f"An error occurred: {e}", exc_info=True)
+        finally:
+            logger.info("Data Fetcher Shutting Down")
+            logger.info("=" * 40)
+
+async def main():
+    app = DataCollectorApp()
+    app.setup_signal_handlers()
+    await app.run()
 
 if __name__ == "__main__":
     asyncio.run(main())

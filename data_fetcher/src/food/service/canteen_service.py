@@ -99,13 +99,12 @@ class CanteenService:
 
     def update_canteen_database(self):
         """Main method to update the entire canteen database."""
-        logger.info("=" * 62)
         logger.info("Updating canteen data...")
         try:
             self.delete_all_canteen_data()
             self.store_canteen_data()
             logger.info("Canteen data updated successfully!")
-            logger.info("=" * 62 + "\n")
+            logger.info("=" * 40 + "\n")
         except Exception as e:
             logger.error(f"Error while updating canteen database: {str(e)}")
         finally:
