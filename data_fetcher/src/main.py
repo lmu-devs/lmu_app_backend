@@ -23,8 +23,8 @@ class DataCollectorApp:
             LinkCollector(),
             UniversityCollector(),
             # RoomfinderCollector(),
-            # CinemaCollector(),
             # SportCollector(),
+            # CinemaCollector(),
             # FoodCollector(),
         ]
         
@@ -55,18 +55,13 @@ class DataCollectorApp:
                 for collector in self.collectors
             ]
             
-            while self.is_running:
-                await asyncio.sleep(60)
-            
-            # Cancel all tasks on shutdown
-            for task in tasks:
-                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
             
         except Exception as e:
             logger.error(f"An error occurred: {e}", exc_info=True)
         finally:
             logger.info("Data Fetcher Shutting Down")
-            logger.info("=" * 50)
+            logger.info("=" * 40)
 
 async def main():
     app = DataCollectorApp()

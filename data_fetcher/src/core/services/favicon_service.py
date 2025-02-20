@@ -1,11 +1,6 @@
-import io
 import os
-from hashlib import md5
-from urllib.parse import urljoin, urlparse
-
 import requests
-from bs4 import BeautifulSoup
-from PIL import Image
+
 
 
 class FaviconService:
@@ -15,86 +10,34 @@ class FaviconService:
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)
 
-    def save_favicon(self, url):
-        """
-        Save the favicon from a given URL as PNG.
-        Returns the local path where the favicon was saved, or None if failed.
-        """
-        try:
-            favicon_url = self.get_favicon_url(url)
-            if not favicon_url:
-                return None
-
-            # Generate filename
-            filename = md5(url.encode()).hexdigest() + '.png'
-            local_path = os.path.join(self.save_directory, filename)
-
-            # Download favicon
-            response = requests.get(favicon_url, stream=True)
-            response.raise_for_status()
-
-            # Convert to PNG if necessary
-            image_data = response.content
-            image = Image.open(io.BytesIO(image_data))
-            
-            # Convert to RGBA if needed
-            if image.mode != 'RGBA':
-                image = image.convert('RGBA')
-            
-            # Save as PNG
-            image.save(local_path, 'PNG')
-            return local_path
-
-        except Exception as e:
-            print(f"Error saving favicon: {str(e)}")
-            return None
 
     def get_favicon_url(self, url):
         """
-        Get the favicon URL using faviconextractor.com with fallbacks.
-        Returns the complete favicon URL or None if not found.
+        Get the favicon URL using allesedv.com with DuckDuckGo and Google as fallbacks.
         """
         try:
-            # Clean the URL
-            if not url.startswith(('http://', 'https://')):
-                url = 'https://' + url
+            # Clean the URL to get domain
+            domain = url.split('/')[2] if '//' in url else url.split('/')[0]
             
-            parsed_url = urlparse(url)
-            domain = parsed_url.netloc
-
-            # Try faviconextractor.com first
-            favicon_extractor_url = f"https://www.faviconextractor.com/api/favicon/{domain}?larger=true"
-            response = requests.get(favicon_extractor_url)
+            # Try allesedv.com first (supports multiple sizes)
+            allesedv_url = f"https://f3.allesedv.com/64/{domain}"
+            response = requests.head(allesedv_url)
             if response.status_code == 200:
-                try:
-                    # The API returns the actual favicon URL in the response
-                    actual_favicon_url = response.json().get('favicon')
-                    if actual_favicon_url:
-                        return actual_favicon_url
-                except:
-                    pass  # If JSON parsing fails, move to fallback
+                return allesedv_url
 
-            # First fallback: Google's favicon service
-            google_favicon_url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
-            response = requests.head(google_favicon_url)
+            # Try DuckDuckGo second
+            ddg_url = f"https://icons.duckduckgo.com/ip3/{domain}.ico"
+            response = requests.head(ddg_url)
             if response.status_code == 200:
-                return google_favicon_url
+                return ddg_url
 
-            # Second fallback: Traditional method
-            response = requests.get(url)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
+            # Fallback to Google's service
+            google_url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
+            response = requests.head(google_url)
+            if response.status_code == 200:
+                return google_url
 
-            # Look for favicon in HTML
-            icon_links = soup.find_all('link', rel=lambda r: r and ('icon' in r.lower()))
-            if icon_links:
-                favicon_url = icon_links[0].get('href')
-                if favicon_url and not favicon_url.startswith(('http://', 'https://')):
-                    favicon_url = urljoin(url, favicon_url)
-                return favicon_url
-
-            # Last resort: Try default favicon.ico location
-            return f"{parsed_url.scheme}://{parsed_url.netloc}/favicon.ico"
+            return None
 
         except Exception as e:
             print(f"Error getting favicon URL: {str(e)}")
@@ -106,18 +49,19 @@ def main():
     service = FaviconService()
     
     test_urls = [
-        "lmu.de",
-        "lmu-dev.org",
-        "moodle.lmu.de",
-        "lmu-app.lmu-dev.org",
+        # "https://lmu.de",
+        "https://lmu-dev.org",
+        "https://moodle.lmu.de/my/",
+        "https://lmu-app.lmu-dev.org",
+        "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+        "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds?state=user&type=0",
     ]
 
     for url in test_urls:
         print(f"\nTesting URL: {url}")
         favicon_url = service.get_favicon_url(url)
         print(f"Favicon URL: {favicon_url}")
-        saved_path = service.save_favicon(url)
-        print(f"Saved favicon to: {saved_path}")
+
 
 
 if __name__ == "__main__":

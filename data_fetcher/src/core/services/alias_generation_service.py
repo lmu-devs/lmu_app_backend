@@ -18,11 +18,13 @@ class AliasGenerationService:
         system_message = SystemMessage(content="You are a helpful assistant that generates aliases for a given input. Try to be creative and think of simple and SINGE WORD search terms that a user would use to find the given input. DONT REPEAT SIMILAR ALIASES. SINGLE WORDS ONLY. DONT USE CAMEL CASE.")
         self.llm_factory = llm_factory or LLMFactory(provider='gemini', system_message=system_message)
 
-    def generate_alias(self, content: str) -> str:
+    def generate_alias(self, content: str, context: str) -> AliasGenerationResponse:
+        context = f"This is the context: {context}" if context else ""
         return self.llm_factory.create_completion(
             response_model=AliasGenerationResponse,
             model="gpt-3.5-turbo",
             messages=[
+                UserMessage(content=context),
                 UserMessage(content=content),
             ],
         )
