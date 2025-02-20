@@ -6,11 +6,11 @@ from shared.src.tables.links.links_table import LinkTable
 
 
 class Link(BaseModel):
+    title: str
+    description: str
     url: str
     favicon_url: str | None = None
     tags: List[str]
-    title: str
-    description: str
     aliases: List[str] | None = None
     
     @classmethod
