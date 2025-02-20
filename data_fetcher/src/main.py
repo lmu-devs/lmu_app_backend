@@ -22,10 +22,10 @@ class DataCollectorApp:
         self.collectors = [
             LinkCollector(),
             UniversityCollector(),
-            # RoomfinderCollector(),
-            # SportCollector(),
-            # CinemaCollector(),
-            # FoodCollector(),
+            RoomfinderCollector(),
+            FoodCollector(),
+            SportCollector(),
+            CinemaCollector(),
         ]
         
     async def setup(self):
