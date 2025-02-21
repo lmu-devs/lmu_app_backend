@@ -20,11 +20,11 @@ class DataCollectorApp:
         self.settings = get_settings()
         self.is_running = True
         self.collectors = [
-            LinkCollector(),
-            UniversityCollector(),
-            RoomfinderCollector(),
-            FoodCollector(),
-            SportCollector(),
+            # LinkCollector(),
+            # UniversityCollector(),
+            # RoomfinderCollector(),
+            # FoodCollector(),
+            # SportCollector(),
             CinemaCollector(),
         ]
         
