@@ -1,19 +1,12 @@
 import uuid
 
-from sqlalchemy import (UUID, Boolean, Column, Date, DateTime, Enum, Float,
-                        ForeignKey, Integer, String, Table, UniqueConstraint)
+from sqlalchemy import (ARRAY, UUID, Boolean, Column, Date, DateTime, Enum, Float,
+                        ForeignKey, Integer, String, UniqueConstraint)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.enums import RatingSourceEnum
 from shared.src.tables.language_table import LanguageTable
-
-# Association table for the many-to-many relationship between movies and genres
-movie_genre_association = Table(
-    'movie_genre_associations', Base.metadata,
-    Column('movie_id', UUID(as_uuid=True), ForeignKey('movies.id', ondelete='CASCADE'), primary_key=True),
-    Column('genre_id', UUID(as_uuid=True), ForeignKey('movie_genres.id', ondelete='CASCADE'), primary_key=True)
-)
 
 class MovieTable(Base):
     __tablename__ = "movies"
@@ -28,7 +21,6 @@ class MovieTable(Base):
     language = Column(String, nullable=True)
     
     translations = relationship("MovieTranslationTable", back_populates="movie", cascade="all, delete-orphan")
-    genres = relationship("MovieGenreTable", secondary=movie_genre_association, back_populates="movies")
     screenings = relationship("MovieScreeningTable", back_populates="movie", cascade="all, delete-orphan")
     ratings = relationship("MovieRatingTable", back_populates="movie", cascade="all, delete-orphan")
     trailers = relationship("MovieTrailerTable", back_populates="movie", cascade="all, delete-orphan")
@@ -46,17 +38,9 @@ class MovieTranslationTable(LanguageTable, Base):
     tagline = Column(String, nullable=True)
     poster_url = Column(String, nullable=True)
     backdrop_url = Column(String, nullable=True)
+    genres = Column(ARRAY(String), nullable=True)
     
     movie = relationship("MovieTable", back_populates="translations")
-
-
-class MovieGenreTable(Base):
-    __tablename__ = "movie_genres"
-
-    id = Column(UUID(as_uuid=True), primary_key=True, nullable=False, index=True)
-    name = Column(String, nullable=False)
-    
-    movies = relationship("MovieTable", secondary=movie_genre_association, back_populates="genres")
 
 class MovieRatingTable(Base):
     __tablename__ = "movie_ratings"

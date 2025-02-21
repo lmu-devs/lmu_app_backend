@@ -50,9 +50,6 @@ class MovieService:
         .outerjoin(MovieTable.ratings)
         .options(contains_eager(MovieTable.ratings))
         
-        # Add genres relationship
-        .outerjoin(MovieTable.genres)
-        .options(contains_eager(MovieTable.genres))
         )
         
         if movie_id:

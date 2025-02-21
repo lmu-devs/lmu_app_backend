@@ -34,13 +34,11 @@ class ScreeningService:
         .join(MovieScreeningTable.movie)
         .outerjoin(MovieTable.translations)
         .outerjoin(MovieTable.ratings)
-        .outerjoin(MovieTable.genres)
         .outerjoin(MovieTable.trailers)
         .outerjoin(MovieTrailerTable.translations)
         .options(
             contains_eager(MovieScreeningTable.movie).contains_eager(MovieTable.translations),
             contains_eager(MovieScreeningTable.movie).contains_eager(MovieTable.ratings),
-            contains_eager(MovieScreeningTable.movie).contains_eager(MovieTable.genres),
             contains_eager(MovieScreeningTable.movie)
             .contains_eager(MovieTable.trailers)
             .contains_eager(MovieTrailerTable.translations)
