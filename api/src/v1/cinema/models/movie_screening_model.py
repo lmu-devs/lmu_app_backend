@@ -5,14 +5,14 @@ from datetime import datetime
 from pydantic import BaseModel, RootModel
 
 from shared.src.tables import MovieScreeningTable
-from shared.src.models.location_model import Location
 from ...core.models.university_scheme import University
 from .movie_model import Movie
-from .cinema_model import Cinema
 
 
 class MovieScreening(BaseModel):
     id: uuid.UUID
+    cinema_id: str
+    university_id: str
     entry_time: datetime
     start_time: datetime
     end_time: datetime | None
@@ -22,23 +22,19 @@ class MovieScreening(BaseModel):
     external_link: str | None
     note: str | None
     movie: Movie
-    university: University
-    cinema: Cinema
     
     @classmethod
     def from_table(cls, screening: MovieScreeningTable) -> 'MovieScreening':
-        university = University.from_table(screening.university)
         movie = Movie.from_table(screening.movie)
-        cinema = Cinema.from_table(screening.cinema)
         
         return MovieScreening(
             id=screening.id,
+            cinema_id=screening.cinema_id,
+            university_id=screening.university_id,
             entry_time=screening.entry_time,
             start_time=screening.start_time,
             end_time=screening.end_time,
-            university=university,
             movie=movie,
-            cinema=cinema,
             price=screening.price,
             is_ov=screening.is_ov,
             subtitles=screening.subtitles,

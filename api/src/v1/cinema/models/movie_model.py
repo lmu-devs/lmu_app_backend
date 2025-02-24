@@ -4,9 +4,9 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-
-from shared.src.tables import MovieTable, MovieTranslationTable
 from shared.src.models.image_model import Image
+from shared.src.tables import MovieTable, MovieTranslationTable
+
 from .movie_rating_model import MovieRatings
 from .movie_trailer_model import MovieTrailers
 
@@ -21,7 +21,7 @@ class Movie(BaseModel):
     poster: Image | None
     backdrop: Image | None
     runtime: int | None
-    genres: List[str] | None = None
+    genres: List[str] = []
     ratings: MovieRatings | None
     trailers: MovieTrailers | None
     
@@ -33,7 +33,7 @@ class Movie(BaseModel):
         title = movie_translations.title if movie_translations else "not translated"
         overview = movie_translations.overview if movie_translations else "not translated"
         tagline = movie_translations.tagline if movie_translations else "not translated"
-        genres = movie_translations.genres if movie_translations else []
+        genres = movie_translations.genres if movie_translations and movie_translations.genres else []
         poster = Image.from_params(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
         backdrop = Image.from_params(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
         trailers = MovieTrailers.from_table(movie.trailers)

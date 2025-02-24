@@ -27,3 +27,13 @@ async def get_all(
     links = Links.from_table(links)
     return links
 
+@router.get("/benefits", response_model=Links, description="Get all benefits for important LMU services")
+async def get_all(
+    db: AsyncSession = Depends(get_async_db),
+    language: LanguageEnum = Depends(get_language),
+):
+    link_service = LinkService(db, language)
+    links = await link_service.get_links()
+    links = Links.from_table(links)
+    return links
+
