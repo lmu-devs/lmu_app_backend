@@ -20,12 +20,12 @@ class DataCollectorApp:
         self.settings = get_settings()
         self.is_running = True
         self.collectors = [
-            # LinkCollector(),
+            LinkCollector(),
             # UniversityCollector(),
             # RoomfinderCollector(),
             # FoodCollector(),
             # SportCollector(),
-            CinemaCollector(),
+            # CinemaCollector(),
         ]
         
     async def setup(self):

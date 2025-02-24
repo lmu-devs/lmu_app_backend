@@ -1,0 +1,2 @@
+from .link_benefits_table import LinkBenefitTable, LinkBenefitTranslationTable
+from .link_resources_table import LinkResourceTable, LinkResourceTranslationTable
