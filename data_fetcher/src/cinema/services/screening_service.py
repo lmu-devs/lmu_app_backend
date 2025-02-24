@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from data_fetcher.src.cinema.crawler import HmScreeningCrawler, LmuScreeningCrawler, TumScreeningCrawler
 from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
@@ -132,6 +132,9 @@ class ScreeningService:
         
         for lang in LanguageEnum:
             lang_data = tmdb_data[lang]
+            genres = lang_data.get("genres", [])
+            genres = [genre['name'] for genre in genres]
+
             translation = MovieTranslationTable(
                 movie_id=movie_id,
                 language=lang.value,
@@ -140,6 +143,7 @@ class ScreeningService:
                 tagline=lang_data.get("tagline", ""),
                 poster_url=poster_url,
                 backdrop_url=backdrop_url,
+                genres=genres
             )
             translations.append(translation)
 

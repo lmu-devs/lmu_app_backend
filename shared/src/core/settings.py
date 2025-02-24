@@ -1,9 +1,16 @@
 from functools import lru_cache
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from shared.src.settings.llm_settings import AnthropicSettings, GeminiSettings, OpenAISettings
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    app_name: str = "GenAI Project Template"
+    openai: OpenAISettings = OpenAISettings()
+    anthropic: AnthropicSettings = AnthropicSettings()
+    gemini: GeminiSettings = GeminiSettings()
     
     # Base URL for the eat API
     API_BASE_URL: str = "https://api.lmu-dev.org"
@@ -40,6 +47,20 @@ class Settings(BaseSettings):
     PGADMIN_PORT: str = "5050"
     PGADMIN_DEFAULT_EMAIL: str
     PGADMIN_DEFAULT_PASSWORD: str
+    
+    # Metabase settings
+    MB_DB_DBNAME: str
+    MB_DB_USER: str
+    MB_DB_PASSWORD: str
+    MB_DB_HOST: str
+    MB_DB_PORT: str
+    
+    MB_EMAIL: str
+    MB_PASSWORD: str
+    
+    # AI Keys
+    GEMINI_API_KEY: str
+    OPENAI_API_KEY: str
     
     class ConfigDict:
         env_file = ".env"

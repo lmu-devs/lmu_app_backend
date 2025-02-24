@@ -1,6 +1,6 @@
 import requests
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.enums import LanguageEnum
@@ -74,3 +74,5 @@ class TmdbService():
         except Exception as e:
             logger.error(f"Unexpected error processing TMDB data for {title}: {e}")
             return None
+        
+        

@@ -5,8 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from packaging import version
 
 from shared.src.core.database import Database
-from shared.src.core.error_handlers import api_error_handler
 from shared.src.core.exceptions import APIException
+from shared.src.core.error_handlers import api_error_handler
 from shared.src.core.logging import get_food_logger
 from shared.src.core.settings import get_settings
 
@@ -21,6 +21,7 @@ from .places.routers import places_router
 from .sport.routers import sport_router
 from .roomfinder.routers import roomfinder_router
 from .timeline.routers import timeline_router
+from .links.routers import link_router
 
 
 api_logger = get_food_logger(__name__)
@@ -37,7 +38,7 @@ def create_app():
     app = FastAPI(
         title="lmu-dev-api", 
         description="API for Students App in Munich.", 
-        version="1.1.5", 
+        version="0.2.0", 
         docs_url=f"{prefix}/docs", 
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
     )
@@ -67,6 +68,7 @@ def create_app():
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
     app.include_router(roomfinder_router.router, prefix=roomfinder_prefix, tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
+    app.include_router(link_router.router, prefix=prefix, tags=["link"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
