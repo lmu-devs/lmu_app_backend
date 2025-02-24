@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from packaging import version
 
 from shared.src.core.database import Database
 from shared.src.core.error_handlers import api_error_handler
@@ -23,6 +25,7 @@ from .timeline.routers import timeline_router
 
 api_logger = get_food_logger(__name__)
 
+MIN_APP_VERSION = "1.0.0"
 
 def create_app():
     settings = get_settings()
@@ -73,6 +76,27 @@ def create_app():
         allow_methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["*"],
     )
+
+    # Middleware to check the app-version in header
+    @app.middleware("http")
+    async def check_app_version(request: Request, call_next):
+        app_version = request.headers.get("app-version")
+        
+        if app_version:
+            try:
+                if version.parse(app_version) < version.parse(MIN_APP_VERSION):
+                    return JSONResponse(
+                        status_code=426, 
+                        content={"detail": f"Upgrade required. Minimum supported version is {MIN_APP_VERSION}."}
+                    )
+            except Exception:
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": "Invalid app-version format."}
+                )
+
+        response = await call_next(request)
+        return response
     
     # Middleware to add charset to JSON responses for üäö
     @app.middleware("http")
