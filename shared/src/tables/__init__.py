@@ -8,4 +8,4 @@ from .university_table import *
 from .feedback_table import *
 from .sport import *
 from .roomfinder import *
-from .links import *
+from .link import *

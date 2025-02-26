@@ -1,5 +1,5 @@
 from shared.src.enums import LanguageEnum
-from shared.src.tables.links.link_resources_table import LinkResourceTable, LinkResourceTranslationTable, LinkType
+from shared.src.tables.link.link_resources_table import LinkResourceTable, LinkResourceTranslationTable, LinkType
 
 
 link_resource_constants = [

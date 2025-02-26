@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.links import LinkResourceTable, LinkResourceTranslationTable
+from shared.src.tables.link import LinkResourceTable, LinkResourceTranslationTable
 
 
 class LinkResource(BaseModel):

@@ -2,13 +2,14 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.links import LinkBenefitTable, LinkBenefitTranslationTable
+from shared.src.tables.link import LinkBenefitTable, LinkBenefitTranslationTable
 
 
-class Benefit(BaseModel):
+class LinkBenefit(BaseModel):
     title: str
     description: str
     url: str
+    favicon_url: str | None = None
     image_url: str | None = None
     aliases: List[str] = []
     
@@ -21,6 +22,7 @@ class Benefit(BaseModel):
         
         return cls(
             url=benefit.url,
+            favicon_url=benefit.favicon_url,
             image_url=benefit.image_url,
             title=title,
             description=description,
@@ -28,9 +30,9 @@ class Benefit(BaseModel):
         )
         
 class LinkBenefits(RootModel):
-    root: List[Benefit]
+    root: List[LinkBenefit]
     
     @classmethod
     def from_table(cls, benefits: List[LinkBenefitTable]):
-        return cls([Benefit.from_table(benefit) for benefit in benefits])
+        return cls([LinkBenefit.from_table(benefit) for benefit in benefits])
 

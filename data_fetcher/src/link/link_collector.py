@@ -1,6 +1,6 @@
 from data_fetcher.src.core.base_collector import BaseCollector
-from data_fetcher.src.links.services.link_benefit_service import LinkBenefitService
-from data_fetcher.src.links.services.link_resource_service import LinkResourceService
+from data_fetcher.src.link.services.link_benefit_service import LinkBenefitService
+from data_fetcher.src.link.services.link_resource_service import LinkResourceService
 
 
 class LinkCollector(BaseCollector):

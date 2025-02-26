@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from shared.src.tables.links.link_table import LinkTable, LinkTranslationTable
+from shared.src.tables.link.link_table import LinkTable, LinkTranslationTable
 
 
 class LinkBenefitTable(LinkTable):

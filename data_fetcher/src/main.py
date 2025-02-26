@@ -4,7 +4,7 @@ import sys
 
 from data_fetcher.src.cinema.cinema_collector import CinemaCollector
 from data_fetcher.src.food.food_collector import FoodCollector
-from data_fetcher.src.links.links_collector import LinkCollector
+from data_fetcher.src.link.link_collector import LinkCollector
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
 from data_fetcher.src.university.university_collector import UniversityCollector

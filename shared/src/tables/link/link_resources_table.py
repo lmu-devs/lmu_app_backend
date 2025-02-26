@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.tables.language_table import LanguageTable
-from shared.src.tables.links.link_table import LinkTable, LinkTranslationTable
+from shared.src.tables.link.link_table import LinkTable, LinkTranslationTable
 
 
 class LinkType(str, Enum):

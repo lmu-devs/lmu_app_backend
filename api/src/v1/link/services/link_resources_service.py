@@ -4,10 +4,10 @@ from sqlalchemy.orm import selectinload
 
 from api.src.v1.core.translation_utils import apply_translation_query
 from shared.src.enums.language_enums import LanguageEnum
-from shared.src.tables.links.link_resources_table import LinkResourceTable, LinkResourceTranslationTable
+from shared.src.tables.link.link_resources_table import LinkResourceTable, LinkResourceTranslationTable
 
 
-class LinkService:
+class LinkResourceService:
     def __init__(self, db: AsyncSession, language: LanguageEnum = LanguageEnum.GERMAN):
         self.db = db
         self.language = language 

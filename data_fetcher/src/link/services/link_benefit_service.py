@@ -2,10 +2,10 @@ from sqlalchemy.orm import Session
 
 from data_fetcher.src.core.services.alias_generation_service import AliasGenerationService
 from data_fetcher.src.core.services.favicon_service import FaviconService
-from data_fetcher.src.links.constants.link_benefit_constants import link_benefit_constants
+from data_fetcher.src.link.constants.link_benefit_constants import link_benefit_constants
 from shared.src.core.logging import get_translation_logger
 from shared.src.services.translation_service import TranslationService
-from shared.src.tables.links.link_benefits_table import LinkBenefitTable, LinkBenefitTranslationTable
+from shared.src.tables.link.link_benefits_table import LinkBenefitTable, LinkBenefitTranslationTable
 
 
 logger = get_translation_logger(__name__)
@@ -23,6 +23,7 @@ class LinkBenefitService:
         self._merge_benefits_in_db()
         self._add_missing_aliases()
         self._add_missing_translations()
+        self._add_missing_favicon_urls()
         
     def _delete_benefits_not_in_constants(self):
         # Get the set of link IDs from constants
@@ -85,10 +86,9 @@ class LinkBenefitService:
         
 
     def _add_missing_favicon_urls(self):
-        
-        link_favicon_urls = self.db.query(LinkBenefitTable).filter(LinkBenefitTable.image_url.is_(None)).all()
+        link_favicon_urls = self.db.query(LinkBenefitTable).filter(LinkBenefitTable.favicon_url.is_(None)).all()
         for link in link_favicon_urls:
-            link.image_url = self.favicon_service.get_favicon_url(link.url)
+            link.favicon_url = self.favicon_service.get_favicon_url(link.url)
             self.db.merge(link)
         
         self.db.commit()
