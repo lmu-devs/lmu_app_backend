@@ -13,7 +13,7 @@ from .cinema.routers import cinema_router
 from .feedback.routers import feedback_router
 from .food.routers import canteen_router, dish_router, menu_router, taste_router
 from .home.routers import home_router
-from .links.routers import link_router
+from .link.routers import link_router
 from .log.routers import log_router
 from .places.routers import places_router
 from .roomfinder.routers import roomfinder_router
