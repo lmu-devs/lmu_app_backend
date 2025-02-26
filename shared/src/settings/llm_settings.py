@@ -23,7 +23,7 @@ class AnthropicSettings(LLMProviderSettings):
 
 class GeminiSettings(LLMProviderSettings):
     api_key: str | None = Field(alias="GEMINI_API_KEY", default=None)
-    default_model: str = "gemini-2.0-flash-lite-preview-02-05"
+    default_model: str = "gemini-2.0-flash"
     generation_config: GenerationConfig = GenerationConfig(
         max_output_tokens=1024,
     )
