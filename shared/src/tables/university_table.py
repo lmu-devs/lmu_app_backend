@@ -12,7 +12,7 @@ class UniversityTable(Base):
     translations = relationship("UniversityTranslationTable", back_populates="university", cascade="all, delete-orphan")
     screenings = relationship("MovieScreeningTable", back_populates="university", cascade="all, delete-orphan")
 
-class UniversityTranslationTable(LanguageTable, Base):
+class UniversityTranslationTable(LanguageTable):
     __tablename__ = "university_translations"
 
     university_id = Column(Enum(UniversityEnum), ForeignKey("universities.id", ondelete='CASCADE'), nullable=False, primary_key=True)

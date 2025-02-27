@@ -34,7 +34,7 @@ class CinemaLocationTable(LocationTable, Base):
     
     cinema = relationship("CinemaTable", back_populates="location")
     
-class CinemaTranslationTable(LanguageTable, Base):
+class CinemaTranslationTable(LanguageTable):
     __tablename__ = "cinema_translations"
     
     cinema_id = Column(String, ForeignKey('cinemas.id', ondelete='CASCADE'), primary_key=True)

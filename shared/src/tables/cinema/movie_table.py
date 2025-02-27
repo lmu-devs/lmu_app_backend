@@ -29,7 +29,7 @@ class MovieTable(Base):
         UniqueConstraint('original_title', 'release_date', name='uix_original_title_release_date'),
     )
     
-class MovieTranslationTable(LanguageTable, Base):
+class MovieTranslationTable(LanguageTable):
     __tablename__ = "movie_translations"
     
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete='CASCADE'), primary_key=True)
@@ -68,7 +68,7 @@ class MovieTrailerTable(Base):
     translations = relationship("MovieTrailerTranslationTable", back_populates="trailer", cascade="all, delete-orphan")
     
     
-class MovieTrailerTranslationTable(LanguageTable, Base):
+class MovieTrailerTranslationTable(LanguageTable):
     __tablename__ = "movie_trailer_translations"
     
     trailer_id = Column(UUID(as_uuid=True), ForeignKey("movie_trailers.id"), primary_key=True)

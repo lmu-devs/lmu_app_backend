@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Time
+from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String, Time, func
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
@@ -14,14 +14,14 @@ class SportTypeTable(Base):
     __tablename__ = "sport_type"
 
     id = Column(String, primary_key=True)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
     
     # Relationships
     translations = relationship("SportTypeTranslationTable", back_populates="sport_type")
     sport_courses = relationship("SportCourseTable", back_populates="sport_type")
 
-class SportTypeTranslationTable(LanguageTable, Base):
+class SportTypeTranslationTable(LanguageTable):
     __tablename__ = "sport_type_translation"
     
     sport_type_id = Column(String, ForeignKey("sport_type.id"), primary_key=True)
@@ -56,7 +56,7 @@ class SportCourseTable(Base):
     translations = relationship("SportCourseTranslationTable", back_populates="sport_course")
     time_slots = relationship("SportCourseTimeSlotTable", back_populates="sport_course")
     location = relationship("SportCourseLocationTable", uselist=False, back_populates="sport_course")
-class SportCourseTranslationTable(LanguageTable, Base):
+class SportCourseTranslationTable(LanguageTable):
     __tablename__ = "sport_course_translation"
     
     sport_course_id = Column(String, ForeignKey("sport_course.id"), primary_key=True, nullable=False)

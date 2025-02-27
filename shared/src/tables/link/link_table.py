@@ -1,4 +1,4 @@
-from sqlalchemy import ARRAY, Column, ForeignKey, String
+from sqlalchemy import ARRAY, Column, String
 from sqlalchemy.ext.declarative import declared_attr
 
 from shared.src.core.database import Base
@@ -22,7 +22,7 @@ class LinkTable(Base):
     
     
     
-class LinkTranslationTable(LanguageTable, Base):
+class LinkTranslationTable(LanguageTable):
     __abstract__ = True
     
     @declared_attr

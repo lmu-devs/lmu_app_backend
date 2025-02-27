@@ -79,7 +79,7 @@ class DishLikeTable(Base):
     def __repr__(self):
         return f"<DishLike(dish_id='{self.dish_id}', user_id='{self.user_id}')>"
 
-class DishTranslationTable(LanguageTable, Base):
+class DishTranslationTable(LanguageTable):
     __tablename__ = "dish_translations"
     
     dish_id = Column(UUID(as_uuid=True), ForeignKey("dishes.id", ondelete='CASCADE'), nullable=False, primary_key=True)
