@@ -1,8 +1,7 @@
-from typing import Annotated, Any, Literal, Union
+from typing import Any, Literal
 
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel, RootModel
 
-from api.src.v1.cinema.models.movie_screening_model import MovieScreenings
 from shared.src.enums.home_tile_enums import HomeTileEnum
 from shared.src.enums.language_enums import LanguageEnum
 
@@ -12,10 +11,10 @@ class HomeTileTranslation(BaseModel):
 
 
 class BaseHomeTile(BaseModel):
-    type: Literal[HomeTileEnum.BENEFITS, HomeTileEnum.NEWS, HomeTileEnum.EVENTS, HomeTileEnum.SPORTS, HomeTileEnum.ROOMFINDER, HomeTileEnum.WISHLIST, HomeTileEnum.FEEDBACK, HomeTileEnum.CINEMAS]
+    type: Literal[HomeTileEnum.BENEFITS, HomeTileEnum.NEWS, HomeTileEnum.EVENTS, HomeTileEnum.SPORTS, HomeTileEnum.ROOMFINDER, HomeTileEnum.WISHLIST, HomeTileEnum.FEEDBACK, HomeTileEnum.CINEMAS, HomeTileEnum.TIMELINE]
     size: int
     title: str
-    description: str
+    description: str | None = None
     data: Any | None = None
 
     

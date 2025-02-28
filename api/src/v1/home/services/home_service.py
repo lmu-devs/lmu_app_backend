@@ -47,41 +47,50 @@ class HomeService:
         return HomeTiles(
             root=[
                 BaseHomeTile(
-                    type=HomeTileEnum.BENEFITS,
+                    type=HomeTileEnum.TIMELINE,
                     size=2,
                     title="Timeline",
-                    description="Timeline"
                 ),
-                BaseHomeTile(
-                    type=HomeTileEnum.NEWS,
-                    size=1,
-                    title="News",
-                    description="News"
-                ),
-                BaseHomeTile(
-                    type=HomeTileEnum.CINEMAS,
-                    size=3,
-                    title="Cine",
-                    description="Cine",
-                    data=screenings
-                ),
-                BaseHomeTile(
-                    type=HomeTileEnum.EVENTS,
-                    size=1,
-                    title="Events",
-                    description="Events"
-                ),
+                # BaseHomeTile(
+                #     type=HomeTileEnum.NEWS,
+                #     size=1,
+                #     title="News",
+                #     description="+ 3 this week"
+                # ),
+                # BaseHomeTile(
+                #     type=HomeTileEnum.EVENTS,
+                #     size=1,
+                #     title="Events",
+                #     description="Events"
+                # ),
                 BaseHomeTile(
                     type=HomeTileEnum.SPORTS,
                     size=1,
                     title="Sports",
-                    description="Sports"
+                    description="124 courses"
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.ROOMFINDER,
                     size=1,
                     title="Roomfinder",
-                    description="Roomfinder"
+                ),
+                BaseHomeTile(
+                    type=HomeTileEnum.CINEMAS,
+                    size=3,
+                    title="Cinema",
+                    data=screenings
+                ),
+                BaseHomeTile(
+                    type=HomeTileEnum.WISHLIST,
+                    size=1,
+                    title="Wishlist",
+                    description="7 features"
+                ),
+                BaseHomeTile(
+                    type=HomeTileEnum.FEEDBACK,
+                    size=1,
+                    title="Feedback",
+                    description="für die App"
                 ),
             ]
         )
