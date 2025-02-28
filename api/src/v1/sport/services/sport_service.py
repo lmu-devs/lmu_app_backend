@@ -5,11 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
-from shared.src.tables.sport import (
-    SportCourseTable,
-    SportTypeTable,
-    SportTypeTranslationTable,
-)
+from shared.src.tables.sport import SportCourseTable, SportTypeTable, SportTypeTranslationTable
+from shared.src.tables.sport.sport_table import SportCourseTranslationTable
 
 from ...core.translation_utils import create_translation_order_case
 
@@ -23,6 +20,14 @@ class SportService:
         query = self._get_sports_query(sport_type_id)
         result = await self.db.execute(query)
         return result.scalars().unique().all()
+    
+    async def get_basis_ticket(self) -> SportTypeTable:
+        query = select(SportTypeTable)
+        query = query.outerjoin(SportTypeTable.translations)
+        query = query.filter(SportTypeTranslationTable.title.like("%Basic-Ticket%"))
+        query = query.options(contains_eager(SportTypeTable.translations))
+        result = await self.db.execute(query)
+        return result.scalars().first()
     
     def _get_sports_query(self, sport_type_id: Optional[str] = None):
         query = (

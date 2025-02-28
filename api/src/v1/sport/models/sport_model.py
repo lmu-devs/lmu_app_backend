@@ -1,12 +1,12 @@
-
-
-from pydantic import BaseModel, RootModel
 from datetime import datetime, time
 from typing import List
+
+from pydantic import BaseModel, RootModel
 
 from shared.src.enums import WeekdayEnum
 from shared.src.models import Location
 from shared.src.tables.sport.sport_table import SportCourseTable, SportCourseTimeSlotTable, SportTypeTable
+
 
 class TimeSlot(BaseModel):
     day: WeekdayEnum
@@ -96,7 +96,20 @@ class SportTypes(RootModel):
     @classmethod
     def from_table(cls, tables: List[SportTypeTable]) -> "SportTypes":
         return cls(root=[SportType.from_table(table) for table in tables])
-
+    
+    
+class Sport(BaseModel):
+    base_url: str
+    basic_ticket: SportType
+    sport_types: SportTypes
+    
+    @classmethod
+    def model(cls, sport_types: SportTypes, basic_ticket: SportType) -> "Sport":
+        return cls(
+            base_url="https://www.buchung.zhs-muenchen.de/angebote/aktueller_zeitraum_0/",
+            basic_ticket=basic_ticket,
+            sport_types=sport_types
+        )
 
 
     
