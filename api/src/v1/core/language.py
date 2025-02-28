@@ -8,7 +8,6 @@ from shared.src.enums import LanguageEnum
 async def get_language(
     accept_language: Optional[str] = Header(
         default=LanguageEnum.GERMAN,
-        description="Supported languages (en, de)",
         enum=[lang.value for lang in LanguageEnum]
     )
 ) -> LanguageEnum:

@@ -54,7 +54,7 @@ class WishlistLikeTable(Base):
     user = relationship("UserTable", back_populates="liked_wishlists") 
     
 
-class WishlistTranslationTable(LanguageTable, Base):
+class WishlistTranslationTable(LanguageTable):
     __tablename__ = "wishlist_translations"
     
     wishlist_id = Column(Integer, ForeignKey("wishlists.id", ondelete='CASCADE'), primary_key=True)
