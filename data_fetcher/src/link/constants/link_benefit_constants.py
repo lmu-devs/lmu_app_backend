@@ -11,12 +11,12 @@ link_benefit_constants = [
             LinkBenefitTranslationTable(
                 language=LanguageEnum.ENGLISH_US, 
                 title="MVG Ermäßigungsticket", 
-                description="Discounted ticket for 38€ per month newspapers and magazines free and daily current Münchner Philharmoniker Discounted tickets for students Staatsoper Cheap tickets and numerous activities", 
+                description="Discounted ticket for 38€ per month", 
             ),
             LinkBenefitTranslationTable(
                 language=LanguageEnum.GERMAN, 
                 title="MVG Ermäßigungsticket", 
-                description="Vergünstigtes Deutschlandticket für 38€ pro Monat Zeitung und Zeitschriften Kostenlos und tagesaktuell Münchner Philharmoniker Ermäßigte Tickets für Studenten Staatsoper Günstigere Tickets und zahlreiche Aktivitäten", 
+                description="Vergünstigtes Deutschlandticket für 38€ pro Monat", 
             )
         ]
     ),

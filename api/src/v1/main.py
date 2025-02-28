@@ -15,6 +15,7 @@ from .food.routers import canteen_router, dish_router, menu_router, taste_router
 from .home.routers import home_router
 from .link.routers import link_router
 from .log.routers import log_router
+from .notification.routers import notification_router
 from .places.routers import places_router
 from .roomfinder.routers import roomfinder_router
 from .sport.routers import sport_router
@@ -64,6 +65,7 @@ def create_app():
     app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
+    app.include_router(notification_router.router, prefix=f"{prefix}/notification", tags=["notification"])
     
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

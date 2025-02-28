@@ -1,5 +1,5 @@
 from enum import Enum
-from sqlalchemy import Column, String, DateTime, UUID, ForeignKey, ARRAY
+from sqlalchemy import Column, String, DateTime, UUID, ForeignKey, ARRAY, func
 from sqlalchemy.orm import relationship
 from shared.src.core.database import Base
 from datetime import datetime
@@ -26,8 +26,8 @@ class FeedbackTable(Base):
     tags = Column(ARRAY(String), nullable=True)
     app_version = Column(String, nullable=True)
     system_version = Column(String, nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationship with user
     user = relationship("UserTable", back_populates="feedback") 
