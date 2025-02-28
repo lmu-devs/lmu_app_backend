@@ -57,9 +57,14 @@ class Settings(BaseSettings):
     MB_EMAIL: str
     MB_PASSWORD: str
     
+    # Firebase
+    FIREBASE_CREDENTIALS: str
+    
     # AI Keys
     GEMINI_API_KEY: str
     OPENAI_API_KEY: str
+    
+    
     
     class ConfigDict:
         env_file = ".env"
