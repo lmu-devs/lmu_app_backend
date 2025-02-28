@@ -53,5 +53,56 @@ link_resource_constants = [
                 description="App für das Buchen von Sitzplätzen und Räumen in Bibliotheken", 
             )
         ]
+    ),
+    LinkResourceTable(
+        id="IMMATRICULATION",
+        url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/",
+        types=[LinkType.INTERNAL],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US, 
+                title="Study Administration", 
+                description="Immatriculation, Study Certificate, etc.", 
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN, 
+                title="Verwaltung Studium", 
+                description="Immatrikulation, Studienbescheinigung, Beitragskonto, etc.", 
+            )
+        ]
+    ),
+    LinkResourceTable(
+        id="MAILBOX",
+        url="https://mailbox.portal.uni-muenchen.de/webmail/webmail/ui/MainPage.html",
+        types=[LinkType.INTERNAL],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US, 
+                title="LMU-Mail", 
+                description="Online Mail Portal", 
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN, 
+                title="LMU-Mail", 
+                description="Online Mail Portal", 
+            )
+        ]
+    ),
+    LinkResourceTable(
+        id="USER_ACCOUNT",
+        url="https://www.portal.uni-muenchen.de/benutzerkonto/#!/",
+        types=[LinkType.INTERNAL],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US, 
+                title="LMU User Account", 
+                description="LMU Card, E-Mail, LRZ ID, etc.", 
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN, 
+                title="LMU Benutzerkonto", 
+                description="LMU Karte, E-Mail, LRZ ID, etc.", 
+            )
+        ]
     )
 ]

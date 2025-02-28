@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.logging import get_food_logger
 from shared.src.core.database import get_async_db
+from shared.src.enums.language_enums import LanguageEnum
 from ..models.home_model import Home
 from ..services.home_service import HomeService
 
@@ -13,5 +14,5 @@ logger = get_food_logger(__name__)
 async def get_home(
     db: AsyncSession = Depends(get_async_db)
 ):
-    home_service = HomeService(db)
+    home_service = HomeService(db, LanguageEnum.GERMAN)
     return await home_service.get_home_data()
