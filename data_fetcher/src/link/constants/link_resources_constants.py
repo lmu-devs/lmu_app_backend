@@ -78,13 +78,13 @@ link_resource_constants = [
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US, 
-                title="LMU-Mail", 
-                description="Online Mail Portal", 
+                title="E-Mail", 
+                description="Online LMU Mail Portal", 
             ),
             LinkResourceTranslationTable(
                 language=LanguageEnum.GERMAN, 
-                title="LMU-Mail", 
-                description="Online Mail Portal", 
+                title="E-Mail", 
+                description="Online LMU Mail Portal", 
             )
         ]
     ),
@@ -95,12 +95,12 @@ link_resource_constants = [
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US, 
-                title="LMU User Account", 
+                title="User Account", 
                 description="LMU Card, E-Mail, LRZ ID, etc.", 
             ),
             LinkResourceTranslationTable(
                 language=LanguageEnum.GERMAN, 
-                title="LMU Benutzerkonto", 
+                title="Benutzerkonto", 
                 description="LMU Karte, E-Mail, LRZ ID, etc.", 
             )
         ]
