@@ -75,6 +75,18 @@ class HomeService:
                     title="Roomfinder",
                 ),
                 BaseHomeTile(
+                    type=HomeTileEnum.LINKS,
+                    size=1,
+                    title="Links",
+                    description="12 links"
+                ),
+                BaseHomeTile(
+                    type=HomeTileEnum.BENEFITS,
+                    size=1,
+                    title="Benefits",
+                    description="4 offers"
+                ),
+                BaseHomeTile(
                     type=HomeTileEnum.CINEMAS,
                     size=3,
                     title="Cinema",
