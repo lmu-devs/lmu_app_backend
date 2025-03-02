@@ -62,6 +62,9 @@ jobs:
                   # Copy compose.yml to the server
                   scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/compose.yml
 
+                  # Copy entrypoint.sh to the server
+                  scp entrypoint.sh ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/entrypoint.sh
+
                   # Deploy using Docker Compose
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
                   export ENVIRONMENT=staging && \
