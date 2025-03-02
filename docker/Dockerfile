@@ -27,7 +27,9 @@ COPY ./alembic.ini /app/alembic.ini
 ENV SERVICE_TYPE=api
 
 # Entrypoint script to determine which service to run
-COPY docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+# Convert any Windows line endings to Unix
+RUN apt-get update && apt-get install -y dos2unix && dos2unix /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"] 

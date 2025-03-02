@@ -28,11 +28,12 @@ jobs:
                   echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-            - name: Build and push API image
+            - name: Build and push multi-architecture API image
               uses: docker/build-push-action@v4
               with:
                   context: .
                   file: ./docker/Dockerfile
+                  platforms: linux/amd64,linux/arm64
                   push: true
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/lmu-api:staging
