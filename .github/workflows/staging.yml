@@ -52,7 +52,11 @@ jobs:
             - name: Add host key
               run: |
                   mkdir -p ~/.ssh
-                  ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+                  echo "Attempting to scan host ${{ secrets.HOST }}"
+                  ssh-keyscan -H ${{ secrets.HOST }} -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key"
+                  cat ~/.ssh/known_hosts
+                  echo "Verifying connectivitya to ${{ secrets.HOST }}"
+                  nc -zv ${{ secrets.HOST }} 22 || echo "Cannot connect to port 22"
 
             - name: Deploy to staging server
               run: |
