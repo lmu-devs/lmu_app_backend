@@ -27,6 +27,7 @@ COPY ./alembic.ini /app/alembic.ini
 ENV SERVICE_TYPE=api
 
 # Entrypoint script to determine which service to run
+COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Convert any Windows line endings to Unix

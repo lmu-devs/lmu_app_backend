@@ -98,7 +98,7 @@ services:
         # Use build for local development (default)
         build:
             context: .
-            dockerfile: docker/Dockerfile
+            dockerfile: Dockerfile
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
@@ -128,7 +128,7 @@ services:
         # Use build for local development (default)
         build:
             context: .
-            dockerfile: docker/Dockerfile
+            dockerfile: Dockerfile
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
