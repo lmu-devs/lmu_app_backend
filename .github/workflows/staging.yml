@@ -28,21 +28,20 @@ jobs:
                   echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-            - name: Build and push multi-architecture API image
-              uses: docker/build-push-action@v4
-              with:
-                  context: .
-                  file: ./Dockerfile
-                  platforms: linux/amd64,linux/arm64
-                  push: true
-                  tags: |
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-api:staging
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-api:${{ steps.meta.outputs.commit_sha }}
-                  build-args: |
-                      BUILD_ENV=staging
-                      COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
-                      BUILD_DATE=${{ steps.meta.outputs.build_date }}
-                  no-cache: true
+            # - name: Build and push multi-architecture API image
+            #   uses: docker/build-push-action@v4
+            #   with:
+            #       context: .
+            #       file: ./Dockerfile
+            #       platforms: linux/amd64,linux/arm64
+            #       push: true
+            #       tags: |
+            #           ${{ secrets.DOCKER_USERNAME }}/lmu-api:staging
+            #           ${{ secrets.DOCKER_USERNAME }}/lmu-api:${{ steps.meta.outputs.commit_sha }}
+            #       build-args: |
+            #           BUILD_ENV=staging
+            #           COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
+            #           BUILD_DATE=${{ steps.meta.outputs.build_date }}
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
@@ -52,23 +51,44 @@ jobs:
             - name: Add host key
               run: |
                   mkdir -p ~/.ssh
-                  echo "Attempting to scan host ${{ secrets.HOST }}"
-                  ssh-keyscan -H ${{ secrets.HOST }} -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key"
+                  echo "HOST secret value length check"
+                  echo "Length: ${#HOST}"
+                  echo "Attempting to scan host using direct IP 157.230.114.51"
+                  ssh-keyscan -H 157.230.114.51 -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key with direct IP"
+                  echo "Attempting to scan host using secret"
+                  ssh-keyscan -H ${{ secrets.HOST }} -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key with secret"
                   cat ~/.ssh/known_hosts
-                  echo "Verifying connectivitya to ${{ secrets.HOST }}"
-                  nc -zv ${{ secrets.HOST }} 22 || echo "Cannot connect to port 22"
+                  echo "Verifying connectivity to direct IP 157.230.114.51"
+                  nc -zv 157.230.114.51 22 || echo "Cannot connect to port 22 on direct IP"
+                  echo "Verifying connectivity to secret HOST"
+                  nc -zv ${{ secrets.HOST }} 22 || echo "Cannot connect to port 22 on secret HOST"
+                  # Create SSH config to disable strict host key checking
+                  echo "Host ${{ secrets.HOST }} 157.230.114.51" > ~/.ssh/config
+                  echo "  StrictHostKeyChecking no" >> ~/.ssh/config
+                  echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+                  chmod 600 ~/.ssh/config
 
-            - name: Deploy to staging server
-              run: |
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
-                  git pull origin staging && \
-                  export ENVIRONMENT=staging && \
-                  docker compose down && \
-                  docker compose up -d"
+            # - name: Deploy to staging server
+            #   run: |
+            #       echo "Trying to deploy using HOST secret..."
+            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
+            #       git pull origin staging && \
+            #       export ENVIRONMENT=staging && \
+            #       docker compose down && \
+            #       docker compose up -d" || \
+            #       (echo "Failed with HOST secret, trying direct IP..." && \
+            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@157.230.114.51 "cd ${{ secrets.APP_PATH }} && \
+            #       git pull origin staging && \
+            #       export ENVIRONMENT=staging && \
+            #       docker compose down && \
+            #       docker compose up -d")
 
-            - name: Run database migrations
-              run: |
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            # - name: Run database migrations
+            #   run: |
+            #       echo "Trying to run migrations using HOST secret..."
+            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head" || \
+            #       (echo "Failed with HOST secret, trying direct IP..." && \
+            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@157.230.114.51 "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head")
 
             - name: Notify deployment success
               if: success()
