@@ -59,11 +59,10 @@ jobs:
                   # Create deployment directory if it doesn't exist
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ secrets.APP_PATH }}"
 
-                  # Copy compose.yml to the server
+                  # Copy compose.yml, entrypoint.sh, and Dockerfile to the server
                   scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/compose.yml
-
-                  # Copy entrypoint.sh to the server
                   scp entrypoint.sh ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/entrypoint.sh
+                  scp Dockerfile ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/Dockerfile
 
                   # Deploy using Docker Compose
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
