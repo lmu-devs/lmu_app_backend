@@ -1,8 +1,10 @@
 FROM python:3.12-slim
 
-#
-WORKDIR /app
+# Set environment argument with default value
+ARG ENVIRONMENT=development
+ENV ENVIRONMENT=${ENVIRONMENT}
 
+WORKDIR /app
 
 # install dependencies
 COPY requirements.txt ./
@@ -12,5 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY ./shared /app/shared
 COPY ./api /app/api
 
+# Copy appropriate environment file
+COPY .env.${ENVIRONMENT} /app/.env
 
 CMD ["uvicorn", "api.src.v1.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
