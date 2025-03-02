@@ -68,20 +68,14 @@ jobs:
                   echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
                   chmod 600 ~/.ssh/config
 
-            # - name: Deploy to staging server
-            #   run: |
-            #       echo "Trying to deploy using HOST secret..."
-            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
-            #       git pull origin staging && \
-            #       export ENVIRONMENT=staging && \
-            #       docker compose down && \
-            #       docker compose up -d" || \
-            #       (echo "Failed with HOST secret, trying direct IP..." && \
-            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@157.230.114.51 "cd ${{ secrets.APP_PATH }} && \
-            #       git pull origin staging && \
-            #       export ENVIRONMENT=staging && \
-            #       docker compose down && \
-            #       docker compose up -d")
+            - name: Deploy to staging server
+              run: |
+                  echo "Deploying to staging server..."
+                  ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
+                  git pull origin staging && \
+                  export ENVIRONMENT=staging && \
+                  docker compose down && \
+                  docker compose up -d"
 
             # - name: Run database migrations
             #   run: |
