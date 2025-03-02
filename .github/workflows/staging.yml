@@ -41,7 +41,6 @@ jobs:
                       BUILD_ENV=staging
                       COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
                       BUILD_DATE=${{ steps.meta.outputs.build_date }}
-                  no-cache: true
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
