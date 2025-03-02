@@ -43,13 +43,13 @@ jobs:
                   echo "Deploying commit: ${COMMIT_SHA}"
 
                   # Pull the image from staging with the specific commit SHA
-                  docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-api:${COMMIT_SHA}
+                  docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${COMMIT_SHA}
 
                   # Tag it for production
-                  docker tag ${{ secrets.DOCKER_USERNAME }}/lmu-api:${COMMIT_SHA} ${{ secrets.DOCKER_USERNAME }}/lmu-api:production
+                  docker tag ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${COMMIT_SHA} ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:production
 
                   # Push the production tag
-                  docker push ${{ secrets.DOCKER_USERNAME }}/lmu-api:production
+                  docker push ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:production
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
