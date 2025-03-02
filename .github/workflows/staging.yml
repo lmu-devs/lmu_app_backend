@@ -51,8 +51,8 @@ jobs:
             - name: Add host key
               run: |
                   mkdir -p ~/.ssh
-                  echo "HOST secret value length check"
-                  echo "Length: ${#HOST}"
+                  echo "HOST secret check"
+                  echo "Secret exists: ${{ secrets.HOST != '' }}"
                   echo "Attempting to scan host using direct IP 157.230.114.51"
                   ssh-keyscan -H 157.230.114.51 -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key with direct IP"
                   echo "Attempting to scan host using secret"
