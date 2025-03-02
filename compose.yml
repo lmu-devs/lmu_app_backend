@@ -91,14 +91,15 @@ services:
         depends_on:
             db_mb:
                 condition: service_healthy
+        env_file:
+            - .env
 
     api_v1:
-        build:
-            context: .
-            dockerfile: docker/Dockerfile-api
+        image: ${DOCKER_USERNAME}/lmu-api:${ENVIRONMENT}
         environment:
             - API_VERSION=v1
             - PYTHONPATH=/app
+            - ENVIRONMENT=${ENVIRONMENT:-development}
         env_file:
             - .env
         container_name: api_v1
@@ -115,9 +116,7 @@ services:
         restart: always
 
     data_fetcher:
-        build:
-            context: .
-            dockerfile: docker/Dockerfile-data_fetcher
+        image: ${DOCKER_USERNAME}/lmu-api:${ENVIRONMENT}
         env_file:
             - .env
         container_name: data_fetcher
@@ -129,6 +128,8 @@ services:
         environment:
             - PYTHONPATH=/app
             - PYTHONUNBUFFERED=1
+            - ENVIRONMENT=${ENVIRONMENT:-development}
+            - SERVICE_TYPE=data_fetcher
         depends_on:
             db:
                 condition: service_healthy
