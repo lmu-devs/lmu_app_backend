@@ -28,20 +28,20 @@ jobs:
                   echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-            - name: Build and push multi-architecture API image
-              uses: docker/build-push-action@v4
-              with:
-                  context: .
-                  file: ./Dockerfile
-                  platforms: linux/amd64,linux/arm64
-                  push: true
-                  tags: |
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:staging
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${{ steps.meta.outputs.commit_sha }}
-                  build-args: |
-                      BUILD_ENV=staging
-                      COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
-                      BUILD_DATE=${{ steps.meta.outputs.build_date }}
+            # - name: Build and push multi-architecture API image
+            #   uses: docker/build-push-action@v4
+            #   with:
+            #       context: .
+            #       file: ./Dockerfile
+            #       platforms: linux/amd64,linux/arm64
+            #       push: true
+            #       tags: |
+            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:staging
+            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${{ steps.meta.outputs.commit_sha }}
+            #       build-args: |
+            #           BUILD_ENV=staging
+            #           COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
+            #           BUILD_DATE=${{ steps.meta.outputs.build_date }}
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
@@ -58,9 +58,9 @@ jobs:
                   echo "Deploying to staging server..."
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
                   export ENVIRONMENT=staging && \
-                  docker compose pull && \
+                  docker compose pull nginx api_v1 db pgadmin data_fetcher && \
                   docker compose down && \
-                  docker compose up -d"
+                  docker compose up -d nginx api_v1 db pgadmin data_fetcher"
 
             - name: Run database migrations
               run: |
