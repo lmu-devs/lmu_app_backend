@@ -56,6 +56,13 @@ jobs:
             - name: Deploy to staging server
               run: |
                   echo "Deploying to staging server..."
+                  # Create deployment directory if it doesn't exist
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ secrets.APP_PATH }}"
+
+                  # Copy compose.yml to the server
+                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/compose.yml
+
+                  # Deploy using Docker Compose
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
                   export ENVIRONMENT=staging && \
                   docker compose pull nginx api_v1 db pgadmin data_fetcher && \
