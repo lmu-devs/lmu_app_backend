@@ -104,7 +104,7 @@ services:
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
         # Use image for production (when DOCKER_REGISTRY is set)
-        image: ${DOCKER_USERNAME}/lmu-api:${ENVIRONMENT}
+        image: ${DOCKER_USERNAME}/lmu-app-backend:${ENVIRONMENT}
         environment:
             - API_VERSION=v1
             - PYTHONPATH=/app
@@ -134,7 +134,7 @@ services:
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
         # Use image for production (when DOCKER_REGISTRY is set)
-        image: ${DOCKER_USERNAME}/lmu-api:${ENVIRONMENT}
+        image: ${DOCKER_USERNAME}/lmu-app-backend:${ENVIRONMENT}
         env_file:
             - .env
         container_name: data_fetcher
