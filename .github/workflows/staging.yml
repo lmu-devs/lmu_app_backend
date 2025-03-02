@@ -25,8 +25,8 @@ jobs:
             - name: Extract metadata for Docker
               id: meta
               run: |
-                  echo "::set-output name=commit_sha::$(git rev-parse --short HEAD)"
-                  echo "::set-output name=build_date::$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+                  echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+                  echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
             - name: Build and push API image
               uses: docker/build-push-action@v4
@@ -41,6 +41,7 @@ jobs:
                       BUILD_ENV=staging
                       COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
                       BUILD_DATE=${{ steps.meta.outputs.build_date }}
+                  no-cache: true
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0

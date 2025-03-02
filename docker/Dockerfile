@@ -23,9 +23,6 @@ COPY ./data_fetcher /app/data_fetcher
 COPY ./alembic /app/alembic
 COPY ./alembic.ini /app/alembic.ini
 
-# Copy appropriate environment file
-COPY .env.${ENVIRONMENT} /app/.env
-
 # Default to API service
 ENV SERVICE_TYPE=api
 
