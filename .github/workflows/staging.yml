@@ -51,38 +51,22 @@ jobs:
             - name: Add host key
               run: |
                   mkdir -p ~/.ssh
-                  echo "HOST secret check"
-                  echo "Secret exists: ${{ secrets.HOST != '' }}"
-                  echo "Attempting to scan host using direct IP 157.230.114.51"
-                  ssh-keyscan -H 157.230.114.51 -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key with direct IP"
-                  echo "Attempting to scan host using secret"
-                  ssh-keyscan -H ${{ secrets.HOST }} -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key with secret"
-                  cat ~/.ssh/known_hosts
-                  echo "Verifying connectivity to direct IP 157.230.114.51"
-                  nc -zv 157.230.114.51 22 || echo "Cannot connect to port 22 on direct IP"
-                  echo "Verifying connectivity to secret HOST"
-                  nc -zv ${{ secrets.HOST }} 22 || echo "Cannot connect to port 22 on secret HOST"
-                  # Create SSH config to disable strict host key checking
-                  echo "Host ${{ secrets.HOST }} 157.230.114.51" > ~/.ssh/config
-                  echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-                  echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
-                  chmod 600 ~/.ssh/config
+                  ssh-keyscan -H ${{ secrets.HOST }} -T 60 >> ~/.ssh/known_hosts || echo "Failed to scan host key"
 
             - name: Deploy to staging server
               run: |
                   echo "Deploying to staging server..."
-                  ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
+                  git config pull.rebase false && \
                   git pull origin staging && \
                   export ENVIRONMENT=staging && \
                   docker compose down && \
                   docker compose up -d"
 
-            # - name: Run database migrations
-            #   run: |
-            #       echo "Trying to run migrations using HOST secret..."
-            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head" || \
-            #       (echo "Failed with HOST secret, trying direct IP..." && \
-            #       ssh -o StrictHostKeyChecking=no ${{ secrets.USER }}@157.230.114.51 "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head")
+            - name: Run database migrations
+              run: |
+                  echo "Running database migrations..."
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
 
             - name: Notify deployment success
               if: success()
