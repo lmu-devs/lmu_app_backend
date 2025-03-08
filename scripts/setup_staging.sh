@@ -30,9 +30,9 @@ mkdir -p /opt/lmu_app_backend
 cd /opt/lmu_app_backend
 
 # Clone the repository
-echo "Cloning the repository..."
-git clone https://github.com/lmu-devs/lmu_app_backend.git .
-git checkout staging
+# echo "Cloning the repository..."
+# git clone https://github.com/lmu-devs/lmu_app_backend.git .
+# git checkout staging
 
 # Create environment file - Manual step!
 echo "Create environment file..."
