@@ -37,19 +37,33 @@ jobs:
                   username: ${{ secrets.DOCKER_USERNAME }}
                   password: ${{ secrets.DOCKER_TOKEN }}
 
-            - name: Pull and retag Docker image for production
+            - name: Pull and retag Docker api image for production
               run: |
                   COMMIT_SHA=${{ steps.get_sha.outputs.commit_sha }}
                   echo "Deploying commit: ${COMMIT_SHA}"
 
                   # Pull the image from staging with the specific commit SHA
-                  docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${COMMIT_SHA}
+                  docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:${COMMIT_SHA}
 
                   # Tag it for production
-                  docker tag ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${COMMIT_SHA} ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:production
+                  docker tag ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:${COMMIT_SHA} ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:production
 
                   # Push the production tag
-                  docker push ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:production
+                  docker push ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:production
+
+            - name: Pull and retag Docker data_fetcher image for production
+              run: |
+                  COMMIT_SHA=${{ steps.get_sha.outputs.commit_sha }}
+                  echo "Deploying commit: ${COMMIT_SHA}"
+
+                  # Pull the image from staging with the specific commit SHA
+                  docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${COMMIT_SHA}
+
+                  # Tag it for production
+                  docker tag ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${COMMIT_SHA} ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:production
+
+                  # Push the production tag
+                  docker push ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:production
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
@@ -69,9 +83,9 @@ jobs:
                   docker compose down && \
                   docker compose up -d"
 
-            - name: Run database migrations
-              run: |
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            # - name: Run database migrations
+            #   run: |
+            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
 
             - name: Notify deployment success
               if: success()
