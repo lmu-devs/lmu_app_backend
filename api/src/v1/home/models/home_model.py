@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import datetime
 
 from api.src.v1.home.models.home_tile_model import HomeTiles
 

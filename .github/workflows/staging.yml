@@ -53,22 +53,22 @@ jobs:
                   cache-from: type=local,src=/tmp/.buildx-cache
                   cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
-            # - name: Build and push multi-architecture data fetcher image
-            #   uses: docker/build-push-action@v4
-            #   with:
-            #       context: .
-            #       file: ./docker/Dockerfile-data_fetcher
-            #       platforms: linux/amd64,linux/arm64
-            #       push: true
-            #       tags: |
-            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
-            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${{ steps.meta.outputs.commit_sha }}
-            #       build-args: |
-            #           BUILD_ENV=staging
-            #           COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
-            #           BUILD_DATE=${{ steps.meta.outputs.build_date }}
-            #       cache-from: type=local,src=/tmp/.buildx-cache
-            #       cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+            - name: Build and push multi-architecture data fetcher image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  file: ./docker/Dockerfile-data_fetcher
+                  platforms: linux/amd64,linux/arm64
+                  push: true
+                  tags: |
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${{ steps.meta.outputs.commit_sha }}
+                  build-args: |
+                      BUILD_ENV=staging
+                      COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
+                      BUILD_DATE=${{ steps.meta.outputs.build_date }}
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
