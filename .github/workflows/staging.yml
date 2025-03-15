@@ -44,8 +44,8 @@ jobs:
                   platforms: linux/amd64,linux/arm64
                   push: true
                   tags: |
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:staging
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${{ steps.meta.outputs.commit_sha }}
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:staging
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:${{ steps.meta.outputs.commit_sha }}
                   build-args: |
                       BUILD_ENV=staging
                       COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
