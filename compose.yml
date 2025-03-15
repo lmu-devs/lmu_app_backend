@@ -97,7 +97,7 @@ services:
     api_v1:
         build:
             context: .
-            dockerfile: Dockerfile.api
+            dockerfile: docker/Dockerfile-api
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
@@ -122,7 +122,7 @@ services:
     data_fetcher:
         build:
             context: .
-            dockerfile: Dockerfile.data_fetcher
+            dockerfile: docker/Dockerfile-data_fetcher
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
