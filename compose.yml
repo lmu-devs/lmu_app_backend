@@ -95,18 +95,15 @@ services:
             - .env
 
     api_v1:
-        # Use build for local development (default)
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.api
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        # Use image for production (when DOCKER_REGISTRY is set)
-        image: ${DOCKER_USERNAME}/lmu-app-backend:${ENVIRONMENT}
+        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
         environment:
-            - API_VERSION=v1
             - PYTHONPATH=/app
             - ENVIRONMENT=${ENVIRONMENT:-development}
         env_file:
@@ -125,16 +122,14 @@ services:
         restart: always
 
     data_fetcher:
-        # Use build for local development (default)
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.data_fetcher
             args:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        # Use image for production (when DOCKER_REGISTRY is set)
-        image: ${DOCKER_USERNAME}/lmu-app-backend:${ENVIRONMENT}
+        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
         env_file:
             - .env
         container_name: data_fetcher
@@ -147,7 +142,6 @@ services:
             - PYTHONPATH=/app
             - PYTHONUNBUFFERED=1
             - ENVIRONMENT=${ENVIRONMENT:-development}
-            - SERVICE_TYPE=data_fetcher
         depends_on:
             db:
                 condition: service_healthy
@@ -160,7 +154,6 @@ services:
         ports:
             - '80:80' # Public HTTP Port
             - '443:443' # Public HTTPS Port
-            - '81:81' # Admin Port
         volumes:
             - ./nginx/data:/data
             - ./nginx/letsencrypt:/etc/letsencrypt

@@ -16,6 +16,14 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
 
+            - name: Cache Docker layers
+              uses: actions/cache@v3
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-buildx-${{ hashFiles('requirements.txt') }}
+                  restore-keys: |
+                      ${{ runner.os }}-buildx-
+
             - name: Login to Docker Hub
               uses: docker/login-action@v2
               with:
@@ -28,20 +36,39 @@ jobs:
                   echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-            # - name: Build and push multi-architecture API image
-            #   uses: docker/build-push-action@v4
-            #   with:
-            #       context: .
-            #       file: ./Dockerfile
-            #       platforms: linux/amd64,linux/arm64
-            #       push: true
-            #       tags: |
-            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:staging
-            #           ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${{ steps.meta.outputs.commit_sha }}
-            #       build-args: |
-            #           BUILD_ENV=staging
-            #           COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
-            #           BUILD_DATE=${{ steps.meta.outputs.build_date }}
+            - name: Build and push multi-architecture API image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  file: ./docker/Dockerfile-api
+                  platforms: linux/amd64,linux/arm64
+                  push: true
+                  tags: |
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:staging
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend:${{ steps.meta.outputs.commit_sha }}
+                  build-args: |
+                      BUILD_ENV=staging
+                      COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
+                      BUILD_DATE=${{ steps.meta.outputs.build_date }}
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+            - name: Build and push multi-architecture data fetcher image
+              uses: docker/build-push-action@v4
+              with:
+                  context: .
+                  file: ./docker/Dockerfile-data_fetcher
+                  platforms: linux/amd64,linux/arm64
+                  push: true
+                  tags: |
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
+                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${{ steps.meta.outputs.commit_sha }}
+                  build-args: |
+                      BUILD_ENV=staging
+                      COMMIT_SHA=${{ steps.meta.outputs.commit_sha }}
+                      BUILD_DATE=${{ steps.meta.outputs.build_date }}
+                  cache-from: type=local,src=/tmp/.buildx-cache
+                  cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
             - name: Set up SSH
               uses: webfactory/ssh-agent@v0.7.0
@@ -59,7 +86,7 @@ jobs:
                   # Create deployment directory if it doesn't exist
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ secrets.APP_PATH }}"
 
-                  # Copy compose.yml, entrypoint.sh, and Dockerfile to the server
+                  # Copy compose.yml, entrypoint.sh to the server
                   scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/compose.yml
                   scp entrypoint.sh ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/entrypoint.sh
 
@@ -68,7 +95,7 @@ jobs:
                   export ENVIRONMENT=staging && \
                   docker compose pull nginx db api_v1 pgadmin data_fetcher && \
                   docker compose down && \
-                  docker compose up -d nginx db api_v1 pgadmin data_fetcher"
+                  docker compose up -d nginx db api_v1"
 
             # - name: Run database migrations
             #   run: |

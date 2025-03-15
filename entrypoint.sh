@@ -9,5 +9,6 @@ if [ "$SERVICE_TYPE" = "data_fetcher" ]; then
     exec python data_fetcher/src/main.py
 else
     echo "Running API service..."
+    export PYTHONPATH=/app
     exec uvicorn api.src.v1.main:app --host 0.0.0.0 --port 8000 --reload
 fi 

@@ -1,9 +1,5 @@
-from datetime import datetime
-
 from sqlalchemy.orm import Session
 
-from api.src.v1.cinema.models.movie_screening_model import MovieScreenings
-from api.src.v1.cinema.services.screening_service import ScreeningService
 from api.src.v1.home.models.home_model import Home
 from api.src.v1.home.models.home_tile_model import (
     BaseHomeTile,
@@ -13,14 +9,14 @@ from api.src.v1.home.models.home_tile_model import (
 from shared.src.core.logging import get_food_logger
 from shared.src.enums.language_enums import LanguageEnum
 
-
 logger = get_food_logger(__name__)
+
 
 class HomeService:
     def __init__(self, db: Session, language: LanguageEnum):
         self.db = db
         self.language = language
-    
+
     # def get_semester_fee(self):
     #     return SemesterFee(
     #         fee=85.00,
@@ -29,21 +25,20 @@ class HomeService:
     #         bic="BYLADEMM",
     #         reference="Matrikelnr/20251/LMU Rueckmeldung SoSe 2025",
     #         time_period=TimePeriod(
-    #             start_date=datetime(2024, 12, 4), 
+    #             start_date=datetime(2024, 12, 4),
     #             end_date=datetime(2025, 2, 8)
     #             )
     #         )
-    
+
     async def get_tiles(self):
-        screenings_service = ScreeningService(self.db, self.language)
-        screenings = await screenings_service.get_movie_screenings()
+        # screenings_service = ScreeningService(self.db, self.language)
+        # screenings = await screenings_service.get_movie_screenings()
         # up to 4 screenings today and after
         # screenings = [screening for screening in screenings if screening.date >= datetime.now()]
-        screenings = screenings[:4]
-        
-        
-        logger.info(f"Screenings: {screenings}")
-        screenings = MovieScreenings.from_table(screenings)
+        # screenings = screenings[:4]
+
+        # logger.info(f"Screenings: {screenings}")
+        # screenings = MovieScreenings.from_table(screenings)
         return HomeTiles(
             root=[
                 BaseHomeTile(
@@ -67,7 +62,7 @@ class HomeService:
                     type=HomeTileEnum.SPORTS,
                     size=1,
                     title="Sports",
-                    description="124 courses"
+                    description="124 courses",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.ROOMFINDER,
@@ -76,29 +71,24 @@ class HomeService:
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.CINEMAS,
-                    size=3,
+                    size=2,
                     title="Cinema",
-                    data=screenings
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.WISHLIST,
                     size=1,
                     title="Wishlist",
-                    description="7 features"
+                    description="7 features",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.FEEDBACK,
                     size=1,
                     title="Feedback",
-                    description="für die App"
+                    description="für die App",
                 ),
             ]
         )
-    
+
     async def get_home_data(self):
         # TODO: make dynamic
-        return Home(
-            featured=[],
-            tiles=await self.get_tiles()
-        )
-    
+        return Home(featured=[], tiles=await self.get_tiles())
