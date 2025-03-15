@@ -8,8 +8,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Only copy data_fetcher and shared folders
-COPY ./data_fetcher /app/data_fetcher/src
-COPY ./shared /app/shared/src
+COPY ./data_fetcher /app/data_fetcher
+COPY ./shared /app/shared
 
 
 # run data_fetcher/main.py
