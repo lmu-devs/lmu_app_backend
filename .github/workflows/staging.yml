@@ -94,7 +94,7 @@ jobs:
                   export ENVIRONMENT=staging && \
                   docker compose pull nginx db api_v1 pgadmin data_fetcher && \
                   docker compose down && \
-                  docker compose up -d nginx db api_v1"
+                  docker compose up -d nginx db api_v1 data_fetcher"
 
             # - name: Run database migrations
             #   run: |
