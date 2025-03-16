@@ -63,7 +63,7 @@ jobs:
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
 
                   # Copy compose.yml
-                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}/compose.yml
+                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}compose.yml
 
                   # Deploy
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
