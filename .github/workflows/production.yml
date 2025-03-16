@@ -56,6 +56,16 @@ jobs:
 
             - name: Deploy to production server
               run: |
+                  # Create deployment directory if it doesn't exist
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ vars.APP_PATH }}"
+
+                  # Clean up dangling images before deployment
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
+
+                  # Copy compose.yml
+                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}/compose.yml
+
+                  # Deploy
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
                   export ENVIRONMENT=production && \
                   docker compose down && \
