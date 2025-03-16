@@ -25,7 +25,6 @@ jobs:
             - name: Extract metadata for Docker
               id: meta
               run: |
-                  echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
             - name: Build and push multi-architecture API image
