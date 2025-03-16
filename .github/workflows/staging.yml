@@ -51,7 +51,6 @@ jobs:
                   push: true
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:${{ steps.meta.outputs.commit_sha }}
                   build-args: |
                       BUILD_ENV=staging
                       BUILD_DATE=${{ steps.meta.outputs.build_date }}
