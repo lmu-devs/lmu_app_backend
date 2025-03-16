@@ -25,7 +25,6 @@ jobs:
             - name: Extract metadata for Docker
               id: meta
               run: |
-                  echo "commit_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
             - name: Build and push multi-architecture API image
@@ -37,7 +36,6 @@ jobs:
                   push: true
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:staging
-                      ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:${{ steps.meta.outputs.commit_sha }}
                   build-args: |
                       BUILD_ENV=staging
                       BUILD_DATE=${{ steps.meta.outputs.build_date }}
@@ -74,17 +72,16 @@ jobs:
               run: |
                   echo "Deploying to staging server..."
                   # Create deployment directory if it doesn't exist
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ secrets.APP_PATH }}"
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ vars.APP_PATH }}"
 
                   # Clean up dangling images before deployment
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
 
                   # Copy compose.yml
-                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ secrets.APP_PATH }}/compose.yml
+                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}/compose.yml
 
                   # Deploy using Docker Compose
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
-                  export ENVIRONMENT=staging && \
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
                   docker compose pull nginx db api_v1 pgadmin data_fetcher && \
                   docker compose down && \
                   docker compose up -d nginx db api_v1 data_fetcher"
@@ -92,7 +89,7 @@ jobs:
             # - name: Run database migrations
             #   run: |
             #       echo "Running database migrations..."
-            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api_v1 alembic upgrade head"
 
             - name: Notify deployment success
               if: success()

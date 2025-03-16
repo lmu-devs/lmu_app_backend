@@ -56,15 +56,23 @@ jobs:
 
             - name: Deploy to production server
               run: |
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
-                  git pull origin main && \
-                  export ENVIRONMENT=production && \
+                  # Create deployment directory if it doesn't exist
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ vars.APP_PATH }}"
+
+                  # Clean up dangling images before deployment
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
+
+                  # Copy compose.yml
+                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}compose.yml
+
+                  # Deploy
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
                   docker compose down && \
                   docker compose up -d"
 
             # - name: Run database migrations
             #   run: |
-            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api_v1 alembic upgrade head"
 
             - name: Notify deployment success
               if: success()
