@@ -22,6 +22,7 @@ jobs:
 
             - name: Pull and retag Docker api image for production
               run: |
+
                   # Pull the staging image
                   docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:staging
 
@@ -33,6 +34,7 @@ jobs:
 
             - name: Pull and retag Docker data_fetcher image for production
               run: |
+
                   # Pull the staging image
                   docker pull ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
 
