@@ -67,7 +67,6 @@ jobs:
 
                   # Deploy
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
-                  export ENVIRONMENT=production && \
                   docker compose down && \
                   docker compose up -d"
 
