@@ -241,7 +241,7 @@ class MenuFetcher:
         labels = set()
         
         # Poultry detection
-        poultry_keywords = ['huhn', 'hähnchen', 'hahn', 'chicken', 'pute', 'hühner', 'ente']
+        poultry_keywords = ['huhn', 'hähnchen', 'hahn', 'chicken', 'pute', 'hühner', 'ente', 'hendl']
         if any(keyword in dish_name_lower for keyword in poultry_keywords):
             labels.add('POULTRY')
         
