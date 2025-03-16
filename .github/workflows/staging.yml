@@ -81,9 +81,8 @@ jobs:
 
                   # Deploy using Docker Compose
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
-                  docker compose pull nginx db api_v1 pgadmin data_fetcher && \
-                  docker compose down && \
-                  docker compose up -d nginx db api_v1 data_fetcher"
+                  docker compose pull api_v1 data_fetcher && \
+                  docker compose up -d --force-recreate api_v1 data_fetcher"
 
             # - name: Run database migrations
             #   run: |
