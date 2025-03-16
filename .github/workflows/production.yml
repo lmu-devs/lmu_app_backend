@@ -65,9 +65,10 @@ jobs:
                   # Copy compose.yml
                   scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}compose.yml
 
-                  # Deploy
+                  # Deploy with forced pull of latest images
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
                   docker compose down && \
+                  docker compose pull && \
                   docker compose up -d"
 
             # - name: Run database migrations
