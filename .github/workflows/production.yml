@@ -56,14 +56,14 @@ jobs:
 
             - name: Deploy to production server
               run: |
-                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && \
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
                   export ENVIRONMENT=production && \
                   docker compose down && \
                   docker compose up -d"
 
             # - name: Run database migrations
             #   run: |
-            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ secrets.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api_v1 alembic upgrade head"
 
             - name: Notify deployment success
               if: success()
