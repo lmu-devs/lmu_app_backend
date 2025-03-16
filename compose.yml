@@ -91,22 +91,27 @@ services:
         depends_on:
             db_mb:
                 condition: service_healthy
+        env_file:
+            - .env
 
     api_v1:
         build:
             context: .
             dockerfile: docker/Dockerfile-api
+            args:
+                BUILD_ENV: ${ENVIRONMENT:-development}
+                COMMIT_SHA: local
+                BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
         environment:
-            - API_VERSION=v1
             - PYTHONPATH=/app
+            - ENVIRONMENT=${ENVIRONMENT:-development}
         env_file:
             - .env
         container_name: api_v1
         networks:
             - backend
             - frontend
-        volumes:
-            - .:/app
         ports:
             - '127.0.0.1:8001:8000'
         depends_on:
@@ -118,17 +123,21 @@ services:
         build:
             context: .
             dockerfile: docker/Dockerfile-data_fetcher
+            args:
+                BUILD_ENV: ${ENVIRONMENT:-development}
+                COMMIT_SHA: local
+                BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
         env_file:
             - .env
         container_name: data_fetcher
         networks:
             - frontend
             - backend
-        volumes:
-            - .:/app
         environment:
             - PYTHONPATH=/app
             - PYTHONUNBUFFERED=1
+            - ENVIRONMENT=${ENVIRONMENT:-development}
         depends_on:
             db:
                 condition: service_healthy
