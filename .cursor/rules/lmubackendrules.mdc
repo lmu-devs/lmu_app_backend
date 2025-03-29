@@ -16,5 +16,5 @@ alwaysApply: false
 - dns over cloudflare
 
 ## Environments
-- Staging ({service}.staging.lmu-dev.org - 157.230.114.51)
+- Staging ({service}-staging.lmu-dev.org - 157.230.114.51)
 - Production ({service}.lmu-dev.org - 64.226.106.247)
