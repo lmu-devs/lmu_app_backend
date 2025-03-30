@@ -2,10 +2,9 @@ import json
 
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.roomfinder.models import Building, BuildingPart, City, Floor, Room, Street
+from data_fetcher.src.roomfinder.models import Building, City, Floor, Room, Street
 from shared.src.tables.roomfinder import (
     BuildingLocationTable,
-    BuildingPartTable,
     BuildingTable,
     CityTable,
     FloorTable,
@@ -23,7 +22,6 @@ class RoomfinderService:
         self._update_cities()
         self._update_streets()
         self._update_buildings()
-        self._update_building_parts()
         self._update_floors()
         self._update_rooms()
         self.db.commit()
@@ -63,29 +61,17 @@ class RoomfinderService:
             
         for building in buildings:
             self.db.merge(BuildingTable(
-                id=building.code,
+                building_part_id=building.buildingPartCode,
+                building_id=building.buildingCode,
                 street_id=building.streetCode,
-                display_name=building.displayName
+                title=building.title,
+                aliases=building.aliases
             ))
             self.db.merge(BuildingLocationTable(
-                building_id=building.code,
-                address=building.displayName.capitalize().replace(" - ", ""),
+                building_id=building.buildingPartCode,
+                address=building.address,
                 latitude=building.lat,
                 longitude=building.lng
-            ))
-        self.db.flush()
-
-    def _update_building_parts(self) -> None:
-        """Updates building_parts table with data from 4_building_part.json"""
-        with open('data_fetcher/src/roomfinder/constants/4_building_part.json') as f:
-            building_part_data = json.load(f)
-            building_parts = BuildingPart.from_json_list(building_part_data)
-            
-        for building_part in building_parts:
-            self.db.merge(BuildingPartTable(
-                id=building_part.code,
-                building_id=building_part.buildingCode,
-                address=building_part.address
             ))
         self.db.flush()
 
@@ -98,7 +84,7 @@ class RoomfinderService:
         for floor in floors:
             self.db.merge(FloorTable(
                 id=floor.code,
-                building_part_id=floor.buildingPart,
+                building_part_id=floor.buildingPartCode,
                 level=floor.level,
                 name=floor.name,
                 map_uri=floor.mapUri,
@@ -143,5 +129,5 @@ if __name__ == "__main__":
         
         # print all display names
         for building in buildings:
-            print(building.displayName.capitalize().replace(" - ", ""))
+            print(building.title)
 

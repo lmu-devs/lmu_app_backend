@@ -1,5 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from api.src.v1.home.models.home_featured_model import FeaturedTiles
 from api.src.v1.home.models.home_tile_model import HomeTiles
 
 # class Link(BaseModel):
@@ -19,5 +20,5 @@ from api.src.v1.home.models.home_tile_model import HomeTiles
 #     receiver: str
 
 class Home(BaseModel):
-    featured: list[str] = []
-    tiles: HomeTiles
+    featured: FeaturedTiles = Field()
+    tiles: HomeTiles = Field()

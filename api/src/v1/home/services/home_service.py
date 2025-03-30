@@ -43,21 +43,14 @@ class HomeService:
             root=[
                 BaseHomeTile(
                     type=HomeTileEnum.TIMELINE,
-                    size=2,
+                    size=1,
                     title="Timeline",
                 ),
-                # BaseHomeTile(
-                #     type=HomeTileEnum.NEWS,
-                #     size=1,
-                #     title="News",
-                #     description="+ 3 this week"
-                # ),
-                # BaseHomeTile(
-                #     type=HomeTileEnum.EVENTS,
-                #     size=1,
-                #     title="Events",
-                #     description="Events"
-                # ),
+                BaseHomeTile(
+                    type=HomeTileEnum.ROOMFINDER,
+                    size=1,
+                    title="Roomfinder",
+                ),
                 BaseHomeTile(
                     type=HomeTileEnum.SPORTS,
                     size=1,
@@ -65,9 +58,9 @@ class HomeService:
                     description="124 courses",
                 ),
                 BaseHomeTile(
-                    type=HomeTileEnum.ROOMFINDER,
+                    type=HomeTileEnum.CINEMAS,
                     size=1,
-                    title="Roomfinder",
+                    title="Cinema",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.LINKS,
@@ -82,11 +75,6 @@ class HomeService:
                     description="4 offers"
                 ),
                 BaseHomeTile(
-                    type=HomeTileEnum.CINEMAS,
-                    size=2,
-                    title="Cinema",
-                ),
-                BaseHomeTile(
                     type=HomeTileEnum.WISHLIST,
                     size=1,
                     title="Wishlist",
@@ -98,6 +86,18 @@ class HomeService:
                     title="Feedback",
                     description="für die App",
                 ),
+                # BaseHomeTile(
+                #     type=HomeTileEnum.NEWS,
+                #     size=1,
+                #     title="News",
+                #     description="+ 3 this week"
+                # ),
+                # BaseHomeTile(
+                #     type=HomeTileEnum.EVENTS,
+                #     size=1,
+                #     title="Events",
+                #     description="Events"
+                # ),
             ]
         )
 

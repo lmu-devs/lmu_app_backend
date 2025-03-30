@@ -4,9 +4,12 @@ from pydantic import BaseModel
 
 
 class Building(BaseModel):
-    code: str
     streetCode: str
-    displayName: str
+    buildingCode: str
+    buildingPartCode: str
+    title: str
+    aliases: list[str]
+    address: str
     lat: float
     lng: float
 
