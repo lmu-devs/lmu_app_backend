@@ -49,7 +49,7 @@ services:
             - backend
 
     pgadmin:
-        image: dpage/pgadmin4:9.1.0
+        image: dpage/pgadmin4
         container_name: pgadmin
         env_file:
             - .env
