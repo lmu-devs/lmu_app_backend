@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from shared.src.tables.roomfinder import BuildingTable, CityTable, FloorTable, RoomTable, StreetTable
+from shared.src.tables.roomfinder import BuildingTable, FloorTable, RoomTable, StreetTable
 
 
 class RoomfinderService:
@@ -19,13 +19,11 @@ class RoomfinderService:
     
     async def get_all(self):
         result = await self.db.execute(
-            select(CityTable)
+            select(StreetTable)
             .options(
-                selectinload(CityTable.streets)
-                .selectinload(StreetTable.buildings)
+                selectinload(StreetTable.buildings)
                 .selectinload(BuildingTable.location),
-                selectinload(CityTable.streets)
-                .selectinload(StreetTable.buildings)
+                selectinload(StreetTable.buildings)
                 .selectinload(BuildingTable.floors)
                 .selectinload(FloorTable.rooms)
             )

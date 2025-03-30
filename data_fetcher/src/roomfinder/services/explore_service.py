@@ -2,11 +2,10 @@ import json
 
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.roomfinder.models import Building, City, Floor, Room, Street
+from data_fetcher.src.roomfinder.models import Building, Floor, Room, Street
 from shared.src.tables.roomfinder import (
     BuildingLocationTable,
     BuildingTable,
-    CityTable,
     FloorTable,
     RoomTable,
     StreetTable,
@@ -19,25 +18,12 @@ class RoomfinderService:
 
     def update_database(self) -> None:
         """Updates all explore related tables in the database"""
-        self._update_cities()
         self._update_streets()
         self._update_buildings()
         self._update_floors()
         self._update_rooms()
         self.db.commit()
 
-    def _update_cities(self) -> None:
-        """Updates cities table with data from 1_city.json"""
-        with open('data_fetcher/src/roomfinder/constants/1_city.json') as f:
-            city_data = json.load(f)
-            cities = City.from_json_list(city_data)
-            
-        for city in cities:
-            self.db.merge(CityTable(
-                id=city.code,
-                name=city.name
-            ))
-        self.db.flush()
 
     def _update_streets(self) -> None:
         """Updates streets table with data from 2_street.json"""
@@ -48,8 +34,7 @@ class RoomfinderService:
         for street in streets:
             self.db.merge(StreetTable(
                 id=street.code,
-                name=street.name,
-                city_id=street.cityCode
+                name=street.name
             ))
         self.db.flush()
 
@@ -111,11 +96,6 @@ class RoomfinderService:
 
 
 if __name__ == "__main__":
-    with open('data_fetcher/src/roomfinder/constants/1_city.json') as f:
-        city_data = json.load(f)
-        cities = City.from_json_list(city_data)
-    
-        print(cities)
         
     with open('data_fetcher/src/roomfinder/constants/2_street.json') as f:
         street_data = json.load(f)
