@@ -94,7 +94,8 @@ services:
         env_file:
             - .env
 
-    api_v1:
+    api:
+        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
         build:
             context: .
             dockerfile: docker/Dockerfile-api
@@ -107,7 +108,7 @@ services:
             - ENVIRONMENT=${ENVIRONMENT:-development}
         env_file:
             - .env
-        container_name: api_v1
+        container_name: api
         networks:
             - backend
             - frontend
@@ -117,17 +118,16 @@ services:
             db:
                 condition: service_healthy
         restart: always
+
+    api_dev:
+        extends: api
+        container_name: api_dev
         volumes:
             - .:/app
 
-    api_hosted:
-        extends: api_v1
-        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
-        container_name: api_hosted
-        volumes: []
-
 
     data_fetcher:
+        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
         build:
             context: .
             dockerfile: docker/Dockerfile-data_fetcher
@@ -149,14 +149,12 @@ services:
             db:
                 condition: service_healthy
         restart: on-failure
+
+    data_fetcher_dev:
+        extends: data_fetcher
+        container_name: data_fetcher_dev
         volumes:
             - .:/app
-
-    data_fetcher_hosted:
-        extends: data_fetcher
-        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
-        container_name: data_fetcher_hosted
-        volumes: []
 
 
     nginx:
