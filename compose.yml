@@ -121,6 +121,12 @@ services:
         volumes:
             - .:/app
 
+    api_v1_hosted:
+        extends: api_v1
+        volumes: []
+        profiles:
+            - hosted
+
     data_fetcher:
         build:
             context: .
@@ -146,6 +152,12 @@ services:
         restart: on-failure
         volumes:
             - .:/app
+
+    data_fetcher_hosted:
+        extends: data_fetcher
+        volumes: []
+        profiles:
+            - hosted
 
 
     nginx:

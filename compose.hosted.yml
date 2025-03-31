@@ -1,6 +1,0 @@
-services:
-    api_v1:
-        volumes: []
-
-    data_fetcher:
-        volumes: []
