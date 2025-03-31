@@ -102,7 +102,6 @@ services:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
         environment:
             - PYTHONPATH=/app
             - ENVIRONMENT=${ENVIRONMENT:-development}
@@ -121,11 +120,12 @@ services:
         volumes:
             - .:/app
 
-    api_v1_hosted:
+    api_hosted:
         extends: api_v1
+        image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
+        container_name: api_hosted
         volumes: []
-        profiles:
-            - hosted
+
 
     data_fetcher:
         build:
@@ -135,7 +135,6 @@ services:
                 BUILD_ENV: ${ENVIRONMENT:-development}
                 COMMIT_SHA: local
                 BUILD_DATE: $(date -u +'%Y-%m-%dT%H:%M:%SZ')
-        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
         env_file:
             - .env
         container_name: data_fetcher
@@ -155,9 +154,9 @@ services:
 
     data_fetcher_hosted:
         extends: data_fetcher
+        image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
+        container_name: data_fetcher_hosted
         volumes: []
-        profiles:
-            - hosted
 
 
     nginx:

@@ -67,8 +67,8 @@ jobs:
 
                   # Deploy with forced pull of latest images
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
-                  docker compose --profile hosted pull api_v1 data_fetcher && \
-                  docker compose --profile hosted up -d --force-recreate api_v1 data_fetcher"
+                  docker compose pull api_hosted data_fetcher_hosted && \
+                  docker compose up -d --force-recreate api_hosted data_fetcher_hosted"
 
             # - name: Run database migrations
             #   run: |
