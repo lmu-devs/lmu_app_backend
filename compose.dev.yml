@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+    api_v1:
+        volumes:
+            - .:/app
+
+    data_fetcher:
+        volumes:
+            - .:/app
