@@ -63,12 +63,12 @@ jobs:
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
 
                   # Copy compose.yml
-                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}compose.yml
+                  scp compose.yml compose.hosted.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}
 
                   # Deploy with forced pull of latest images
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
-                  docker compose pull api_v1 data_fetcher && \
-                  docker compose up -d --force-recreate api_v1 data_fetcher"
+                  docker compose -f compose.yml -f compose.staging.yml pull api_v1 data_fetcher && \
+                  docker compose -f compose.yml -f compose.staging.yml up -d --force-recreate api_v1 data_fetcher"
 
             # - name: Run database migrations
             #   run: |

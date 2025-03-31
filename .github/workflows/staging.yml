@@ -76,13 +76,13 @@ jobs:
                   # Clean up dangling images before deployment
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "docker image prune -f"
 
-                  # Copy compose.yml
-                  scp compose.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}/compose.yml
+                  # Copy compose files
+                  scp compose.yml compose.hosted.yml ${{ secrets.USER }}@${{ secrets.HOST }}:${{ vars.APP_PATH }}/
 
-                  # Deploy using Docker Compose
+                  # Deploy using Docker Compose with hosted override
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
-                  docker compose pull api_v1 data_fetcher && \
-                  docker compose up -d --force-recreate api_v1 data_fetcher"
+                  docker compose -f compose.yml -f compose.hosted.yml pull api_v1 data_fetcher && \
+                  docker compose -f compose.yml -f compose.hosted.yml up -d --force-recreate api_v1 data_fetcher"
 
             # - name: Run database migrations
             #   run: |
