@@ -1,4 +1,4 @@
-from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, ForeignKey, Integer, String, Time, func
+from sqlalchemy import UUID, Boolean, Column, DateTime, Enum, ForeignKey, String, Time, func
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
