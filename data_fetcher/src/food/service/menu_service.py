@@ -67,6 +67,13 @@ class MenuFetcher:
             # Process each Menu object in the data
             for menu in menus:
                 date = menu.menu_date
+                # create menu day for edge cases where dishes exists but opneing hours dont match
+                self.db.merge(MenuDayTable(
+                    date=date,
+                    canteen_id=canteen_id,
+                    is_closed=CanteenOpeningStatusService.is_closed(date)
+                ))
+                
                 # Clear existing dish associations for this day
                 self.db.query(MenuDishAssociation).filter_by(
                     menu_day_date=date,
