@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 from data_fetcher.src.cinema.crawler import HmScreeningCrawler, LmuScreeningCrawler, TumScreeningCrawler
 from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
@@ -29,7 +29,7 @@ class ScreeningService:
     def _create_edge_case_movie_model(self, movie_data: ScreeningCrawl) -> tuple[MovieTable, list[MovieTranslationTable], MovieScreeningTable, list[MovieRatingTable], list[MovieTrailerTable], list[MovieTrailerTranslationTable]]:
         """Create MovieTable and related instances from API data"""
         
-        movie_id = uuid.uuid4()
+        movie_id = uuid.uuid5(uuid.NAMESPACE_DNS, movie_data.title)
         movie = MovieTable(
             id=movie_id,
             runtime=movie_data.runtime,
@@ -51,7 +51,7 @@ class ScreeningService:
         if movie_data.runtime:
             end_time = movie_data.date + timedelta(minutes=movie_data.runtime)
         
-        screening_id = uuid.uuid4()
+        screening_id = uuid.uuid5(uuid.NAMESPACE_DNS, (movie_data.title + movie_data.cinema_id + str(movie_data.date)))
         entry_time = movie_data.date - timedelta(minutes=30)
         screening = MovieScreeningTable(
             id=screening_id,
