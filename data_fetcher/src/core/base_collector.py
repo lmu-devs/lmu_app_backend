@@ -13,13 +13,13 @@ class BaseCollector(ABC):
         self.name = self.__class__.__name__
         self.logger = get_main_fetcher_logger(self.name)
         self.is_running = True
-    
+
     def log_boundary(self, message: str):
         """Log a message with boundary markers"""
         self.logger.info("\n")
         self.logger.info("=" * 40)
         self.logger.info(message)
-    
+
     @abstractmethod
     async def _collect_data(self, db):
         """Implement the actual data fetching logic"""
@@ -45,6 +45,7 @@ class BaseCollector(ABC):
             self.logger.info(f"⏹️  Shutting down {self.name}")
             self.logger.info("=" * 40)
 
+
 class ScheduledCollector(BaseCollector):
     def __init__(self, job_schedule: Optional[schedule.Job] = None):
         """
@@ -55,28 +56,34 @@ class ScheduledCollector(BaseCollector):
         super().__init__()
         self.job = job_schedule
         if job_schedule:
-            job_schedule.do(self.collect)
+            # Wrap the collect coroutine in a sync function that runs it in the event loop
+            def run_collect():
+                asyncio.create_task(self.collect())
+
+            job_schedule.do(run_collect)
 
     async def run(self):
         """Main run loop for scheduled collector - runs at scheduled times"""
         self.log_boundary(f"🔄 Starting {self.name}")
         self.logger.info("📅  Schedule Configuration:")
         self.logger.info(f"   • Interval: {self.job.interval}")
-        self.logger.info(f"   • Next Run: {self.job.next_run.strftime('%H:%M:%S %d-%m-%Y')}")
-        
+        self.logger.info(
+            f"   • Next Run: {self.job.next_run.strftime('%H:%M:%S %d-%m-%Y')}"
+        )
+
         try:
             # Run immediately on startup
             await self.collect()
-            
+
             # Then follow the schedule
             while self.is_running:
                 next_run = schedule.idle_seconds()
                 if next_run is None:
                     break
-                    
+
                 await asyncio.sleep(next_run)
                 schedule.run_pending()
-                
+
         except Exception as e:
             self.logger.error(f"Error in {self.name}: {e}", exc_info=True)
         finally:
