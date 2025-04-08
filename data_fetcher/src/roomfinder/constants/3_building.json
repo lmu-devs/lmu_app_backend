@@ -84,7 +84,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 01 (K)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 01 (K), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -94,7 +97,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 05 (B)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 05 (B), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -104,7 +110,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 07 (C)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 07 (C), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -114,7 +123,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 09 (D)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 09 (D), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -124,7 +136,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 11 (E)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 11 (E), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -134,7 +149,10 @@
         "buildingCode": "bw2955",
         "streetCode": "S0003",
         "title": "Butenandtstr. 13 (F)",
-        "aliases": [],
+        "aliases": [
+            "Chemie",
+            "Pharmazie"
+        ],
         "address": "Butenandtstr. 13 (F), München",
         "lat": 48.11363,
         "lng": 11.46503
@@ -238,7 +256,9 @@
         "buildingCode": "bw1502",
         "streetCode": "S0018",
         "title": "Goethestr. 29 (J)",
-        "aliases": [],
+        "aliases": [
+            "Pharmakologie"
+        ],
         "address": "Goethestr. 29 (J), München",
         "lat": 48.13544,
         "lng": 11.55887
@@ -248,7 +268,9 @@
         "buildingCode": "bw1509",
         "streetCode": "S0018",
         "title": "Goethestr. 31 (H)",
-        "aliases": [],
+        "aliases": [
+            "Pharmakologie"
+        ],
         "address": "Goethestr. 31 (H), München",
         "lat": 48.13521,
         "lng": 11.55911
@@ -258,7 +280,9 @@
         "buildingCode": "bw1503",
         "streetCode": "S0018",
         "title": "Goethestr. 33 (G)",
-        "aliases": [],
+        "aliases": [
+            "Pharmakologie"
+        ],
         "address": "Goethestr. 33 (G), München",
         "lat": 48.13487,
         "lng": 11.5588
@@ -268,7 +292,9 @@
         "buildingCode": "bw2970",
         "streetCode": "S0069",
         "title": "Großhaderner Str. 02",
-        "aliases": [],
+        "aliases": [
+            "Biologie"
+        ],
         "address": "Großhaderner Str. 02",
         "lat": 48.10915,
         "lng": 11.45844
@@ -278,7 +304,9 @@
         "buildingCode": "bw2974",
         "streetCode": "S0069",
         "title": "Großhaderner Str. 04",
-        "aliases": [],
+        "aliases": [
+            "Biologie"
+        ],
         "address": "Großhaderner Str. 04",
         "lat": 48.10926,
         "lng": 11.45949
@@ -288,7 +316,9 @@
         "buildingCode": "bw2980",
         "streetCode": "S0069",
         "title": "Großhaderner Str. 06",
-        "aliases": [],
+        "aliases": [
+            "Biologie"
+        ],
         "address": "Großhaderner Str. 06",
         "lat": 48.10992,
         "lng": 11.45998
@@ -298,7 +328,9 @@
         "buildingCode": "bw3200",
         "streetCode": "S0069",
         "title": "Großhaderner Str. 09",
-        "aliases": [],
+        "aliases": [
+            "Biologie"
+        ],
         "address": "Großhaderner Str. 09",
         "lat": 48.1110066,
         "lng": 11.459759
@@ -468,7 +500,10 @@
         "buildingCode": "bw0607",
         "streetCode": "S0030",
         "title": "Leopoldstr. 13A",
-        "aliases": [],
+        "aliases": [
+            "Environment",
+            "Society"
+        ],
         "address": "Leopoldstr. 13A, München",
         "lat": 48.15612,
         "lng": 11.58214
@@ -898,7 +933,7 @@
         "buildingCode": "bw1715",
         "streetCode": "S0060",
         "title": "Thalkirchner Str. 36 / Frauenlobstr. 7a",
-        "aliases": [],
+        "aliases": ["Pathologie", "Medien Informatik", "HCI"],
         "address": "Thalkirchner Str. 36 / Frauenlobstr. 7a, München",
         "lat": 48.129971,
         "lng": 11.564907
