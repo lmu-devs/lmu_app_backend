@@ -82,7 +82,6 @@ class ZhsCrawler:
                 return []
 
             # First collect all courses
-            courses = []
             course_dict: Dict[str, List[Course]] = {}
             
             for course_data in data['kurse']:
@@ -97,7 +96,39 @@ class ZhsCrawler:
                 # Extract course info
                 course_id = course_data[1]
                 title = course_data[2]  # This is the sport type/title
-                name = course_data[3]   # This is the specific course name/level
+                
+                def _transform_name(name: str) -> str:
+                    # Direct matches
+                    if name == "A":
+                        return "Anfänger"
+                    if name == "F":
+                        return "Fortgeschritten"
+                    if name == "L":
+                        return "Leistungssport"
+                    
+                    # Handle combinations with slash
+                    name = name.replace("F/L", "Fortgeschritten / Leistungssport")
+                    name = name.replace("A/F", "Anfänger / Fortgeschritten")
+                    
+                    # Handle cases where it's a single letter with comma or space
+                    name = name.replace("F,", "Fortgeschritten,")
+                    name = name.replace("F ", "Fortgeschritten ")
+                    name = name.replace("A,", "Anfänger,")
+                    name = name.replace("A ", "Anfänger ")
+                    name = name.replace("L,", "Leistungssport,")
+                    name = name.replace("L ", "Leistungssport ")
+                    
+                    # Handle cases where letter is at the end
+                    if name.endswith(" A"):
+                        name = name[:-2] + " Anfänger"
+                    if name.endswith(" F"):
+                        name = name[:-2] + " Fortgeschritten"
+                    if name.endswith(" L"):
+                        name = name[:-2] + " Leistungssport"
+                    
+                    return name
+                
+                name = _transform_name(course_data[3])   # This is the specific course name/level
                 
                 # Skip if title contains any excluded keywords
                 if exclude_keywords and any(
@@ -154,7 +185,7 @@ if __name__ == "__main__":
         print(f"Number of courses: {len(sport.courses)}")
         for course in sport.courses[:10]:  # Print first 2 courses of each sport
             print(f"\n  Course: {course.name}")
-            print(f"  Time slots:")
+            print("  Time slots:")
             for slot in course.time_slots:
                 print(f"    {slot.day}: {slot.start_time}-{slot.end_time}")
             print(f"  Duration: {course.duration.start_date.date()} to {course.duration.end_date.date()}")

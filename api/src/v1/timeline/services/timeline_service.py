@@ -46,7 +46,7 @@ class TimelineService:
                 Event(
                 title="Vorlesungsbeginn",
                 type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2025, 4, 22), end=datetime(2025, 4, 22)),
+                timeframe=Timeframe(start=datetime(2025, 4, 23), end=datetime(2025, 4, 23)),
                 ),
                 Event(
                 title="Semesterferien",
@@ -75,28 +75,22 @@ class TimelineService:
                 type=EventTypeEnum.SEMESTER,
                 timeframe=Timeframe(start=datetime(2026, 4, 13), end=datetime(2026, 4, 13)),
                 ),
+                # Winter
                 Event(
-                title="Semesterferien",
+                title="Vorlesungsbeginn",
                 type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2027, 7, 17), end=datetime(2027, 10, 11)),
-                )
-                # ,
-                # # Winter
-                # Event(
-                # title="Vorlesungsbeginn",
-                # type=EventTypeEnum.SEMESTER,
-                # timeframe=Timeframe(start=datetime(2026, 10, 13), end=datetime(2026, 10, 13)),
-                # ),
-                # Event(
-                # title="Winterferien",
-                # type=EventTypeEnum.SEMESTER,
-                # timeframe=Timeframe(start=datetime(2026, 12, 13), end=datetime(2027, 1, 13)),
-                # ),
-                # Event(
-                # title="Semesterbeitrag zahlen",
-                # type=EventTypeEnum.SEMESTER,
-                # timeframe=Timeframe(start=datetime(2026, 12, 15), end=datetime(2027, 2, 8)),
-                # ),
+                timeframe=Timeframe(start=datetime(2026, 10, 13), end=datetime(2026, 10, 13)),
+                ),
+                Event(
+                title="Winterferien",
+                type=EventTypeEnum.SEMESTER,
+                timeframe=Timeframe(start=datetime(2026, 12, 13), end=datetime(2027, 1, 13)),
+                ),
+                Event(
+                title="Semesterbeitrag zahlen",
+                type=EventTypeEnum.SEMESTER,
+                timeframe=Timeframe(start=datetime(2026, 12, 15), end=datetime(2027, 2, 8)),
+                ),
                 # Event(
                 # title="Semesterferien",
                 # type=EventTypeEnum.SEMESTER,

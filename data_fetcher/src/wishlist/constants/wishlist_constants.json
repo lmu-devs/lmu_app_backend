@@ -14,7 +14,7 @@
             "language": "en-US"
         }
     ],
-    "status": "BETA",
+    "status": "DONE",
     "prototype_url": "",
     "release_date": "2024-11-19T11:53:31.756000",
     "images": [
@@ -195,6 +195,167 @@
             "blurhash": null
         }
     ]
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "AI Chat",
+            "description_short": "Chatte übers Studium",
+            "description": "Chatte mit deiner Prüfungsordnung, finde Antworten auf deine Fragen mit Quellenangaben und vermeide das tauchen in veraltete Websiten.",
+            "language": "de-DE"
+        },
+        {
+            "title": "AI Chat",
+            "description_short": "Chat about your studies",
+            "description": "Chat with your study regulations, find answers to your questions with source references and avoid searching through outdated websites.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2024-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Kursplan",
+            "description_short": "Kurse finden und planen",
+            "description": "Finde alle Kurse der Universität und plane deinen Semester. Kurse synchronisieren sich mit deinem Kalender mit Raum und Zeit.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Course Plan",
+            "description_short": "Find courses and plan",
+            "description": "Find all courses of the university and plan your semester. Courses synchronize with your calendar with room and time.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Notenrechner",
+            "description_short": "Berechne deinen Notendurchschnitt",
+            "description": "Trage deine Noten und ECTS ein und erhalte deinen Schnitt.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Grade Calculator",
+            "description_short": "Calculate your grade average",
+            "description": "Enter your grades and ECTS and get your average.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Easy Mail Setup",
+            "description_short": "Anleitung für Mail",
+            "description": "Erhalte eine Anleitung für das hinzufügen deines LMU Mail Accounts in deiner Mail App auf deinem Smartphone.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Easy Mail Setup",
+            "description_short": "Guide for Mail",
+            "description": "Get a guide for adding your LMU Mail account to your email app on your smartphone.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Hochschul Gruppen und Vereine",
+            "description_short": "Übersicht und Kontakte",
+            "description": "Erhalte eine Übersicht über alle Hochschul Gruppen und Vereine und deren Kontakte.",
+            "language": "de-DE"
+        },
+        {
+            "title": "University Groups and Clubs",
+            "description_short": "Overview and Contacts",
+            "description": "Get an overview of all university groups and clubs and their contacts.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Personen finden",
+            "description_short": "Profs, Dozenten, Mitarbeiter...",
+            "description": "Erhalte eine Übersicht über alle Profs, Dozenten und Mitarbeiter der Universität und deren Kontakte.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Find People",
+            "description_short": "Profs, Dozenten, Mitarbeiter...",
+            "description": "Get an overview of all professors, lecturers and staff of the university and their contacts.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Website",
+            "description_short": "LMU Students App als Website",
+            "description": "Verwende die LMU Students App im Webbrowser.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Website",
+            "description_short": "LMU Students App als Website",
+            "description": "Use the LMU Students App in the web browser.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
 }
 
 
