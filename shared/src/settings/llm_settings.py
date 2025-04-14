@@ -1,9 +1,12 @@
+from google.generativeai.types import GenerationConfig
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from google.generativeai.types import GenerationConfig
+
 
 class LLMProviderSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     temperature: float = 0.0
     max_tokens: int | None = None

@@ -24,21 +24,37 @@ class Movie(BaseModel):
     genres: List[str] = []
     ratings: MovieRatings | None
     trailers: MovieTrailers | None
-    
+
     @classmethod
-    def from_table(cls, movie: MovieTable) -> 'Movie':
-        
-        movie_translations: MovieTranslationTable = movie.translations[0] if movie.translations else None
-        
+    def from_table(cls, movie: MovieTable) -> "Movie":
+
+        movie_translations: MovieTranslationTable = (
+            movie.translations[0] if movie.translations else None
+        )
+
         title = movie_translations.title if movie_translations else "not translated"
-        overview = movie_translations.overview if movie_translations else "not translated"
+        overview = (
+            movie_translations.overview if movie_translations else "not translated"
+        )
         tagline = movie_translations.tagline if movie_translations else "not translated"
-        genres = movie_translations.genres if movie_translations and movie_translations.genres else []
-        poster = Image.from_params(movie_translations.poster_url, "poster") if movie_translations.poster_url else None
-        backdrop = Image.from_params(movie_translations.backdrop_url, "backdrop") if movie_translations.backdrop_url else None
+        genres = (
+            movie_translations.genres
+            if movie_translations and movie_translations.genres
+            else []
+        )
+        poster = (
+            Image.from_params(movie_translations.poster_url, "poster")
+            if movie_translations.poster_url
+            else None
+        )
+        backdrop = (
+            Image.from_params(movie_translations.backdrop_url, "backdrop")
+            if movie_translations.backdrop_url
+            else None
+        )
         trailers = MovieTrailers.from_table(movie.trailers)
         ratings = MovieRatings.from_table(movie.ratings)
-        
+
         return Movie(
             id=movie.id,
             title=title,
@@ -57,7 +73,7 @@ class Movie(BaseModel):
 
 class Movies(RootModel):
     root: List[Movie] | list = []
-    
+
     @classmethod
-    def from_table(cls, movies: List[MovieTable]) -> 'Movies':
+    def from_table(cls, movies: List[MovieTable]) -> "Movies":
         return Movies(root=[Movie.from_table(movie) for movie in movies])

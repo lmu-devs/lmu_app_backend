@@ -11,7 +11,8 @@ from shared.src.core.settings import get_settings
 
 from .cinema.routers import cinema_router
 from .feedback.routers import feedback_router
-from .food.routers import canteen_router, dish_router, menu_router, taste_router
+from .food.routers import (canteen_router, dish_router, menu_router,
+                           taste_router)
 from .home.routers import home_router
 from .link.routers import link_router
 from .log.routers import log_router
@@ -22,32 +23,47 @@ from .timeline.routers import timeline_router
 from .user.routers import user_router
 from .wishlist.routers import wishlist_router
 
-
 api_logger = get_food_logger(__name__)
 
 
 def create_app():
     settings = get_settings()
     prefix = settings.API_V1_PREFIX
-    
+
     app = FastAPI(
-        title="lmu-dev-api", 
-        description="API for Students App in Munich.", 
-        version="0.2.0", 
-        docs_url=f"{prefix}/docs", 
+        title="lmu-dev-api",
+        description="API for Students App in Munich.",
+        version="0.2.0",
+        docs_url=f"{prefix}/docs",
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
     )
-    
+
     # Add exception handlers
     app.add_exception_handler(Exception, api_error_handler)
     app.add_exception_handler(APIException, api_error_handler)
-    
+
     # Add static files
-    app.mount(path="/images/canteens", app=StaticFiles(directory="/app/shared/src/assets/canteens"), name="canteen_images")
-    app.mount(path="/images/dishes", app=StaticFiles(directory="/app/shared/src/assets/dishes"), name="dish_images")
-    app.mount(path="/images/wishlist", app=StaticFiles(directory="/app/shared/src/assets/wishlists"), name="wishlist_images")
-    app.mount(path="/images/cinemas", app=StaticFiles(directory="/app/shared/src/assets/cinemas"), name="cinema_images")
-    
+    app.mount(
+        path="/images/canteens",
+        app=StaticFiles(directory="/app/shared/src/assets/canteens"),
+        name="canteen_images",
+    )
+    app.mount(
+        path="/images/dishes",
+        app=StaticFiles(directory="/app/shared/src/assets/dishes"),
+        name="dish_images",
+    )
+    app.mount(
+        path="/images/wishlist",
+        app=StaticFiles(directory="/app/shared/src/assets/wishlists"),
+        name="wishlist_images",
+    )
+    app.mount(
+        path="/images/cinemas",
+        app=StaticFiles(directory="/app/shared/src/assets/cinemas"),
+        name="cinema_images",
+    )
+
     # Include routers
     app.include_router(canteen_router.router, prefix=f"{prefix}/food", tags=["food"])
     app.include_router(menu_router.router, prefix=f"{prefix}/food", tags=["food"])
@@ -61,26 +77,29 @@ def create_app():
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
     app.include_router(places_router.router, prefix=prefix, tags=["places"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
-    app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
+    app.include_router(
+        roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"]
+    )
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
-    
+
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["https://students-app.lmu-dev.org","http://localhost:53480"],
+        allow_origins=["https://students-app.lmu-dev.org", "http://localhost:53480"],
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "DELETE"],
         allow_headers=["*"],
     )
-    
+
     # Middleware to check app version
     @app.middleware("http")
     async def check_app_version_middleware(request: Request, call_next):
         app_version = request.headers.get("app-version")
-            
+
         if app_version:
             from packaging import version
+
             try:
                 if version.parse(app_version) < version.parse(settings.MIN_APP_VERSION):
                     return JSONResponse(
@@ -88,15 +107,15 @@ def create_app():
                         content={
                             "detail": "Please update your client to the latest version",
                             "current_version": app_version,
-                            "required_version": settings.MIN_APP_VERSION
-                        }
+                            "required_version": settings.MIN_APP_VERSION,
+                        },
                     )
             except version.InvalidVersion:
                 return JSONResponse(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"detail": "Invalid app version format"}
+                    content={"detail": "Invalid app version format"},
                 )
-                
+
         return await call_next(request)
 
     # Middleware to add charset to JSON responses for üäö
@@ -110,7 +129,7 @@ def create_app():
     @app.get("/", include_in_schema=False)
     async def root():
         return {"message": "Hello Wörld"}
-    
+
     # Initialize the database
     try:
         Database(settings=settings)
@@ -124,5 +143,6 @@ def create_app():
 def main():
     api_logger.info("Running main()")
     return create_app()
+
 
 app = main()  # This line is crucial, gets called in Dockerfile

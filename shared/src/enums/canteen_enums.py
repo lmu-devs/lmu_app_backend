@@ -18,35 +18,34 @@ class CanteenEnum(str, Enum):
     MENSA_PASING = "mensa-pasing"
     MENSA_WEIHENSTEPHAN = "mensa-weihenstephan"
     MENSA_ROSENHEIM = "mensa-rosenheim"
-    
+
     STUBISTRO_AKADEMIESTR = "stubistro-akademiestr"
     STUBISTRO_SCHELLINGSTR = "stubistro-schellingstr"
     STUBISTRO_ARCISSTR = "stubistro-arcisstr"
     STUBISTRO_GOETHESTR = "stubistro-goethestr"
     STUBISTRO_BUTENANDSTR = "stubistro-butenandstr"
     STUBISTRO_MARTINSRIED = "stubistro-martinsried"
-    
+
     STUBISTRO_AKADEMIE_WEIHENSTEPHAN = "stubistro-akademie-weihenstephan"
     STUBISTRO_KARLSTR = "stucafe-karlstr"
 
-    
     ## TUM API not working
     STUBISTRO_SCHILLERSTR = "stubistro-schillerstr"
     STUBISTRO_OETTINGENSTR = "stubistro-oettingenstr"
     STUBISTRO_ADALBERTSTR = "stubistro-adalbertstr"
-    STUBISTRO_OLYMPIACAMPUS = "stubistro-olympiacampus" # = stucafe-connollystr
+    STUBISTRO_OLYMPIACAMPUS = "stubistro-olympiacampus"  # = stucafe-connollystr
     STUBISTRO_EICHINGER_PLATZ = "stubistro-eichinger-platz"
     STUBISTRO_GARCHING_BOLTZMANN15 = "stubistro-garching-boltzmann15"
     STUBISTRO_GARCHING_BOLTZMANN19 = "stubistro-garching-boltzmann19"
     STUBISTRO_OBERSCHLEISSHEIM = "stubistro-oberschleissheim"
     STUBISTRO_BENEDIKTBEUREN = "stubistro-benediktbeuren"
-    
+
     STUCAFE_ARCISSTR = "stucafe-arcisstr"
     STUCAFE_LEOPOLDSTR = "stucafe-leopoldstr"
     STUCAFE_PASING = "stucafe-pasing"
     STUCAFE_WEIHENSTEPHAN_MAXIMUS = "stucafe-weihenstephan-maximus"
     STUCAFE_LOTHSTR = "stucafe-lothstr"
-    
+
     # STULOUNGE_LEOPOLDSTR = "stulounge-leopoldstr"
     # STULOUNGE_OLYMPIACAMPUS = "stulounge-olympiacampus"
     # STULOUNGE_ARCISSTR = "stulounge-arcisstr"
@@ -54,14 +53,13 @@ class CanteenEnum(str, Enum):
     # STULOUNGE_BUTENANDSTR = "stulounge-butenandstr"
     # STULOUNGE_ROSENHEIM = "stulounge-rosenheim"
     # STULOUNGE_WEIHENSTEPHAN = "stulounge-weihenstephan"
-    
+
     ESPRESSOBAR_LUDWIGSTR = "espressobar-ludwigstr"
     ESPRESSOBAR_MARTINSRIED = "espressobar-martinsried"
     ESPRESSOBAR_GARCHING_APE = "espressobar-garching-ape"
     ESPRESSOBAR_GARCHING = "espressobar-garching"
     ESPRESSOBAR_WEIHENSTEPHAN = "espressobar-weihenstephan"
-    
-    
+
     def get_active_canteens():
         return [
             CanteenEnum.MENSA_ARCISSTR,
@@ -72,7 +70,6 @@ class CanteenEnum(str, Enum):
             CanteenEnum.MENSA_PASING,
             CanteenEnum.MENSA_ROSENHEIM,
             CanteenEnum.MENSA_WEIHENSTEPHAN,
-            
             CanteenEnum.STUBISTRO_ADALBERTSTR,
             CanteenEnum.STUBISTRO_AKADEMIESTR,
             CanteenEnum.STUBISTRO_ARCISSTR,
@@ -90,22 +87,17 @@ class CanteenEnum(str, Enum):
             CanteenEnum.STUBISTRO_SCHELLINGSTR,
             CanteenEnum.STUBISTRO_SCHILLERSTR,
             CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN,
-            
             CanteenEnum.STUCAFE_LOTHSTR,
-            CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS
+            CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
         ]
-    
+
     @classmethod
     def get_active_canteens_values(cls):
         return [canteen.value for canteen in cls.get_active_canteens()]
-    
-    
+
     ## Sort out
     # MEDIZINER_MENSA = "mediziner-mensa"
     # FMI_BISTRO = "fmi-bistro"
     # IPP_BISTRO = "ipp-bistro"
     # MENSA_BILDUNGSCAMPUS_HEILBRONN = "mensa-bildungscampus-heilbronn"
     # MENSA_STRAUBING = "mensa-straubing"
-
-
-

@@ -16,7 +16,7 @@ class Building(BaseModel):
     @classmethod
     def from_dict(cls, data: Dict[str, str]) -> "Building":
         return cls(**data)
-    
+
     @classmethod
     def from_json_list(cls, json_list: List[Dict[str, str]]) -> List["Building"]:
         return [cls.from_dict(item) for item in json_list]

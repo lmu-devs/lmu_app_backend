@@ -9,6 +9,7 @@ from shared.src.core.logging import get_food_logger
 
 logger = get_food_logger(__name__)
 
+
 class LogService:
     def __init__(self):
         """Initialize the LogService."""
@@ -20,10 +21,10 @@ class LogService:
             logger.error("Logs directory not found")
             raise NotFoundError(
                 detail="Logs directory not found",
-                extra={"directory": self.log_directory}
+                extra={"directory": self.log_directory},
             )
-        
-        return [f for f in os.listdir(self.log_directory) if f.endswith('.log')]
+
+        return [f for f in os.listdir(self.log_directory) if f.endswith(".log")]
 
     def create_log_archive(self) -> str:
         """Create a zip file containing all logs."""
@@ -31,8 +32,7 @@ class LogService:
         if not log_files:
             logger.error("No log files found")
             raise NotFoundError(
-                detail="No log files found",
-                extra={"directory": self.log_directory}
+                detail="No log files found", extra={"directory": self.log_directory}
             )
 
         # Create a temporary zip file
@@ -40,7 +40,7 @@ class LogService:
         temp_dir = tempfile.gettempdir()
         zip_path = os.path.join(temp_dir, f"logs_{timestamp}.zip")
 
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for log_file in log_files:
                 file_path = os.path.join(self.log_directory, log_file)
                 zipf.write(file_path, log_file)

@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class HomeTileEnum(str, Enum):
     TIMELINE = "TIMELINE"
     EVENTS = "EVENTS"

@@ -8,4 +8,4 @@ from .semester_model import Semester
 
 class Timeline(BaseModel):
     semesters: List[Semester]
-    events: List[Event] 
+    events: List[Event]

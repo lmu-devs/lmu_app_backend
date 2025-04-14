@@ -1,6 +1,6 @@
 from __future__ import annotations
-from datetime import datetime
 
+from datetime import datetime
 
 date_pattern = "%d.%m.%Y"
 cli_date_format = "dd.mm.yyyy"
@@ -24,5 +24,3 @@ def make_duplicates_unique(names_with_duplicates):
             names_without_duplicates[i] += f" ({count})"
 
     return names_without_duplicates
-
-

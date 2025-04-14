@@ -4,8 +4,8 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from shared.src.enums import LanguageEnum
-from shared.src.tables import WishlistStatus
 from shared.src.models import Images, Rating
+from shared.src.tables import WishlistStatus
 
 
 class WishlistTranslation(BaseModel):
@@ -13,6 +13,7 @@ class WishlistTranslation(BaseModel):
     description_short: str
     description: str
     language: LanguageEnum
+
 
 class WishlistCreate(BaseModel):
     status: WishlistStatus
@@ -42,5 +43,3 @@ class Wishlist(BaseModel):
 
 class Wishlists(BaseModel):
     wishlists: List[Wishlist]
-    
-    

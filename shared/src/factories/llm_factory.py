@@ -3,13 +3,13 @@ from typing import Any, Literal, Protocol
 
 import google.generativeai as genai
 import instructor
-
 # from anthropic import Anthropic
 from google.generativeai import GenerativeModel
 from openai import OpenAI
 from pydantic import BaseModel
 
-from shared.src.core.settings import AnthropicSettings, GeminiSettings, OpenAISettings, get_settings
+from shared.src.core.settings import (AnthropicSettings, GeminiSettings,
+                                      OpenAISettings, get_settings)
 from shared.src.models.llm_message_models import SystemMessage, UserMessage
 
 type LLMProviders = Literal["openai", "anthropic", "gemini"]
@@ -24,7 +24,9 @@ type ClientInitializer = dict[LLMProviders, ClientInitializerCallback]
 
 
 class LLMFactory:
-    def __init__(self, provider: LLMProviders, system_message: SystemMessage | None = None) -> None:
+    def __init__(
+        self, provider: LLMProviders, system_message: SystemMessage | None = None
+    ) -> None:
         self.provider: LLMProviders = provider
         self.system_message: SystemMessage | None = system_message
         self.settings: LLMSettings = getattr(get_settings(), provider)
@@ -35,13 +37,16 @@ class LLMFactory:
             genai.configure(api_key=self.settings.api_key)
 
         client_initializers: ClientInitializer = {
-            "openai": lambda settings: instructor.from_openai(OpenAI(api_key=settings.api_key)),
-            # "anthropic": lambda settings: instructor.from_anthropic(Anthropic(api_key=settings.api_key)),
-            "gemini": lambda settings: instructor.from_gemini(GenerativeModel(
-                model_name=settings.default_model,
-                generation_config=settings.generation_config,
-                system_instruction=getattr(self.system_message, "content", None),
+            "openai": lambda settings: instructor.from_openai(
+                OpenAI(api_key=settings.api_key)
             ),
+            # "anthropic": lambda settings: instructor.from_anthropic(Anthropic(api_key=settings.api_key)),
+            "gemini": lambda settings: instructor.from_gemini(
+                GenerativeModel(
+                    model_name=settings.default_model,
+                    generation_config=settings.generation_config,
+                    system_instruction=getattr(self.system_message, "content", None),
+                ),
                 mode=instructor.Mode.GEMINI_JSON,
             ),
         }
@@ -80,8 +85,7 @@ class LLMFactory:
                 response_model=response_model,
             )
 
-    
-    
+
 if __name__ == "__main__":
 
     class CompletionResponse(BaseModel):

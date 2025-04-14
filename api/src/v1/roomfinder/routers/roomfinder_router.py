@@ -7,11 +7,15 @@ from shared.src.core.logging import get_places_logger
 
 from ..services.roomfinder_service import RoomfinderService
 
-
 router = APIRouter()
 logger = get_places_logger(__name__)
 
-@router.get("/all", response_model=Streets, description="Get all Streets, Buildings, Floors, Rooms")
+
+@router.get(
+    "/all",
+    response_model=Streets,
+    description="Get all Streets, Buildings, Floors, Rooms",
+)
 async def get_all(
     db: AsyncSession = Depends(get_async_db),
 ):

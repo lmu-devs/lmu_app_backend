@@ -3,7 +3,6 @@ from datetime import time
 from shared.src.enums.canteen_enums import CanteenEnum
 from shared.src.models import OpeningHour, OpeningHours, WeekdayEnum
 
-
 munich_opening_hours = {
     CanteenEnum.MENSA_LEOPOLDSTR: OpeningHours(
         opening_hours=[

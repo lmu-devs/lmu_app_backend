@@ -8,23 +8,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.src.core.exceptions import DatabaseError
 from shared.src.core.logging import get_main_logger
 
-    
 logger = get_main_logger(__name__)
+
 
 class LikeService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def get_like(
-        self, 
+        self,
         like_table: Type[Any],
-        entity_id: Any, 
+        entity_id: Any,
         user_id: uuid.UUID,
-        entity_id_column: str = None
+        entity_id_column: str = None,
     ) -> Optional[Any]:
         """
         Generic method to get a like status
-        
+
         Args:
             like_table: The like table class (e.g., WishlistLikeTable)
             entity_id: ID of the entity (wishlist_id, dish_id, etc.)
@@ -36,22 +36,18 @@ class LikeService:
                 # Automatically generate column name (e.g., "wishlist_likes" -> "wishlist_id")
                 entity_id_column = f"{like_table.__tablename__[:-6]}_id"
 
-            stmt = (
-                select(like_table)
-                .where(
-                    getattr(like_table, entity_id_column) == entity_id,
-                    like_table.user_id == user_id
-                )
+            stmt = select(like_table).where(
+                getattr(like_table, entity_id_column) == entity_id,
+                like_table.user_id == user_id,
             )
-            
+
             result = await self.db.execute(stmt)
             return result.scalar_one_or_none()
-            
+
         except SQLAlchemyError as e:
             logger.error(f"Failed to fetch like status: {str(e)}")
             raise DatabaseError(
-                detail="Failed to fetch like status",
-                extra={"original_error": str(e)}
+                detail="Failed to fetch like status", extra={"original_error": str(e)}
             )
 
     async def toggle_like(
@@ -59,15 +55,17 @@ class LikeService:
         like_table: Type[Any],
         entity_id: Any,
         user_id: uuid.UUID,
-        entity_id_column: str = None
+        entity_id_column: str = None,
     ) -> bool:
         """
         Generic method to toggle like status
-        
+
         Returns:
             bool: True if liked, False if unliked
         """
-        existing_like = await self.get_like(like_table, entity_id, user_id, entity_id_column)
+        existing_like = await self.get_like(
+            like_table, entity_id, user_id, entity_id_column
+        )
 
         try:
             if existing_like:
@@ -77,19 +75,17 @@ class LikeService:
             else:
                 if entity_id_column is None:
                     entity_id_column = f"{like_table.__tablename__[:-6]}_id"
-                
-                new_like = like_table(**{
-                    entity_id_column: entity_id,
-                    'user_id': user_id
-                })
+
+                new_like = like_table(
+                    **{entity_id_column: entity_id, "user_id": user_id}
+                )
                 self.db.add(new_like)
                 await self.db.commit()
                 return True
-                
+
         except SQLAlchemyError as e:
             await self.db.rollback()
             logger.error(f"Failed to toggle like status: {str(e)}")
             raise DatabaseError(
-                detail="Failed to toggle like status",
-                extra={"original_error": str(e)}
+                detail="Failed to toggle like status", extra={"original_error": str(e)}
             )

@@ -11,12 +11,23 @@ class HomeTileTranslation(BaseModel):
 
 
 class BaseHomeTile(BaseModel):
-    type: Literal[HomeTileEnum.BENEFITS, HomeTileEnum.NEWS, HomeTileEnum.EVENTS, HomeTileEnum.SPORTS, HomeTileEnum.ROOMFINDER, HomeTileEnum.WISHLIST, HomeTileEnum.FEEDBACK, HomeTileEnum.CINEMAS, HomeTileEnum.TIMELINE, HomeTileEnum.LINKS]
+    type: Literal[
+        HomeTileEnum.BENEFITS,
+        HomeTileEnum.NEWS,
+        HomeTileEnum.EVENTS,
+        HomeTileEnum.SPORTS,
+        HomeTileEnum.ROOMFINDER,
+        HomeTileEnum.WISHLIST,
+        HomeTileEnum.FEEDBACK,
+        HomeTileEnum.CINEMAS,
+        HomeTileEnum.TIMELINE,
+        HomeTileEnum.LINKS,
+    ]
     size: int
     title: str
     description: str | None = None
     data: Any | None = None
 
-    
+
 class HomeTiles(RootModel):
     root: list[BaseHomeTile]

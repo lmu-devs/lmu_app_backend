@@ -1,11 +1,8 @@
 from sqlalchemy.orm import Session
 
 from api.src.v1.home.models.home_model import Home
-from api.src.v1.home.models.home_tile_model import (
-    BaseHomeTile,
-    HomeTileEnum,
-    HomeTiles,
-)
+from api.src.v1.home.models.home_tile_model import (BaseHomeTile, HomeTileEnum,
+                                                    HomeTiles)
 from shared.src.core.logging import get_food_logger
 from shared.src.enums.language_enums import LanguageEnum
 
@@ -66,13 +63,13 @@ class HomeService:
                     type=HomeTileEnum.LINKS,
                     size=1,
                     title="Links",
-                    description="12 links"
+                    description="12 links",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.BENEFITS,
                     size=1,
                     title="Benefits",
-                    description="4 offers"
+                    description="4 offers",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.WISHLIST,

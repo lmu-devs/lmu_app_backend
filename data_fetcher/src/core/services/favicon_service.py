@@ -1,6 +1,6 @@
 import os
-import requests
 
+import requests
 
 
 class FaviconService:
@@ -10,40 +10,37 @@ class FaviconService:
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)
 
-
     def get_favicon_url(self, url):
         """
         Get the favicon URL using allesedv.com with DuckDuckGo and Google as fallbacks.
         """
         try:
             # Clean the URL to get domain
-            domain = url.split('/')[2] if '//' in url else url.split('/')[0]
-            
+            domain = url.split("/")[2] if "//" in url else url.split("/")[0]
+
             # Try icon.horse service first
             url = f"https://icon.horse/icon/{domain}"
             response = requests.head(url)
             if response.status_code == 200:
                 return url
-            
+
             # Try DuckDuckGo
             ddg_url = f"https://icons.duckduckgo.com/ip3/{domain}.ico"
             response = requests.head(ddg_url)
             if response.status_code == 200:
                 return ddg_url
-            
+
             # Try allesedv.com
             allesedv_url = f"https://f3.allesedv.com/64/{domain}"
             response = requests.head(allesedv_url)
             if response.status_code == 200:
                 return allesedv_url
-            
+
             # Try Google's service first
             url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
             response = requests.head(url)
             if response.status_code == 200:
                 return url
-
-
 
             return None
 
@@ -55,7 +52,7 @@ class FaviconService:
 def main():
     # Test the FaviconService
     service = FaviconService()
-    
+
     test_urls = [
         # "https://lmu.de",
         # "lmu-dev.org",
@@ -71,7 +68,6 @@ def main():
         print(f"\nTesting URL: {url}")
         favicon_url = service.get_favicon_url(url)
         print(f"Favicon URL: {favicon_url}")
-
 
 
 if __name__ == "__main__":

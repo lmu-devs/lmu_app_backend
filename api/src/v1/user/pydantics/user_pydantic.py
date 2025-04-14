@@ -12,5 +12,5 @@ def user_to_pydantic(user: UserTable) -> User:
         password=user.password,
         api_key=user.api_key,
         created_at=user.created_at,
-        updated_at=user.updated_at
+        updated_at=user.updated_at,
     )

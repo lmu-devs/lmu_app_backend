@@ -1,10 +1,11 @@
-from typing import List
 import uuid
-
 from datetime import datetime
+from typing import List
+
 from pydantic import BaseModel, RootModel
 
 from shared.src.tables import MovieScreeningTable
+
 from ...core.models.university_scheme import University
 from .movie_model import Movie
 
@@ -22,11 +23,11 @@ class MovieScreening(BaseModel):
     external_link: str | None
     note: str | None
     movie: Movie
-    
+
     @classmethod
-    def from_table(cls, screening: MovieScreeningTable) -> 'MovieScreening':
+    def from_table(cls, screening: MovieScreeningTable) -> "MovieScreening":
         movie = Movie.from_table(screening.movie)
-        
+
         return MovieScreening(
             id=screening.id,
             cinema_id=screening.cinema_id,
@@ -42,12 +43,13 @@ class MovieScreening(BaseModel):
             booking_link=screening.booking_link,
             note=screening.note,
         )
-    
-    
-    
+
+
 class MovieScreenings(RootModel):
     root: List[MovieScreening] | list = []
-    
+
     @classmethod
-    def from_table(cls, screenings: List[MovieScreeningTable]) -> 'MovieScreenings':
-        return MovieScreenings(root=[MovieScreening.from_table(screening) for screening in screenings])
+    def from_table(cls, screenings: List[MovieScreeningTable]) -> "MovieScreenings":
+        return MovieScreenings(
+            root=[MovieScreening.from_table(screening) for screening in screenings]
+        )

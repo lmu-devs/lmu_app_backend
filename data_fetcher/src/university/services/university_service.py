@@ -13,12 +13,12 @@ class UniversityService:
     def add_universities(self):
         """Add universities and their translations to database"""
         self.logger.info("⬆️  Adding universities to database...")
-        
+
         for university in UniversityEnum:
             university_table = UniversityTable(id=university.value)
             self.db.merge(university_table)
             self._add_university_translations(university)
-        
+
         self.db.commit()
         self.logger.info("💾 Added universities to database")
 
@@ -26,8 +26,6 @@ class UniversityService:
         translations = university_translations[university]
         for language, title in translations.items():
             translation = UniversityTranslationTable(
-                university_id=university.value,
-                language=language.value,
-                title=title
+                university_id=university.value, language=language.value, title=title
             )
-            self.db.merge(translation) 
+            self.db.merge(translation)

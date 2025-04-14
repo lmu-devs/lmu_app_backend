@@ -22,18 +22,20 @@ class FoodCollector(ScheduledCollector):
         try:
             # Update canteen data
             CanteenService(db).update_canteen_database()
-            
+
             menu_service = MenuFetcher(db)
-            
+
             # Calculate date range
             date_from = datetime.now().date()
             date_to = date_from + timedelta(days=self.days_amount)
-            self.logger.info(f"Fetching menu data for {self.days_amount} days, starting from {date_from}")
-            
+            self.logger.info(
+                f"Fetching menu data for {self.days_amount} days, starting from {date_from}"
+            )
+
             # Store empty menu for each canteen
             for canteen in CanteenEnum:
                 menu_service.store_menu_days(canteen, date_from, date_to)
-                
+
             # Update menu dishes for each canteen
             for canteen in CanteenEnum.get_active_canteens():
                 try:
@@ -43,12 +45,12 @@ class FoodCollector(ScheduledCollector):
                     error_response = handle_error(e)
                     self.logger.error(
                         f"Error updating menu for canteen {canteen.value}",
-                        extra=error_response['error']['extra'],
-                        exc_info=True
+                        extra=error_response["error"]["extra"],
+                        exc_info=True,
                     )
                     continue
-                    
+
         except requests.exceptions.RequestException as e:
             self.logger.error("Error fetching data:", e)
         except Exception as e:
-            self.logger.error(f"Unexpected error during scheduled fetch: {str(e)}") 
+            self.logger.error(f"Unexpected error during scheduled fetch: {str(e)}")

@@ -1,7 +1,6 @@
 from shared.src.enums import CinemaEnum
 from shared.src.models import Location
 
-
 CinemaLocationConstants = {
     CinemaEnum.LMU.value: Location(
         address="Hörsaal B052, Theresienstraße 37, München",

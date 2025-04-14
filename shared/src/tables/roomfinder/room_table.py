@@ -15,5 +15,3 @@ class RoomTable(Base):
 
     # Relationship
     floor = relationship("FloorTable", back_populates="rooms")
-
-    

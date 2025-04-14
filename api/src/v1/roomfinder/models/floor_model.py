@@ -1,8 +1,10 @@
 from typing import List
+
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.roomfinder.floor_table import FloorTable
 from api.src.v1.roomfinder.models.room_model import Rooms
+from shared.src.tables.roomfinder.floor_table import FloorTable
+
 
 class Floor(BaseModel):
     id: str
@@ -18,6 +20,7 @@ class Floor(BaseModel):
             map_uri=data.map_uri,
             rooms=Rooms.from_table(data.rooms),
         )
+
 
 class Floors(RootModel):
     root: List[Floor]

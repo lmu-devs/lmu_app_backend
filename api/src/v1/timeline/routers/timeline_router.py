@@ -10,9 +10,9 @@ from shared.src.enums import LanguageEnum
 from ..models.timeline_model import Timeline
 from ..services.timeline_service import TimelineService
 
-
 router = APIRouter()
 logger = get_places_logger(__name__)
+
 
 @router.get("/timeline", response_model=Timeline, description="Get timeline data")
 async def get_timeline(

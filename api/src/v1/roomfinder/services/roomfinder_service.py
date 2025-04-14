@@ -2,7 +2,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from shared.src.tables.roomfinder import BuildingTable, FloorTable, RoomTable, StreetTable
+from shared.src.tables.roomfinder import (BuildingTable, FloorTable, RoomTable,
+                                          StreetTable)
 
 
 class RoomfinderService:
@@ -12,22 +13,22 @@ class RoomfinderService:
     async def get_rooms(self):
         result = await self.db.execute(select(RoomTable))
         return result.scalars().all()
-    
+
     async def get_building_parts(self, id: str):
-        result = await self.db.execute(select(BuildingTable).where(BuildingTable.id == id))
-        return result.scalars().all()
-    
-    async def get_all(self):
         result = await self.db.execute(
-            select(StreetTable)
-            .options(
-                selectinload(StreetTable.buildings)
-                .selectinload(BuildingTable.location),
-                selectinload(StreetTable.buildings)
-                .selectinload(BuildingTable.floors)
-                .selectinload(FloorTable.rooms)
-            )
+            select(BuildingTable).where(BuildingTable.id == id)
         )
         return result.scalars().all()
 
-
+    async def get_all(self):
+        result = await self.db.execute(
+            select(StreetTable).options(
+                selectinload(StreetTable.buildings).selectinload(
+                    BuildingTable.location
+                ),
+                selectinload(StreetTable.buildings)
+                .selectinload(BuildingTable.floors)
+                .selectinload(FloorTable.rooms),
+            )
+        )
+        return result.scalars().all()
