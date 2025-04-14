@@ -81,13 +81,15 @@ jobs:
 
                   # Deploy using Docker Compose with hosted override
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
+                  echo 'Pulling latest images...' && \
                   docker compose pull api data_fetcher && \
+                  echo 'Bringing up services...' && \
                   docker compose up -d --force-recreate api data_fetcher"
 
-            # - name: Run database migrations
-            #   run: |
-            #       echo "Running database migrations..."
-            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            - name: Run database migrations
+              run: |
+                  echo "Running database migrations on staging..."
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api alembic upgrade head"
 
             - name: Notify deployment success
               if: success()

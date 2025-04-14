@@ -56,6 +56,7 @@ jobs:
 
             - name: Deploy to production server
               run: |
+                  echo "Deploying to production server..."
                   # Create deployment directory if it doesn't exist
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "mkdir -p ${{ vars.APP_PATH }}"
 
@@ -67,12 +68,15 @@ jobs:
 
                   # Deploy with forced pull of latest images
                   ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && \
+                  echo 'Pulling latest images...' && \
                   docker compose pull api data_fetcher && \
+                  echo 'Bringing up services...' && \
                   docker compose up -d --force-recreate api data_fetcher"
 
-            # - name: Run database migrations
-            #   run: |
-            #       ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api_v1 alembic upgrade head"
+            - name: Run database migrations
+              run: |
+                  echo "Running database migrations on production..."
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker exec api alembic upgrade head"
 
             - name: Notify deployment success
               if: success()

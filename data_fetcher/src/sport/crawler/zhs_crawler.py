@@ -100,31 +100,31 @@ class ZhsCrawler:
                 def _transform_name(name: str) -> str:
                     # Direct matches
                     if name == "A":
-                        return "Anfänger"
+                        return "Anfänger (A)"
                     if name == "F":
-                        return "Fortgeschritten"
+                        return "Fortgeschritten (F)"
                     if name == "L":
-                        return "Leistungssport"
+                        return "Leistungssport (L)"
                     
                     # Handle combinations with slash
-                    name = name.replace("F/L", "Fortgeschritten / Leistungssport")
-                    name = name.replace("A/F", "Anfänger / Fortgeschritten")
+                    name = name.replace("F/L", "Fortgeschritten / Leistungssport (F/L)")
+                    name = name.replace("A/F", "Anfänger / Fortgeschritten (A/F)")
                     
                     # Handle cases where it's a single letter with comma or space
-                    name = name.replace("F,", "Fortgeschritten,")
-                    name = name.replace("F ", "Fortgeschritten ")
-                    name = name.replace("A,", "Anfänger,")
-                    name = name.replace("A ", "Anfänger ")
-                    name = name.replace("L,", "Leistungssport,")
-                    name = name.replace("L ", "Leistungssport ")
+                    name = name.replace("F,", "Fortgeschritten (F),")
+                    name = name.replace("F ", "Fortgeschritten (F) ")
+                    name = name.replace("A,", "Anfänger (A),")
+                    name = name.replace("A ", "Anfänger (A) ")
+                    name = name.replace("L,", "Leistungssport (L),")
+                    name = name.replace("L ", "Leistungssport (L) ")
                     
                     # Handle cases where letter is at the end
                     if name.endswith(" A"):
-                        name = name[:-2] + " Anfänger"
+                        name = name[:-2] + " Anfänger (A)"
                     if name.endswith(" F"):
-                        name = name[:-2] + " Fortgeschritten"
+                        name = name[:-2] + " Fortgeschritten (F)"
                     if name.endswith(" L"):
-                        name = name[:-2] + " Leistungssport"
+                        name = name[:-2] + " Leistungssport (L)"
                     
                     return name
                 
