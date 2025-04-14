@@ -125,7 +125,6 @@ services:
         volumes:
             - .:/app
 
-
     data_fetcher:
         image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
         build:
@@ -155,7 +154,6 @@ services:
         container_name: data_fetcher_dev
         volumes:
             - .:/app
-
 
     nginx:
         container_name: nginx
