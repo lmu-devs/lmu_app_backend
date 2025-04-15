@@ -2,9 +2,14 @@
 
 This is the backend service for the LMU App. It provides the necessary API endpoints and data processing for the LMU application.
 
+[API Documentation](/api/README.md) 
+
+[Data Fetcher Documentation](/data_fetcher/README.md)
+
 ## Table of Contents
 - [LMU App Backend](#lmu-app-backend)
   - [Table of Contents](#table-of-contents)
+  - [Structure](#structure)
   - [Tech Stack](#tech-stack)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -19,6 +24,10 @@ This is the backend service for the LMU App. It provides the necessary API endpo
   - [CI/CD Pipeline](#cicd-pipeline)
   - [Deployment Workflow](#deployment-workflow)
   - [Usage](#usage)
+
+## Structure
+![alt text](documentation/assets/backend_structure.png)
+
 
 ## Tech Stack
 

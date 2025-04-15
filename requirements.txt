@@ -37,3 +37,6 @@ instructor==1.7.2
 google-genai
 instructor[google-generativeai]
 langchain
+pre-commit==4.2.0
+black==25.1.0
+isort==6.0.1
