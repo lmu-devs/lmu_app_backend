@@ -18,15 +18,9 @@ class UserTable(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
-    liked_dishes = relationship(
-        "DishLikeTable", back_populates="user", cascade="all, delete-orphan"
-    )
-    liked_canteens = relationship(
-        "CanteenLikeTable", back_populates="user", cascade="all, delete-orphan"
-    )
-    liked_wishlists = relationship(
-        "WishlistLikeTable", back_populates="user", cascade="all, delete-orphan"
-    )
+    liked_dishes = relationship("DishLikeTable", back_populates="user", cascade="all, delete-orphan")
+    liked_canteens = relationship("CanteenLikeTable", back_populates="user", cascade="all, delete-orphan")
+    liked_wishlists = relationship("WishlistLikeTable", back_populates="user", cascade="all, delete-orphan")
     feedback = relationship("FeedbackTable", back_populates="user")
 
     def __repr__(self):

@@ -1,5 +1,14 @@
-from sqlalchemy import (UUID, Boolean, Column, DateTime, Enum, ForeignKey,
-                        String, Time, func)
+from sqlalchemy import (
+    UUID,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    ForeignKey,
+    String,
+    Time,
+    func,
+)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
@@ -26,14 +35,10 @@ class CanteenTable(Base):
         back_populates="canteen",
         cascade="all, delete-orphan",
     )
-    images = relationship(
-        "CanteenImageTable", back_populates="canteen", cascade="all, delete-orphan"
-    )
+    images = relationship("CanteenImageTable", back_populates="canteen", cascade="all, delete-orphan")
     status = relationship("CanteenStatusTable", back_populates="canteen", uselist=False)
     likes = relationship("CanteenLikeTable", back_populates="canteen")
-    menu_days = relationship(
-        "MenuDayTable", back_populates="canteen", cascade="all, delete-orphan"
-    )
+    menu_days = relationship("MenuDayTable", back_populates="canteen", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Canteen(id='{self.id}', name='{self.name}')>"
@@ -65,9 +70,7 @@ class CanteenStatusTable(Base):
 class CanteenLocationTable(LocationTable, Base):
     __tablename__ = "canteen_locations"
 
-    canteen_id = Column(
-        String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True
-    )
+    canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True)
 
     canteen = relationship("CanteenTable", back_populates="location")
 
@@ -75,13 +78,9 @@ class CanteenLocationTable(LocationTable, Base):
 class CanteenOpeningHoursTable(Base):
     __tablename__ = "canteen_opening_hours"
 
-    canteen_id = Column(
-        String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True
-    )
+    canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True)
     day = Column(Enum(WeekdayEnum, name="weekday"), primary_key=True)
-    type = Column(
-        Enum(OpeningHoursTypeEnum, name="opening_hours_type"), primary_key=True
-    )
+    type = Column(Enum(OpeningHoursTypeEnum, name="opening_hours_type"), primary_key=True)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
@@ -92,12 +91,8 @@ class CanteenOpeningHoursTable(Base):
 class CanteenLikeTable(Base):
     __tablename__ = "canteen_likes"
 
-    canteen_id = Column(
-        String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True
-    )
-    user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
-    )
+    canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -105,18 +100,14 @@ class CanteenLikeTable(Base):
     user = relationship("UserTable", back_populates="liked_canteens")
 
     def __repr__(self):
-        return (
-            f"<CanteenLike(canteen_id='{self.canteen_id}', user_id='{self.user_id}')>"
-        )
+        return f"<CanteenLike(canteen_id='{self.canteen_id}', user_id='{self.user_id}')>"
 
 
 # Table to represent the many-to-many relationship between canteens and images
 class CanteenImageTable(ImageTable, Base):
     __tablename__ = "canteen_images"
 
-    canteen_id = Column(
-        String, ForeignKey("canteens.id", ondelete="CASCADE"), nullable=False
-    )
+    canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), nullable=False)
 
     canteen = relationship("CanteenTable", back_populates="images")
 

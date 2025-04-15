@@ -4,10 +4,14 @@ from typing import Any, Dict, List
 
 import requests
 
-from data_fetcher.src.sport.models.sport_models import (Course, Price,
-                                                        SportCourse,
-                                                        SportCourseLocation,
-                                                        TimeFrame, TimeSlot)
+from data_fetcher.src.sport.models.sport_models import (
+    Course,
+    Price,
+    SportCourse,
+    SportCourseLocation,
+    TimeFrame,
+    TimeSlot,
+)
 from shared.src.core.logging import get_sport_fetcher_logger
 
 logger = get_sport_fetcher_logger(__name__)
@@ -131,33 +135,24 @@ class ZhsCrawler:
 
                     return name
 
-                name = _transform_name(
-                    course_data[3]
-                )  # This is the specific course name/level
+                name = _transform_name(course_data[3])  # This is the specific course name/level
 
                 # Skip if title contains any excluded keywords
-                if exclude_keywords and any(
-                    keyword.lower() in title.lower() for keyword in exclude_keywords
-                ):
+                if exclude_keywords and any(keyword.lower() in title.lower() for keyword in exclude_keywords):
                     continue
 
                 try:
                     course = Course(
                         id=course_id,
                         name=name,
-                        time_slots=TimeSlot.from_pattern(
-                            course_data[4], course_data[5], data["tage"]
-                        ),
+                        time_slots=TimeSlot.from_pattern(course_data[4], course_data[5], data["tage"]),
                         duration=TimeFrame.from_duration_string(course_data[7]),
                         instructor=course_data[8],
                         price=Price.from_price_string(course_data[9]),
-                        location=SportCourseLocation.from_pattern(
-                            data["orte"][course_data[6][0]]
-                        ),
+                        location=SportCourseLocation.from_pattern(data["orte"][course_data[6][0]]),
                         category_id=course_data[12],
                         status_code=course_data[0],
-                        is_available=course_data[10]
-                        != 0,  # 0 seems to indicate availability
+                        is_available=course_data[10] != 0,  # 0 seems to indicate availability
                     )
 
                     # Group courses by title
@@ -170,10 +165,7 @@ class ZhsCrawler:
                     continue
 
             # Create SportCourse objects from the grouped courses
-            sport_courses = [
-                SportCourse(title=title, courses=courses)
-                for title, courses in course_dict.items()
-            ]
+            sport_courses = [SportCourse(title=title, courses=courses) for title, courses in course_dict.items()]
 
             logger.info(
                 f"Found {len(sport_courses)} sport types with {sum(len(sc.courses) for sc in sport_courses)} total courses"
@@ -200,9 +192,7 @@ if __name__ == "__main__":
             print("  Time slots:")
             for slot in course.time_slots:
                 print(f"    {slot.day}: {slot.start_time}-{slot.end_time}")
-            print(
-                f"  Duration: {course.duration.start_date.date()} to {course.duration.end_date.date()}"
-            )
+            print(f"  Duration: {course.duration.start_date.date()} to {course.duration.end_date.date()}")
             print(f"  Price: {course.price.student}€ (Student)")
             print(f"  Available: {course.is_available}")
             print(f"  Location: {course.location.address}")

@@ -31,9 +31,7 @@ class TmdbService:
             if year:
                 search_params["year"] = year
 
-            search_response = requests.get(
-                search_url, params=search_params, headers=self.tmdb_headers
-            )
+            search_response = requests.get(search_url, params=search_params, headers=self.tmdb_headers)
             search_response.raise_for_status()
 
             results = search_response.json().get("results", [])
@@ -54,9 +52,7 @@ class TmdbService:
                     "append_to_response": "external_ids,videos",
                 }
 
-                details_response = requests.get(
-                    details_url, params=params, headers=self.tmdb_headers
-                )
+                details_response = requests.get(details_url, params=params, headers=self.tmdb_headers)
                 details_response.raise_for_status()
                 movie_data[lang] = details_response.json()
                 logger.debug(f"Retrieved {lang.value} data for movie {title}")

@@ -73,9 +73,7 @@ class TimeSlot(BaseModel):
                         )
 
             except (ValueError, IndexError) as e:
-                logger.warning(
-                    f"Could not parse time slot for pattern {pattern_idx}: {time_patterns} - {str(e)}"
-                )
+                logger.warning(f"Could not parse time slot for pattern {pattern_idx}: {time_patterns} - {str(e)}")
                 continue
 
         return slots
@@ -205,9 +203,7 @@ class TimeFrame(BaseModel):
                 if end.strip().split(".")[-1].isdigit():
                     year = end.strip().split(".")[-1]
 
-                return cls(
-                    start_date=parse_date(start, year), end_date=parse_date(end, year)
-                )
+                return cls(start_date=parse_date(start, year), end_date=parse_date(end, year))
 
             # Case 4: Single date
             return cls(start_date=parse_date(duration), end_date=parse_date(duration))
@@ -219,9 +215,7 @@ class TimeFrame(BaseModel):
 
 class SportCourseLocation(Location):
     @classmethod
-    def from_pattern(
-        cls, location_data: list[str, float, float]
-    ) -> "SportCourseLocation":
+    def from_pattern(cls, location_data: list[str, float, float]) -> "SportCourseLocation":
         if not location_data or len(location_data) < 3:
             return None
         # Skip if any required field is empty or invalid
@@ -243,9 +237,7 @@ class Course(BaseModel):
     price: Price
     location: SportCourseLocation | None = None
     category_id: int
-    status_code: int = Field(
-        ..., description="Usually 5, meaning might be related to course status"
-    )
+    status_code: int = Field(..., description="Usually 5, meaning might be related to course status")
     is_available: bool = False
 
 
@@ -263,7 +255,4 @@ class SportCourse(BaseModel):
                 course_dict[course.title] = []
             course_dict[course.title].append(course)
 
-        return [
-            cls(title=title, courses=course_list)
-            for title, course_list in course_dict.items()
-        ]
+        return [cls(title=title, courses=course_list) for title, course_list in course_dict.items()]

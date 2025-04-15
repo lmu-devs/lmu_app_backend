@@ -5,9 +5,11 @@ from pydantic import BaseModel, RootModel
 
 from shared.src.enums import WeekdayEnum
 from shared.src.models import Location
-from shared.src.tables.sport.sport_table import (SportCourseTable,
-                                                 SportCourseTimeSlotTable,
-                                                 SportTypeTable)
+from shared.src.tables.sport.sport_table import (
+    SportCourseTable,
+    SportCourseTimeSlotTable,
+    SportTypeTable,
+)
 
 
 class TimeSlot(BaseModel):
@@ -89,9 +91,7 @@ class SportType(BaseModel):
     @classmethod
     def from_table(cls, table: SportTypeTable) -> "SportType":
         return cls(
-            title=(
-                table.translations[0].title if table.translations else "not translated"
-            ),
+            title=(table.translations[0].title if table.translations else "not translated"),
             courses=SportCourses.from_table(table.sport_courses),
         )
 

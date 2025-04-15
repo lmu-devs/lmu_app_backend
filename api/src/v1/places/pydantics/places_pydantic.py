@@ -2,8 +2,11 @@ from typing import List
 
 from api.src.v1.places.models.places_model import Place, PlaceEnum
 from shared.src.models.location_model import Location
-from shared.src.tables import (BuildingLocationTable, CanteenLocationTable,
-                               CinemaLocationTable)
+from shared.src.tables import (
+    BuildingLocationTable,
+    CanteenLocationTable,
+    CinemaLocationTable,
+)
 
 
 async def places_to_pydantic(places: List[any]) -> List[Place]:
@@ -24,7 +27,5 @@ async def places_to_pydantic(places: List[any]) -> List[Place]:
         else:
             raise ValueError(f"Invalid place type: {type(place)}")
 
-        places_pydantic.append(
-            Place(id=id, location=Location.from_table(place.location), type=place_type)
-        )
+        places_pydantic.append(Place(id=id, location=Location.from_table(place.location), type=place_type))
     return places_pydantic

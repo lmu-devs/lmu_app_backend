@@ -2,8 +2,11 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shared.src.settings.llm_settings import (AnthropicSettings,
-                                              GeminiSettings, OpenAISettings)
+from shared.src.settings.llm_settings import (
+    AnthropicSettings,
+    GeminiSettings,
+    OpenAISettings,
+)
 
 
 class Settings(BaseSettings):

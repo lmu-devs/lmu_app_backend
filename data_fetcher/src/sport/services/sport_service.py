@@ -6,12 +6,14 @@ from data_fetcher.src.sport.crawler.zhs_crawler import ZhsCrawler
 from data_fetcher.src.sport.models.sport_models import SportCourse
 from shared.src.core.logging import get_sport_fetcher_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables.sport.sport_table import (SportCourseLocationTable,
-                                                 SportCourseTable,
-                                                 SportCourseTimeSlotTable,
-                                                 SportCourseTranslationTable,
-                                                 SportTypeTable,
-                                                 SportTypeTranslationTable)
+from shared.src.tables.sport.sport_table import (
+    SportCourseLocationTable,
+    SportCourseTable,
+    SportCourseTimeSlotTable,
+    SportCourseTranslationTable,
+    SportTypeTable,
+    SportTypeTranslationTable,
+)
 
 logger = get_sport_fetcher_logger(__name__)
 

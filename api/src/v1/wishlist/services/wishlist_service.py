@@ -11,8 +11,12 @@ from api.src.v1.core.translation_utils import apply_translation_query
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (WishlistImageTable, WishlistLikeTable,
-                               WishlistTable, WishlistTranslationTable)
+from shared.src.tables import (
+    WishlistImageTable,
+    WishlistLikeTable,
+    WishlistTable,
+    WishlistTranslationTable,
+)
 
 logger = get_food_logger(__name__)
 
@@ -52,14 +56,10 @@ class WishlistService:
             wishlists = result.scalars().unique().all()
 
             if not wishlists:
-                raise NotFoundError(
-                    detail="No wishlists found", extra={"wishlist_id": wishlist_id}
-                )
+                raise NotFoundError(detail="No wishlists found", extra={"wishlist_id": wishlist_id})
             return wishlists
         except SQLAlchemyError as e:
-            raise DatabaseError(
-                detail="Failed to fetch wishlists", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch wishlists", extra={"original_error": str(e)})
 
     def _set_translations(self, wishlist: WishlistTable, translations: list) -> None:
         wishlist.translations = [
@@ -97,13 +97,9 @@ class WishlistService:
             return result[0]
         except SQLAlchemyError as e:
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to create wishlist", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to create wishlist", extra={"original_error": str(e)})
 
-    async def update_wishlist(
-        self, wishlist_id: int, wishlist_data: dict
-    ) -> WishlistTable:
+    async def update_wishlist(self, wishlist_id: int, wishlist_data: dict) -> WishlistTable:
         try:
             wishlist = (await self.get_wishlists(wishlist_id=wishlist_id))[0]
 
@@ -127,9 +123,7 @@ class WishlistService:
             return result[0]
         except SQLAlchemyError as e:
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to update wishlist", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to update wishlist", extra={"original_error": str(e)})
 
     async def delete_wishlist(self, wishlist_id: int) -> bool:
         try:
@@ -139,11 +133,7 @@ class WishlistService:
             return True
         except SQLAlchemyError as e:
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to delete wishlist", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to delete wishlist", extra={"original_error": str(e)})
 
     async def toggle_like(self, wishlist_id: int, user_id: uuid.UUID) -> bool:
-        return await self.like_service.toggle_like(
-            WishlistLikeTable, wishlist_id, user_id
-        )
+        return await self.like_service.toggle_like(WishlistLikeTable, wishlist_id, user_id)

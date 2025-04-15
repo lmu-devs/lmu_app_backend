@@ -4,7 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.src.v1.core.translation_utils import apply_translation_query
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.tables.link.link_benefits_table import (
-    LinkBenefitTable, LinkBenefitTranslationTable)
+    LinkBenefitTable,
+    LinkBenefitTranslationTable,
+)
 
 
 class LinkBenefitService:

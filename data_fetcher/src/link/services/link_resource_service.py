@@ -1,15 +1,19 @@
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.core.services.alias_generation_service import \
-    AliasGenerationService
+from data_fetcher.src.core.services.alias_generation_service import (
+    AliasGenerationService,
+)
 from data_fetcher.src.core.services.favicon_service import FaviconService
-from data_fetcher.src.link.constants.link_resources_constants import \
-    link_resource_constants
+from data_fetcher.src.link.constants.link_resources_constants import (
+    link_resource_constants,
+)
 from shared.src.core.logging import get_translation_logger
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.translation_service import TranslationService
 from shared.src.tables.link.link_resources_table import (
-    LinkResourceTable, LinkResourceTranslationTable)
+    LinkResourceTable,
+    LinkResourceTranslationTable,
+)
 
 logger = get_translation_logger(__name__)
 
@@ -38,18 +42,16 @@ class LinkResourceService:
         ).delete(synchronize_session=False)
 
         # Then delete the links that aren't in constants
-        self.db.query(LinkResourceTable).filter(
-            ~LinkResourceTable.id.in_(constant_link_ids)
-        ).delete(synchronize_session=False)
+        self.db.query(LinkResourceTable).filter(~LinkResourceTable.id.in_(constant_link_ids)).delete(
+            synchronize_session=False
+        )
 
     def _merge_link_resources_in_db(self):
         self._delete_link_resources_not_in_constants()
 
         # Merge the links from constants
         for link in self.link_constants:
-            base_link = LinkResourceTable(
-                id=link.id, url=link.url, favicon_url=link.favicon_url, types=link.types
-            )
+            base_link = LinkResourceTable(id=link.id, url=link.url, favicon_url=link.favicon_url, types=link.types)
             self.db.merge(base_link)
 
         self.db.flush()
@@ -65,15 +67,11 @@ class LinkResourceService:
     def _add_missing_aliases(self):
 
         link_translations = (
-            self.db.query(LinkResourceTranslationTable)
-            .filter(LinkResourceTranslationTable.aliases.is_(None))
-            .all()
+            self.db.query(LinkResourceTranslationTable).filter(LinkResourceTranslationTable.aliases.is_(None)).all()
         )
 
         for link_translation in link_translations:
-            aliases = self.alias_generation_service.generate_alias(
-                link_translation.title, link_translation.description
-            )
+            aliases = self.alias_generation_service.generate_alias(link_translation.title, link_translation.description)
             link_translation.aliases = aliases.aliases
             self.db.merge(link_translation)
             logger.info(f"Generated aliases for {link_translation.title}: {aliases}")
@@ -90,11 +88,7 @@ class LinkResourceService:
 
     def _add_missing_favicon_urls(self):
 
-        link_favicon_urls = (
-            self.db.query(LinkResourceTable)
-            .filter(LinkResourceTable.favicon_url.is_(None))
-            .all()
-        )
+        link_favicon_urls = self.db.query(LinkResourceTable).filter(LinkResourceTable.favicon_url.is_(None)).all()
         for link in link_favicon_urls:
             link.favicon_url = self.favicon_service.get_favicon_url(link.url)
             self.db.merge(link)

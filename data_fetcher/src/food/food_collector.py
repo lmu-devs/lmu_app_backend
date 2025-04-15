@@ -28,9 +28,7 @@ class FoodCollector(ScheduledCollector):
             # Calculate date range
             date_from = datetime.now().date()
             date_to = date_from + timedelta(days=self.days_amount)
-            self.logger.info(
-                f"Fetching menu data for {self.days_amount} days, starting from {date_from}"
-            )
+            self.logger.info(f"Fetching menu data for {self.days_amount} days, starting from {date_from}")
 
             # Store empty menu for each canteen
             for canteen in CanteenEnum:

@@ -4,9 +4,7 @@ from fastapi import HTTPException, status
 
 
 class BaseException(Exception):
-    def __init__(
-        self, detail: str, error_code: str, extra: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self, detail: str, error_code: str, extra: Optional[Dict[str, Any]] = None):
         super().__init__(detail)
         self.detail = detail
         self.error_code = error_code
@@ -88,9 +86,7 @@ class ValidationError(BaseException):
 
 
 class ExternalAPIError(BaseException):
-    def __init__(
-        self, detail: str, service: str, extra: Optional[Dict[str, Any]] = None
-    ):
+    def __init__(self, detail: str, service: str, extra: Optional[Dict[str, Any]] = None):
         super().__init__(
             detail=detail,
             error_code="EXTERNAL_API_ERROR",

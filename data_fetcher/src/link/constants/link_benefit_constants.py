@@ -1,6 +1,5 @@
 from shared.src.enums import LanguageEnum
-from shared.src.tables.link import (LinkBenefitTable,
-                                    LinkBenefitTranslationTable)
+from shared.src.tables.link import LinkBenefitTable, LinkBenefitTranslationTable
 
 link_benefit_constants = [
     LinkBenefitTable(

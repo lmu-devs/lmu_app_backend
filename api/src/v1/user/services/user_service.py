@@ -35,9 +35,7 @@ class UserService:
     async def store_user(self, device_id: str) -> UserTable:
         """Store user data in the database"""
         logger.info("Storing user data")
-        new_user = UserTable(
-            api_key=APIKey.generate_user_key(device_id), device_id=device_id
-        )
+        new_user = UserTable(api_key=APIKey.generate_user_key(device_id), device_id=device_id)
         self.db.add(new_user)
         await self.db.commit()
         return new_user
@@ -50,9 +48,7 @@ class UserService:
         except Exception as e:
             logger.error(f"Error creating user: {str(e)}")
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to create user", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to create user", extra={"original_error": str(e)})
         finally:
             self.db.close()
 
@@ -67,9 +63,7 @@ class UserService:
         except Exception as e:
             logger.error(f"Error while updating user in database: {str(e)}")
             self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to update user", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to update user", extra={"original_error": str(e)})
 
     async def delete_user(self, user: UserTable) -> None:
         """Delete user from database by user_id"""
@@ -81,6 +75,4 @@ class UserService:
         except Exception as e:
             logger.error(f"Error while deleting user from database: {str(e)}")
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to delete user", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to delete user", extra={"original_error": str(e)})

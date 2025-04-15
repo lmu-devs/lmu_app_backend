@@ -77,9 +77,7 @@ munich_locations = {
     #     latitude=48.181983,
     #     longitude=11.552184
     # ),
-    CanteenEnum.MENSA_LOTHSTR: Location(
-        address="Lothstr. 13d, 80335 München", latitude=48.153950, longitude=11.552431
-    ),
+    CanteenEnum.MENSA_LOTHSTR: Location(address="Lothstr. 13d, 80335 München", latitude=48.153950, longitude=11.552431),
     CanteenEnum.STUCAFE_LOTHSTR: Location(
         address="Lothstr. 64, 80335 München", latitude=48.155054, longitude=11.555812
     ),

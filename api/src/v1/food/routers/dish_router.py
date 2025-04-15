@@ -95,7 +95,5 @@ async def toggle_like(
 ):
 
     like_status = await DishService(db).toggle_like(dish_id, current_user.id)
-    food_logger.info(
-        f"Toggled like for dish {dish_id} by user {current_user.id}. Result: {like_status}"
-    )
+    food_logger.info(f"Toggled like for dish {dish_id} by user {current_user.id}. Result: {like_status}")
     return like_status

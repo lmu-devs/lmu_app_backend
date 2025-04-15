@@ -3,8 +3,13 @@ import json
 from sqlalchemy.orm import Session
 
 from data_fetcher.src.roomfinder.models import Building, Floor, Room, Street
-from shared.src.tables.roomfinder import (BuildingLocationTable, BuildingTable,
-                                          FloorTable, RoomTable, StreetTable)
+from shared.src.tables.roomfinder import (
+    BuildingLocationTable,
+    BuildingTable,
+    FloorTable,
+    RoomTable,
+    StreetTable,
+)
 
 
 class RoomfinderService:

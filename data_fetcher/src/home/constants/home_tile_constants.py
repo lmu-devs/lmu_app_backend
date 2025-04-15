@@ -1,6 +1,8 @@
-from data_fetcher.src.home.models.home_tile_model import (HomeTile,
-                                                          HomeTileTranslation,
-                                                          MovieHomeTile)
+from data_fetcher.src.home.models.home_tile_model import (
+    HomeTile,
+    HomeTileTranslation,
+    MovieHomeTile,
+)
 from shared.src.enums.home_tile_enums import HomeTileEnum
 from shared.src.enums.language_enums import LanguageEnum
 

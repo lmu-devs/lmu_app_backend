@@ -60,11 +60,7 @@ class HmScreeningCrawler:
                 try:
                     # Extract image URL
                     image_tag = showcase.find("img")
-                    custom_poster_url = (
-                        f"https://www.unifilm.de/{image_tag['src']}"
-                        if image_tag
-                        else None
-                    )
+                    custom_poster_url = f"https://www.unifilm.de/{image_tag['src']}" if image_tag else None
 
                     # Extract description and tagline
                     text_container = showcase.find("div", class_="text_container")
@@ -90,9 +86,7 @@ class HmScreeningCrawler:
                     if film_data:
                         for li in film_data.find_all("li"):
                             if "Min." in li.get_text():
-                                runtime = int(
-                                    li.get_text().replace(" Min.", "").strip()
-                                )
+                                runtime = int(li.get_text().replace(" Min.", "").strip())
 
                     # Extract basic information
                     date = showcase.select_one(".film-info-text.datum")
@@ -100,9 +94,7 @@ class HmScreeningCrawler:
                     title = showcase.select_one("h1.headline-h3 span")
 
                     if not all([date, time, title]):
-                        logger.warning(
-                            f"Missing required information in row: {showcase}"
-                        )
+                        logger.warning(f"Missing required information in row: {showcase}")
                         continue
 
                     date = date.text.strip()

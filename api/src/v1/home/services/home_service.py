@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 
 from api.src.v1.home.models.home_model import Home
-from api.src.v1.home.models.home_tile_model import (BaseHomeTile, HomeTileEnum,
-                                                    HomeTiles)
+from api.src.v1.home.models.home_tile_model import BaseHomeTile, HomeTileEnum, HomeTiles
 from shared.src.core.logging import get_food_logger
 from shared.src.enums.language_enums import LanguageEnum
 

@@ -18,9 +18,7 @@ class TimezoneManager:
         return cls.now().date()
 
     @classmethod
-    def convert_to_timezone(
-        cls, dt: datetime, timezone: Optional[str] = None
-    ) -> datetime:
+    def convert_to_timezone(cls, dt: datetime, timezone: Optional[str] = None) -> datetime:
         """Convert a datetime object to specified timezone (defaults to Berlin)"""
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=ZoneInfo("UTC"))

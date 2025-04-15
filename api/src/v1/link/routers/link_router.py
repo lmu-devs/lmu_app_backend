@@ -30,9 +30,7 @@ async def get_all(
     return links
 
 
-@router.get(
-    "/benefits", response_model=LinkBenefits, description="Get all student benefits"
-)
+@router.get("/benefits", response_model=LinkBenefits, description="Get all student benefits")
 async def get_all(
     db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),

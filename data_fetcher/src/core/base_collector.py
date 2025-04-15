@@ -67,9 +67,7 @@ class ScheduledCollector(BaseCollector):
         self.log_boundary(f"🔄 Starting {self.name}")
         self.logger.info("📅  Schedule Configuration:")
         self.logger.info(f"   • Interval: {self.job.interval}")
-        self.logger.info(
-            f"   • Next Run: {self.job.next_run.strftime('%H:%M:%S %d-%m-%Y')}"
-        )
+        self.logger.info(f"   • Next Run: {self.job.next_run.strftime('%H:%M:%S %d-%m-%Y')}")
 
         try:
             # Run immediately on startup

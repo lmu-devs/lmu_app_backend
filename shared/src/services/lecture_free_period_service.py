@@ -64,20 +64,12 @@ class LectureFreePeriodService:
 
         # Determine current semester
         if 4 <= check_date.month <= 9:  # Summer semester period
-            start_date, end_date = self._get_semester_dates(
-                check_date.year, Semester.SUMMER
-            )
+            start_date, end_date = self._get_semester_dates(check_date.year, Semester.SUMMER)
         else:  # Winter semester period
-            if (
-                check_date.month < 4
-            ):  # First months belong to previous year's winter semester
-                start_date, end_date = self._get_semester_dates(
-                    check_date.year - 1, Semester.WINTER
-                )
+            if check_date.month < 4:  # First months belong to previous year's winter semester
+                start_date, end_date = self._get_semester_dates(check_date.year - 1, Semester.WINTER)
             else:
-                start_date, end_date = self._get_semester_dates(
-                    check_date.year, Semester.WINTER
-                )
+                start_date, end_date = self._get_semester_dates(check_date.year, Semester.WINTER)
 
         # Check if date is outside lecture period
         is_free = not (start_date <= check_date <= end_date)
@@ -91,6 +83,4 @@ if __name__ == "__main__":
     today = date.today()
     another_date = date(2025, 2, 11)
     print(f"Is today ({today}) lecture-free? {service.is_lecture_free()}")
-    print(
-        f"Is another date ({another_date}) lecture-free? {service.is_lecture_free(another_date)}"
-    )
+    print(f"Is another date ({another_date}) lecture-free? {service.is_lecture_free(another_date)}")

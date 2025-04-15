@@ -4,9 +4,7 @@ from sqlalchemy.orm import contains_eager
 from shared.src.enums import LanguageEnum
 
 
-def apply_translation_query(
-    base_query: Select, model, translation_model, language: LanguageEnum
-) -> Select:
+def apply_translation_query(base_query: Select, model, translation_model, language: LanguageEnum) -> Select:
     """
     Generic function to apply translation filtering logic to any query with translations.
     """

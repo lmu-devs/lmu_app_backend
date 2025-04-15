@@ -10,9 +10,7 @@ class ImageTable:
 
     @declared_attr
     def id(cls):
-        return Column(
-            UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True
-        )
+        return Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
 
     @declared_attr
     def url(cls):

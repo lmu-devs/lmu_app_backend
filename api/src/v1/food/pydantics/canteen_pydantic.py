@@ -6,13 +6,9 @@ from shared.src.models.location_model import Location
 from shared.src.tables import CanteenTable
 
 
-def canteen_to_pydantic(
-    canteen: CanteenTable, user_likes_canteen: bool = None
-) -> CanteenResponse:
+def canteen_to_pydantic(canteen: CanteenTable, user_likes_canteen: bool = None) -> CanteenResponse:
     location = Location.from_table(canteen.location)
-    rating = Rating.from_params(
-        like_count=canteen.like_count, is_liked=user_likes_canteen
-    )
+    rating = Rating.from_params(like_count=canteen.like_count, is_liked=user_likes_canteen)
     images = Images.from_table(canteen.images)
     status = CanteenStatus.from_table(canteen.status)
 
@@ -30,12 +26,8 @@ def canteen_to_pydantic(
 
     if canteen.status.is_lecture_free:
         opening_hours = ActiveOpeningHours(
-            opening_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_HOURS]
-            or [],
-            serving_hours=opening_hours_dict[
-                OpeningHoursTypeEnum.LECTURE_FREE_SERVING_HOURS
-            ]
-            or [],
+            opening_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_HOURS] or [],
+            serving_hours=opening_hours_dict[OpeningHoursTypeEnum.LECTURE_FREE_SERVING_HOURS] or [],
         )
     else:
         opening_hours = ActiveOpeningHours(

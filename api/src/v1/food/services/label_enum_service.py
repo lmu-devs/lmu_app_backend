@@ -8,19 +8,13 @@ def translate_taste_profile(language: LanguageEnum) -> dict:
         # Create a new dict with all fields except 'text'
         new_item = {k: v for k, v in item.items() if k != "text"}
         # Add translated text
-        new_item["text"] = item["text"].get(
-            language.value, item["text"].get("de-DE", "not translated")
-        )
+        new_item["text"] = item["text"].get(language.value, item["text"].get("de-DE", "not translated"))
         return new_item
 
     # Translate preferences presets
     translated_profile = {
-        "preferences_presets": [
-            translate_text(preset) for preset in taste_profile["preferences_presets"]
-        ],
-        "alergies_presets": [
-            translate_text(preset) for preset in taste_profile["alergies_presets"]
-        ],
+        "preferences_presets": [translate_text(preset) for preset in taste_profile["preferences_presets"]],
+        "alergies_presets": [translate_text(preset) for preset in taste_profile["alergies_presets"]],
         "sorted_labels": [],
     }
 
@@ -28,9 +22,7 @@ def translate_taste_profile(language: LanguageEnum) -> dict:
     for category in taste_profile["sorted_labels"]:
         translated_category = {
             "enum_category": category["enum_category"],
-            "name": category["name"].get(
-                language.value, category["name"].get("de-DE", "not translated")
-            ),
+            "name": category["name"].get(language.value, category["name"].get("de-DE", "not translated")),
             "items": [translate_text(item) for item in category["items"]],
         }
         translated_profile["sorted_labels"].append(translated_category)

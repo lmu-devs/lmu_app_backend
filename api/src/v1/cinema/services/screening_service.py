@@ -3,11 +3,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (CinemaTable, CinemaTranslationTable,
-                               MovieScreeningTable, MovieTable,
-                               MovieTrailerTable, MovieTrailerTranslationTable,
-                               MovieTranslationTable, UniversityTable,
-                               UniversityTranslationTable)
+from shared.src.tables import (
+    CinemaTable,
+    CinemaTranslationTable,
+    MovieScreeningTable,
+    MovieTable,
+    MovieTrailerTable,
+    MovieTrailerTranslationTable,
+    MovieTranslationTable,
+    UniversityTable,
+    UniversityTranslationTable,
+)
 
 from ...core.translation_utils import create_translation_order_case
 
@@ -32,12 +38,8 @@ class ScreeningService:
             .outerjoin(MovieTable.trailers)
             .outerjoin(MovieTrailerTable.translations)
             .options(
-                contains_eager(MovieScreeningTable.movie).contains_eager(
-                    MovieTable.translations
-                ),
-                contains_eager(MovieScreeningTable.movie).contains_eager(
-                    MovieTable.ratings
-                ),
+                contains_eager(MovieScreeningTable.movie).contains_eager(MovieTable.translations),
+                contains_eager(MovieScreeningTable.movie).contains_eager(MovieTable.ratings),
                 contains_eager(MovieScreeningTable.movie)
                 .contains_eager(MovieTable.trailers)
                 .contains_eager(MovieTrailerTable.translations),
@@ -45,26 +47,16 @@ class ScreeningService:
             # University and its relationships
             .join(MovieScreeningTable.university)
             .outerjoin(UniversityTable.translations)
-            .options(
-                contains_eager(MovieScreeningTable.university).contains_eager(
-                    UniversityTable.translations
-                )
-            )
+            .options(contains_eager(MovieScreeningTable.university).contains_eager(UniversityTable.translations))
             # Cinema and its relationships
             .join(MovieScreeningTable.cinema)
             .outerjoin(CinemaTable.translations)
             .outerjoin(CinemaTable.location)
             .outerjoin(CinemaTable.images)
             .options(
-                contains_eager(MovieScreeningTable.cinema).contains_eager(
-                    CinemaTable.translations
-                ),
-                contains_eager(MovieScreeningTable.cinema).contains_eager(
-                    CinemaTable.location
-                ),
-                contains_eager(MovieScreeningTable.cinema).contains_eager(
-                    CinemaTable.images
-                ),
+                contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.translations),
+                contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.location),
+                contains_eager(MovieScreeningTable.cinema).contains_eager(CinemaTable.images),
             )
             # Screening location
             .outerjoin(MovieScreeningTable.location)

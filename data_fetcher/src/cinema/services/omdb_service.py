@@ -24,9 +24,7 @@ class OmdbService:
 
             data = response.json()
             if data.get("Response") == "False":
-                logger.warning(
-                    f"OMDB returned no data for {imdb_id}: {data.get('Error')}"
-                )
+                logger.warning(f"OMDB returned no data for {imdb_id}: {data.get('Error')}")
                 return None
 
             logger.info(f"Successfully retrieved OMDB data for {imdb_id}")

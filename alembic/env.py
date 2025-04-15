@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from shared.src.core.database import Base
 from shared.src.core.settings import get_settings
+
 # Import models
 from shared.src.tables import *
 

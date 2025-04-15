@@ -6,9 +6,7 @@ from shared.src.enums import LanguageEnum
 
 
 async def get_language(
-    accept_language: Optional[str] = Header(
-        default=LanguageEnum.GERMAN, enum=[lang.value for lang in LanguageEnum]
-    )
+    accept_language: Optional[str] = Header(default=LanguageEnum.GERMAN, enum=[lang.value for lang in LanguageEnum])
 ) -> LanguageEnum:
     """
     FastAPI dependency that extracts the preferred language from the Accept-Language header.

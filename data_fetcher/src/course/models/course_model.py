@@ -8,9 +8,7 @@ class Course(BaseModel):
 
     # Basic course information
     # id: Optional[str] = Field(default=None, description="Unique identifier for the course")
-    name: Optional[List[str]] = Field(
-        default=None, alias="Name_value", description="Name of the course"
-    )
+    name: Optional[List[str]] = Field(default=None, alias="Name_value", description="Name of the course")
     degree: Optional[List[str]] = Field(
         default=None,
         alias="Degree_of_completion_value",

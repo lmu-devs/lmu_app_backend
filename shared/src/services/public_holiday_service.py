@@ -26,9 +26,7 @@ class PublicHolidayService:
         logger.info(
             f"Initializing holiday service for language {language} (country: {country_code}, state: {state_code})"
         )
-        self.country_holidays = holidays.country_holidays(
-            country_code, subdiv=state_code
-        )
+        self.country_holidays = holidays.country_holidays(country_code, subdiv=state_code)
 
     def is_university_holiday(self, check_date: date = None) -> bool:
         """Check if date falls within university holiday"""

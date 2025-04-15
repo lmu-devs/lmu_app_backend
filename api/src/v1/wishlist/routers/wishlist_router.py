@@ -27,10 +27,7 @@ async def get_wishlists(
     wishlist_service = WishlistService(db)
     wishlists = await wishlist_service.get_wishlists(language, id)
 
-    return [
-        await wishlist_to_pydantic(wishlist, user.id if user else None)
-        for wishlist in wishlists
-    ]
+    return [await wishlist_to_pydantic(wishlist, user.id if user else None) for wishlist in wishlists]
 
 
 @router.post("/wishlists/toggle-like", response_model=bool)

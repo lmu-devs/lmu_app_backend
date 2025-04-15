@@ -23,9 +23,7 @@ class Price:
     def __repr__(self):
         if self.price_per_unit and self.unit:
             if isinstance(self.base_price, float):
-                return (
-                    f"{self.base_price: .2f}€ + {self.price_per_unit: .2f} {self.unit}"
-                )
+                return f"{self.base_price: .2f}€ + {self.price_per_unit: .2f} {self.unit}"
             return f"{self.base_price} + {self.price_per_unit} {self.unit}"
         if isinstance(self.base_price, float):
             return f"{self.base_price: .2f}€"
@@ -42,9 +40,7 @@ class Price:
 
     def __hash__(self) -> int:
         # http://stackoverflow.com/questions/4005318/how-to-implement-a-good-hash-function-in-python
-        return (
-            (hash(self.base_price) << 1) ^ hash(self.price_per_unit) ^ hash(self.unit)
-        )
+        return (hash(self.base_price) << 1) ^ hash(self.price_per_unit) ^ hash(self.unit)
 
 
 class Prices:
@@ -79,11 +75,7 @@ class Prices:
 
     def __eq__(self, other: Any) -> bool:
         if isinstance(other, self.__class__):
-            return (
-                self.students == other.students
-                and self.staff == other.staff
-                and self.guests == other.guests
-            )
+            return self.students == other.students and self.staff == other.staff and self.guests == other.guests
         return False
 
     def __repr__(self):
@@ -224,12 +216,7 @@ class Dish:
 
     def __hash__(self) -> int:
         # http://stackoverflow.com/questions/4005318/how-to-implement-a-good-hash-function-in-python
-        return (
-            (hash(self.title) << 1)
-            ^ hash(self.prices)
-            ^ hash(frozenset(self.labels))
-            ^ hash(self.dish_type)
-        )
+        return (hash(self.title) << 1) ^ hash(self.prices) ^ hash(frozenset(self.labels)) ^ hash(self.dish_type)
 
 
 class Menu:

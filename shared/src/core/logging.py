@@ -22,9 +22,7 @@ def setup_logger(module_name: str, component_name: str, log_file: Optional[str] 
     logger.setLevel(logging.INFO)
 
     # Format
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Console Handler
     console_handler = logging.StreamHandler(sys.stdout)
@@ -36,9 +34,7 @@ def setup_logger(module_name: str, component_name: str, log_file: Optional[str] 
         log_path = Path("logs")
         log_path.mkdir(exist_ok=True)
 
-        file_handler = logging.FileHandler(
-            log_path / f"{log_file}_{datetime.now().strftime('%Y%m%d')}.log"
-        )
+        file_handler = logging.FileHandler(log_path / f"{log_file}_{datetime.now().strftime('%Y%m%d')}.log")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 

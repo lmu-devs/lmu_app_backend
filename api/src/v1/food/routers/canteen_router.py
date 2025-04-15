@@ -35,15 +35,8 @@ async def get_canteens(
         canteens, likes = await asyncio.gather(
             service.get_canteens(canteen_id), service.get_user_liked(current_user.id)
         )
-        food_logger.info(
-            f"Fetched {'canteen' if canteen_id else 'all active canteens'}"
-        )
-        return Canteens(
-            [
-                canteen_to_pydantic(canteen, likes.get(canteen.id, False))
-                for canteen in canteens
-            ]
-        )
+        food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
+        return Canteens([canteen_to_pydantic(canteen, likes.get(canteen.id, False)) for canteen in canteens])
 
     canteens = await service.get_canteens(canteen_id)
     food_logger.info(f"Fetched {'canteen' if canteen_id else 'all active canteens'}")
@@ -67,7 +60,5 @@ async def toggle_like(
 ) -> bool:
     canteen_service = CanteenService(db)
     result = await canteen_service.toggle_like(canteen_id, current_user.id)
-    food_logger.info(
-        f"Toggled like for canteen {canteen_id} by user {current_user.id}. Result: {result}"
-    )
+    food_logger.info(f"Toggled like for canteen {canteen_id} by user {current_user.id}. Result: {result}")
     return result

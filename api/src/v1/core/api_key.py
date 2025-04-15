@@ -78,9 +78,7 @@ class APIKey:
         db: AsyncSession = Depends(get_async_db),
     ) -> UserTable:
         user: UserTable = (
-            await db.execute(
-                select(UserTable).filter(UserTable.api_key == api_key_header)
-            )
+            await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))
         ).scalar_one_or_none()
         if user is None:
             raise AuthorizationError(
@@ -96,13 +94,9 @@ class APIKey:
         db: AsyncSession = Depends(get_async_db),
     ) -> UserTable:
         user: UserTable = (
-            await db.execute(
-                select(UserTable).filter(UserTable.api_key == api_key_header)
-            )
+            await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))
         ).scalar_one_or_none()
-        logger.info(
-            f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}"
-        )
+        logger.info(f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}")
         return user
 
 

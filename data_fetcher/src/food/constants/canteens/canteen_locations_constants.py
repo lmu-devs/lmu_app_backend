@@ -1,7 +1,13 @@
 from data_fetcher.src.food.constants.canteens.areas.locations import (
-    benediktbeuren_locations, freising_locations, garching_locations,
-    martinsried_grosshadern_locations, munich_locations,
-    oberschleissheim_locations, pasing_locations, rosenheim_locations)
+    benediktbeuren_locations,
+    freising_locations,
+    garching_locations,
+    martinsried_grosshadern_locations,
+    munich_locations,
+    oberschleissheim_locations,
+    pasing_locations,
+    rosenheim_locations,
+)
 from shared.src.enums import CanteenEnum
 from shared.src.models import Location
 

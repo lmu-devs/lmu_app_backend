@@ -2,8 +2,13 @@ import pytest
 
 from shared.src.enums import LanguageEnum
 from shared.src.services import TranslationService
-from shared.src.tables import (DishTable, DishTranslationTable, WishlistStatus,
-                               WishlistTable, WishlistTranslationTable)
+from shared.src.tables import (
+    DishTable,
+    DishTranslationTable,
+    WishlistStatus,
+    WishlistTable,
+    WishlistTranslationTable,
+)
 
 
 @pytest.fixture
@@ -29,9 +34,7 @@ def test_wishlist_translations(translation_service):
     # Should create translations for all languages
     assert len(translations) == len(LanguageEnum)
 
-    german_trans = next(
-        t for t in translations if t.language == LanguageEnum.GERMAN.value
-    )
+    german_trans = next(t for t in translations if t.language == LanguageEnum.GERMAN.value)
     assert german_trans.title is not None
     assert german_trans.description is not None
 
@@ -61,9 +64,7 @@ def test_dish_translations_with_source(translation_service):
         price_simple="Test Price",
     )
 
-    dish.translations = [
-        DishTranslationTable(language=LanguageEnum.GERMAN.value, title="Grüner Salat")
-    ]
+    dish.translations = [DishTranslationTable(language=LanguageEnum.GERMAN.value, title="Grüner Salat")]
 
     translations = translation_service.create_missing_translations(dish)
 
@@ -71,9 +72,7 @@ def test_dish_translations_with_source(translation_service):
     assert len(translations) == len(LanguageEnum)
 
     # English translation should exist
-    eng_trans = next(
-        t for t in translations if t.language == LanguageEnum.ENGLISH_US.value
-    )
+    eng_trans = next(t for t in translations if t.language == LanguageEnum.ENGLISH_US.value)
     assert eng_trans.title is not None
 
 
@@ -89,8 +88,7 @@ def test_no_duplicate_translations(translation_service):
 
     # Add translations for all languages
     dish.translations = [
-        DishTranslationTable(language=lang.value, title=f"Title in {lang.value}")
-        for lang in LanguageEnum
+        DishTranslationTable(language=lang.value, title=f"Title in {lang.value}") for lang in LanguageEnum
     ]
 
     translations = translation_service.create_missing_translations(dish)

@@ -9,9 +9,14 @@ from sqlalchemy.orm import selectinload
 from shared.src.core.exceptions import DatabaseError, NotFoundError
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (CanteenTable, DishLikeTable, DishTable,
-                               DishTranslationTable, MenuDayTable,
-                               MenuDishAssociation)
+from shared.src.tables import (
+    CanteenTable,
+    DishLikeTable,
+    DishTable,
+    DishTranslationTable,
+    MenuDayTable,
+    MenuDishAssociation,
+)
 
 from ...core.service.like_service import LikeService
 from ...core.translation_utils import apply_translation_query
@@ -83,9 +88,7 @@ class DishService:
 
         except SQLAlchemyError as e:
             logger.error(f"Failed to fetch dishes: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch dishes", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch dishes", extra={"original_error": str(e)})
 
     async def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
         return await self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
@@ -130,6 +133,4 @@ class DishService:
             return dish_dates
 
         except SQLAlchemyError as e:
-            raise DatabaseError(
-                detail="Failed to fetch dish dates", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch dish dates", extra={"original_error": str(e)})

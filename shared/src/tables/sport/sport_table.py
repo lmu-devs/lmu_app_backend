@@ -1,8 +1,19 @@
 from datetime import datetime
 from uuid import uuid4
 
-from sqlalchemy import (UUID, Boolean, Column, DateTime, Enum, Float,
-                        ForeignKey, Integer, String, Time, func)
+from sqlalchemy import (
+    UUID,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Time,
+    func,
+)
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
@@ -19,9 +30,7 @@ class SportTypeTable(Base):
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationships
-    translations = relationship(
-        "SportTypeTranslationTable", back_populates="sport_type"
-    )
+    translations = relationship("SportTypeTranslationTable", back_populates="sport_type")
     sport_courses = relationship("SportCourseTable", back_populates="sport_type")
 
 
@@ -58,21 +67,15 @@ class SportCourseTable(Base):
 
     # Relationships
     sport_type = relationship("SportTypeTable", back_populates="sport_courses")
-    translations = relationship(
-        "SportCourseTranslationTable", back_populates="sport_course"
-    )
+    translations = relationship("SportCourseTranslationTable", back_populates="sport_course")
     time_slots = relationship("SportCourseTimeSlotTable", back_populates="sport_course")
-    location = relationship(
-        "SportCourseLocationTable", uselist=False, back_populates="sport_course"
-    )
+    location = relationship("SportCourseLocationTable", uselist=False, back_populates="sport_course")
 
 
 class SportCourseTranslationTable(LanguageTable):
     __tablename__ = "sport_course_translation"
 
-    sport_course_id = Column(
-        String, ForeignKey("sport_course.id"), primary_key=True, nullable=False
-    )
+    sport_course_id = Column(String, ForeignKey("sport_course.id"), primary_key=True, nullable=False)
     title = Column(String, nullable=False)
 
     # Relationship
@@ -95,9 +98,7 @@ class SportCourseTimeSlotTable(Base):
 class SportCourseLocationTable(LocationTable, Base):
     __tablename__ = "sport_course_location"
 
-    sport_course_id = Column(
-        String, ForeignKey("sport_course.id", ondelete="CASCADE"), primary_key=True
-    )
+    sport_course_id = Column(String, ForeignKey("sport_course.id", ondelete="CASCADE"), primary_key=True)
 
     # Relationships
     sport_course = relationship("SportCourseTable", back_populates="location")

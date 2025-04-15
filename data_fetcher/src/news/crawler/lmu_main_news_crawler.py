@@ -102,9 +102,7 @@ class LMUMainNewsCrawler:
                 ):
 
                     image_id = doc["identifier"]
-                    image_urls[image_id] = doc["resolutionsMetaData"]["1_1_format_m"][
-                        "url"
-                    ]
+                    image_urls[image_id] = doc["resolutionsMetaData"]["1_1_format_m"]["url"]
 
         logger.info(f"Found {len(image_urls)} image URLs")
         return image_urls
@@ -125,9 +123,7 @@ class LMUMainNewsCrawler:
         params = {
             "pagesize": "50",
             "page": "1",
-            "filter": json.dumps(
-                {"$or": [{"_id": image_id} for image_id in image_ids]}
-            ),
+            "filter": json.dumps({"$or": [{"_id": image_id} for image_id in image_ids]}),
         }
 
         try:
@@ -197,33 +193,23 @@ class LMUMainNewsCrawler:
                             {
                                 "entityType": "news",
                                 "locale.identifier": "DE",
-                                "formData.tt_formats.value": {
-                                    "$elemMatch": {"identifier": "nr"}
-                                },
-                                "formData.tt_lang_translated.value": {
-                                    "$elemMatch": {"identifier": "DE"}
-                                },
+                                "formData.tt_formats.value": {"$elemMatch": {"identifier": "nr"}},
+                                "formData.tt_lang_translated.value": {"$elemMatch": {"identifier": "DE"}},
                             },
                             {
                                 "entityType": "videos",
                                 "locale.identifier": "DE",
-                                "formData.tt_lang_translated.value": {
-                                    "$elemMatch": {"identifier": "DE"}
-                                },
+                                "formData.tt_lang_translated.value": {"$elemMatch": {"identifier": "DE"}},
                             },
                             {
                                 "entityType": "social_medias",
                                 "locale.identifier": "DE",
-                                "formData.tt_lang_translated.value": {
-                                    "$elemMatch": {"identifier": "DE"}
-                                },
+                                "formData.tt_lang_translated.value": {"$elemMatch": {"identifier": "DE"}},
                             },
                             {
                                 "entityType": "gallery",
                                 "locale.identifier": "DE",
-                                "formData.tt_lang_translated.value": {
-                                    "$elemMatch": {"identifier": "DE"}
-                                },
+                                "formData.tt_lang_translated.value": {"$elemMatch": {"identifier": "DE"}},
                             },
                         ]
                     }

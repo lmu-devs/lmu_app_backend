@@ -11,8 +11,7 @@ from shared.src.core.settings import get_settings
 
 from .cinema.routers import cinema_router
 from .feedback.routers import feedback_router
-from .food.routers import (canteen_router, dish_router, menu_router,
-                           taste_router)
+from .food.routers import canteen_router, dish_router, menu_router, taste_router
 from .home.routers import home_router
 from .link.routers import link_router
 from .log.routers import log_router
@@ -77,9 +76,7 @@ def create_app():
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
     app.include_router(places_router.router, prefix=prefix, tags=["places"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
-    app.include_router(
-        roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"]
-    )
+    app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
 

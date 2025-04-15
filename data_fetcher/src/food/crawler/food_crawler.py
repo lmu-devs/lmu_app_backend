@@ -16,9 +16,7 @@ class FoodCrawler:
             # menu_parser.MensaBildungscampusHeilbronnParser,
         }
 
-    def get_menu_parsing_strategy(
-        self, canteen: CanteenEnum
-    ) -> Optional[menu_parser.MenuParser]:
+    def get_menu_parsing_strategy(self, canteen: CanteenEnum) -> Optional[menu_parser.MenuParser]:
         for parser in self.parsers:
             if canteen in parser.canteens:
                 return parser()
@@ -50,9 +48,7 @@ def main():
             print(dish.title)
             print(dish.prices)
             # print(dish.labels.text)
-            existing_labels = [
-                label.name for label in dish.labels
-            ]  # Changed to access label.text
+            existing_labels = [label.name for label in dish.labels]  # Changed to access label.text
             print(existing_labels)
 
 

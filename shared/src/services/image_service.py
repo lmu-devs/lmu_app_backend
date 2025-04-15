@@ -8,9 +8,7 @@ from shared.src.enums.image_format_enum import ImageFormatEnum
 
 class ImageService:
     @staticmethod
-    def _get_save_parameters(
-        format: ImageFormatEnum, quality: Optional[int] = None
-    ) -> dict:
+    def _get_save_parameters(format: ImageFormatEnum, quality: Optional[int] = None) -> dict:
         """
         Get the appropriate save parameters for different image formats
 
@@ -52,10 +50,7 @@ class ImageService:
         try:
             with Image.open(input_path) as img:
                 # Convert RGBA to RGB if saving as JPEG
-                if (
-                    output_format in [ImageFormatEnum.JPEG, ImageFormatEnum.JPG]
-                    and img.mode == "RGBA"
-                ):
+                if output_format in [ImageFormatEnum.JPEG, ImageFormatEnum.JPG] and img.mode == "RGBA":
                     background = Image.new("RGB", img.size, (255, 255, 255))
                     background.paste(img, mask=img.split()[3])
                     img = background
@@ -64,9 +59,7 @@ class ImageService:
                 if output_path is None:
                     directory = os.path.dirname(input_path)
                     filename = os.path.splitext(os.path.basename(input_path))[0]
-                    output_path = os.path.join(
-                        directory, f"{filename}.{output_format.extension}"
-                    )
+                    output_path = os.path.join(directory, f"{filename}.{output_format.extension}")
 
                 # Get save parameters
                 save_params = ImageService._get_save_parameters(output_format, quality)
@@ -77,9 +70,7 @@ class ImageService:
             raise Exception(f"Failed to convert image: {str(e)}")
 
     @staticmethod
-    def compress_image(
-        input_path: str, quality: int, output_path: Optional[str] = None
-    ) -> str:
+    def compress_image(input_path: str, quality: int, output_path: Optional[str] = None) -> str:
         """
         Compress an image while maintaining its original format
 
@@ -94,9 +85,7 @@ class ImageService:
         try:
             # Get original format
             with Image.open(input_path) as img:
-                format = ImageFormatEnum(
-                    img.format
-                )  # Convert string to ImageFormat enum
+                format = ImageFormatEnum(img.format)  # Convert string to ImageFormat enum
                 return ImageService.convert_image(
                     input_path=input_path,
                     output_format=format,
@@ -149,9 +138,7 @@ class ImageService:
                 if output_path is None:
                     directory = os.path.dirname(input_path)
                     filename = os.path.splitext(os.path.basename(input_path))[0]
-                    output_path = os.path.join(
-                        directory, f"{filename}.{format.extension}"
-                    )
+                    output_path = os.path.join(directory, f"{filename}.{format.extension}")
 
                 # Get save parameters
                 save_params = ImageService._get_save_parameters(format, quality)

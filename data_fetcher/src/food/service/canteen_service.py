@@ -1,19 +1,24 @@
 from sqlalchemy.orm import Session
 
-from data_fetcher.src.food.constants.canteens.canteens_constants import \
-    CanteensConstants
-from data_fetcher.src.food.service.canteen_images_service import \
-    CanteenImageService
-from data_fetcher.src.food.service.canteen_opening_status_service import \
-    CanteenOpeningStatusService
+from data_fetcher.src.food.constants.canteens.canteens_constants import (
+    CanteensConstants,
+)
+from data_fetcher.src.food.service.canteen_images_service import CanteenImageService
+from data_fetcher.src.food.service.canteen_opening_status_service import (
+    CanteenOpeningStatusService,
+)
 from shared.src.core.database import Database, get_db
 from shared.src.core.exceptions import DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
 from shared.src.core.settings import get_settings
 from shared.src.enums import OpeningHoursTypeEnum
 from shared.src.models import Canteen
-from shared.src.tables import (CanteenLocationTable, CanteenOpeningHoursTable,
-                               CanteenStatusTable, CanteenTable)
+from shared.src.tables import (
+    CanteenLocationTable,
+    CanteenOpeningHoursTable,
+    CanteenStatusTable,
+    CanteenTable,
+)
 
 logger = get_food_fetcher_logger(__name__)
 
@@ -44,9 +49,7 @@ class CanteenService:
                 status_obj = CanteenStatusTable(
                     canteen_id=canteen.id,
                     is_closed=CanteenOpeningStatusService.is_closed(),
-                    is_temporary_closed=CanteenOpeningStatusService.is_temp_closed(
-                        canteen.opening_hours
-                    ),
+                    is_temporary_closed=CanteenOpeningStatusService.is_temp_closed(canteen.opening_hours),
                     is_lecture_free=CanteenOpeningStatusService.is_lecture_free(),
                 )
 

@@ -10,9 +10,7 @@ class WishlistUser(HttpUser):
     def on_start(self):
         """Initialize user with API key"""
         # You might want to get a real API key for testing
-        self.headers = {
-            "user-api-key": "e6fa19d33ad0e52e258d3cd33c2b637cec9e7478d7bcc30685ccc301c50c9fb1"
-        }
+        self.headers = {"user-api-key": "e6fa19d33ad0e52e258d3cd33c2b637cec9e7478d7bcc30685ccc301c50c9fb1"}
 
     @task(3)  # Weight of 3 (more frequent)
     def get_wishlists(self):
@@ -27,9 +25,7 @@ class WishlistUser(HttpUser):
     @task(1)  # Weight of 1 (less frequent)
     def toggle_like(self):
         wishlist_id = random.randint(1, 10)
-        self.client.post(
-            f"/wishlists/toggle-like?id={wishlist_id}", headers=self.headers
-        )
+        self.client.post(f"/wishlists/toggle-like?id={wishlist_id}", headers=self.headers)
 
     # @task(1)
     # def create_wishlist(self):
