@@ -192,7 +192,7 @@ link_resource_constants = [
     ),
     LinkResourceTable(
         id="M365",
-        url="www.lmu.de/m365-login",
+        url="https://www.lmu.de/m365-login",
         types=[LinkType.INTERNAL],
         translations=[
             LinkResourceTranslationTable(

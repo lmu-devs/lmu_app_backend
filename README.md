@@ -5,6 +5,7 @@ This is the backend service for the LMU App. It provides the necessary API endpo
 ## Table of Contents
 - [LMU App Backend](#lmu-app-backend)
   - [Table of Contents](#table-of-contents)
+  - [Tech Stack](#tech-stack)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
     - [Using Python Virtual Environment](#using-python-virtual-environment)
@@ -13,22 +14,27 @@ This is the backend service for the LMU App. It provides the necessary API endpo
     - [Development](#development)
     - [Staging](#staging)
     - [Production](#production)
+  - [Components](#components)
   - [Branching Strategy](#branching-strategy)
   - [CI/CD Pipeline](#cicd-pipeline)
   - [Deployment Workflow](#deployment-workflow)
-    - [Environments](#environments-1)
-    - [Branching Strategy](#branching-strategy-1)
-    - [Deployment Process](#deployment-process)
-    - [Manual Deployment](#manual-deployment)
   - [Usage](#usage)
+
+## Tech Stack
+
+- FastAPI - Modern Python web framework
+- PostgreSQL - Primary database
+- Docker Compose - Container orchestration
+- Nginx Proxy Manager - Reverse proxy and SSL management
+- Metabase - Data analytics and visualization
+- PgAdmin - Database management interface
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 * You have installed the latest version of [Python](https://www.python.org/downloads/) (3.12 recommended)
-* (Optional) You have installed [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/)
-* You have a Windows/Linux/Mac machine.
-* You have read the LMU App documentation (if available).
+* You have installed [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/)
+* You have a Windows/Linux/Mac machine
 
 ## Installation
 
@@ -62,8 +68,7 @@ Before you begin, ensure you have met the following requirements:
 
 5. Run docker compose:
    ```
-   docker-compose build
-   docker-compose up -d
+   docker compose up -d
    ```
 
 ### Using Docker Compose
@@ -74,12 +79,15 @@ Before you begin, ensure you have met the following requirements:
    cd lmu-app-backend
    ```
 
-2. Build and run the Docker containers:
+2. Copy the environment template (Ask a developer for the .env file):
    ```
-   docker-compose up --build
+   cp .env.template .env
    ```
 
-   This command will build the Docker image and start the containers defined in your `docker-compose.yml` file.
+3. Build and run the Docker containers:
+   ```
+   docker compose up --build
+   ```
 
 ## Environments
 
@@ -89,125 +97,122 @@ The application supports three environments:
 
 The development environment is used for local development and testing.
 
-1. Copy the environment template:
-   ```
-   cp .env.template .env
-   ```
+- Run the application using Docker Compose with development services:
+  ```
+  docker compose up api_dev data_fetcher_dev db db_mb pgadmin metabase nginx --build
+  ```
 
-2. Run the application using Docker Compose:
-   ```
-   docker compose up --build
-   ```
+This setup uses the `api_dev` and `data_fetcher_dev` services which mount the local codebase as a volume, enabling:
+- Hot-reload: Code changes are reflected immediately without rebuilding containers
+- Live debugging: Changes to the codebase are immediately available in the containers
+- Development workflow: Edit code locally while running services in containers
 
 ### Staging
 
-The staging environment is hosted on a Digital Ocean droplet and is used for testing features before they are deployed to production.
+The staging environment is hosted on a Digital Ocean droplet.
 
-- URL: `api.staging.lmu-dev.org`
+- URL: `{service}-staging.lmu-dev.org`
+- IP: `157.230.114.51`
+- DNS: Managed through Cloudflare
 - Deployment: Automatic when code is pushed to the `staging` branch
-
-To deploy manually to staging:
-```
-docker compose -f compose.staging.yml up -d --build
-```
 
 ### Production
 
-The production environment is hosted on a Digital Ocean droplet and is the live environment used by end users.
+The production environment is hosted on a Digital Ocean droplet.  
+Available services: 
+[api.lmu-dev.org](https://api.lmu-dev.org)  [metabase.lmu-dev.org](https://metabase.lmu-dev.org)  [pgadmin.lmu-dev.org](https://pgadmin.lmu-dev.org)  [nginx.lmu-dev.org](https://nginx.lmu-dev.org)  
 
-- URL: `api.lmu-dev.org`
+- URL: `{service}.lmu-dev.org`
+- IP: `64.226.106.247`
+- DNS: Managed through Cloudflare
 - Deployment: Automatic when code is pushed to the `main` branch
 
-To deploy manually to production:
-```
-docker compose -f compose.production.yml up -d --build
-```
+## Components
+
+The application consists of several Docker services:
+
+1. **API Service** (`api`):
+   - Main FastAPI application
+   - Exposed on port 8001 (localhost)
+   - Development mode available with hot-reload (`api_dev`)
+
+2. **Database** (`db`):
+   - PostgreSQL 16.4
+   - Exposed on port 5432
+   - Includes health checks
+
+3. **Metabase** (`metabase`):
+   - Data analytics platform
+   - Exposed on port 3000
+   - Separate PostgreSQL instance (`db_mb`) on port 5433
+
+4. **PgAdmin** (`pgadmin`):
+   - Database management interface
+   - Configurable port through environment variables
+
+5. **Data Fetcher** (`data_fetcher`):
+   - Background data processing service
+   - Development mode available (`data_fetcher_dev`)
+
+6. **Nginx Proxy Manager** (`nginx`):
+   - Reverse proxy and SSL management
+   - Ports 80 and 443
+   - Includes Let's Encrypt integration
 
 ## Branching Strategy
 
-We follow a simple branching strategy:
+We follow a trunk-based development strategy:
 
-1. `main` - Production branch. Represents the code currently in production.
-2. `staging` - Staging branch. Used for testing features before they are deployed to production.
-3. Feature branches - Created from `staging` for new features or bug fixes.
+1. `main` - Production branch, represents live code
+2. `staging` - Integration branch for testing
+3. Feature branches - Created from `staging`
 
 Workflow:
-1. Create a feature branch from `staging`
-2. Develop and test your feature
-3. Create a pull request to merge into `staging`
-4. After testing in staging, create a pull request to merge `staging` into `main`
+1. Create feature branch from `staging`
+2. Develop and test
+3. Create PR to merge into `staging`
+4. After testing, merge `staging` into `main`
 
 ## CI/CD Pipeline
 
-We use GitHub Actions for continuous integration and deployment:
+GitHub Actions automation:
 
-1. **CI Tests**: Run on pull requests to `staging` and `main` branches
-2. **Staging Deployment**: Automatically deploys to staging when code is pushed to the `staging` branch
-3. **Production Deployment**: Automatically deploys to production when code is pushed to the `main` branch
+1. **Continuous Integration**:
+   - Runs on all pull requests
+   - Executes test suite
+   - Performs code quality checks
+
+2. **Staging Deployment**:
+   - Triggered on `staging` branch updates
+   - Builds and tags Docker images
+   - Deploys to staging environment
+
+3. **Production Deployment**:
+   - Triggered on `main` branch updates
+   - Uses staging-verified images
+   - Deploys to production environment
 
 ## Deployment Workflow
 
-This project uses a multi-environment deployment strategy with Docker images:
-
-### Environments
-
-- **Development**: Local environment for development
-- **Staging**: Hosted environment for testing (`service.staging.xxx.org`)
-- **Production**: Production environment (`api.xxx.org`)
-
-### Branching Strategy
-
-- **`main`**: Production-ready code, always stable
-- **`staging`**: Integration branch for testing before production
-- Feature branches should be created from and merged back to `staging`
-
-### Deployment Process
-
 1. **Development**:
-   - Run locally using `docker compose up`
+   ```
+   docker compose up
+   ```
 
 2. **Staging**:
-   - Push changes to the `staging` branch
-   - GitHub Actions will:
-     - Build Docker images
-     - Tag images with both `staging` and the commit SHA
-     - Push images to Docker Hub
-     - Deploy to the staging server
+   - Automatic deployment from `staging` branch
+   - Manual: `docker compose up db api data_fetcher --build`
 
 3. **Production**:
-   - Push changes to the `main` branch (or use the GitHub workflow dispatch)
-   - GitHub Actions will:
-     - Pull the same Docker images that were tested in staging
-     - Tag them as `production`
-     - Deploy to the production server
-
-This ensures that the exact same code that was tested in staging is deployed to production.
-
-### Manual Deployment
-
-You can also trigger a production deployment manually with a specific commit SHA:
-
-1. Go to GitHub Actions
-2. Select the "Deploy to Production" workflow
-3. Click "Run workflow"
-4. Enter the specific commit SHA to deploy (optional)
-5. Click "Run workflow"
+   - Automatic deployment from `main` branch
+   - Manual: `docker compose up db api data_fetcher --build`
 
 ## Usage
 
-To run the LMU App Backend, follow these steps:
+After deployment, the following services are available:
 
-1. If using virtual environment, make sure it's activated.
-2. Run the main application:
-   ```
-   python app.py
-   ```
-
-If using Docker Compose:
-```
-docker-compose up
-```
-
-Swagger UI should be accessible at `http://localhost:8001/v1/docs`
-REST API should now be running and accessible at `http://localhost:8001/v1`
-PgAdmin should now be running and accessible at `http://localhost:5050`
+- API Documentation: `http://localhost:8001/v1/docs`
+- REST API: `http://localhost:8001/v1`
+- PgAdmin: `http://localhost:5050`
+- Metabase: `http://localhost:3000`
+- Nginx Proxy Manager: `http://localhost:81`
