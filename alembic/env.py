@@ -67,6 +67,11 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table" and name.startswith('directus_'):
+        return False
+    return True
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
@@ -82,7 +87,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object
         )
 
         with context.begin_transaction():

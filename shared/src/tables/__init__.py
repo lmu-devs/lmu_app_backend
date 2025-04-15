@@ -9,3 +9,4 @@ from .feedback_table import *
 from .sport import *
 from .roomfinder import *
 from .link import *
+from .linkv2 import *

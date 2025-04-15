@@ -173,6 +173,37 @@ services:
         networks:
             - frontend
 
+    directus:
+        image: directus/directus:latest
+        container_name: directus
+        ports:
+            - '8055:8055'
+        environment:
+            KEY: 'your-unique-key'
+            SECRET: 'your-unique-secret'
+            ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+            ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+            DB_CLIENT: 'pg'
+            DB_HOST: db
+            DB_PORT: '5432'
+            DB_DATABASE: ${POSTGRES_DB}
+            DB_USER: ${POSTGRES_USER}
+            DB_PASSWORD: ${POSTGRES_PASSWORD}
+            CORS_ENABLED: 'true'
+            CORS_ORIGIN: 'true'
+            PUBLIC_URL: 'http://localhost:8055'
+        volumes:
+            - ./directus/extensions:/directus/extensions
+            - ./directus/uploads:/directus/uploads
+            - ./directus/schema:/directus/schema
+        networks:
+            - frontend
+            - backend
+        depends_on:
+            db:
+                condition: service_healthy
+        restart: unless-stopped
+
 volumes:
     postgres_data:
     postgres_metabase_data:
