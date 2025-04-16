@@ -20,7 +20,6 @@ from api.src.v1.home.models.home_tile_model import HomeTiles
 #     receiver: str
 
 
-
 class Home(BaseModel):
     featured: FeaturedTiles = Field()
     tiles: HomeTiles = Field()
