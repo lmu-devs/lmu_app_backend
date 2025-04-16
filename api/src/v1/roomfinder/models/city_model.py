@@ -1,8 +1,10 @@
 from typing import List
+
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.roomfinder.city_table import CityTable
 from api.src.v1.roomfinder.models.street_model import Streets
+from shared.src.tables.roomfinder.city_table import CityTable
+
 
 class City(BaseModel):
     id: str
@@ -10,7 +12,7 @@ class City(BaseModel):
     streets: Streets
 
     @classmethod
-    def from_table(cls, data: CityTable) -> 'City':
+    def from_table(cls, data: CityTable) -> "City":
         return cls(
             id=data.id,
             name=data.name,

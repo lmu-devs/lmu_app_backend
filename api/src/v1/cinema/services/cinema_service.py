@@ -13,30 +13,32 @@ from shared.src.tables import (
 from ...core.translation_utils import create_translation_order_case
 from ..models import Cinema
 
+
 class CinemaService:
     def __init__(self, db: AsyncSession, language: LanguageEnum):
         self.db = db
         self.language = language
-        
+
     async def get_cinemas(self, cinema_id) -> List[Cinema]:
         query = self._get_cinemas_query(cinema_id)
         result = await self.db.execute(query)
         return result.scalars().unique().all()
-    
+
     def _get_cinemas_query(self, cinema_id: Optional[str] = None):
-        query = (select(CinemaTable)
-        .outerjoin(CinemaTable.images)
-        .outerjoin(CinemaTable.location)
-        .join(CinemaTable.translations)
-        .options(
-            contains_eager(CinemaTable.translations),
-            contains_eager(CinemaTable.images),
-            contains_eager(CinemaTable.location)
-                )
+        query = (
+            select(CinemaTable)
+            .outerjoin(CinemaTable.images)
+            .outerjoin(CinemaTable.location)
+            .join(CinemaTable.translations)
+            .options(
+                contains_eager(CinemaTable.translations),
+                contains_eager(CinemaTable.images),
+                contains_eager(CinemaTable.location),
+            )
         )
         if cinema_id:
             query = query.filter(CinemaTable.id == cinema_id)
-            
+
         return query.order_by(
             create_translation_order_case(CinemaTranslationTable, self.language)
         )

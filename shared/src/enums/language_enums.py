@@ -4,10 +4,11 @@ from shared.src.core.logging import get_food_logger
 
 logger = get_food_logger(__name__)
 
+
 class LanguageEnum(str, Enum):
     GERMAN = "de-DE"
     ENGLISH_US = "en-US"
-    
+
     @classmethod
     def from_header(cls, header: str) -> "LanguageEnum":
         """Convert HTTP Accept-Language header to Language enum"""
@@ -17,5 +18,7 @@ class LanguageEnum(str, Enum):
             return cls.GERMAN
         if header.startswith("EN"):
             return cls.ENGLISH_US
-        logger.warning(f"No supported language found in Accept-Language header: {header}")
+        logger.warning(
+            f"No supported language found in Accept-Language header: {header}"
+        )
         return cls.GERMAN  # Default fallback

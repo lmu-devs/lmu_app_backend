@@ -7,7 +7,8 @@ class UniversityEnum(str, Enum):
     LMU = "LMU"
     TUM = "TUM"
     HM = "HM"
-    
+
+
 university_translations = {
     UniversityEnum.LMU: {
         LanguageEnum.GERMAN: "Ludwig-Maximilians-Universität München",
@@ -20,5 +21,5 @@ university_translations = {
     UniversityEnum.HM: {
         LanguageEnum.GERMAN: "Hochschule München",
         LanguageEnum.ENGLISH_US: "University of Applied Sciences Munich",
-    }
+    },
 }

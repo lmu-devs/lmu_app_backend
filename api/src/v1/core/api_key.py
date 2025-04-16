@@ -7,34 +7,35 @@ from requests import Session
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared.src.core.database import get_async_db, get_db
 from shared.src.core.exceptions import AuthenticationError, AuthorizationError
 from shared.src.core.logging import get_main_logger
-from shared.src.core.database import get_db, get_async_db
 from shared.src.core.settings import get_settings
 from shared.src.tables import UserTable
 
 logger = get_main_logger(__name__)
 
 user_api_key = APIKeyHeader(
-    name="user-api-key", 
+    name="user-api-key",
     auto_error=False,
-    description="User API key for authenticated user operations"
+    description="User API key for authenticated user operations",
 )
 system_api_key = APIKeyHeader(
-    name="system-api-key", 
+    name="system-api-key",
     auto_error=False,
-    description="System API key for creating users"
+    description="System API key for creating users",
 )
 admin_api_key = APIKeyHeader(
-    name="admin-api-key", 
+    name="admin-api-key",
     auto_error=False,
-    description="Admin API key for administrative operations"
+    description="Admin API key for administrative operations",
 )
+
 
 class APIKey:
     def __init__(self):
         pass
-    
+
     @staticmethod
     async def verify_admin_api_key(api_key: str = Security(admin_api_key)) -> bool:
         """Verify the admin API key."""
@@ -73,25 +74,35 @@ class APIKey:
 
     @staticmethod
     async def verify_user_api_key(
-        api_key_header: str = Security(user_api_key), 
-        db: AsyncSession = Depends(get_async_db)
+        api_key_header: str = Security(user_api_key),
+        db: AsyncSession = Depends(get_async_db),
     ) -> UserTable:
-        user: UserTable = (await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))).scalar_one_or_none()
+        user: UserTable = (
+            await db.execute(
+                select(UserTable).filter(UserTable.api_key == api_key_header)
+            )
+        ).scalar_one_or_none()
         if user is None:
             raise AuthorizationError(
                 detail="Could not validate user credentials. ",
-                extra={"user-api-key": api_key_header}
+                extra={"user-api-key": api_key_header},
             )
         logger.info(f"Successfully validated user API key for {str(user.id)}")
         return user
 
     @staticmethod
     async def verify_user_api_key_soft(
-        api_key_header: str = Security(user_api_key), 
-        db: AsyncSession = Depends(get_async_db)
+        api_key_header: str = Security(user_api_key),
+        db: AsyncSession = Depends(get_async_db),
     ) -> UserTable:
-        user: UserTable = (await db.execute(select(UserTable).filter(UserTable.api_key == api_key_header))).scalar_one_or_none()
-        logger.info(f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}")
+        user: UserTable = (
+            await db.execute(
+                select(UserTable).filter(UserTable.api_key == api_key_header)
+            )
+        ).scalar_one_or_none()
+        logger.info(
+            f"Checked user API key for {str(user.id) if user else 'unknown (no match)'}"
+        )
         return user
 
 

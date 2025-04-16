@@ -22,10 +22,10 @@ class FileManagementService:
             filename = os.path.basename(url) or f"file_{hash(url)}"
 
         full_path = os.path.join(self.base_path, filename)
-        
+
         # Download and save the file
         urllib.request.urlretrieve(url, full_path)
-        
+
         return full_path
 
     def save_file_from_path(self, source_path: str, filename: str | None) -> str:
@@ -37,33 +37,35 @@ class FileManagementService:
             filename = os.path.basename(source_path)
 
         full_path = os.path.join(self.base_path, filename)
-        
+
         # Copy the file
         os.replace(source_path, full_path)
-        
+
         return full_path
-    
+
     def generate_save_file_name(filename: str) -> str:
         # Replace spaces with underscores and remove special characters
-        safe_filename = ''.join(
-            '_' if char.isspace() 
-            else char if char.isalnum() or char == '_' or char == '.'
-            else '' 
+        safe_filename = "".join(
+            (
+                "_"
+                if char.isspace()
+                else char if char.isalnum() or char == "_" or char == "." else ""
+            )
             for char in filename
         )
         return safe_filename
-    
+
     @staticmethod
     def delete_file(file_path: str) -> bool:
         """
         Safely delete a file
-        
+
         Args:
             file_path: Path to the file to delete
-            
+
         Returns:
             bool: True if file was deleted successfully, False if file doesn't exist
-            
+
         Raises:
             Exception: If deletion fails for any other reason
         """

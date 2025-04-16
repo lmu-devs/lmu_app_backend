@@ -7,15 +7,12 @@ class Message(BaseModel):
 
 
 class SystemMessage(Message):
-    role: str = "system" 
+    role: str = "system"
 
 
 class UserMessage(Message):
-    role: str = "user" 
+    role: str = "user"
 
 
 class AssistantMessage(Message):
     role: str = "assistant"
-
-
-

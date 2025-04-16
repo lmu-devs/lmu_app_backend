@@ -1,9 +1,9 @@
 from typing import List
+
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.roomfinder.street_table import StreetTable
-
 from api.src.v1.roomfinder.models.building_model import Buildings
+from shared.src.tables.roomfinder.street_table import StreetTable
 
 
 class Street(BaseModel):

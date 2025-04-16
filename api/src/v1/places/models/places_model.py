@@ -14,6 +14,7 @@ class PlaceEnum(str, Enum):
     BUILDING = "building"
     CINEMA = "cinema"
 
+
 class Place(BaseModel):
     id: str
     location: Location

@@ -1,9 +1,8 @@
 from typing import Dict, List, Optional
 
-from shared.src.enums import CanteenEnum
-
-from data_fetcher.src.food.crawler.entities import Menu
 import data_fetcher.src.food.crawler.menu_parser as menu_parser
+from data_fetcher.src.food.crawler.entities import Menu
+from shared.src.enums import CanteenEnum
 
 
 class FoodCrawler:
@@ -17,7 +16,9 @@ class FoodCrawler:
             # menu_parser.MensaBildungscampusHeilbronnParser,
         }
 
-    def get_menu_parsing_strategy(self, canteen: CanteenEnum) -> Optional[menu_parser.MenuParser]:
+    def get_menu_parsing_strategy(
+        self, canteen: CanteenEnum
+    ) -> Optional[menu_parser.MenuParser]:
         for parser in self.parsers:
             if canteen in parser.canteens:
                 return parser()
@@ -40,18 +41,20 @@ class FoodCrawler:
 def main():
     crawler = FoodCrawler()
     canteen = CanteenEnum.STUBISTRO_OETTINGENSTR
-    
+
     menus = crawler.get_menus(canteen)
-    
+
     for menu in menus:
         print(menu.menu_date)
         for dish in menu.dishes:
             print(dish.title)
             print(dish.prices)
             # print(dish.labels.text)
-            existing_labels = [label.name for label in dish.labels]  # Changed to access label.text
+            existing_labels = [
+                label.name for label in dish.labels
+            ]  # Changed to access label.text
             print(existing_labels)
-            
+
 
 if __name__ == "__main__":
     main()

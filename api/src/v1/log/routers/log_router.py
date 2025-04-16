@@ -14,26 +14,25 @@ router = APIRouter()
 logger = get_food_logger(__name__)
 
 
-@router.get("/logs", 
+@router.get(
+    "/logs",
     response_class=FileResponse,
-    description="Get all logs as a compressed zip file. Requires system API key.")
-async def get_logs(
-    authorized: Annotated[bool, Depends(APIKey.verify_admin_api_key)]
-):
+    description="Get all logs as a compressed zip file. Requires system API key.",
+)
+async def get_logs(authorized: Annotated[bool, Depends(APIKey.verify_admin_api_key)]):
     """Endpoint to retrieve compressed log files."""
     try:
         log_service = LogService()
         zip_path = log_service.create_log_archive()
-        
+
         logger.info("Sending compressed log files")
         return FileResponse(
             path=zip_path,
             filename=os.path.basename(zip_path),
-            media_type='application/zip'
+            media_type="application/zip",
         )
     except Exception as e:
         logger.error(f"Error while creating log archive: {str(e)}")
         raise ConfigurationError(
-            detail="Failed to create log archive",
-            extra={"error": str(e)}
+            detail="Failed to create log archive", extra={"error": str(e)}
         )

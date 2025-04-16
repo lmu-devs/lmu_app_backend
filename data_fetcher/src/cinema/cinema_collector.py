@@ -13,6 +13,6 @@ class CinemaCollector(ScheduledCollector):
 
     async def _collect_data(self, db):
         service = CinemaService(db)
-        
+
         service.add_constant_cinema_data()
-        await service.fetch_scheduled_data() 
+        await service.fetch_scheduled_data()

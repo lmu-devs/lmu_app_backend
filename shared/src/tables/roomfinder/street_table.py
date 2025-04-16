@@ -13,4 +13,4 @@ class StreetTable(Base):
 
     # Relationships
     buildings = relationship("BuildingTable", back_populates="street")
-    city = relationship("CityTable", back_populates="streets") 
+    city = relationship("CityTable", back_populates="streets")

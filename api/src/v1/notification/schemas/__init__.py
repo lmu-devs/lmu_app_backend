@@ -1,1 +1,1 @@
-# Notification schemas 
+# Notification schemas

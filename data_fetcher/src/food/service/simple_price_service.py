@@ -6,13 +6,13 @@ class PriceService:
     def calculate_simple_price(prices: Prices):
         """
         Calculate a simple price rating from 1 to 3 based on student pricing.
-        
+
         :param student_price: A dictionary containing student pricing information
         :return: String rating from € to €€€, or None if conditions are not met
         """
         if not prices.students:
             return None
-        
+
         base_price = prices.students.base_price
         price_per_unit = prices.students.price_per_unit
         unit = prices.students.unit

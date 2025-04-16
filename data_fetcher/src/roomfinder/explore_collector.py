@@ -13,4 +13,3 @@ class RoomfinderCollector(BaseCollector):
     async def _collect_data(self, db):
         service = RoomfinderService(db)
         service.update_database()
-         

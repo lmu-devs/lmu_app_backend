@@ -1,6 +1,9 @@
 from shared.src.enums import LanguageEnum
-from shared.src.tables.link.link_resources_table import LinkResourceTable, LinkResourceTranslationTable, LinkType
-
+from shared.src.tables.link.link_resources_table import (
+    LinkResourceTable,
+    LinkResourceTranslationTable,
+    LinkType,
+)
 
 link_resource_constants = [
     LinkResourceTable(
@@ -9,16 +12,16 @@ link_resource_constants = [
         types=[LinkType.INTERNAL],
         translations=[
             LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US, 
-                title="Moodle", 
-                description="Courses and learning materials", 
+                language=LanguageEnum.ENGLISH_US,
+                title="Moodle",
+                description="Courses and learning materials",
             ),
             LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN, 
-                title="Moodle", 
-                description="Kurse und Lernmaterialien", 
-            )
-        ]
+                language=LanguageEnum.GERMAN,
+                title="Moodle",
+                description="Kurse und Lernmaterialien",
+            ),
+        ],
     ),
     LinkResourceTable(
         id="LSF",
@@ -26,16 +29,16 @@ link_resource_constants = [
         types=[LinkType.INTERNAL],
         translations=[
             LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US, 
-                title="LSF", 
-                description="Course Management System", 
+                language=LanguageEnum.ENGLISH_US,
+                title="LSF",
+                description="Course Management System",
             ),
             LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN, 
-                title="LSF", 
-                description="Veranstaltungs-Management-System", 
-            )
-        ]
+                language=LanguageEnum.GERMAN,
+                title="LSF",
+                description="Veranstaltungs-Management-System",
+            ),
+        ],
     ),
     LinkResourceTable(
         id="ANNY",
@@ -43,15 +46,15 @@ link_resource_constants = [
         types=[LinkType.EXTERNAL],
         translations=[
             LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US, 
-                title="Anny", 
-                description="App for booking seats and rooms in libraries", 
+                language=LanguageEnum.ENGLISH_US,
+                title="Anny",
+                description="App for booking seats and rooms in libraries",
             ),
             LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN, 
-                title="Anny", 
-                description="App für das Buchen von Sitzplätzen und Räumen in Bibliotheken", 
-            )
-        ]
-    )
+                language=LanguageEnum.GERMAN,
+                title="Anny",
+                description="App für das Buchen von Sitzplätzen und Räumen in Bibliotheken",
+            ),
+        ],
+    ),
 ]

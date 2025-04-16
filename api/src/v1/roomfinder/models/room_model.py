@@ -1,7 +1,9 @@
 from typing import List
+
 from pydantic import BaseModel, RootModel
 
 from shared.src.tables.roomfinder.room_table import RoomTable
+
 
 class Room(BaseModel):
     id: str

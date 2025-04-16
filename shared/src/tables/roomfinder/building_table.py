@@ -15,14 +15,15 @@ class BuildingTable(Base):
     # Relationships
     street = relationship("StreetTable", back_populates="buildings")
     building_parts = relationship("BuildingPartTable", back_populates="building")
-    location = relationship("BuildingLocationTable", back_populates="building", uselist=False) 
-
+    location = relationship(
+        "BuildingLocationTable", back_populates="building", uselist=False
+    )
 
 
 class BuildingLocationTable(Base, LocationTable):
     __tablename__ = "building_locations"
 
     building_id = Column(String, ForeignKey("buildings.id"), primary_key=True)
-    
+
     # Relationship
     building = relationship("BuildingTable", back_populates="location")

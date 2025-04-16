@@ -5,4 +5,4 @@ from data_fetcher.src.university.services.university_service import UniversitySe
 class UniversityCollector(BaseCollector):
     async def _collect_data(self, db):
         service = UniversityService(db)
-        service.add_universities() 
+        service.add_universities()

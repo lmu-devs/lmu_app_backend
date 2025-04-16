@@ -23,7 +23,6 @@ from ..schemas.notification_schema import (
 )
 from ..services.notification_service import NotificationService
 
-
 router = APIRouter()
 logger = get_notification_logger(__name__)
 
@@ -38,23 +37,19 @@ logger = get_notification_logger(__name__)
 async def create_notification(
     notification: NotificationCreate,
     db: AsyncSession = Depends(get_async_db),
-    authorized: bool = Depends(APIKey.verify_admin_api_key)
+    authorized: bool = Depends(APIKey.verify_admin_api_key),
 ):
     """Create a new notification with optional translations."""
     service = NotificationService(db)
-    
+
     # Extract translations if provided
     translations = None
     if notification.translations:
         translations = [
-            {
-                "language": trans.language,
-                "title": trans.title,
-                "body": trans.body
-            }
+            {"language": trans.language, "title": trans.title, "body": trans.body}
             for trans in notification.translations
         ]
-    
+
     result = await service.create_notification(
         title=notification.title,
         body=notification.body,
@@ -64,7 +59,7 @@ async def create_notification(
         language=notification.language,
         translations=translations,
     )
-    
+
     # Fetch the notification with translations to return
     return await service.get_notification_with_translations(result.id)
 
@@ -83,7 +78,9 @@ async def get_notifications(
 ):
     """Get all notifications."""
     service = NotificationService(db)
-    result = await service.get_notifications(limit=limit, offset=offset, notification_id=notification_id)
+    result = await service.get_notifications(
+        limit=limit, offset=offset, notification_id=notification_id
+    )
     return result
 
 
@@ -207,4 +204,4 @@ async def unsubscribe_from_topic(
         base_topic=subscription.topic,
         language=language.value,
     )
-    return result 
+    return result

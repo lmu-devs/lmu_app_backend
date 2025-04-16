@@ -1,9 +1,11 @@
 from typing import List
+
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.roomfinder.building_table import BuildingTable
 from api.src.v1.roomfinder.models.building_part_model import BuildingParts
 from shared.src.models.location_model import Location
+from shared.src.tables.roomfinder.building_table import BuildingTable
+
 
 class Building(BaseModel):
     id: str
@@ -19,6 +21,7 @@ class Building(BaseModel):
             location=Location.from_table(data.location),
             building_parts=BuildingParts.from_table(data.building_parts),
         )
+
 
 class Buildings(RootModel):
     root: List[Building]

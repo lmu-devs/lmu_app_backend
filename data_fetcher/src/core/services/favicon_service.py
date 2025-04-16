@@ -1,6 +1,6 @@
 import os
-import requests
 
+import requests
 
 
 class FaviconService:
@@ -10,15 +10,14 @@ class FaviconService:
         if not os.path.exists(save_directory):
             os.makedirs(save_directory)
 
-
     def get_favicon_url(self, url):
         """
         Get the favicon URL using allesedv.com with DuckDuckGo and Google as fallbacks.
         """
         try:
             # Clean the URL to get domain
-            domain = url.split('/')[2] if '//' in url else url.split('/')[0]
-            
+            domain = url.split("/")[2] if "//" in url else url.split("/")[0]
+
             # Try allesedv.com first (supports multiple sizes)
             allesedv_url = f"https://f3.allesedv.com/64/{domain}"
             response = requests.head(allesedv_url)
@@ -47,7 +46,7 @@ class FaviconService:
 def main():
     # Test the FaviconService
     service = FaviconService()
-    
+
     test_urls = [
         # "https://lmu.de",
         "https://lmu-dev.org",
@@ -61,7 +60,6 @@ def main():
         print(f"\nTesting URL: {url}")
         favicon_url = service.get_favicon_url(url)
         print(f"Favicon URL: {favicon_url}")
-
 
 
 if __name__ == "__main__":

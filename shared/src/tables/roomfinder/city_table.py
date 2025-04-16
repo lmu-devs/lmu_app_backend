@@ -11,4 +11,4 @@ class CityTable(Base):
     name = Column(String, nullable=False)
 
     # Relationships
-    streets = relationship("StreetTable", back_populates="city") 
+    streets = relationship("StreetTable", back_populates="city")

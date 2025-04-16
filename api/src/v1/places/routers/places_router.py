@@ -1,4 +1,5 @@
 from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,9 +12,9 @@ from shared.src.tables import UserTable
 from ..models.places_model import Place
 from ..services.places_service import PlacesService
 
-
 router = APIRouter()
 logger = get_places_logger(__name__)
+
 
 @router.get("/places", response_model=List[Place], description="Get places data")
 async def get_places(

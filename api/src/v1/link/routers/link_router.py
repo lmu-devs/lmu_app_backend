@@ -11,11 +11,15 @@ from shared.src.enums import LanguageEnum
 
 from ..services.link_resources_service import LinkResourceService
 
-
 router = APIRouter()
 logger = get_links_logger(__name__)
 
-@router.get("/resources", response_model=LinkResources, description="Get all resources for important LMU services")
+
+@router.get(
+    "/resources",
+    response_model=LinkResources,
+    description="Get all resources for important LMU services",
+)
 async def get_all(
     db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),
@@ -25,7 +29,10 @@ async def get_all(
     links = LinkResources.from_table(links)
     return links
 
-@router.get("/benefits", response_model=LinkBenefits, description="Get all student benefits")
+
+@router.get(
+    "/benefits", response_model=LinkBenefits, description="Get all student benefits"
+)
 async def get_all(
     db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),
@@ -34,4 +41,3 @@ async def get_all(
     benefits = await link_benefit_service.get_benefits()
     benefits = LinkBenefits.from_table(benefits)
     return benefits
-

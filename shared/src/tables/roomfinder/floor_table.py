@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 
+
 class FloorTable(Base):
     __tablename__ = "floors"
 

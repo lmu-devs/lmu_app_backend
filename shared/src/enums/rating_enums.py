@@ -11,6 +11,6 @@ class RatingSourceEnum(Enum):
         source_mapping = {
             "Internet Movie Database": cls.IMDB,
             "Rotten Tomatoes": cls.ROTTEN_TOMATOES,
-            "Metacritic": cls.METACRITIC
+            "Metacritic": cls.METACRITIC,
         }
-        return source_mapping.get(source) 
+        return source_mapping.get(source)

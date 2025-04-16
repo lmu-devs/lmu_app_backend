@@ -1,14 +1,18 @@
-from pydantic import BaseModel
 from datetime import datetime
+
+from pydantic import BaseModel
+
 
 class Link(BaseModel):
     title: str
     url: str
-    
+
+
 class TimePeriod(BaseModel):
     start_date: datetime
     end_date: datetime
-    
+
+
 class SemesterFee(BaseModel):
     fee: float
     time_period: TimePeriod
@@ -16,6 +20,7 @@ class SemesterFee(BaseModel):
     bic: str
     reference: str
     receiver: str
+
 
 class Home(BaseModel):
     semester_fee: SemesterFee
