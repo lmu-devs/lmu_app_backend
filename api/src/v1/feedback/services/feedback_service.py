@@ -16,9 +16,7 @@ class FeedbackService:
         self.db = db
         self.telegram_service = TelegramService()
 
-    async def create_feedback(
-        self, user_id: uuid.UUID, feedback_data: dict
-    ) -> FeedbackTable:
+    async def create_feedback(self, user_id: uuid.UUID, feedback_data: dict) -> FeedbackTable:
         try:
             new_feedback = FeedbackTable(
                 id=uuid.uuid4(),
@@ -43,9 +41,7 @@ class FeedbackService:
         except SQLAlchemyError as e:
             logger.error(f"Failed to create feedback: {str(e)}")
             await self.db.rollback()
-            raise DatabaseError(
-                detail="Failed to create feedback", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to create feedback", extra={"original_error": str(e)})
 
     async def send_telegram_notification(self, feedback: FeedbackTable):
         await self.telegram_service.send_feedback_notification(

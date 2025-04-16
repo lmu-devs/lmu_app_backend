@@ -16,9 +16,7 @@ class UniversityTable(Base):
         back_populates="university",
         cascade="all, delete-orphan",
     )
-    screenings = relationship(
-        "MovieScreeningTable", back_populates="university", cascade="all, delete-orphan"
-    )
+    screenings = relationship("MovieScreeningTable", back_populates="university", cascade="all, delete-orphan")
 
 
 class UniversityTranslationTable(LanguageTable):

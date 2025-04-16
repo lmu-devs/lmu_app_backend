@@ -29,9 +29,7 @@ type ClientInitializer = dict[LLMProviders, ClientInitializerCallback]
 
 
 class LLMFactory:
-    def __init__(
-        self, provider: LLMProviders, system_message: SystemMessage | None = None
-    ) -> None:
+    def __init__(self, provider: LLMProviders, system_message: SystemMessage | None = None) -> None:
         self.provider: LLMProviders = provider
         self.system_message: SystemMessage | None = system_message
         self.settings: LLMSettings = getattr(get_settings(), provider)
@@ -42,9 +40,7 @@ class LLMFactory:
             genai.configure(api_key=self.settings.api_key)
 
         client_initializers: ClientInitializer = {
-            "openai": lambda settings: instructor.from_openai(
-                OpenAI(api_key=settings.api_key)
-            ),
+            "openai": lambda settings: instructor.from_openai(OpenAI(api_key=settings.api_key)),
             # "anthropic": lambda settings: instructor.from_anthropic(Anthropic(api_key=settings.api_key)),
             "gemini": lambda settings: instructor.from_gemini(
                 GenerativeModel(

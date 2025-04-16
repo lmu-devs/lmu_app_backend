@@ -91,9 +91,7 @@ class SportType(BaseModel):
     @classmethod
     def from_table(cls, table: SportTypeTable) -> "SportType":
         return cls(
-            title=(
-                table.translations[0].title if table.translations else "not translated"
-            ),
+            title=(table.translations[0].title if table.translations else "not translated"),
             courses=SportCourses.from_table(table.sport_courses),
         )
 

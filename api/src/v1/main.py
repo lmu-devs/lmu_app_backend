@@ -77,9 +77,7 @@ def create_app():
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
     app.include_router(places_router.router, prefix=prefix, tags=["places"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
-    app.include_router(
-        roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"]
-    )
+    app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
     app.include_router(

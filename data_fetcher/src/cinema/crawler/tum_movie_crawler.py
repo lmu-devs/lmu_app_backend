@@ -109,9 +109,7 @@ class TumScreeningCrawler:
             logger.error(f"Error extracting description: {e}")
             return None
 
-    def _get_movie_details(
-        self, external_link: str
-    ) -> tuple[int | None, str | None, str | None, str | None]:
+    def _get_movie_details(self, external_link: str) -> tuple[int | None, str | None, str | None, str | None]:
         """Get year, custom poster URL, tagline, and description from movie's detail page"""
         soup = self._fetch_movie_details(external_link)
         if not soup:
@@ -136,9 +134,7 @@ class TumScreeningCrawler:
         response = requests.get(self.rss_url)
 
         if response.status_code != 200:
-            logger.error(
-                f"Failed to fetch the RSS feed, status code: {response.status_code}"
-            )
+            logger.error(f"Failed to fetch the RSS feed, status code: {response.status_code}")
             return []
 
         logger.info("Successfully fetched TUM movie RSS feed")
@@ -149,23 +145,15 @@ class TumScreeningCrawler:
             base_title = item.title.text
 
             is_garching = self._is_garching_in_title(base_title)
-            self.cinema_id = (
-                CinemaEnum.TUM_GARCHING.value if is_garching else CinemaEnum.TUM.value
-            )
+            self.cinema_id = CinemaEnum.TUM_GARCHING.value if is_garching else CinemaEnum.TUM.value
             title = self._clean_title(base_title)
             date = self._parse_date(item.pubDate.text)
             external_link = item.link.text
-            year, custom_poster_url, tagline, description = self._get_movie_details(
-                external_link
-            )
+            year, custom_poster_url, tagline, description = self._get_movie_details(external_link)
             is_edge_case = year is None
             price = 0 if "Free Entrance" in base_title else self.price
             is_ov = "OV" in base_title
-            subtitles = (
-                "OmdU"
-                if "OmdU" in base_title
-                else "OmeU" if "OmeU" in base_title else None
-            )
+            subtitles = "OmdU" if "OmdU" in base_title else "OmeU" if "OmeU" in base_title else None
             address = item.find("location").text if item.find("location") else None
 
             movies.append(

@@ -20,9 +20,7 @@ class SportService:
         self.db = db
         self.language = language
 
-    async def get_sports(
-        self, sport_type_id: Optional[str] = None
-    ) -> List[SportTypeTable]:
+    async def get_sports(self, sport_type_id: Optional[str] = None) -> List[SportTypeTable]:
         query = self._get_sports_query(sport_type_id)
         result = await self.db.execute(query)
         return result.scalars().unique().all()
@@ -45,21 +43,13 @@ class SportService:
             .outerjoin(SportCourseTable.location)
             .options(
                 contains_eager(SportTypeTable.translations),
-                contains_eager(SportTypeTable.sport_courses).contains_eager(
-                    SportCourseTable.translations
-                ),
-                contains_eager(SportTypeTable.sport_courses).contains_eager(
-                    SportCourseTable.time_slots
-                ),
-                contains_eager(SportTypeTable.sport_courses).contains_eager(
-                    SportCourseTable.location
-                ),
+                contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.translations),
+                contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.time_slots),
+                contains_eager(SportTypeTable.sport_courses).contains_eager(SportCourseTable.location),
             )
         )
 
         if sport_type_id:
             query = query.filter(SportTypeTable.id == sport_type_id)
 
-        return query.order_by(
-            create_translation_order_case(SportTypeTranslationTable, self.language)
-        )
+        return query.order_by(create_translation_order_case(SportTypeTranslationTable, self.language))

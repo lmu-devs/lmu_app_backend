@@ -127,20 +127,13 @@ class NotificationService:
         Returns:
             List of notifications with translations
         """
-        stmt = (
-            select(NotificationTable)
-            .order_by(NotificationTable.created_at.desc())
-            .limit(limit)
-            .offset(offset)
-        )
+        stmt = select(NotificationTable).order_by(NotificationTable.created_at.desc()).limit(limit).offset(offset)
         if notification_id:
             stmt = stmt.where(NotificationTable.id == notification_id)
             result = await self.db.execute(stmt)
             notification = result.scalar_one_or_none()
             if notification:
-                return [
-                    await self.get_notification_with_translations(str(notification.id))
-                ]
+                return [await self.get_notification_with_translations(str(notification.id))]
             return []
 
         result = await self.db.execute(stmt)
@@ -149,9 +142,7 @@ class NotificationService:
         # Get translations for all notifications
         notification_responses = []
         for notification in notifications:
-            notification_responses.append(
-                await self.get_notification_with_translations(str(notification.id))
-            )
+            notification_responses.append(await self.get_notification_with_translations(str(notification.id)))
 
         return notification_responses
 
@@ -194,9 +185,7 @@ class NotificationService:
             # Try to get translation in service language
             default_translation = translation_map.get(
                 self.language.value,
-                next(
-                    iter(translation_map.values())
-                ),  # First available if service language not found
+                next(iter(translation_map.values())),  # First available if service language not found
             )
 
             # If using base_topic, create a localized topic name
@@ -255,9 +244,7 @@ class NotificationService:
                 # Try to get translation in service language
                 default_translation = translation_map.get(
                     self.language.value,
-                    next(
-                        iter(translation_map.values())
-                    ),  # First available if service language not found
+                    next(iter(translation_map.values())),  # First available if service language not found
                 )
 
                 result = self.firebase_service.send_notification(
@@ -336,9 +323,7 @@ class NotificationService:
         logger.info(f"Registered device token: {device_token.id}")
         return device_token
 
-    async def get_device_tokens(
-        self, user_id: Optional[str] = None
-    ) -> List[DeviceTokenTable]:
+    async def get_device_tokens(self, user_id: Optional[str] = None) -> List[DeviceTokenTable]:
         """
         Get device tokens.
 
@@ -358,9 +343,7 @@ class NotificationService:
 
         return list(device_tokens)
 
-    async def subscribe_to_topic(
-        self, tokens: List[str], base_topic: str, language: LanguageEnum = None
-    ) -> Dict:
+    async def subscribe_to_topic(self, tokens: List[str], base_topic: str, language: LanguageEnum = None) -> Dict:
         """
         Subscribe device tokens to a language-specific topic.
 
@@ -382,9 +365,7 @@ class NotificationService:
         logger.info(f"Subscribed to topic: {localized_topic}, result: {result}")
         return result
 
-    async def unsubscribe_from_topic(
-        self, tokens: List[str], base_topic: str, language: LanguageEnum = None
-    ) -> Dict:
+    async def unsubscribe_from_topic(self, tokens: List[str], base_topic: str, language: LanguageEnum = None) -> Dict:
         """
         Unsubscribe device tokens from a language-specific topic.
 
@@ -524,7 +505,5 @@ class NotificationService:
         await self.db.execute(stmt)
         await self.db.commit()
 
-        logger.info(
-            f"Sent notification: {notification_id} to topic: {localized_topic}, result: {result}"
-        )
+        logger.info(f"Sent notification: {notification_id} to topic: {localized_topic}, result: {result}")
         return result

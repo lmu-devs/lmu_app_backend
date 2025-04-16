@@ -23,13 +23,9 @@ class NotificationTranslationCreate(NotificationTranslationBase):
 class NotificationTranslationResponse(NotificationTranslationBase):
     """Schema for notification translation response."""
 
-    notification_id: str = Field(
-        ..., description="ID of the notification this translation belongs to"
-    )
+    notification_id: str = Field(..., description="ID of the notification this translation belongs to")
     created_at: datetime = Field(..., description="When the translation was created")
-    updated_at: datetime = Field(
-        ..., description="When the translation was last updated"
-    )
+    updated_at: datetime = Field(..., description="When the translation was last updated")
 
     class Config:
         from_attributes = True
@@ -38,15 +34,9 @@ class NotificationTranslationResponse(NotificationTranslationBase):
 class NotificationBase(BaseModel):
     """Base schema for notification data."""
 
-    image_url: Optional[str] = Field(
-        None, description="URL of an image to include in the notification"
-    )
-    data: Optional[Dict[str, Any]] = Field(
-        None, description="Additional data to send with the notification"
-    )
-    base_topic: Optional[str] = Field(
-        None, description="Base topic name for localized notifications"
-    )
+    image_url: Optional[str] = Field(None, description="URL of an image to include in the notification")
+    data: Optional[Dict[str, Any]] = Field(None, description="Additional data to send with the notification")
+    base_topic: Optional[str] = Field(None, description="Base topic name for localized notifications")
 
 
 class NotificationCreate(NotificationBase):
@@ -55,9 +45,7 @@ class NotificationCreate(NotificationBase):
     # Default translation in the primary language
     title: str = Field(..., description="Notification title (default language)")
     body: str = Field(..., description="Notification body (default language)")
-    language: LanguageEnum = Field(
-        default=LanguageEnum.GERMAN, description="Language for the default translation"
-    )
+    language: LanguageEnum = Field(default=LanguageEnum.GERMAN, description="Language for the default translation")
     # Optional additional translations
     translations: Optional[List[NotificationTranslationCreate]] = Field(
         None, description="Additional translations for the notification"
@@ -69,13 +57,9 @@ class NotificationResponse(NotificationBase):
 
     id: str = Field(..., description="Notification ID")
     is_sent: bool = Field(..., description="Whether the notification has been sent")
-    sent_at: Optional[datetime] = Field(
-        None, description="When the notification was sent"
-    )
+    sent_at: Optional[datetime] = Field(None, description="When the notification was sent")
     created_at: datetime = Field(..., description="When the notification was created")
-    updated_at: datetime = Field(
-        ..., description="When the notification was last updated"
-    )
+    updated_at: datetime = Field(..., description="When the notification was last updated")
     translations: List[NotificationTranslationResponse] = Field(
         default_factory=list, description="Translations of this notification"
     )
@@ -104,9 +88,7 @@ class DeviceTokenBase(BaseModel):
 
     token: str = Field(..., description="Device token for push notifications")
     device_type: str = Field(..., description="Device type (android, ios, web)")
-    preferred_language: Optional[LanguageEnum] = Field(
-        None, description="User's preferred language for notifications"
-    )
+    preferred_language: Optional[LanguageEnum] = Field(None, description="User's preferred language for notifications")
 
 
 class DeviceTokenCreate(DeviceTokenBase):
@@ -121,9 +103,7 @@ class DeviceTokenResponse(DeviceTokenBase):
     id: str = Field(..., description="Device token ID")
     user_id: Optional[str] = Field(None, description="User ID")
     created_at: datetime = Field(..., description="When the device token was created")
-    updated_at: datetime = Field(
-        ..., description="When the device token was last updated"
-    )
+    updated_at: datetime = Field(..., description="When the device token was last updated")
 
     class Config:
         from_attributes = True
@@ -139,10 +119,6 @@ class TopicSubscriptionRequest(BaseModel):
 class TopicSubscriptionResponse(BaseModel):
     """Schema for topic subscription response."""
 
-    success: int = Field(
-        ..., description="Number of successful subscriptions/unsubscriptions"
-    )
-    failure: int = Field(
-        ..., description="Number of failed subscriptions/unsubscriptions"
-    )
+    success: int = Field(..., description="Number of successful subscriptions/unsubscriptions")
+    failure: int = Field(..., description="Number of failed subscriptions/unsubscriptions")
     error: Optional[str] = Field(None, description="Error message if any")

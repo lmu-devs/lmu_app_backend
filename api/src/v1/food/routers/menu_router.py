@@ -31,9 +31,7 @@ async def get_menu(
         description="Start date for menu search. Defaults to today",
         example=TimezoneManager.now_date(),
     ),
-    days_amount: int = Query(
-        default=14, description="Number of days to fetch from start date", ge=1, le=31
-    ),
+    days_amount: int = Query(default=14, description="Number of days to fetch from start date", ge=1, le=31),
     canteen_id: str = Query(
         default=None,
         description="Filter by canteen_id, if not provided, all canteens will be fetched",
@@ -41,9 +39,7 @@ async def get_menu(
         enum=CanteenEnum.get_active_canteens_values(),
     ),
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
-    only_liked_canteens: bool = Query(
-        default=False, description="Filter menus by liked canteens"
-    ),
+    only_liked_canteens: bool = Query(default=False, description="Filter menus by liked canteens"),
     language: LanguageEnum = Depends(get_language),
     db: AsyncSession = Depends(get_async_db),
 ):
@@ -54,8 +50,6 @@ async def get_menu(
     user_id = current_user.id if current_user else None
 
     service = MenuService(db)
-    menu_days = await service.get_days(
-        canteen_id, date_from, date_to, current_user, only_liked_canteens, language
-    )
+    menu_days = await service.get_days(canteen_id, date_from, date_to, current_user, only_liked_canteens, language)
 
     return menu_days_to_pydantic(menu_days, user_id)

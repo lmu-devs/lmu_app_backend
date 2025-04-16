@@ -18,14 +18,8 @@ class Cinema(BaseModel):
 
     @classmethod
     def from_table(cls, cinema: CinemaTable) -> "Cinema":
-        title = (
-            cinema.translations[0].title if cinema.translations else "not translated"
-        )
-        descriptions = (
-            cinema.translations[0].description
-            if cinema.translations
-            else "not translated"
-        )
+        title = cinema.translations[0].title if cinema.translations else "not translated"
+        descriptions = cinema.translations[0].description if cinema.translations else "not translated"
         location = Location.from_table(cinema.location) if cinema.location else None
         images = Images.from_table(cinema.images) if cinema.images else None
 

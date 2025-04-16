@@ -51,9 +51,7 @@ class DataCollectorApp:
         try:
             await self.setup()
 
-            tasks = [
-                asyncio.create_task(collector.run()) for collector in self.collectors
-            ]
+            tasks = [asyncio.create_task(collector.run()) for collector in self.collectors]
 
             await asyncio.gather(*tasks, return_exceptions=True)
 

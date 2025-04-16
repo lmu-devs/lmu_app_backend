@@ -26,9 +26,7 @@ class MenuDishAssociation(Base):
     canteen_id = Column(String, nullable=False)
 
     __table_args__ = (
-        ForeignKeyConstraint(
-            ["menu_day_date", "canteen_id"], ["menu_days.date", "menu_days.canteen_id"]
-        ),
+        ForeignKeyConstraint(["menu_day_date", "canteen_id"], ["menu_days.date", "menu_days.canteen_id"]),
     )
 
     dish = relationship("DishTable", back_populates="menu_associations")
@@ -42,17 +40,13 @@ class MenuDayTable(Base):
     __tablename__ = "menu_days"
 
     date = Column(Date, primary_key=True)
-    canteen_id = Column(
-        String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True
-    )
+    canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True)
     is_closed = Column(Boolean, nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     canteen = relationship("CanteenTable", back_populates="menu_days")
-    dish_associations = relationship(
-        "MenuDishAssociation", back_populates="menu_day", cascade="all, delete-orphan"
-    )
+    dish_associations = relationship("MenuDishAssociation", back_populates="menu_day", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<MenuDay(date='{self.date}', canteen_id='{self.canteen_id}')>"

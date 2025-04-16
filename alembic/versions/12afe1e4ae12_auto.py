@@ -30,12 +30,8 @@ def upgrade() -> None:
     op.drop_table("link_translations")
     op.drop_table("sport_course_likes")
     op.drop_table("links")
-    op.create_foreign_key(
-        None, "movie_screenings", "cinemas", ["cinema_id"], ["id"], ondelete="CASCADE"
-    )
-    op.add_column(
-        "movie_translations", sa.Column("genres", sa.ARRAY(sa.String()), nullable=True)
-    )
+    op.create_foreign_key(None, "movie_screenings", "cinemas", ["cinema_id"], ["id"], ondelete="CASCADE")
+    op.add_column("movie_translations", sa.Column("genres", sa.ARRAY(sa.String()), nullable=True))
     # ### end Alembic commands ###
 
 
@@ -48,21 +44,15 @@ def downgrade() -> None:
         sa.Column("id", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.Column("url", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.Column("favicon_url", sa.VARCHAR(), autoincrement=False, nullable=True),
-        sa.Column(
-            "types", postgresql.ARRAY(sa.VARCHAR()), autoincrement=False, nullable=False
-        ),
+        sa.Column("types", postgresql.ARRAY(sa.VARCHAR()), autoincrement=False, nullable=False),
         sa.PrimaryKeyConstraint("id", name="links_pkey"),
     )
     op.create_table(
         "sport_course_likes",
         sa.Column("sport_course_id", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.Column("user_id", sa.UUID(), autoincrement=False, nullable=False),
-        sa.Column(
-            "created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
+        sa.Column("created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
+        sa.Column("updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
         sa.ForeignKeyConstraint(
             ["sport_course_id"],
             ["sport_course.id"],
@@ -75,9 +65,7 @@ def downgrade() -> None:
             name="sport_course_likes_user_id_fkey",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint(
-            "sport_course_id", "user_id", name="sport_course_likes_pkey"
-        ),
+        sa.PrimaryKeyConstraint("sport_course_id", "user_id", name="sport_course_likes_pkey"),
     )
     op.create_table(
         "link_translations",
@@ -91,12 +79,8 @@ def downgrade() -> None:
         sa.Column("title", sa.VARCHAR(), autoincrement=False, nullable=False),
         sa.Column("description", sa.VARCHAR(), autoincrement=False, nullable=True),
         sa.Column("language", sa.VARCHAR(), autoincrement=False, nullable=False),
-        sa.Column(
-            "created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
+        sa.Column("created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
+        sa.Column("updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
         sa.PrimaryKeyConstraint("link_id", "language", name="link_translations_pkey"),
     )
     op.create_table(
@@ -129,20 +113,14 @@ def downgrade() -> None:
             name="movie_screening_locations_screening_id_fkey",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint(
-            "screening_id", "address", name="movie_screening_locations_pkey"
-        ),
+        sa.PrimaryKeyConstraint("screening_id", "address", name="movie_screening_locations_pkey"),
     )
     op.create_table(
         "movie_screening_likes",
         sa.Column("movie_screening_id", sa.UUID(), autoincrement=False, nullable=False),
         sa.Column("user_id", sa.UUID(), autoincrement=False, nullable=False),
-        sa.Column(
-            "created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
-        sa.Column(
-            "updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
+        sa.Column("created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
+        sa.Column("updated_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
         sa.ForeignKeyConstraint(
             ["movie_screening_id"],
             ["movie_screenings.id"],
@@ -155,9 +133,7 @@ def downgrade() -> None:
             name="movie_screening_likes_user_id_fkey",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint(
-            "movie_screening_id", "user_id", name="movie_screening_likes_pkey"
-        ),
+        sa.PrimaryKeyConstraint("movie_screening_id", "user_id", name="movie_screening_likes_pkey"),
     )
     op.create_table(
         "movie_genre_associations",
@@ -175,8 +151,6 @@ def downgrade() -> None:
             name="movie_genre_associations_movie_id_fkey",
             ondelete="CASCADE",
         ),
-        sa.PrimaryKeyConstraint(
-            "movie_id", "genre_id", name="movie_genre_associations_pkey"
-        ),
+        sa.PrimaryKeyConstraint("movie_id", "genre_id", name="movie_genre_associations_pkey"),
     )
     # ### end Alembic commands ###

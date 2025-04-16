@@ -18,22 +18,14 @@ class MovieTrailer(BaseModel):
 
     @classmethod
     def from_table(cls, trailer: MovieTrailerTable) -> "MovieTrailer":
-        trailer_translations: MovieTrailerTranslationTable = (
-            trailer.translations[0] if trailer.translations else None
-        )
+        trailer_translations: MovieTrailerTranslationTable = trailer.translations[0] if trailer.translations else None
         title = trailer_translations.title if trailer_translations else "not translated"
         key = trailer_translations.key if trailer_translations else "not translated"
 
         url = f"https://www.youtube.com/watch?v={key}" if key else None
-        thumbnail_url = (
-            f"https://img.youtube.com/vi/{key}/hqdefault.jpg" if key else None
-        )
+        thumbnail_url = f"https://img.youtube.com/vi/{key}/hqdefault.jpg" if key else None
 
-        thumbnail = (
-            Image.from_params(thumbnail_url, f"YouTube Thumbnail for {title}")
-            if thumbnail_url
-            else None
-        )
+        thumbnail = Image.from_params(thumbnail_url, f"YouTube Thumbnail for {title}") if thumbnail_url else None
 
         return MovieTrailer(
             id=trailer.id,
@@ -50,6 +42,4 @@ class MovieTrailers(RootModel):
 
     @classmethod
     def from_table(cls, trailers: List[MovieTrailerTable]) -> "MovieTrailers":
-        return MovieTrailers(
-            root=[MovieTrailer.from_table(trailer) for trailer in trailers]
-        )
+        return MovieTrailers(root=[MovieTrailer.from_table(trailer) for trailer in trailers])

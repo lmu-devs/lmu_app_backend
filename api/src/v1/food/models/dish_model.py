@@ -28,9 +28,7 @@ class Dish(BaseModel):
         if user_id:
             user_likes_dish = any(like.user_id == user_id for like in dish.likes)
 
-        rating = Rating.from_params(
-            like_count=dish.like_count, is_liked=user_likes_dish
-        )
+        rating = Rating.from_params(like_count=dish.like_count, is_liked=user_likes_dish)
 
         prices = DishPrices.from_table(dish.prices)
 

@@ -37,9 +37,7 @@ class NotificationTable(Base):
 class NotificationTranslationTable(LanguageTable):
     __tablename__ = "notification_translations"
 
-    notification_id = Column(
-        UUID, ForeignKey("notifications.id", ondelete="CASCADE"), primary_key=True
-    )
+    notification_id = Column(UUID, ForeignKey("notifications.id", ondelete="CASCADE"), primary_key=True)
     title = Column(String(255), nullable=False)
     body = Column(Text, nullable=False)
     notification = relationship("NotificationTable", back_populates="translations")

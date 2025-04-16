@@ -25,26 +25,16 @@ class DishTable(Base):
     dish_type = Column(String, nullable=False)
     dish_category = Column(String, nullable=False)
     labels = Column(ARRAY(String), nullable=False)
-    price_simple = Column(
-        String, nullable=True
-    )  # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
+    price_simple = Column(String, nullable=True)  # price abbreviation like 1 = €, 2 = €€, 3 = €€€ based on the price
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 
     # Relationship
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")
-    prices = relationship(
-        "DishPriceTable", back_populates="dish", cascade="all, delete-orphan"
-    )
-    likes = relationship(
-        "DishLikeTable", back_populates="dish", cascade="all, delete-orphan"
-    )
-    translations = relationship(
-        "DishTranslationTable", back_populates="dish", cascade="all, delete-orphan"
-    )
-    images = relationship(
-        "DishImageTable", back_populates="dish", cascade="all, delete-orphan"
-    )
+    prices = relationship("DishPriceTable", back_populates="dish", cascade="all, delete-orphan")
+    likes = relationship("DishLikeTable", back_populates="dish", cascade="all, delete-orphan")
+    translations = relationship("DishTranslationTable", back_populates="dish", cascade="all, delete-orphan")
+    images = relationship("DishImageTable", back_populates="dish", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Dish(id='{self.id}', type='{self.dish_type}')>"
@@ -65,9 +55,7 @@ class DishPriceTable(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     category = Column(String, nullable=False)
-    dish_id = Column(
-        UUID(as_uuid=True), ForeignKey("dishes.id", ondelete="CASCADE"), nullable=False
-    )
+    dish_id = Column(UUID(as_uuid=True), ForeignKey("dishes.id", ondelete="CASCADE"), nullable=False)
     base_price = Column(Float, nullable=True)
     price_per_unit = Column(Float, nullable=True)
     unit = Column(String, nullable=True)
@@ -97,12 +85,8 @@ class DishLikeTable(Base):
     __tablename__ = "dish_likes"
 
     id = Column(Integer, primary_key=True, index=True)
-    dish_id = Column(
-        UUID(as_uuid=True), ForeignKey("dishes.id", ondelete="CASCADE"), nullable=False
-    )
-    user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
+    dish_id = Column(UUID(as_uuid=True), ForeignKey("dishes.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

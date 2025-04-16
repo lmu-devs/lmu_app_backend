@@ -41,9 +41,9 @@ class LinkBenefitService:
         ).delete(synchronize_session=False)
 
         # Then delete the links that aren't in constants
-        self.db.query(LinkBenefitTable).filter(
-            ~LinkBenefitTable.id.in_(constant_benefit_ids)
-        ).delete(synchronize_session=False)
+        self.db.query(LinkBenefitTable).filter(~LinkBenefitTable.id.in_(constant_benefit_ids)).delete(
+            synchronize_session=False
+        )
 
     def _merge_benefits_in_db(self):
         self._delete_benefits_not_in_constants()
@@ -70,9 +70,7 @@ class LinkBenefitService:
     def _add_missing_aliases(self):
 
         benefit_translations = (
-            self.db.query(LinkBenefitTranslationTable)
-            .filter(LinkBenefitTranslationTable.aliases.is_(None))
-            .all()
+            self.db.query(LinkBenefitTranslationTable).filter(LinkBenefitTranslationTable.aliases.is_(None)).all()
         )
 
         for benefit_translation in benefit_translations:
@@ -94,11 +92,7 @@ class LinkBenefitService:
         self.db.commit()
 
     def _add_missing_favicon_urls(self):
-        link_favicon_urls = (
-            self.db.query(LinkBenefitTable)
-            .filter(LinkBenefitTable.favicon_url.is_(None))
-            .all()
-        )
+        link_favicon_urls = self.db.query(LinkBenefitTable).filter(LinkBenefitTable.favicon_url.is_(None)).all()
         for link in link_favicon_urls:
             link.favicon_url = self.favicon_service.get_favicon_url(link.url)
             self.db.merge(link)

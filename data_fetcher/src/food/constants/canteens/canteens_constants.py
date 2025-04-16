@@ -14,12 +14,8 @@ class CanteensConstants:
             id=CanteenEnum.MENSA_LEOPOLDSTR,
             name="Leopoldstraße",
             type=CanteenTypeEnum.MENSA,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.MENSA_LEOPOLDSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_LEOPOLDSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_LEOPOLDSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_LEOPOLDSTR),
             url_id=411,
         ),
         Canteen(
@@ -27,9 +23,7 @@ class CanteensConstants:
             name="Lothstraße",
             type=CanteenTypeEnum.MENSA,
             location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_LOTHSTR),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_LOTHSTR
-            ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_LOTHSTR),
             url_id=431,
         ),
         Canteen(
@@ -37,9 +31,7 @@ class CanteensConstants:
             name="Arcisstraße",
             type=CanteenTypeEnum.MENSA,
             location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_ARCISSTR),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_ARCISSTR
-            ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_ARCISSTR),
             url_id=421,
         ),
         Canteen(
@@ -47,21 +39,15 @@ class CanteensConstants:
             name="Garching",
             type=CanteenTypeEnum.MENSA,
             location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_GARCHING),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_GARCHING
-            ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_GARCHING),
             url_id=422,
         ),
         Canteen(
             id=CanteenEnum.MENSA_MARTINSRIED,
             name="Martinsried",
             type=CanteenTypeEnum.MENSA,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.MENSA_MARTINSRIED
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_MARTINSRIED
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_MARTINSRIED),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_MARTINSRIED),
             url_id=412,
         ),
         Canteen(
@@ -69,261 +55,175 @@ class CanteensConstants:
             name="Pasing",
             type=CanteenTypeEnum.MENSA,
             location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_PASING),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_PASING
-            ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_PASING),
             url_id=432,
         ),
         Canteen(
             id=CanteenEnum.MENSA_WEIHENSTEPHAN,
             name="Weihenstephan",
             type=CanteenTypeEnum.MENSA,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.MENSA_WEIHENSTEPHAN
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_WEIHENSTEPHAN
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_WEIHENSTEPHAN),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_WEIHENSTEPHAN),
             url_id=423,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_ARCISSTR,
             name="Arcisstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_ARCISSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_ARCISSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_ARCISSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_ARCISSTR),
             url_id=450,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_BENEDIKTBEUREN,
             name="Benediktbeuren",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_BENEDIKTBEUREN
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_BENEDIKTBEUREN
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_BENEDIKTBEUREN),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_BENEDIKTBEUREN),
             url_id=417,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_SCHELLINGSTR,
             name="Schellingstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_SCHELLINGSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_SCHELLINGSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_SCHELLINGSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_SCHELLINGSTR),
             url_id=416,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GOETHESTR,
             name="Goethestraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_GOETHESTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_GOETHESTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_GOETHESTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_GOETHESTR),
             url_id=418,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_BUTENANDSTR,
             name="Butenandstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_BUTENANDSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_BUTENANDSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_BUTENANDSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_BUTENANDSTR),
             url_id=414,
         ),
         Canteen(
             id=CanteenEnum.MENSA_ROSENHEIM,
             name="Rosenheim",
             type=CanteenTypeEnum.MENSA,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.MENSA_ROSENHEIM
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.MENSA_ROSENHEIM
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.MENSA_ROSENHEIM),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.MENSA_ROSENHEIM),
             url_id=441,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_AKADEMIESTR,
             name="Akademiestraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_AKADEMIESTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_AKADEMIESTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_AKADEMIESTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_AKADEMIESTR),
             url_id=455,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_KARLSTR,
             name="Karlstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_KARLSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_KARLSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_KARLSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_KARLSTR),
             url_id=453,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_SCHILLERSTR,
             name="Schillerstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_SCHILLERSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_SCHILLERSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_SCHILLERSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_SCHILLERSTR),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN,
             name="Weihenstephan Akademie",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_AKADEMIE_WEIHENSTEPHAN),
             url_id=456,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_OETTINGENSTR,
             name="Oettingenstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_OETTINGENSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_OETTINGENSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_OETTINGENSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_OETTINGENSTR),
             url_id=424,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_ADALBERTSTR,
             name="Adalbertstraße",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_ADALBERTSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_ADALBERTSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_ADALBERTSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_ADALBERTSTR),
             url_id=452,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_OLYMPIACAMPUS,
             name="Olympiacampus",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_OLYMPIACAMPUS
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_OLYMPIACAMPUS
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_OLYMPIACAMPUS),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_OLYMPIACAMPUS),
             url_id=425,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_EICHINGER_PLATZ,
             name="Eichinger Platz",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_EICHINGER_PLATZ
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_EICHINGER_PLATZ
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_EICHINGER_PLATZ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_EICHINGER_PLATZ),
             url_id=451,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_MARTINSRIED,
             name="Martinsried",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_MARTINSRIED
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_MARTINSRIED
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_MARTINSRIED),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_MARTINSRIED),
             url_id=415,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15,
             name="Garching Boltzmannstr 15",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN15),
             url_id=457,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19,
             name="Garching Boltzmannstr 19",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_GARCHING_BOLTZMANN19),
             url_id=426,
         ),
         Canteen(
             id=CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM,
             name="Oberschleissheim",
             type=CanteenTypeEnum.STUBISTRO,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUBISTRO_OBERSCHLEISSHEIM),
             url_id=419,
         ),
         Canteen(
             id=CanteenEnum.STUCAFE_ARCISSTR,
             name="Arcisstraße",
             type=CanteenTypeEnum.STUCAFE,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUCAFE_ARCISSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUCAFE_ARCISSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_ARCISSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_ARCISSTR),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.STUCAFE_LEOPOLDSTR,
             name="Leopoldstraße",
             type=CanteenTypeEnum.STUCAFE,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUCAFE_LEOPOLDSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUCAFE_LEOPOLDSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_LEOPOLDSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_LEOPOLDSTR),
             url_id=None,
         ),
         Canteen(
@@ -331,33 +231,23 @@ class CanteensConstants:
             name="Pasing",
             type=CanteenTypeEnum.STUCAFE,
             location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_PASING),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUCAFE_PASING
-            ),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_PASING),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS,
             name="Weihenstephan Maximus",
             type=CanteenTypeEnum.STUCAFE,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_WEIHENSTEPHAN_MAXIMUS),
             url_id=525,
         ),
         Canteen(
             id=CanteenEnum.STUCAFE_LOTHSTR,
             name="Lothstraße",
             type=CanteenTypeEnum.STUCAFE,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.STUCAFE_LOTHSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.STUCAFE_LOTHSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.STUCAFE_LOTHSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.STUCAFE_LOTHSTR),
             url_id=533,
         ),
         # Canteen(
@@ -413,60 +303,40 @@ class CanteensConstants:
             id=CanteenEnum.ESPRESSOBAR_LUDWIGSTR,
             name="Ludwigstraße",
             type=CanteenTypeEnum.ESPRESSOBAR,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.ESPRESSOBAR_LUDWIGSTR
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.ESPRESSOBAR_LUDWIGSTR
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.ESPRESSOBAR_LUDWIGSTR),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.ESPRESSOBAR_LUDWIGSTR),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.ESPRESSOBAR_MARTINSRIED,
             name="Martinsried",
             type=CanteenTypeEnum.ESPRESSOBAR,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.ESPRESSOBAR_MARTINSRIED
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.ESPRESSOBAR_MARTINSRIED
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.ESPRESSOBAR_MARTINSRIED),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.ESPRESSOBAR_MARTINSRIED),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.ESPRESSOBAR_GARCHING_APE,
             name="Garching Ape",
             type=CanteenTypeEnum.ESPRESSOBAR,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.ESPRESSOBAR_GARCHING_APE
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.ESPRESSOBAR_GARCHING_APE
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.ESPRESSOBAR_GARCHING_APE),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.ESPRESSOBAR_GARCHING_APE),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.ESPRESSOBAR_GARCHING,
             name="Garching",
             type=CanteenTypeEnum.ESPRESSOBAR,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.ESPRESSOBAR_GARCHING
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.ESPRESSOBAR_GARCHING
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.ESPRESSOBAR_GARCHING),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.ESPRESSOBAR_GARCHING),
             url_id=None,
         ),
         Canteen(
             id=CanteenEnum.ESPRESSOBAR_WEIHENSTEPHAN,
             name="Weihenstephan",
             type=CanteenTypeEnum.ESPRESSOBAR,
-            location=CanteenLocationsConstants.get_location(
-                CanteenEnum.ESPRESSOBAR_WEIHENSTEPHAN
-            ),
-            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(
-                CanteenEnum.ESPRESSOBAR_WEIHENSTEPHAN
-            ),
+            location=CanteenLocationsConstants.get_location(CanteenEnum.ESPRESSOBAR_WEIHENSTEPHAN),
+            opening_hours=CanteenOpeningHoursConstants.get_opening_hours(CanteenEnum.ESPRESSOBAR_WEIHENSTEPHAN),
             url_id=None,
         ),
         # Canteen(

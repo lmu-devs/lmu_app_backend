@@ -6,10 +6,7 @@ from shared.src.tables import MenuDayTable
 
 
 def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> MenuDay:
-    dishes_dto = [
-        Dish.from_table(association.dish, user_id=user_id)
-        for association in menu_day.dish_associations
-    ]
+    dishes_dto = [Dish.from_table(association.dish, user_id=user_id) for association in menu_day.dish_associations]
 
     return MenuDay(
         date=menu_day.date,
@@ -19,9 +16,5 @@ def menu_day_to_pydantic(menu_day: MenuDayTable, user_id: uuid.UUID = None) -> M
     )
 
 
-def menu_days_to_pydantic(
-    menu_days: List[MenuDayTable], user_id: uuid.UUID = None
-) -> Menus:
-    return Menus(
-        root=[menu_day_to_pydantic(menu_day, user_id) for menu_day in menu_days]
-    )
+def menu_days_to_pydantic(menu_days: List[MenuDayTable], user_id: uuid.UUID = None) -> Menus:
+    return Menus(root=[menu_day_to_pydantic(menu_day, user_id) for menu_day in menu_days])

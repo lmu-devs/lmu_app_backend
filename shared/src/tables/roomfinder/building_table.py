@@ -15,9 +15,7 @@ class BuildingTable(Base):
     # Relationships
     street = relationship("StreetTable", back_populates="buildings")
     building_parts = relationship("BuildingPartTable", back_populates="building")
-    location = relationship(
-        "BuildingLocationTable", back_populates="building", uselist=False
-    )
+    location = relationship("BuildingLocationTable", back_populates="building", uselist=False)
 
 
 class BuildingLocationTable(Base, LocationTable):

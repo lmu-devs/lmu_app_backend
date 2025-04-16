@@ -15,9 +15,7 @@ class LinkResource(BaseModel):
 
     @classmethod
     def from_table(cls, link: LinkResourceTable):
-        translations: LinkResourceTranslationTable = (
-            link.translations[0] if link.translations else None
-        )
+        translations: LinkResourceTranslationTable = link.translations[0] if link.translations else None
         title = translations.title if translations else "not translated"
         description = translations.description if translations else "not translated"
         aliases = translations.aliases if translations and translations.aliases else []

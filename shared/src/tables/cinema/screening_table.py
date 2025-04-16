@@ -24,9 +24,7 @@ class MovieScreeningTable(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     date = Column(DateTime)
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete="CASCADE"))
-    university_id = Column(
-        Enum(UniversityEnum), ForeignKey("universities.id", ondelete="CASCADE")
-    )
+    university_id = Column(Enum(UniversityEnum), ForeignKey("universities.id", ondelete="CASCADE"))
     cinema_id = Column(String, ForeignKey("cinemas.id", ondelete="CASCADE"))
     entry_time = Column(DateTime, nullable=True)
     start_time = Column(DateTime, nullable=True)
@@ -41,9 +39,7 @@ class MovieScreeningTable(Base):
     movie = relationship("MovieTable", back_populates="screenings")
     university = relationship("UniversityTable", back_populates="screenings")
     cinema = relationship("CinemaTable", back_populates="screenings")
-    location = relationship(
-        "MovieLocationTable", back_populates="screening", uselist=False
-    )
+    location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
 
     __table_args__ = (UniqueConstraint("date", "movie_id", name="uix_date_movie_id"),)
 

@@ -50,6 +50,4 @@ class MovieScreenings(RootModel):
 
     @classmethod
     def from_table(cls, screenings: List[MovieScreeningTable]) -> "MovieScreenings":
-        return MovieScreenings(
-            root=[MovieScreening.from_table(screening) for screening in screenings]
-        )
+        return MovieScreenings(root=[MovieScreening.from_table(screening) for screening in screenings])

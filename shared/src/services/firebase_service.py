@@ -41,9 +41,7 @@ class FirebaseService:
                 cred = credentials.Certificate(cred_dict)
             else:
                 # Use credentials from file
-                cred_path = os.environ.get(
-                    "FIREBASE_CREDENTIALS_PATH", "/env/firebaseServiceAccountKey.json"
-                )
+                cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH", "/env/firebaseServiceAccountKey.json")
                 if os.path.exists(cred_path):
                     cred = credentials.Certificate(cred_path)
                 else:

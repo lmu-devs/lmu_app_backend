@@ -46,9 +46,7 @@ class LikeService:
 
         except SQLAlchemyError as e:
             logger.error(f"Failed to fetch like status: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch like status", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch like status", extra={"original_error": str(e)})
 
     async def toggle_like(
         self,
@@ -63,9 +61,7 @@ class LikeService:
         Returns:
             bool: True if liked, False if unliked
         """
-        existing_like = await self.get_like(
-            like_table, entity_id, user_id, entity_id_column
-        )
+        existing_like = await self.get_like(like_table, entity_id, user_id, entity_id_column)
 
         try:
             if existing_like:
@@ -76,9 +72,7 @@ class LikeService:
                 if entity_id_column is None:
                     entity_id_column = f"{like_table.__tablename__[:-6]}_id"
 
-                new_like = like_table(
-                    **{entity_id_column: entity_id, "user_id": user_id}
-                )
+                new_like = like_table(**{entity_id_column: entity_id, "user_id": user_id})
                 self.db.add(new_like)
                 await self.db.commit()
                 return True
@@ -86,6 +80,4 @@ class LikeService:
         except SQLAlchemyError as e:
             await self.db.rollback()
             logger.error(f"Failed to toggle like status: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to toggle like status", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to toggle like status", extra={"original_error": str(e)})

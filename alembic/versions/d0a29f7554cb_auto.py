@@ -207,12 +207,8 @@ def upgrade() -> None:
         ["id"],
         ondelete="CASCADE",
     )
-    op.create_foreign_key(
-        None, "sport_course_time_slot", "sport_course", ["sport_course_id"], ["id"]
-    )
-    op.create_foreign_key(
-        None, "sport_course_translation", "sport_course", ["sport_course_id"], ["id"]
-    )
+    op.create_foreign_key(None, "sport_course_time_slot", "sport_course", ["sport_course_id"], ["id"])
+    op.create_foreign_key(None, "sport_course_translation", "sport_course", ["sport_course_id"], ["id"])
     op.alter_column(
         "university_translations",
         "created_at",

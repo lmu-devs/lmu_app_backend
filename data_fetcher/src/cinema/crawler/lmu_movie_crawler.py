@@ -38,9 +38,7 @@ class LmuScreeningCrawler:
         response = requests.get(f"{self.base_url}/programm")
 
         if response.status_code != 200:
-            logger.error(
-                f"Failed to fetch the page, status code: {response.status_code}"
-            )
+            logger.error(f"Failed to fetch the page, status code: {response.status_code}")
             return []
 
         logger.info("Successfully fetched LMU movie page")
@@ -74,9 +72,7 @@ class LmuScreeningCrawler:
             year = int(year_match.group(1)) if year_match else None
 
             # Clean up title
-            title = re.sub(
-                r"\(R:.*?\d{4}\)", "", full_title
-            )  # Remove director and year
+            title = re.sub(r"\(R:.*?\d{4}\)", "", full_title)  # Remove director and year
             title = re.sub(r"aka.*$", "", title)  # Remove aka part
             title = title.strip()
 

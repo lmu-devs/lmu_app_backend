@@ -15,9 +15,7 @@ class LinkBenefit(BaseModel):
 
     @classmethod
     def from_table(cls, benefit: LinkBenefitTable):
-        translations: LinkBenefitTranslationTable = (
-            benefit.translations[0] if benefit.translations else None
-        )
+        translations: LinkBenefitTranslationTable = benefit.translations[0] if benefit.translations else None
         title = translations.title if translations else "not translated"
         description = translations.description if translations else "not translated"
         aliases = translations.aliases if translations and translations.aliases else []

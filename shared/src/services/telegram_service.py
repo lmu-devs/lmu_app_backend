@@ -38,9 +38,7 @@ class TelegramService:
                 f"App-Version: {app_version} on {system_version}"
             )
 
-            await self.bot.send_message(
-                chat_id=self.chat_id, text=text, parse_mode="HTML"
-            )
+            await self.bot.send_message(chat_id=self.chat_id, text=text, parse_mode="HTML")
         except TelegramError as e:
             logger.error(f"Failed to send Telegram notification: {str(e)}")
 

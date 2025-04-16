@@ -36,9 +36,7 @@ class CanteenImageService:
 
             # Try to match the filename with a canteen enum
             try:
-                canteen_enum = next(
-                    enum for enum in CanteenEnum if enum.value.lower() in name.lower()
-                )
+                canteen_enum = next(enum for enum in CanteenEnum if enum.value.lower() in name.lower())
 
                 # Format display name with number
                 base_name, number = name.rsplit("_", 1)

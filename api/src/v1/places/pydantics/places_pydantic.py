@@ -27,7 +27,5 @@ async def places_to_pydantic(places: List[any]) -> List[Place]:
         else:
             raise ValueError(f"Invalid place type: {type(place)}")
 
-        places_pydantic.append(
-            Place(id=id, location=Location.from_table(place.location), type=place_type)
-        )
+        places_pydantic.append(Place(id=id, location=Location.from_table(place.location), type=place_type))
     return places_pydantic

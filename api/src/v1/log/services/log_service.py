@@ -31,9 +31,7 @@ class LogService:
         log_files = self.get_log_files()
         if not log_files:
             logger.error("No log files found")
-            raise NotFoundError(
-                detail="No log files found", extra={"directory": self.log_directory}
-            )
+            raise NotFoundError(detail="No log files found", extra={"directory": self.log_directory})
 
         # Create a temporary zip file
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

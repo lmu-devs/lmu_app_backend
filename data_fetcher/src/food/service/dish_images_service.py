@@ -30,9 +30,7 @@ class DishImageService:
         self.file_management_service = FileManagementService("shared/src/assets/dishes")
         self.image_service = ImageService()
 
-    def _get_dish_prompt(
-        self, dish_name: str, dish_type: str, labels: list[str]
-    ) -> str:
+    def _get_dish_prompt(self, dish_name: str, dish_type: str, labels: list[str]) -> str:
         prefix = "Delicious and Simplified 3D"
 
         def get_color(dish_type: str, labels: list[str]) -> str:
@@ -66,16 +64,12 @@ class DishImageService:
         print(prompt)
         return prompt
 
-    async def _generate_image_with_transparent_background(
-        self, prompt: str, filename: str
-    ):
+    async def _generate_image_with_transparent_background(self, prompt: str, filename: str):
         image_path = await self.image_generation_service.generate_image(
             prompt, height=512, width=512, steps=12, scales=4.5, seed=12345
         )
         image_path = await self.remove_background_service.remove_background(image_path)
-        return await self.file_management_service.save_file_from_path(
-            image_path, filename=filename
-        )
+        return await self.file_management_service.save_file_from_path(image_path, filename=filename)
 
     def _generate_image_url(self, filepath: str) -> str:
         filename = os.path.basename(filepath)
@@ -90,21 +84,13 @@ class DishImageService:
             raise ValueError(f"No English translation found for dish {dish_obj.id}")
 
         dish_translation_title = dish_translation.title
-        file_name = FileManagementService.generate_save_file_name(
-            dish_translation_title
-        )
-        prompt = self._get_dish_prompt(
-            dish_translation_title, dish_obj.dish_type, dish_obj.labels
-        )
+        file_name = FileManagementService.generate_save_file_name(dish_translation_title)
+        prompt = self._get_dish_prompt(dish_translation_title, dish_obj.dish_type, dish_obj.labels)
         generated_image_path = await self._generate_image_with_transparent_background(
             prompt, f"{file_name}-{dish_obj.id}.png"
         )
-        image_path = await self.image_service.convert_image(
-            generated_image_path, ImageFormatEnum.WEBP
-        )
-        image_path = await self.image_service.resize_image(
-            image_path, max_size=(48 * 6, 48 * 6)
-        )
+        image_path = await self.image_service.convert_image(generated_image_path, ImageFormatEnum.WEBP)
+        image_path = await self.image_service.resize_image(image_path, max_size=(48 * 6, 48 * 6))
 
         await self.file_management_service.delete_file(generated_image_path)
         return DishImageTable(
@@ -122,11 +108,7 @@ if __name__ == "__main__":
         dish_type="Studitopf",
         dish_category="dessert",
         labels=["MEAT"],
-        translations=[
-            DishTranslationTable(
-                dish_id="1", language=LanguageEnum.ENGLISH_US, title="Chicken curry"
-            )
-        ],
+        translations=[DishTranslationTable(dish_id="1", language=LanguageEnum.ENGLISH_US, title="Chicken curry")],
     )
     dish_obj = DishTable(
         id="1",

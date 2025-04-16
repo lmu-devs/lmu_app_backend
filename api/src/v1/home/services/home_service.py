@@ -19,21 +19,15 @@ class HomeService:
             iban="DE54 7005 0000 3701 1903 15",
             bic="BYLADEMM",
             reference="Matrikelnr/20251/LMU Rueckmeldung SoSe 2025",
-            time_period=TimePeriod(
-                start_date=datetime(2024, 12, 4), end_date=datetime(2025, 2, 8)
-            ),
+            time_period=TimePeriod(start_date=datetime(2024, 12, 4), end_date=datetime(2025, 2, 8)),
         )
 
     async def get_home_data(self):
         # Hardcoded data for now
         return Home(
             semester_fee=self.get_semester_fee(),
-            lecture_time=TimePeriod(
-                start_date=datetime(2024, 10, 14), end_date=datetime(2025, 2, 7)
-            ),
-            lecture_free_time=TimePeriod(
-                start_date=datetime(2025, 2, 8), end_date=datetime(2025, 4, 22)
-            ),
+            lecture_time=TimePeriod(start_date=datetime(2024, 10, 14), end_date=datetime(2025, 2, 7)),
+            lecture_free_time=TimePeriod(start_date=datetime(2025, 2, 8), end_date=datetime(2025, 4, 22)),
             links=[
                 Link(title="Moodle", url="https://moodle.lmu.de/"),
                 Link(title="LSF", url="https://lsf.verwaltung.uni-muenchen.de"),

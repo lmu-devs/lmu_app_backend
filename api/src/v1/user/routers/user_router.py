@@ -19,9 +19,7 @@ user_logger = get_user_logger(__name__)
 async def create_user(
     db: AsyncSession = Depends(get_async_db),
     api_key: APIKeyHeader = Depends(APIKey.verify_system_api_key),
-    device_id: str | None = Query(
-        None, description="Device ID for deterministic API key generation"
-    ),
+    device_id: str | None = Query(None, description="Device ID for deterministic API key generation"),
 ):
     service = UserService(db)
     if device_id and await service.is_existing_user(device_id):

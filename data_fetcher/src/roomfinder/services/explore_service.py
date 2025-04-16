@@ -52,9 +52,7 @@ class RoomfinderService:
             streets = Street.from_json_list(street_data)
 
         for street in streets:
-            self.db.merge(
-                StreetTable(id=street.code, name=street.name, city_id=street.cityCode)
-            )
+            self.db.merge(StreetTable(id=street.code, name=street.name, city_id=street.cityCode))
         self.db.flush()
 
     def _update_buildings(self) -> None:

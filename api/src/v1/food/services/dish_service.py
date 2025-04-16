@@ -88,9 +88,7 @@ class DishService:
 
         except SQLAlchemyError as e:
             logger.error(f"Failed to fetch dishes: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch dishes", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch dishes", extra={"original_error": str(e)})
 
     async def toggle_like(self, dish_id: uuid.UUID, user_id: uuid.UUID) -> bool:
         return await self.like_service.toggle_like(DishLikeTable, dish_id, user_id)
@@ -135,6 +133,4 @@ class DishService:
             return dish_dates
 
         except SQLAlchemyError as e:
-            raise DatabaseError(
-                detail="Failed to fetch dish dates", extra={"original_error": str(e)}
-            )
+            raise DatabaseError(detail="Failed to fetch dish dates", extra={"original_error": str(e)})

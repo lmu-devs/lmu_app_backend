@@ -16,9 +16,7 @@ class DeviceTokenTable(Base):
     user_id = Column(UUID, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     token = Column(Text, nullable=False, unique=True)
     device_type = Column(String(50), nullable=False)  # android, ios, web
-    language = Column(
-        String(10), nullable=True
-    )  # Store language code (e.g., "de-DE", "en-US")
+    language = Column(String(10), nullable=True)  # Store language code (e.g., "de-DE", "en-US")
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
 

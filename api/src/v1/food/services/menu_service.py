@@ -68,9 +68,7 @@ class MenuService:
             )
 
             # Add date filters
-            stmt = stmt.where(
-                MenuDayTable.date >= date_from, MenuDayTable.date <= date_to
-            )
+            stmt = stmt.where(MenuDayTable.date >= date_from, MenuDayTable.date <= date_to)
             logger.info(
                 f"Fetching menu days for canteen {canteen_id} from {date_from} to {date_to} with language {language.value}, user_id: {current_user.id if current_user else None}, only_liked_canteens: {only_liked_canteens}"
             )
@@ -92,9 +90,7 @@ class MenuService:
             menu_days = result.scalars().unique().all()
 
             if not menu_days:
-                logger.warning(
-                    f"No menus found for {canteen_id} between {date_from} and {date_to}"
-                )
+                logger.warning(f"No menus found for {canteen_id} between {date_from} and {date_to}")
                 raise NotFoundError(
                     detail="No menus found for the specified period",
                     extra={
@@ -108,6 +104,4 @@ class MenuService:
 
         except SQLAlchemyError as e:
             logger.error(f"Database error while fetching menus: {str(e)}")
-            raise DatabaseError(
-                detail="Failed to fetch menus", extra={"original_error": str(e)}
-            ) from e
+            raise DatabaseError(detail="Failed to fetch menus", extra={"original_error": str(e)}) from e

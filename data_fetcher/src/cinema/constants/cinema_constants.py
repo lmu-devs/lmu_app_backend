@@ -36,16 +36,12 @@ lmu_cinema = CinemaTable(
             language=LanguageEnum.GERMAN.value,
             title="U Kino",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Eigene Snacks erlaubt"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Eigene Snacks erlaubt").model_dump(),
                 CinemaDescription(
                     emoji="🎟️",
                     description="Keine Vorverkauf- und Reservierungsmöglichkeit",
                 ).model_dump(),
-                CinemaDescription(
-                    emoji="☁️", description="Erste Besucher erhalten ein Kissen"
-                ).model_dump(),
+                CinemaDescription(emoji="☁️", description="Erste Besucher erhalten ein Kissen").model_dump(),
             ],
         ),
         CinemaTranslationTable(
@@ -53,15 +49,9 @@ lmu_cinema = CinemaTable(
             language=LanguageEnum.ENGLISH_US.value,
             title="U Kino",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Bring you own snacks"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️", description="No presale, and reservation"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="☁️", description="Free pillow for first visitors"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Bring you own snacks").model_dump(),
+                CinemaDescription(emoji="🎟️", description="No presale, and reservation").model_dump(),
+                CinemaDescription(emoji="☁️", description="Free pillow for first visitors").model_dump(),
             ],
         ),
     ],
@@ -90,12 +80,8 @@ hm_cinema = CinemaTable(
             language=LanguageEnum.GERMAN.value,
             title="HM Kino",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️", description="(Vor)verkauf vor Ort"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Eigene Snacks erlaubt").model_dump(),
+                CinemaDescription(emoji="🎟️", description="(Vor)verkauf vor Ort").model_dump(),
             ],
         ),
         CinemaTranslationTable(
@@ -103,12 +89,8 @@ hm_cinema = CinemaTable(
             language=LanguageEnum.ENGLISH_US.value,
             title="HM Cinema",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Own snacks allowed"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️", description="Offline presale"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Own snacks allowed").model_dump(),
+                CinemaDescription(emoji="🎟️", description="Offline presale").model_dump(),
             ],
         ),
     ],
@@ -137,15 +119,9 @@ tum_cinema = CinemaTable(
             language=LanguageEnum.GERMAN.value,
             title="TU Film",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️", description="Online vorverkauf"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫", description="Offen für Alle"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Eigene Snacks erlaubt").model_dump(),
+                CinemaDescription(emoji="🎟️", description="Online vorverkauf").model_dump(),
+                CinemaDescription(emoji="👫", description="Offen für Alle").model_dump(),
             ],
         ),
         CinemaTranslationTable(
@@ -153,13 +129,9 @@ tum_cinema = CinemaTable(
             language=LanguageEnum.ENGLISH_US.value,
             title="TU Film",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Own snacks allowed"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Own snacks allowed").model_dump(),
                 CinemaDescription(emoji="🎟️", description="Online presale").model_dump(),
-                CinemaDescription(
-                    emoji="👫", description="Open for non-students"
-                ).model_dump(),
+                CinemaDescription(emoji="👫", description="Open for non-students").model_dump(),
             ],
         ),
     ],
@@ -169,24 +141,16 @@ tum_garching_cinema = CinemaTable(
     id=CinemaEnum.TUM_GARCHING.value,
     external_link=TUM_CINEMA_URL,
     instagram_link="https://www.instagram.com/dertufilm/",
-    location=CinemaLocationTable(
-        **vars(CinemaLocationConstants[CinemaEnum.TUM_GARCHING.value])
-    ),
+    location=CinemaLocationTable(**vars(CinemaLocationConstants[CinemaEnum.TUM_GARCHING.value])),
     translations=[
         CinemaTranslationTable(
             cinema_id=CinemaEnum.TUM_GARCHING.value,
             language=LanguageEnum.GERMAN.value,
             title="TU Film Garching",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Eigene Snacks erlaubt"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="🎟️", description="Online vorverkauf"
-                ).model_dump(),
-                CinemaDescription(
-                    emoji="👫", description="Offen für Alle"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Eigene Snacks erlaubt").model_dump(),
+                CinemaDescription(emoji="🎟️", description="Online vorverkauf").model_dump(),
+                CinemaDescription(emoji="👫", description="Offen für Alle").model_dump(),
             ],
         ),
         CinemaTranslationTable(
@@ -194,13 +158,9 @@ tum_garching_cinema = CinemaTable(
             language=LanguageEnum.ENGLISH_US.value,
             title="TU Film Garching",
             description=[
-                CinemaDescription(
-                    emoji="🍿", description="Own snacks allowed"
-                ).model_dump(),
+                CinemaDescription(emoji="🍿", description="Own snacks allowed").model_dump(),
                 CinemaDescription(emoji="🎟️", description="Online presale").model_dump(),
-                CinemaDescription(
-                    emoji="👫", description="Open for non-students"
-                ).model_dump(),
+                CinemaDescription(emoji="👫", description="Open for non-students").model_dump(),
             ],
         ),
     ],

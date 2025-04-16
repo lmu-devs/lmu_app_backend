@@ -49,13 +49,9 @@ class MenuFetcher:
 
             should_create = False
             if is_lecture_free and opening_hours.lecture_free_hours:
-                should_create = any(
-                    oh.day == weekday for oh in opening_hours.lecture_free_hours or []
-                )
+                should_create = any(oh.day == weekday for oh in opening_hours.lecture_free_hours or [])
             elif opening_hours.opening_hours:
-                should_create = any(
-                    oh.day == weekday for oh in opening_hours.opening_hours or []
-                )
+                should_create = any(oh.day == weekday for oh in opening_hours.opening_hours or [])
 
             if should_create:
                 menu_day_obj = self.db.merge(
@@ -69,9 +65,7 @@ class MenuFetcher:
             current_date += timedelta(days=1)
 
         self.db.commit()
-        logger.info(
-            f"Menu days stored successfully for {canteen_id} from {date_from} to {date_to}"
-        )
+        logger.info(f"Menu days stored successfully for {canteen_id} from {date_from} to {date_to}")
 
     def store_menus(self, canteen_id: CanteenEnum):
         try:
@@ -88,9 +82,7 @@ class MenuFetcher:
             for menu in menus:
                 date = menu.menu_date
                 # Clear existing dish associations for this day
-                self.db.query(MenuDishAssociation).filter_by(
-                    menu_day_date=date, canteen_id=canteen_id
-                ).delete()
+                self.db.query(MenuDishAssociation).filter_by(menu_day_date=date, canteen_id=canteen_id).delete()
 
                 # Process each dish
                 for dish in menu.dishes:
@@ -98,26 +90,18 @@ class MenuFetcher:
                     dish_id = self._generate_dish_id(dish_name_de)
 
                     # Combine existing and missing labels
-                    missing_labels: list[str] = self._generate_missing_labels(
-                        dish_name_de
-                    )
-                    existing_labels = [
-                        label.name for label in dish.labels
-                    ]  # Changed to access label.text
+                    missing_labels: list[str] = self._generate_missing_labels(dish_name_de)
+                    existing_labels = [label.name for label in dish.labels]  # Changed to access label.text
                     combined_labels = list(set(existing_labels + missing_labels))
 
                     # Try to get existing dish first
-                    dish_obj = (
-                        self.db.query(DishTable).filter(DishTable.id == dish_id).first()
-                    )
+                    dish_obj = self.db.query(DishTable).filter(DishTable.id == dish_id).first()
 
                     if dish_obj:
                         dish_obj.labels = combined_labels
                         # Update prices whenever they exist, regardless of previous state
                         if dish.prices.students is not None:
-                            dish_obj.price_simple = PriceService.calculate_simple_price(
-                                dish.prices
-                            )
+                            dish_obj.price_simple = PriceService.calculate_simple_price(dish.prices)
                             self.db.add(dish_obj)
                             self.db.flush()
 
@@ -133,18 +117,14 @@ class MenuFetcher:
                                     # Update or create price record
                                     price_obj = (
                                         self.db.query(DishPriceTable)
-                                        .filter_by(
-                                            dish_id=dish_obj.id, category=category
-                                        )
+                                        .filter_by(dish_id=dish_obj.id, category=category)
                                         .first()
                                     )
 
                                     if price_obj:
                                         # Update existing price
                                         price_obj.base_price = price_data.base_price
-                                        price_obj.price_per_unit = (
-                                            price_data.price_per_unit
-                                        )
+                                        price_obj.price_per_unit = price_data.price_per_unit
                                         price_obj.unit = price_data.unit
                                     else:
                                         # Create new price record
@@ -171,9 +151,7 @@ class MenuFetcher:
                             dish_type=dish_type,
                             dish_category=dish_category,
                             labels=combined_labels,
-                            price_simple=PriceService.calculate_simple_price(
-                                dish.prices
-                            ),
+                            price_simple=PriceService.calculate_simple_price(dish.prices),
                         )
                         dish_amount += 1
                         self.db.add(dish_obj)
@@ -208,22 +186,16 @@ class MenuFetcher:
                                 self.db.add(price_obj)
 
                     # Create new MenuDishAssociation
-                    association = MenuDishAssociation(
-                        dish_id=dish_obj.id, menu_day_date=date, canteen_id=canteen_id
-                    )
+                    association = MenuDishAssociation(dish_id=dish_obj.id, menu_day_date=date, canteen_id=canteen_id)
                     self.db.add(association)
 
                     # Add missing translations for existing and new dishes
-                    translations = self.translation_service.create_missing_translations(
-                        dish_obj
-                    )
+                    translations = self.translation_service.create_missing_translations(dish_obj)
                     self.db.add_all(translations)
                     # image = self.dish_image_service.generate_dish_image_table(dish_obj)
                     # self.db.add(image)
             self.db.commit()
-            logger.info(
-                f"Menu dishes added & updated successfully. {dish_amount} dishes added."
-            )
+            logger.info(f"Menu dishes added & updated successfully. {dish_amount} dishes added.")
 
         except IntegrityError as e:
             logger.error(f"Database integrity error while storing menu data: {str(e)}")
@@ -233,9 +205,7 @@ class MenuFetcher:
             )
         except Exception as e:
             logger.debug(f"Failed to process menu data: {str(e)}")
-            raise DataProcessingError(
-                detail="Failed to process menu data", extra={"error": str(e)}
-            )
+            raise DataProcessingError(detail="Failed to process menu data", extra={"error": str(e)})
 
     def _map_dish_type_to_category(self, dish_type: str):
         words = dish_type.strip().split(",")[0].split()

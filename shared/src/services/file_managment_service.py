@@ -46,11 +46,7 @@ class FileManagementService:
     def generate_save_file_name(filename: str) -> str:
         # Replace spaces with underscores and remove special characters
         safe_filename = "".join(
-            (
-                "_"
-                if char.isspace()
-                else char if char.isalnum() or char == "_" or char == "." else ""
-            )
+            ("_" if char.isspace() else char if char.isalnum() or char == "_" or char == "." else "")
             for char in filename
         )
         return safe_filename

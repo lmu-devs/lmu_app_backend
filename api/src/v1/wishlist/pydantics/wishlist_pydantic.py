@@ -7,23 +7,11 @@ from shared.src.models.image_model import Images
 from shared.src.tables import WishlistTable
 
 
-async def wishlist_to_pydantic(
-    wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None
-) -> Wishlist:
+async def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.UUID] = None) -> Wishlist:
 
-    title = (
-        wishlist.translations[0].title if wishlist.translations else "not translated"
-    )
-    description = (
-        wishlist.translations[0].description
-        if wishlist.translations
-        else "not translated"
-    )
-    description_short = (
-        wishlist.translations[0].description_short
-        if wishlist.translations
-        else "not translated"
-    )
+    title = wishlist.translations[0].title if wishlist.translations else "not translated"
+    description = wishlist.translations[0].description if wishlist.translations else "not translated"
+    description_short = wishlist.translations[0].description_short if wishlist.translations else "not translated"
     # Handle likes
     user_likes_wishlist = None
     if user_id:

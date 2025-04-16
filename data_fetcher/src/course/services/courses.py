@@ -43,9 +43,7 @@ class LMUCourseScraper:
             }
 
             try:
-                response = requests.get(
-                    self.base_url, params=initial_params, headers=self.headers
-                )
+                response = requests.get(self.base_url, params=initial_params, headers=self.headers)
                 response.raise_for_status()
                 data = response.json()
                 num_rows = data.get("numRows", 50)  # Default to 50 if can't get total
@@ -114,9 +112,7 @@ def main():
         logger.info(f"\nSuccessfully fetched {len(courses)} courses")
 
         # Save to JSON file
-        with open(
-            "data_fetcher/src/course/temp/lmu_courses.json", "w", encoding="utf-8"
-        ) as f:
+        with open("data_fetcher/src/course/temp/lmu_courses.json", "w", encoding="utf-8") as f:
             # Convert Course objects to dictionaries
             courses_data = [course.dict() for course in courses]
             json.dump(courses_data, f, ensure_ascii=False, indent=2)

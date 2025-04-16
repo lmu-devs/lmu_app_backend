@@ -21,9 +21,7 @@ class RoomfinderService:
         return result.scalars().all()
 
     async def get_building_parts(self, id: str):
-        result = await self.db.execute(
-            select(BuildingTable).where(BuildingTable.id == id)
-        )
+        result = await self.db.execute(select(BuildingTable).where(BuildingTable.id == id))
         return result.scalars().all()
 
     async def get_all(self):

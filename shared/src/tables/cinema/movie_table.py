@@ -33,24 +33,12 @@ class MovieTable(Base):
     runtime = Column(Integer, nullable=True)
     language = Column(String, nullable=True)
 
-    translations = relationship(
-        "MovieTranslationTable", back_populates="movie", cascade="all, delete-orphan"
-    )
-    screenings = relationship(
-        "MovieScreeningTable", back_populates="movie", cascade="all, delete-orphan"
-    )
-    ratings = relationship(
-        "MovieRatingTable", back_populates="movie", cascade="all, delete-orphan"
-    )
-    trailers = relationship(
-        "MovieTrailerTable", back_populates="movie", cascade="all, delete-orphan"
-    )
+    translations = relationship("MovieTranslationTable", back_populates="movie", cascade="all, delete-orphan")
+    screenings = relationship("MovieScreeningTable", back_populates="movie", cascade="all, delete-orphan")
+    ratings = relationship("MovieRatingTable", back_populates="movie", cascade="all, delete-orphan")
+    trailers = relationship("MovieTrailerTable", back_populates="movie", cascade="all, delete-orphan")
 
-    __table_args__ = (
-        UniqueConstraint(
-            "original_title", "release_date", name="uix_original_title_release_date"
-        ),
-    )
+    __table_args__ = (UniqueConstraint("original_title", "release_date", name="uix_original_title_release_date"),)
 
 
 class MovieTranslationTable(LanguageTable):
@@ -104,9 +92,7 @@ class MovieTrailerTable(Base):
 class MovieTrailerTranslationTable(LanguageTable):
     __tablename__ = "movie_trailer_translations"
 
-    trailer_id = Column(
-        UUID(as_uuid=True), ForeignKey("movie_trailers.id"), primary_key=True
-    )
+    trailer_id = Column(UUID(as_uuid=True), ForeignKey("movie_trailers.id"), primary_key=True)
     title = Column(String, nullable=False)
     key = Column(String, nullable=False)
 

@@ -39,6 +39,4 @@ class CinemaService:
         if cinema_id:
             query = query.filter(CinemaTable.id == cinema_id)
 
-        return query.order_by(
-            create_translation_order_case(CinemaTranslationTable, self.language)
-        )
+        return query.order_by(create_translation_order_case(CinemaTranslationTable, self.language))

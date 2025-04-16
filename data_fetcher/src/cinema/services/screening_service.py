@@ -175,9 +175,7 @@ class ScreeningService:
             for rating_data in omdb_data["Ratings"]:
                 source = RatingSourceEnum.from_omdb_source(rating_data["Source"])
                 if source:
-                    normalized_rating = MovieRatingNormalizer().normalize_rating(
-                        source, rating_data["Value"]
-                    )
+                    normalized_rating = MovieRatingNormalizer().normalize_rating(source, rating_data["Value"])
                     rating = MovieRatingTable(
                         movie_id=movie_id,
                         source=source,
@@ -191,9 +189,7 @@ class ScreeningService:
         trailer_translations = []
 
         # Get trailer data from English response
-        base_videos = (
-            tmdb_data[LanguageEnum.ENGLISH_US].get("videos", {}).get("results", [])
-        )
+        base_videos = tmdb_data[LanguageEnum.ENGLISH_US].get("videos", {}).get("results", [])
 
         for video in base_videos:
             if video["site"] == "YouTube" and video["type"] == "Trailer":
@@ -201,9 +197,7 @@ class ScreeningService:
                 trailer = MovieTrailerTable(
                     id=trailer_id,
                     movie_id=movie_id,
-                    published_at=datetime.strptime(
-                        video["published_at"], "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ),
+                    published_at=datetime.strptime(video["published_at"], "%Y-%m-%dT%H:%M:%S.%fZ"),
                     official=video["official"],
                     size=video["size"],
                     type=video["type"],
@@ -257,28 +251,20 @@ class ScreeningService:
             logger.info(f"Processing movie: {crawled_movie.title}")
 
             if crawled_movie.is_edge_case:
-                processed_movies.append(
-                    self._create_edge_case_movie_model(crawled_movie)
-                )
+                processed_movies.append(self._create_edge_case_movie_model(crawled_movie))
 
             else:
                 tmdb_service = TmdbService()
-                tmdb_data = tmdb_service.search_tmdb_movie(
-                    crawled_movie.title, crawled_movie.year
-                )
+                tmdb_data = tmdb_service.search_tmdb_movie(crawled_movie.title, crawled_movie.year)
                 if not tmdb_data:
-                    logger.warning(
-                        f"Could not find TMDB data for {crawled_movie.title}"
-                    )
+                    logger.warning(f"Could not find TMDB data for {crawled_movie.title}")
                     continue
 
                 imdb_id = tmdb_data[LanguageEnum.ENGLISH_US]["external_ids"]["imdb_id"]
                 omdb_service = OmdbService()
                 omdb_data = omdb_service.get_omdb_data(imdb_id)
                 if not omdb_data:
-                    logger.warning(
-                        f"Could not find OMDB data for {crawled_movie.title}"
-                    )
+                    logger.warning(f"Could not find OMDB data for {crawled_movie.title}")
                     continue
 
                 (

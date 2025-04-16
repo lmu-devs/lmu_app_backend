@@ -49,9 +49,7 @@ class MenuParser(ABC):
         date_format: str = "%G-W%V-%u"
         date_str: str = "%d-W%d-%d"
 
-        return datetime.datetime.strptime(
-            date_str % (year, week_number, day), date_format
-        ).date()
+        return datetime.datetime.strptime(date_str % (year, week_number, day), date_format).date()
 
     @abstractmethod
     def parse(self, canteen: CanteenEnum) -> Optional[Menu]:
@@ -180,9 +178,7 @@ class StudentenwerkMenuParser(MenuParser):
 
     # Students, Staff, Guests
     # Looks like those are the fallback prices
-    prices_mensa_weihenstephan_mensa_lothstrasse: Dict[
-        str, Tuple[Price, Price, Price]
-    ] = {
+    prices_mensa_weihenstephan_mensa_lothstrasse: Dict[str, Tuple[Price, Price, Price]] = {
         "Tagesgericht 1": Prices(Price(1.00), Price(2.25), Price(3.10)),
         "Tagesgericht 2": Prices(Price(1.70), Price(2.50), Price(3.50)),
         "Tagesgericht 3": Prices(Price(2.05), Price(2.85), Price(3.90)),
@@ -190,9 +186,7 @@ class StudentenwerkMenuParser(MenuParser):
         "Suppe": Prices(Price(0.60), Price(0.70), Price(1.10)),
         "Stärkebeilagen": Prices(Price(0.65), Price(0.90), Price(1.25)),
         "Beilage": Prices(Price(0.65), Price(0.90), Price(1.25)),
-        "Salatbuffet": Prices(
-            Price(0, 0.80, "100g"), Price(0, 1.00, "100g"), Price(0, 1.35, "100g")
-        ),
+        "Salatbuffet": Prices(Price(0, 0.80, "100g"), Price(0, 1.00, "100g"), Price(0, 1.35, "100g")),
         "Obst": Prices(Price(0.85), Price(0.85), Price(0.85)),
         "Bio-/Aktionsgericht 1": Prices(Price(1.70), Price(2.50), Price(3.50)),
         "Bio-/Aktionsgericht 2": Prices(Price(2.05), Price(2.85), Price(3.90)),
@@ -234,80 +228,50 @@ class StudentenwerkMenuParser(MenuParser):
         return Prices(students, staff, guests)
 
     @staticmethod
-    def __get_price(
-        canteen: CanteenEnum, dish: Tuple[str, str, str, str, str], dish_name: str
-    ) -> Prices:
+    def __get_price(canteen: CanteenEnum, dish: Tuple[str, str, str, str, str], dish_name: str) -> Prices:
         if canteen in [CanteenEnum.MENSA_WEIHENSTEPHAN, CanteenEnum.MENSA_LOTHSTR]:
-            return StudentenwerkMenuParser.prices_mensa_weihenstephan_mensa_lothstrasse.get(
-                dish[0], Prices()
-            )
+            return StudentenwerkMenuParser.prices_mensa_weihenstephan_mensa_lothstrasse.get(dish[0], Prices())
 
         if dish[0] == "Studitopf":  # Soup or Stew
-            price_per_unit_type = (
-                StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
-            )
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
         else:
-            price_per_unit_type = (
-                StudentenwerkMenuParser.SelfServicePricePerUnitType.CLASSIC
-            )
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.CLASSIC
 
         if dish[0] != "Studitopf" and dish[4] == "0":  # Non-Vegetarian
             if "Fi" in dish[2]:
                 base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.FISH
             # TODO: Find better way to distinguish between sausage and meat
             elif "wurst" in dish_name.lower() or "würstchen" in dish_name.lower():
-                base_price_type = (
-                    StudentenwerkMenuParser.SelfServiceBasePriceType.SAUSAGE
-                )
+                base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.SAUSAGE
             else:
                 base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.MEAT
         else:
-            base_price_type = (
-                StudentenwerkMenuParser.SelfServiceBasePriceType.VEGETARIAN_SOUP_STEW
-            )
+            base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.VEGETARIAN_SOUP_STEW
 
         if dish[0] == "Dessert (Glas)":
-            price_per_unit_type = (
-                StudentenwerkMenuParser.SelfServicePricePerUnitType.DESSERT
-            )
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.DESSERT
             base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.DESSERT
 
         if "suppe" in dish_name.lower():
-            price_per_unit_type = (
-                StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
-            )
-            base_price_type = (
-                StudentenwerkMenuParser.SelfServiceBasePriceType.VEGETARIAN_SOUP_STEW
-            )
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.SOUP_STEW
+            base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.VEGETARIAN_SOUP_STEW
             print(dish_name)
 
         if dish[0] == "Pizza":
-            price_per_unit_type = (
-                StudentenwerkMenuParser.SelfServicePricePerUnitType.PIZZA
-            )
+            price_per_unit_type = StudentenwerkMenuParser.SelfServicePricePerUnitType.PIZZA
             if dish[4] == "0":
-                base_price_type = (
-                    StudentenwerkMenuParser.SelfServiceBasePriceType.PIZZA_MEAT
-                )
+                base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.PIZZA_MEAT
             else:
-                base_price_type = (
-                    StudentenwerkMenuParser.SelfServiceBasePriceType.PIZZA_VEGIE
-                )
+                base_price_type = StudentenwerkMenuParser.SelfServiceBasePriceType.PIZZA_VEGIE
         print(dish_name, base_price_type, price_per_unit_type)
-        return StudentenwerkMenuParser.__get_self_service_prices(
-            base_price_type, price_per_unit_type
-        )
+        return StudentenwerkMenuParser.__get_self_service_prices(base_price_type, price_per_unit_type)
 
-    base_url: str = (
-        "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_{url_id}_-de.html"
-    )
+    base_url: str = "https://www.studierendenwerk-muenchen-oberbayern.de/mensa/speiseplan/speiseplan_{url_id}_-de.html"
 
     def parse(self, canteen: CanteenEnum) -> Optional[Menu]:
         menus = []
 
-        page_link: str = self.base_url.format(
-            url_id=CanteensConstants.get_canteen(canteen).url_id
-        )
+        page_link: str = self.base_url.format(url_id=CanteensConstants.get_canteen(canteen).url_id)
         page: requests.Response = requests.get(page_link, timeout=10.0)
         if page.ok:
             try:
@@ -321,9 +285,7 @@ class StudentenwerkMenuParser(MenuParser):
                     if menu:
                         menus.append(menu)
             except Exception as e:
-                print(
-                    f"Exception while parsing menu. Skipping current date. Exception args: {e.args}"
-                )
+                print(f"Exception while parsing menu. Skipping current date. Exception args: {e.args}")
         return menus
 
     def get_menu(self, page: html.Element, canteen: CanteenEnum) -> Optional[Menu]:
@@ -340,9 +302,7 @@ class StudentenwerkMenuParser(MenuParser):
             date: datetime.date = util.parse_date(date_str)
             return date
         except ValueError:
-            warn(
-                f"Error during parsing date from html page. Problematic date: {date_str}"
-            )
+            warn(f"Error during parsing date from html page. Problematic date: {date_str}")
             return None
 
     # public for testing
@@ -355,10 +315,7 @@ class StudentenwerkMenuParser(MenuParser):
     @staticmethod
     def __parse_dishes(menu_html: html.Element, canteen: CanteenEnum) -> List[Dish]:
         # obtain the names of all dishes in a passed menu
-        dish_names: List[str] = [
-            dish.rstrip()
-            for dish in menu_html.xpath("//p[@class='c-menu-dish__title']/text()")
-        ]
+        dish_names: List[str] = [dish.rstrip() for dish in menu_html.xpath("//p[@class='c-menu-dish__title']/text()")]
         # make duplicates unique by adding (2), (3) etc. to the names
         dish_names = util.make_duplicates_unique(dish_names)
         # obtain the types of the dishes (e.g. 'Tagesgericht 1')
@@ -431,9 +388,7 @@ class StudentenwerkMenuParser(MenuParser):
                 )
             else:
                 # find prices
-                prices = StudentenwerkMenuParser.__get_price(
-                    canteen, dishes_dict[name], name
-                )
+                prices = StudentenwerkMenuParser.__get_price(canteen, dishes_dict[name], name)
             dishes.append(Dish(name, prices, labels, dishes_dict[name][0]))
         return dishes
 

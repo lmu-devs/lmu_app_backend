@@ -78,9 +78,7 @@ async def get_notifications(
 ):
     """Get all notifications."""
     service = NotificationService(db)
-    result = await service.get_notifications(
-        limit=limit, offset=offset, notification_id=notification_id
-    )
+    result = await service.get_notifications(limit=limit, offset=offset, notification_id=notification_id)
     return result
 
 

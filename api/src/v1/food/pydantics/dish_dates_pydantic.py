@@ -7,9 +7,7 @@ from shared.src.models import Rating
 from shared.src.tables import DishTable
 
 
-def dish_dates_to_pydantic(
-    results, user_liked_canteens: Dict[str, bool] = None
-) -> DishDates:
+def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:
     date_canteen_map = {}
     for date, canteen_id, canteen in results:
         if date not in date_canteen_map:
@@ -22,11 +20,7 @@ def dish_dates_to_pydantic(
             canteens=[
                 canteen_to_pydantic(
                     canteen,
-                    user_likes_canteen=(
-                        user_liked_canteens.get(canteen.id)
-                        if user_liked_canteens
-                        else None
-                    ),
+                    user_likes_canteen=(user_liked_canteens.get(canteen.id) if user_liked_canteens else None),
                 )
                 for canteen in canteens
             ],

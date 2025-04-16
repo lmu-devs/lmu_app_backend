@@ -39,9 +39,7 @@ class CinemaService:
 
     def clear_cinema_tables(self):
         """Clear all cinema-related tables in the correct order"""
-        logger.info(
-            "Clearing movies, screenings, ratings, trailers, trailer translations and locations data..."
-        )
+        logger.info("Clearing movies, screenings, ratings, trailers, trailer translations and locations data...")
 
         self.db.query(MovieLocationTable).delete()
         self.db.query(MovieTrailerTranslationTable).delete()
@@ -94,11 +92,7 @@ class CinemaService:
                 self.db.rollback()
                 # Check if it's a unique violation error
                 if isinstance(e.__cause__, UniqueViolation):
-                    logger.info(
-                        f"Movie {movie.original_title} already exists in database, skipping..."
-                    )
+                    logger.info(f"Movie {movie.original_title} already exists in database, skipping...")
                 else:
-                    logger.error(
-                        f"Error adding movie {movie.original_title} to database: {e}"
-                    )
+                    logger.error(f"Error adding movie {movie.original_title} to database: {e}")
                 continue

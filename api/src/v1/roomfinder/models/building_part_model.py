@@ -25,6 +25,4 @@ class BuildingParts(RootModel):
 
     @classmethod
     def from_table(cls, data: List[BuildingPartTable]) -> "BuildingParts":
-        return BuildingParts(
-            root=[BuildingPart.from_table(building_part) for building_part in data]
-        )
+        return BuildingParts(root=[BuildingPart.from_table(building_part) for building_part in data])

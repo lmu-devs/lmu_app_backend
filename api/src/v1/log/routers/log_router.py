@@ -33,6 +33,4 @@ async def get_logs(authorized: Annotated[bool, Depends(APIKey.verify_admin_api_k
         )
     except Exception as e:
         logger.error(f"Error while creating log archive: {str(e)}")
-        raise ConfigurationError(
-            detail="Failed to create log archive", extra={"error": str(e)}
-        )
+        raise ConfigurationError(detail="Failed to create log archive", extra={"error": str(e)})

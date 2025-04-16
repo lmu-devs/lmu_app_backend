@@ -41,11 +41,7 @@ class MovieService:
             # Join and load trailers with translations
             .outerjoin(MovieTable.trailers)
             .outerjoin(MovieTrailerTable.translations)
-            .options(
-                contains_eager(MovieTable.trailers).contains_eager(
-                    MovieTrailerTable.translations
-                )
-            )
+            .options(contains_eager(MovieTable.trailers).contains_eager(MovieTrailerTable.translations))
             # Add ratings relationship
             .outerjoin(MovieTable.ratings)
             .options(contains_eager(MovieTable.ratings))
