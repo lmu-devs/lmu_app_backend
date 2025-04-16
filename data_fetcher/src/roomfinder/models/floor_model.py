@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class Floor(BaseModel):
     code: str
-    buildingPart: str
+    buildingPartCode: str
     level: str
     name: str
     mapUri: str

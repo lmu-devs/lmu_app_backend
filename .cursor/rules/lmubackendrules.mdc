@@ -1,6 +1,7 @@
 ---
 description: general backend infos
 globs: 
+alwaysApply: false
 ---
 
 ## Backend Stack
@@ -10,5 +11,10 @@ globs:
 
 
 ## Hosting
-- digital ocean
+- digital ocean ubuntu droplets
+- staging droplet and production droplet
 - dns over cloudflare
+
+## Environments
+- Staging ({service}-staging.lmu-dev.org - 157.230.114.51)
+- Production ({service}.lmu-dev.org - 64.226.106.247)

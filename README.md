@@ -2,20 +2,48 @@
 
 This is the backend service for the LMU App. It provides the necessary API endpoints and data processing for the LMU application.
 
+[API Documentation](/api/README.md) 
+
+[Data Fetcher Documentation](/data_fetcher/README.md)
+
 ## Table of Contents
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-  - [Using Python Virtual Environment](#using-python-virtual-environment)
-  - [Using Docker Compose](#using-docker-compose)
-- [Usage](#usage)
+- [LMU App Backend](#lmu-app-backend)
+  - [Table of Contents](#table-of-contents)
+  - [Structure](#structure)
+  - [Tech Stack](#tech-stack)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [Using Python Virtual Environment](#using-python-virtual-environment)
+    - [Using Docker Compose](#using-docker-compose)
+  - [Environments](#environments)
+    - [Development](#development)
+    - [Staging](#staging)
+    - [Production](#production)
+  - [Components](#components)
+  - [Branching Strategy](#branching-strategy)
+  - [CI/CD Pipeline](#cicd-pipeline)
+  - [Deployment Workflow](#deployment-workflow)
+  - [Usage](#usage)
+
+## Structure
+![alt text](documentation/assets/backend_structure.png)
+
+
+## Tech Stack
+
+- FastAPI - Modern Python web framework
+- PostgreSQL - Primary database
+- Docker Compose - Container orchestration
+- Nginx Proxy Manager - Reverse proxy and SSL management
+- Metabase - Data analytics and visualization
+- PgAdmin - Database management interface
 
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 * You have installed the latest version of [Python](https://www.python.org/downloads/) (3.12 recommended)
-* (Optional) You have installed [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/)
-* You have a Windows/Linux/Mac machine.
-* You have read the LMU App documentation (if available).
+* You have installed [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/)
+* You have a Windows/Linux/Mac machine
 
 ## Installation
 
@@ -49,8 +77,7 @@ Before you begin, ensure you have met the following requirements:
 
 5. Run docker compose:
    ```
-   docker-compose build
-   docker-compose up -d
+   docker compose up -d
    ```
 
 ### Using Docker Compose
@@ -61,28 +88,140 @@ Before you begin, ensure you have met the following requirements:
    cd lmu-app-backend
    ```
 
-2. Build and run the Docker containers:
+2. Copy the environment template (Ask a developer for the .env file):
    ```
-   docker-compose up --build
+   cp .env.template .env
    ```
 
-   This command will build the Docker image and start the containers defined in your `docker-compose.yml` file.
+3. Build and run the Docker containers:
+   ```
+   docker compose up --build
+   ```
+
+## Environments
+
+The application supports three environments:
+
+### Development
+
+The development environment is used for local development and testing.
+
+- Run the application using Docker Compose with development services:
+  ```
+  docker compose up api_dev data_fetcher_dev db db_mb pgadmin metabase nginx --build
+  ```
+
+This setup uses the `api_dev` and `data_fetcher_dev` services which mount the local codebase as a volume, enabling:
+- Hot-reload: Code changes are reflected immediately without rebuilding containers
+- Live debugging: Changes to the codebase are immediately available in the containers
+- Development workflow: Edit code locally while running services in containers
+
+### Staging
+
+The staging environment is hosted on a Digital Ocean droplet.
+
+- URL: `{service}-staging.lmu-dev.org`
+- IP: `157.230.114.51`
+- DNS: Managed through Cloudflare
+- Deployment: Automatic when code is pushed to the `staging` branch
+
+### Production
+
+The production environment is hosted on a Digital Ocean droplet.  
+Available services: 
+[api.lmu-dev.org](https://api.lmu-dev.org)  [metabase.lmu-dev.org](https://metabase.lmu-dev.org)  [pgadmin.lmu-dev.org](https://pgadmin.lmu-dev.org)  [nginx.lmu-dev.org](https://nginx.lmu-dev.org)  
+
+- URL: `{service}.lmu-dev.org`
+- IP: `64.226.106.247`
+- DNS: Managed through Cloudflare
+- Deployment: Automatic when code is pushed to the `main` branch
+
+## Components
+
+The application consists of several Docker services:
+
+1. **API Service** (`api`):
+   - Main FastAPI application
+   - Exposed on port 8001 (localhost)
+   - Development mode available with hot-reload (`api_dev`)
+
+2. **Database** (`db`):
+   - PostgreSQL 16.4
+   - Exposed on port 5432
+   - Includes health checks
+
+3. **Metabase** (`metabase`):
+   - Data analytics platform
+   - Exposed on port 3000
+   - Separate PostgreSQL instance (`db_mb`) on port 5433
+
+4. **PgAdmin** (`pgadmin`):
+   - Database management interface
+   - Configurable port through environment variables
+
+5. **Data Fetcher** (`data_fetcher`):
+   - Background data processing service
+   - Development mode available (`data_fetcher_dev`)
+
+6. **Nginx Proxy Manager** (`nginx`):
+   - Reverse proxy and SSL management
+   - Ports 80 and 443
+   - Includes Let's Encrypt integration
+
+## Branching Strategy
+
+We follow a trunk-based development strategy:
+
+1. `main` - Production branch, represents live code
+2. `staging` - Integration branch for testing
+3. Feature branches - Created from `staging`
+
+Workflow:
+1. Create feature branch from `staging`
+2. Develop and test
+3. Create PR to merge into `staging`
+4. After testing, merge `staging` into `main`
+
+## CI/CD Pipeline
+
+GitHub Actions automation:
+
+1. **Continuous Integration**:
+   - Runs on all pull requests
+   - Executes test suite
+   - Performs code quality checks
+
+2. **Staging Deployment**:
+   - Triggered on `staging` branch updates
+   - Builds and tags Docker images
+   - Deploys to staging environment
+
+3. **Production Deployment**:
+   - Triggered on `main` branch updates
+   - Uses staging-verified images
+   - Deploys to production environment
+
+## Deployment Workflow
+
+1. **Development**:
+   ```
+   docker compose up
+   ```
+
+2. **Staging**:
+   - Automatic deployment from `staging` branch
+   - Manual: `docker compose up db api data_fetcher --build`
+
+3. **Production**:
+   - Automatic deployment from `main` branch
+   - Manual: `docker compose up db api data_fetcher --build`
 
 ## Usage
 
-To run the LMU App Backend, follow these steps:
+After deployment, the following services are available:
 
-1. If using virtual environment, make sure it's activated.
-2. Run the main application:
-   ```
-   python app.py
-   ```
-
-If using Docker Compose:
-```
-docker-compose up
-```
-
-Swagger UI should be accessible at `http://localhost:8001/v1/docs`
-REST API should now be running and accessible at `http://localhost:8001/v1`
-PgAdmin should now be running and accessible at `http://localhost:5050`
+- API Documentation: `http://localhost:8001/v1/docs`
+- REST API: `http://localhost:8001/v1`
+- PgAdmin: `http://localhost:5050`
+- Metabase: `http://localhost:3000`
+- Nginx Proxy Manager: `http://localhost:81`

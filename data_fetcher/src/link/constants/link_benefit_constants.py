@@ -54,7 +54,7 @@ link_benefit_constants = [
     ),
     LinkBenefitTable(
         id="STAATSOPER",
-        url="https://www.staatsoper.de/de/kontakt/kontaktformular/",
+        url="https://www.staatsoper.de/",
         image_url="https://www.staatsoper.de/media/_processed_/9/8/csm_Stufenbar_20-08-2020_052_37d06a9c1f.png",
         translations=[
             LinkBenefitTranslationTable(

@@ -12,7 +12,7 @@ class LocationTable:
 
     @declared_attr
     def address(cls):
-        return Column(String, primary_key=True)
+        return Column(String)
 
     @declared_attr
     def latitude(cls):

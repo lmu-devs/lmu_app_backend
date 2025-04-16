@@ -6,7 +6,6 @@ from pydantic import BaseModel
 class Street(BaseModel):
     code: str
     name: str
-    cityCode: str
 
     @classmethod
     def from_dict(cls, data: Dict[str, str]) -> "Street":

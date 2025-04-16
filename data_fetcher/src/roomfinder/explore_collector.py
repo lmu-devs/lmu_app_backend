@@ -1,5 +1,3 @@
-import schedule
-
 from data_fetcher.src.core.base_collector import BaseCollector
 from data_fetcher.src.roomfinder.services.explore_service import RoomfinderService
 from shared.src.core.logging import get_roomfinder_fetcher_logger

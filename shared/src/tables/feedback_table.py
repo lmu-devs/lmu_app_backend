@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import ARRAY, UUID, Column, DateTime, ForeignKey, String, func
+from sqlalchemy import ARRAY, UUID, Column, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base

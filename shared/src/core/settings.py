@@ -12,10 +12,16 @@ from shared.src.settings.llm_settings import (
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    app_name: str = "GenAI Project Template"
+    app_name: str = "LMU App Backend"
     openai: OpenAISettings = OpenAISettings()
     anthropic: AnthropicSettings = AnthropicSettings()
     gemini: GeminiSettings = GeminiSettings()
+
+    # Environment
+    ENVIRONMENT: str
+
+    # Deployment
+    DOCKER_USERNAME: str
 
     # Base URL for the eat API
     API_BASE_URL: str = "https://api.lmu-dev.org"

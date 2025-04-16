@@ -122,30 +122,98 @@ class TimeFrame(BaseModel):
 
     @classmethod
     def from_duration_string(cls, duration: str) -> "TimeFrame":
-        """Create TimeFrame from ZHS duration string"""
+        """Create TimeFrame from ZHS duration string
+
+        Handles various formats:
+        - Single date with year: '30.05.25'
+        - Single date without year: '30.05.'
+        - Date range with year: '31.05.-01.06.25'
+        - Multiple dates: '23.04., 28.04., 30.04., 05.05.'
+        - Multiple date ranges: '17.05.-18.05./24.05.-25.05.25'
+        """
         try:
             if not duration or duration == "--" or duration == "???":
-                # Return a default timeframe if no duration is specified
                 return cls(start_date=datetime.now(), end_date=datetime.now())
 
-            # Handle single date case (e.g., "25.01.2025")
-            if duration.count("-") == 0:
-                date = datetime.strptime(duration.strip(), "%d.%m.%Y")
-                return cls(start_date=date, end_date=date)
+            # Clean up the input string
+            duration = duration.strip()
 
-            # Handle normal range case (e.g., "14.10.2024-08.02.2025")
-            start, end = duration.split("-")
-            return cls(
-                start_date=datetime.strptime(start.strip(), "%d.%m.%Y"),
-                end_date=datetime.strptime(end.strip(), "%d.%m.%Y"),
-            )
+            # Helper function to parse date with flexible year
+            def parse_date(date_str: str, year: str = None) -> datetime:
+                date_str = date_str.strip()
+                if date_str.endswith("."):
+                    date_str = date_str[:-1]  # Remove trailing dot
+
+                # Split into components
+                parts = date_str.split(".")
+                if len(parts) < 2:
+                    raise ValueError(f"Invalid date format: {date_str}")
+
+                day = int(parts[0])
+                month = int(parts[1])
+
+                # Handle year
+                if len(parts) > 2:
+                    year = parts[2]
+                if year:
+                    if len(year) == 2:
+                        year = f"20{year}"  # Assume 20xx for 2-digit years
+                else:
+                    year = str(datetime.now().year)
+
+                return datetime(int(year), month, day)
+
+            # Case 1: Multiple date ranges with slashes
+            if "/" in duration:
+                ranges = duration.split("/")
+                dates = []
+                year = None
+                # Extract year from the last range if present
+                if ranges[-1].strip().split(".")[-1].isdigit():
+                    year = ranges[-1].strip().split(".")[-1]
+
+                for date_range in ranges:
+                    if "-" in date_range:
+                        start, end = date_range.split("-")
+                        dates.extend([parse_date(start, year), parse_date(end, year)])
+                    else:
+                        dates.append(parse_date(date_range, year))
+
+                return cls(start_date=min(dates), end_date=max(dates))
+
+            # Case 2: Multiple dates with commas
+            if "," in duration:
+                dates = []
+                parts = duration.split(",")
+                year = None
+                # Extract year from the last part if present
+                if parts[-1].strip().split(".")[-1].isdigit():
+                    year = parts[-1].strip().split(".")[-1]
+
+                for part in parts:
+                    dates.append(parse_date(part, year))
+
+                return cls(start_date=min(dates), end_date=max(dates))
+
+            # Case 3: Single date range
+            if "-" in duration:
+                start, end = duration.split("-")
+                year = None
+                # Extract year from end date if present
+                if end.strip().split(".")[-1].isdigit():
+                    year = end.strip().split(".")[-1]
+
+                return cls(start_date=parse_date(start, year), end_date=parse_date(end, year))
+
+            # Case 4: Single date
+            return cls(start_date=parse_date(duration), end_date=parse_date(duration))
+
         except (ValueError, IndexError) as e:
             logger.warning(f"Could not parse duration: {duration} - {str(e)}")
             return cls(start_date=datetime.now(), end_date=datetime.now())
 
 
 class SportCourseLocation(Location):
-
     @classmethod
     def from_pattern(cls, location_data: list[str, float, float]) -> "SportCourseLocation":
         if not location_data or len(location_data) < 3:

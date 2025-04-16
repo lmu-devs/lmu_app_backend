@@ -54,10 +54,6 @@ def get_food_logger(module_name: str):
     return setup_logger(module_name, "food", "food_api")
 
 
-def get_notification_logger(module_name: str):
-    return setup_logger(module_name, "notification", "notification_api")
-
-
 def get_places_logger(module_name: str):
     return setup_logger(module_name, "places", "places_api")
 

@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from typing import List
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
 from sqlalchemy.exc import IntegrityError
@@ -12,7 +11,6 @@ from data_fetcher.src.food.crawler.food_crawler import FoodCrawler
 from data_fetcher.src.food.service.canteen_opening_status_service import (
     CanteenOpeningStatusService,
 )
-from data_fetcher.src.food.service.dish_images_service import DishImageService
 from data_fetcher.src.food.service.simple_price_service import PriceService
 from shared.src.core.exceptions import DatabaseError, DataProcessingError
 from shared.src.core.logging import get_food_fetcher_logger
@@ -54,7 +52,7 @@ class MenuFetcher:
                 should_create = any(oh.day == weekday for oh in opening_hours.opening_hours or [])
 
             if should_create:
-                menu_day_obj = self.db.merge(
+                self.db.merge(
                     MenuDayTable(
                         date=current_date,
                         canteen_id=canteen_id,
@@ -81,6 +79,15 @@ class MenuFetcher:
             # Process each Menu object in the data
             for menu in menus:
                 date = menu.menu_date
+                # create menu day for edge cases where dishes exists but opneing hours dont match
+                self.db.merge(
+                    MenuDayTable(
+                        date=date,
+                        canteen_id=canteen_id,
+                        is_closed=CanteenOpeningStatusService.is_closed(date),
+                    )
+                )
+
                 # Clear existing dish associations for this day
                 self.db.query(MenuDishAssociation).filter_by(menu_day_date=date, canteen_id=canteen_id).delete()
 
@@ -250,6 +257,7 @@ class MenuFetcher:
             "pute",
             "hühner",
             "ente",
+            "hendl",
         ]
         if any(keyword in dish_name_lower for keyword in poultry_keywords):
             labels.add("POULTRY")

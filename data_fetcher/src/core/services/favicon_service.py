@@ -18,23 +18,29 @@ class FaviconService:
             # Clean the URL to get domain
             domain = url.split("/")[2] if "//" in url else url.split("/")[0]
 
-            # Try allesedv.com first (supports multiple sizes)
-            allesedv_url = f"https://f3.allesedv.com/64/{domain}"
-            response = requests.head(allesedv_url)
+            # Try icon.horse service first
+            url = f"https://icon.horse/icon/{domain}"
+            response = requests.head(url)
             if response.status_code == 200:
-                return allesedv_url
+                return url
 
-            # Try DuckDuckGo second
+            # Try DuckDuckGo
             ddg_url = f"https://icons.duckduckgo.com/ip3/{domain}.ico"
             response = requests.head(ddg_url)
             if response.status_code == 200:
                 return ddg_url
 
-            # Fallback to Google's service
-            google_url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
-            response = requests.head(google_url)
+            # Try allesedv.com
+            allesedv_url = f"https://f3.allesedv.com/64/{domain}"
+            response = requests.head(allesedv_url)
             if response.status_code == 200:
-                return google_url
+                return allesedv_url
+
+            # Try Google's service first
+            url = f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
+            response = requests.head(url)
+            if response.status_code == 200:
+                return url
 
             return None
 
@@ -49,11 +55,13 @@ def main():
 
     test_urls = [
         # "https://lmu.de",
-        "https://lmu-dev.org",
-        "https://moodle.lmu.de/my/",
-        "https://lmu-app.lmu-dev.org",
-        "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
-        "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds?state=user&type=0",
+        # "lmu-dev.org",
+        # "https://moodle.lmu.de/my/",
+        # "https://lmu-app.lmu-dev.org",
+        "https://www.portal.uni-muenchen.de/benutzerkonto/#!/"
+        # "https://mailbox.portal.uni-muenchen.de/webmail/webmail/ui/MainPage.html",
+        # "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+        # "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds?state=user&type=0",
     ]
 
     for url in test_urls:

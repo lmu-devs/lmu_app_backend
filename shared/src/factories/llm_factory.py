@@ -59,12 +59,9 @@ class LLMFactory:
         err_msg = f"Unsupported LLM provider: {self.provider}"
         raise ValueError(err_msg)
 
-    def create_completion[T: type[BaseModel]](
-        self,
-        response_model: T,
-        messages: list[dict[str, str]],
-        **kwargs: Any,
-    ) -> T | Generator[T, None, None]:
+    def create_completion[
+        T: type[BaseModel]
+    ](self, response_model: T, messages: list[dict[str, str]], **kwargs: Any,) -> T | Generator[T, None, None]:
         # Konvertiere SystemMessage, HumanMessage und AIMessage in Dictionaries
         messages = [message.model_dump() for message in messages]
 

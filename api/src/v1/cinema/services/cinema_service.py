@@ -5,10 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
-from shared.src.tables import (
-    CinemaTable,
-    CinemaTranslationTable,
-)
+from shared.src.tables import CinemaTable, CinemaTranslationTable
 
 from ...core.translation_utils import create_translation_order_case
 from ..models import Cinema

@@ -56,12 +56,16 @@ class ScheduledCollector(BaseCollector):
         super().__init__()
         self.job = job_schedule
         if job_schedule:
-            job_schedule.do(self.collect)
+            # Wrap the collect coroutine in a sync function that runs it in the event loop
+            def run_collect():
+                asyncio.create_task(self.collect())
+
+            job_schedule.do(run_collect)
 
     async def run(self):
         """Main run loop for scheduled collector - runs at scheduled times"""
         self.log_boundary(f"🔄 Starting {self.name}")
-        self.logger.info(f"📅 Schedule Configuration:")
+        self.logger.info("📅  Schedule Configuration:")
         self.logger.info(f"   • Interval: {self.job.interval}")
         self.logger.info(f"   • Next Run: {self.job.next_run.strftime('%H:%M:%S %d-%m-%Y')}")
 

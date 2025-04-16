@@ -8,7 +8,7 @@ class FloorTable(Base):
     __tablename__ = "floors"
 
     id = Column(String, primary_key=True)
-    building_part_id = Column(String, ForeignKey("building_parts.id"), nullable=False)
+    building_part_id = Column(String, ForeignKey("buildings.building_part_id"), nullable=False)
     level = Column(String, nullable=False)
     name = Column(String, nullable=False)
     map_uri = Column(String, nullable=False)
@@ -17,4 +17,4 @@ class FloorTable(Base):
 
     # Relationships
     rooms = relationship("RoomTable", back_populates="floor")
-    building_part_rel = relationship("BuildingPartTable", back_populates="floors")
+    building = relationship("BuildingTable", back_populates="floors")

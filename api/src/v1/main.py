@@ -80,11 +80,6 @@ def create_app():
     app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
-    app.include_router(
-        notification_router.router,
-        prefix=f"{prefix}/notification",
-        tags=["notification"],
-    )
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
