@@ -113,7 +113,7 @@ services:
             - backend
             - frontend
         ports:
-            - '127.0.0.1:8001:8000'
+            - '8001:8000'
         depends_on:
             db:
                 condition: service_healthy
@@ -192,6 +192,7 @@ services:
             CORS_ENABLED: 'true'
             CORS_ORIGIN: 'true'
             PUBLIC_URL: 'http://localhost:8055'
+            API_BASE_URL: "http://api:8000"
         volumes:
             - ./directus/extensions:/directus/extensions
             - ./directus/uploads:/directus/uploads
