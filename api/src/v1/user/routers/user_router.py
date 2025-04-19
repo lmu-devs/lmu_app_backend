@@ -7,8 +7,7 @@ from shared.src.core.logging import get_user_logger
 from shared.src.tables import UserTable
 
 from ...core import APIKey
-from ..pydantics.user_pydantic import user_to_pydantic
-from ..schemas.user_scheme import User, UserUpdate
+from ..models.user_scheme import User, UserUpdate
 from ..services.user_service import UserService
 
 router = APIRouter()
@@ -23,11 +22,11 @@ async def create_user(
 ):
     service = UserService(db)
     if device_id and await service.is_existing_user(device_id):
-        return user_to_pydantic(await service.get_user_by_device_id(device_id))
+        return User.from_table(await service.get_user_by_device_id(device_id))
 
     new_user = await service.create_user(device_id)
     user_logger.info("Created new user")
-    return user_to_pydantic(new_user)
+    return User.from_table(new_user)
 
 
 @router.put("/users", description="Update user in database")

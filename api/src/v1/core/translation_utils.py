@@ -2,6 +2,7 @@ from sqlalchemy import Select, case
 from sqlalchemy.orm import contains_eager
 
 from shared.src.enums import LanguageEnum
+from shared.src.tables.language_table import LanguageTable
 
 
 def apply_translation_query(base_query: Select, model, translation_model, language: LanguageEnum) -> Select:
@@ -22,7 +23,7 @@ def apply_translation_query(base_query: Select, model, translation_model, langua
     )
 
 
-def create_translation_order_case(translation_table, language: LanguageEnum):
+def create_translation_order_case(translation_table: LanguageTable, language: LanguageEnum):
     """Helper function to create consistent translation ordering cases"""
     return case(
         (translation_table.language == language.value, 1),

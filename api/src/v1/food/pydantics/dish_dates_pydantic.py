@@ -1,10 +1,7 @@
-import uuid
 from typing import Dict
 
-from api.src.v1.food.models import Dish, DishDate, DishDates, DishPrices
+from api.src.v1.food.models import DishDate, DishDates
 from api.src.v1.food.pydantics import canteen_to_pydantic
-from shared.src.models import Rating
-from shared.src.tables import DishTable
 
 
 def dish_dates_to_pydantic(results, user_liked_canteens: Dict[str, bool] = None) -> DishDates:

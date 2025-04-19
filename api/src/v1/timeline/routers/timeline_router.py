@@ -1,11 +1,8 @@
-from typing import List
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_places_logger
-from shared.src.enums import LanguageEnum
 
 from ..models.timeline_model import Timeline
 from ..services.timeline_service import TimelineService
