@@ -76,18 +76,18 @@ link_resource_constants = [
     ),
     LinkResourceTable(
         id="MAILBOX",
-        url="https://mailbox.portal.uni-muenchen.de/webmail/webmail/ui/MainPage.html",
+        url="https://webmail.lrz.de/",
         types=[LinkType.INTERNAL],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
                 title="E-Mail",
-                description="Online LMU Mail Portal",
+                description="LMU Web Mail. Use your LRZ ID and LMU password to login. (LRZ ID is found in the User Account)",
             ),
             LinkResourceTranslationTable(
                 language=LanguageEnum.GERMAN,
                 title="E-Mail",
-                description="Online LMU Mail Portal",
+                description="LMU Web Mail. Verwende deine LRZ ID und dein LMU Passwort um dich einzuloggen. (LRZ ID ist in deinem Benutzerkonto zu finden)",
             ),
         ],
     ),
@@ -241,6 +241,40 @@ link_resource_constants = [
                 language=LanguageEnum.GERMAN,
                 title="Meldungen und Termine",
                 description="Wichtige Fristen und Studienangelegenheiten.",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="GRADES_COMPUTER_SCIENCE",
+        url="https://pvineu.ifi.lmu.de",
+        types=[LinkType.INTERNAL],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Grades CS",
+                description="Grades and Transcript for Computer Science Students.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Noten Informatik",
+                description="Noten und Transkript für (Medien)-Informatik & HCI Studierende",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="BEITRAGSKONTO",
+        url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/",
+        types=[LinkType.INTERNAL],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Contribution Account",
+                description="Pay your semester contribution online",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Beitragskonto",
+                description="Zahle deinen Semesterbeitrag online",
             ),
         ],
     ),

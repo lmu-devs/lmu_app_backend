@@ -324,7 +324,7 @@
         },
         {
             "title": "Find People",
-            "description_short": "Profs, Dozenten, Mitarbeiter...",
+            "description_short": "Professors, Lecturers, Staff...",
             "description": "Get an overview of all professors, lecturers and staff of the university and their contacts.",
             "language": "en-US"
         }
@@ -347,8 +347,31 @@
         },
         {
             "title": "Website",
-            "description_short": "LMU Students App als Website",
+            "description_short": "LMU Students App as Website",
             "description": "Use the LMU Students App in the web browser.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Studierendenausweis",
+            "description_short": "Digitaler Studierendenausweis",
+            "description": "Sehe deinen Studierendenausweis in der App und füge ihn einfach zu deinem Apple/Google Wallet hinzu. Zudem zeigen wir deine Matrikelnummer und weitere Informationen.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Student ID",
+            "description_short": "Digital Student ID",
+            "description": "See your student ID in the app and easily add it to your Apple/Google Wallet. We also show your matriculation number and other information.",
             "language": "en-US"
         }
     ],

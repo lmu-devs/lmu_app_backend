@@ -24,26 +24,6 @@ class TimelineService:
     def get_events(self) -> List[Event]:
         # Mock events
         return [
-            Event(
-                title="Vorlesungsbeginn",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2024, 10, 15), end=datetime(2024, 10, 15)),
-            ),
-            Event(
-                title="Winterferien",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2024, 12, 24), end=datetime(2025, 1, 6)),
-            ),
-            Event(
-                title="Semesterbeitrag zahlen",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2024, 12, 1), end=datetime(2025, 2, 8)),
-            ),
-            Event(
-                title="Semesterferien",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2025, 2, 8), end=datetime(2025, 4, 21)),
-            ),
             # Sommer
             Event(
                 title="Vorlesungsbeginn",
@@ -134,12 +114,12 @@ class TimelineService:
                 timeframe=Timeframe(start=datetime(2026, 10, 1), end=datetime(2027, 3, 31)),
                 type=SemesterTypeEnum.WINTER,
             ),
-            Semester(
-                timeframe=Timeframe(start=datetime(2027, 4, 1), end=datetime(2027, 9, 30)),
-                type=SemesterTypeEnum.SUMMER,
-            ),
-            Semester(
-                timeframe=Timeframe(start=datetime(2027, 10, 1), end=datetime(2028, 3, 31)),
-                type=SemesterTypeEnum.WINTER,
-            ),
+            # Semester(
+            #     timeframe=Timeframe(start=datetime(2027, 4, 1), end=datetime(2027, 9, 30)),
+            #     type=SemesterTypeEnum.SUMMER,
+            # ),
+            # Semester(
+            #     timeframe=Timeframe(start=datetime(2027, 10, 1), end=datetime(2028, 3, 31)),
+            #     type=SemesterTypeEnum.WINTER,
+            # ),
         ]

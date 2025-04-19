@@ -8,7 +8,6 @@ from data_fetcher.src.link.constants.link_resources_constants import (
     link_resource_constants,
 )
 from shared.src.core.logging import get_translation_logger
-from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.translation_service import TranslationService
 from shared.src.tables.link.link_resources_table import (
     LinkResourceTable,

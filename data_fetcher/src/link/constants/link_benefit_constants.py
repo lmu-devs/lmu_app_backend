@@ -69,4 +69,38 @@ link_benefit_constants = [
             ),
         ],
     ),
+    LinkBenefitTable(
+        id="GEATNERPLATZTHEATER",
+        url="https://www.gaertnerplatztheater.de/de/seiten/angebote-fuer-studierende.html",
+        image_url="https://www.gaertnerplatztheater.de/uploads/Foto_Video_Galerien/galerien/Haus/Theater_au%C3%9Fen/_10a9640-regpogozach.jpg?1780_750",
+        translations=[
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Gärtnerplatz Theater",
+                description="Discounted tickets for students",
+            ),
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Gärtnerplatz Theater",
+                description="Ermäßigte Tickets für Studenten",
+            ),
+        ],
+    ),
+    LinkBenefitTable(
+        id="GITHUB_EDUCATION",
+        url="https://github.com/education",
+        image_url="https://education.github.com/assets/pack/opengraph-image-c6d692948bb5fbf237b8a72d6576b4dcc84586335b522a6036904fc16ec7eccd.png",
+        translations=[
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="GitHub Education",
+                description="Free GitHub Pro, GitHub Copilot, GitHub Codespaces, GitHub Student Developer Pack",
+            ),
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="GitHub Education",
+                description="Kostenloses GitHub Pro, GitHub Copilot, GitHub Codespaces, GitHub Student Developer Pack",
+            ),
+        ],
+    ),
 ]

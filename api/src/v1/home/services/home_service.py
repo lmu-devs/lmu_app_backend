@@ -51,7 +51,6 @@ class HomeService:
                     type=HomeTileEnum.SPORTS,
                     size=1,
                     title="Sports",
-                    description="124 courses",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.CINEMAS,
@@ -62,25 +61,21 @@ class HomeService:
                     type=HomeTileEnum.LINKS,
                     size=1,
                     title="Links",
-                    description="12 links",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.BENEFITS,
                     size=1,
                     title="Benefits",
-                    description="4 offers",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.WISHLIST,
                     size=1,
                     title="Wishlist",
-                    description="7 features",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.FEEDBACK,
                     size=1,
                     title="Feedback",
-                    description="für die App",
                 ),
                 # BaseHomeTile(
                 #     type=HomeTileEnum.NEWS,
