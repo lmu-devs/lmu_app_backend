@@ -3,16 +3,12 @@ from typing import Generic, Literal, TypeVar
 import litellm
 from pydantic import BaseModel
 
-from shared.src.core.settings import (
-    AnthropicSettings,
-    GeminiSettings,
-    OpenAISettings,
-    get_settings,
-)
+from shared.src.core.settings import get_settings
 from shared.src.models.llm_message_models import Message, SystemMessage, UserMessage
+from shared.src.settings.llm_settings import AnthropicConfig, OpenAIConfig
 
-LLMProviders = Literal["openai", "anthropic", "gemini"]
-LLMSettings = OpenAISettings | AnthropicSettings | GeminiSettings
+LLMProviders = Literal["openai", "anthropic"]
+LLMSettings = OpenAIConfig | AnthropicConfig
 T = TypeVar("T", bound=BaseModel)
 
 
@@ -25,7 +21,7 @@ class LLMFactory(Generic[T]):
     ) -> None:
         self.provider = provider
         self.system_message = system_message
-        self.settings = getattr(get_settings(), provider)
+        self.settings = getattr(get_settings(), f"{provider}_config")
         self.model = self._normalize_model_name(model or self.settings.default_model)
 
     def _normalize_model_name(self, model: str) -> str:
