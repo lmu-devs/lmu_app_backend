@@ -1,4 +1,5 @@
 from shared.src.enums import LanguageEnum
+from shared.src.enums.faculty_enums import FacultyEnum
 from shared.src.tables.link.link_resources_table import (
     LinkResourceTable,
     LinkResourceTranslationTable,
@@ -10,6 +11,7 @@ link_resource_constants = [
         id="MOODLE",
         url="https://moodle.lmu.de/my/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -27,6 +29,7 @@ link_resource_constants = [
         id="LSF",
         url="https://lsf.verwaltung.uni-muenchen.de/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -44,6 +47,7 @@ link_resource_constants = [
         id="ANNY",
         url="https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
         types=[LinkType.EXTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -61,6 +65,7 @@ link_resource_constants = [
         id="IMMATRICULATION",
         url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -78,6 +83,7 @@ link_resource_constants = [
         id="MAILBOX",
         url="https://webmail.lrz.de/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -95,6 +101,7 @@ link_resource_constants = [
         id="USER_ACCOUNT",
         url="https://www.portal.uni-muenchen.de/benutzerkonto/#!/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -112,6 +119,7 @@ link_resource_constants = [
         id="LMU_DEVELOPERS",
         url="https://lmu-dev.org",
         types=[LinkType.EXTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -129,6 +137,7 @@ link_resource_constants = [
         id="EXCHANGE",
         url="https://www.lmu.de/de/workspace-fuer-studierende/auslandserfahrung-sammeln/auslandsstudium/lmuexchange/index.html",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -146,6 +155,7 @@ link_resource_constants = [
         id="PRINT",
         url="https://upload.printservice.uni-muenchen.de/RicohmyPrint/Login.aspx",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -163,6 +173,7 @@ link_resource_constants = [
         id="LIBRARY",
         url="https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/index.html",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -180,6 +191,7 @@ link_resource_constants = [
         id="STUVE",
         url="https://www.stuve.uni-muenchen.de/stuve/index.html",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -197,6 +209,7 @@ link_resource_constants = [
         id="M365",
         url="https://www.lmu.de/m365-login",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -214,6 +227,7 @@ link_resource_constants = [
         id="SYNC_AND_SHARE",
         url="https://syncandshare.lrz.de/login",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -231,6 +245,7 @@ link_resource_constants = [
         id="NEWS_AND_EVENTS",
         url="https://www.lmu.de/de/workspace-fuer-studierende/meldungen-und-termine/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -248,6 +263,7 @@ link_resource_constants = [
         id="GRADES_COMPUTER_SCIENCE",
         url="https://pvineu.ifi.lmu.de",
         types=[LinkType.INTERNAL],
+        faculties=[FacultyEnum.MATH_INFO_STATS],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
@@ -265,16 +281,17 @@ link_resource_constants = [
         id="BEITRAGSKONTO",
         url="https://qissos.verwaltung.uni-muenchen.de/qisserversos/",
         types=[LinkType.INTERNAL],
+        faculties=[],
         translations=[
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
-                title="Contribution Account",
-                description="Pay your semester contribution online",
+                title="Semester Fee",
+                description="Pay your semester fee online",
             ),
             LinkResourceTranslationTable(
                 language=LanguageEnum.GERMAN,
-                title="Beitragskonto",
-                description="Zahle deinen Semesterbeitrag online",
+                title="Semesterbeitrag",
+                description="Zahle deinen Semesterbeitrag online über das Beitragskonto",
             ),
         ],
     ),

@@ -62,6 +62,16 @@ class TimelineService:
                 type=EventTypeEnum.SEMESTER,
                 timeframe=Timeframe(start=datetime(2026, 4, 13), end=datetime(2026, 4, 13)),
             ),
+            Event(
+                title="Semesterferien",
+                type=EventTypeEnum.SEMESTER,
+                timeframe=Timeframe(start=datetime(2026, 7, 26), end=datetime(2026, 10, 12)),
+            ),
+            Event(
+                title="Semesterbeitrag zahlen",
+                type=EventTypeEnum.SEMESTER,
+                timeframe=Timeframe(start=datetime(2026, 7, 26), end=datetime(2026, 10, 12)),
+            ),
             # Winter
             Event(
                 title="Vorlesungsbeginn",

@@ -2,7 +2,12 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.link import LinkResourceTable, LinkResourceTranslationTable
+from shared.src.enums.faculty_enums import FacultyEnum
+from shared.src.tables.link import (
+    LinkResourceTable,
+    LinkResourceTranslationTable,
+    LinkType,
+)
 
 
 class LinkResource(BaseModel):
@@ -10,7 +15,8 @@ class LinkResource(BaseModel):
     description: str
     url: str
     favicon_url: str | None = None
-    types: List[str] = []
+    faculties: List[FacultyEnum] = []
+    types: List[LinkType] = []
     aliases: List[str] = []
 
     @classmethod
@@ -24,6 +30,7 @@ class LinkResource(BaseModel):
             url=link.url,
             favicon_url=link.favicon_url,
             types=link.types,
+            faculties=link.faculties,
             title=title,
             description=description,
             aliases=aliases,

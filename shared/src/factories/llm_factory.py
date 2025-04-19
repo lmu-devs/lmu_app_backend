@@ -1,12 +1,6 @@
-from collections.abc import Generator
-from typing import Any, Literal, Protocol
+from typing import Generic, Literal, TypeVar
 
-import google.generativeai as genai
-import instructor
-
-# from anthropic import Anthropic
-from google.generativeai import GenerativeModel
-from openai import OpenAI
+import litellm
 from pydantic import BaseModel
 
 from shared.src.core.settings import (
@@ -15,86 +9,114 @@ from shared.src.core.settings import (
     OpenAISettings,
     get_settings,
 )
-from shared.src.models.llm_message_models import SystemMessage, UserMessage
+from shared.src.models.llm_message_models import Message, SystemMessage, UserMessage
 
-type LLMProviders = Literal["openai", "anthropic", "gemini"]
-type LLMSettings = OpenAISettings | AnthropicSettings | GeminiSettings
-
-
-class ClientInitializerCallback(Protocol):
-    def __call__(self, settings: LLMSettings) -> instructor.Instructor: ...
+LLMProviders = Literal["openai", "anthropic", "gemini"]
+LLMSettings = OpenAISettings | AnthropicSettings | GeminiSettings
+T = TypeVar("T", bound=BaseModel)
 
 
-type ClientInitializer = dict[LLMProviders, ClientInitializerCallback]
+class LLMFactory(Generic[T]):
+    def __init__(
+        self,
+        provider: LLMProviders,
+        system_message: SystemMessage | None = None,
+        model: str | None = None,
+    ) -> None:
+        self.provider = provider
+        self.system_message = system_message
+        self.settings = getattr(get_settings(), provider)
+        self.model = self._normalize_model_name(model or self.settings.default_model)
 
+    def _normalize_model_name(self, model: str) -> str:
+        """Normalize the model name by adding provider prefix if needed."""
+        if "/" not in model:
+            return f"{self.provider}/{model}"
+        return model
 
-class LLMFactory:
-    def __init__(self, provider: LLMProviders, system_message: SystemMessage | None = None) -> None:
-        self.provider: LLMProviders = provider
-        self.system_message: SystemMessage | None = system_message
-        self.settings: LLMSettings = getattr(get_settings(), provider)
-        self.client: instructor.Instructor = self._initialize_client()
+    def _prepare_messages(self, messages: list[Message], response_model: type[T]) -> list[dict]:
+        """Prepare messages including system message and JSON formatting instructions."""
+        prepared_messages = [msg.model_dump() for msg in messages]
 
-    def _initialize_client(self) -> instructor.Instructor:
-        if self.provider == "gemini":
-            genai.configure(api_key=self.settings.api_key)
+        system_content = []
+        if self.system_message:
+            system_content.append(self.system_message.content)
 
-        client_initializers: ClientInitializer = {
-            "openai": lambda settings: instructor.from_openai(OpenAI(api_key=settings.api_key)),
-            # "anthropic": lambda settings: instructor.from_anthropic(Anthropic(api_key=settings.api_key)),
-            "gemini": lambda settings: instructor.from_gemini(
-                GenerativeModel(
-                    model_name=settings.default_model,
-                    generation_config=settings.generation_config,
-                    system_instruction=getattr(self.system_message, "content", None),
-                ),
-                mode=instructor.Mode.GEMINI_JSON,
-            ),
+        # Add JSON formatting instruction for OpenAI
+        if self.provider == "openai":
+            schema_str = response_model.model_json_schema()
+            system_content.append(f"You must respond with a JSON object that matches this schema: {schema_str}")
+
+        if system_content:
+            prepared_messages.insert(0, {"role": "system", "content": " ".join(system_content)})
+
+        return prepared_messages
+
+    def create_completion(
+        self,
+        response_model: type[T],
+        messages: list[Message],
+        model: str | None = None,  # Added model parameter
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        stream: bool = False,
+    ) -> T:
+        """Create a completion with the specified response model."""
+
+        messages = self._prepare_messages(messages, response_model)
+
+        # Use completion-specific model if provided, otherwise use factory model
+        current_model = self._normalize_model_name(model) if model else self.model
+
+        # Base completion parameters
+        params = {
+            "model": current_model,
+            "messages": messages,
+            "api_key": self.settings.api_key,
+            "temperature": temperature or self.settings.temperature,
+            "max_tokens": max_tokens or self.settings.max_tokens,
+            "stream": stream,
         }
 
-        initializer = client_initializers.get(self.provider)
-        if initializer:
-            return initializer(self.settings)
+        if self.provider == "openai" and response_model:
+            params["response_format"] = {"type": "json_object"}
 
-        err_msg = f"Unsupported LLM provider: {self.provider}"
-        raise ValueError(err_msg)
-
-    def create_completion[
-        T: type[BaseModel]
-    ](self, response_model: T, messages: list[dict[str, str]], **kwargs: Any,) -> T | Generator[T, None, None]:
-        # Konvertiere SystemMessage, HumanMessage und AIMessage in Dictionaries
-        messages = [message.model_dump() for message in messages]
-
-        if self.provider != "gemini":
-            if self.system_message:
-                messages.insert(0, self.system_message.model_dump())
-            completion_params = {
-                "temperature": kwargs.get("temperature", self.settings.temperature),
-                "max_retries": kwargs.get("max_retries", self.settings.max_retries),
-                "max_tokens": kwargs.get("max_tokens", self.settings.max_tokens),
-                "model": kwargs.get("model", self.settings.default_model),
-                "response_model": response_model,
-                "messages": messages,
-            }
-            return self.client.chat.completions.create(**completion_params)
-        else:
-            return self.client.chat.completions.create(
-                messages=messages,
-                response_model=response_model,
-            )
+        try:
+            response = litellm.completion(**{k: v for k, v in params.items() if v is not None})
+            return response_model.model_validate_json(response.choices[0].message.content)
+        except Exception as e:
+            print(f"LLM completion error: {e}")
+            raise
 
 
+# Example usage
 if __name__ == "__main__":
 
     class CompletionResponse(BaseModel):
         response: str
 
-    llm_factory = LLMFactory(provider="openai")
-    completion = llm_factory.create_completion(
-        response_model=CompletionResponse,
-        messages=[
-            # SystemMessage(content="You are a helpful assistant that generates aliases for a given name."),
-            UserMessage(content="Hey how are you?"),
-        ],
-    )
-    print(completion)
+    try:
+        # Create factory with default model
+        factory = LLMFactory[CompletionResponse](
+            provider="openai",
+            system_message=SystemMessage(content="Be concise and accurate."),
+            model="gpt-4o-mini",  # Default model
+        )
+
+        # Use factory's default model
+        result1 = factory.create_completion(
+            response_model=CompletionResponse,
+            messages=[UserMessage(content="What is 2+2?")],
+        )
+        print("Response with default model:", result1)
+
+        # Override model for specific completion
+        result2 = factory.create_completion(
+            response_model=CompletionResponse,
+            messages=[UserMessage(content="What is 3+3?")],
+            model="gpt-4.1-nano",  # Override model for this completion
+        )
+        print("Response with overridden model:", result2)
+
+    except Exception as e:
+        print(f"Error during example run: {e}")

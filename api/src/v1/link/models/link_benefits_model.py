@@ -2,7 +2,12 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.tables.link import LinkBenefitTable, LinkBenefitTranslationTable
+from shared.src.enums.faculty_enums import FacultyEnum
+from shared.src.tables.link import (
+    BenefitType,
+    LinkBenefitTable,
+    LinkBenefitTranslationTable,
+)
 
 
 class LinkBenefit(BaseModel):
@@ -11,6 +16,8 @@ class LinkBenefit(BaseModel):
     url: str
     favicon_url: str | None = None
     image_url: str | None = None
+    faculties: List[FacultyEnum] = []
+    types: List[BenefitType] = []
     aliases: List[str] = []
 
     @classmethod
@@ -27,6 +34,8 @@ class LinkBenefit(BaseModel):
             title=title,
             description=description,
             aliases=aliases,
+            faculties=benefit.faculties,
+            types=benefit.types,
         )
 
 
