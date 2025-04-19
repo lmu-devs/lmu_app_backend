@@ -27,7 +27,7 @@ jobs:
               run: |
                   echo "build_date=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
 
-            - name: Build and push multi-architecture API image
+            - name: Build and push multi-architecture api image
               uses: docker/build-push-action@v4
               with:
                   context: .
@@ -42,7 +42,7 @@ jobs:
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
-            - name: Build and push multi-architecture data fetcher image
+            - name: Build and push multi-architecture data_fetcher image
               uses: docker/build-push-action@v4
               with:
                   context: .

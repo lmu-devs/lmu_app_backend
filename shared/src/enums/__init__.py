@@ -1,6 +1,7 @@
 from .canteen_enums import *
 from .cinema_enums import *
 from .dish_category_enums import *
+from .faculty_enums import *
 from .home_tile_enums import *
 from .image_format_enum import *
 from .language_enums import *

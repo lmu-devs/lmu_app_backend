@@ -17,15 +17,20 @@ class AliasGenerationResponse(BaseModel):
 class AliasGenerationService:
     def __init__(self, llm_factory: LLMFactory | None = None):
         system_message = SystemMessage(
-            content="You are a helpful assistant that generates aliases for a given input. Try to be creative and think of FITTING, SIMPLE and SINGE WORD search terms that a user would use to find the given input. DONT REPEAT SIMILAR ALIASES. SINGLE WORDS ONLY. DONT USE CAMEL CASE."
+            content="""You are a helpful assistant that generates aliases for a given input. 
+            Be sensitive to the language of the input and generate aliases in the same language.
+            Think of FITTING, SIMPLE and SINGE WORD search terms a student
+            would use to find the given input. DONT REPEAT SIMILAR ALIASES. 
+            SINGLE WORDS ONLY. DONT USE CAMEL CASE. NO "lmu", "munich", "student", "university" in the aliases.
+            """
         )
-        self.llm_factory = llm_factory or LLMFactory(provider="gemini", system_message=system_message)
+        self.llm_factory = llm_factory or LLMFactory(provider="openai", system_message=system_message)
 
-    def generate_alias(self, content: str, context: str) -> AliasGenerationResponse:
+    def generate_alias(self, content: str, context: str | None = None) -> AliasGenerationResponse:
         context = f"This is the context: {context}" if context else ""
         return self.llm_factory.create_completion(
             response_model=AliasGenerationResponse,
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 UserMessage(content=context),
                 UserMessage(content=content),
@@ -35,7 +40,23 @@ class AliasGenerationService:
 
 if __name__ == "__main__":
     alias_generation_service = AliasGenerationService()
-    print(alias_generation_service.generate_alias("LMU Kino"))
-    print(alias_generation_service.generate_alias("Hochschulsport"))
-    print(alias_generation_service.generate_alias("Raumfinder"))
-    print(alias_generation_service.generate_alias("Benutzerkonto"))
+    print(
+        alias_generation_service.generate_alias(
+            "LMU Kino", "This is the context: LMU Kino is a movie theater at LMU Munich"
+        )
+    )
+    print(
+        alias_generation_service.generate_alias(
+            "Hochschulsport", "This is the context: Hochschulsport is a sports club at LMU Munich"
+        )
+    )
+    print(
+        alias_generation_service.generate_alias(
+            "Raumfinder", "This is the context: Raumfinder is a room finder at LMU Munich"
+        )
+    )
+    print(
+        alias_generation_service.generate_alias(
+            "Benutzerkonto", "This is the context: Benutzerkonto is a user account at LMU Munich"
+        )
+    )

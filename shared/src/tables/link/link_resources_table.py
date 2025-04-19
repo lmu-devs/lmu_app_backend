@@ -17,6 +17,7 @@ class LinkResourceTable(LinkTable):
     __tablename__ = "link_resources"
 
     types = Column(ARRAY(String), nullable=False)
+    faculties = Column(ARRAY(String), nullable=True)
 
     translations = relationship("LinkResourceTranslationTable", back_populates="link")
 
