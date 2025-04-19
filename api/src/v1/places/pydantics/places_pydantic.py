@@ -9,7 +9,9 @@ from shared.src.tables import (
 )
 
 
-async def places_to_pydantic(places: List[any]) -> List[Place]:
+async def places_to_pydantic(
+    places: List[BuildingLocationTable | CanteenLocationTable | CinemaLocationTable],
+) -> List[Place]:
     places_pydantic = []
     for place in places:
         if isinstance(place, CanteenLocationTable):

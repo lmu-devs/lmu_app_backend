@@ -12,6 +12,10 @@ logger = get_main_logger(__name__)
 
 
 class LikeService:
+    """
+    Service for managing likes on various entities.
+    """
+
     def __init__(self, db: AsyncSession):
         self.db = db
 

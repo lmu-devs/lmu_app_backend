@@ -10,7 +10,12 @@ from ..models.semester_model import Semester, SemesterTypeEnum
 from ..models.timeline_model import Timeline
 
 
+# TODO: Localize the timeline data
 class TimelineService:
+    """
+    Service to load the timeline data (from the database).
+    """
+
     def __init__(self, db: AsyncSession):
         self.db = db
 
@@ -94,10 +99,10 @@ class TimelineService:
     def get_semesters(self) -> List[Semester]:
         # Mock semesters
         return [
-            Semester(
-                timeframe=Timeframe(start=datetime(2024, 10, 1), end=datetime(2025, 3, 31)),
-                type=SemesterTypeEnum.WINTER,
-            ),
+            # Semester(
+            #     timeframe=Timeframe(start=datetime(2024, 10, 1), end=datetime(2025, 3, 31)),
+            #     type=SemesterTypeEnum.WINTER,
+            # ),
             Semester(
                 timeframe=Timeframe(start=datetime(2025, 4, 1), end=datetime(2025, 9, 30)),
                 type=SemesterTypeEnum.SUMMER,

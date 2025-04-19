@@ -21,5 +21,9 @@ from api.src.v1.home.models.home_tile_model import HomeTiles
 
 
 class Home(BaseModel):
+    """
+    The home page model.
+    """
+
     featured: FeaturedTiles = Field()
     tiles: HomeTiles = Field()

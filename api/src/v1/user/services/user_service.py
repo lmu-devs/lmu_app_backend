@@ -6,7 +6,7 @@ from shared.src.core.logging import get_user_logger
 from shared.src.tables import UserTable
 
 from ...core import APIKey
-from ..schemas.user_scheme import UserUpdate
+from ..models.user_scheme import UserUpdate
 
 logger = get_user_logger(__name__)
 

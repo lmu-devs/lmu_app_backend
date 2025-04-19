@@ -15,6 +15,7 @@ async def wishlist_to_pydantic(wishlist: WishlistTable, user_id: Optional[uuid.U
     # Handle likes
     user_likes_wishlist = None
     if user_id:
+        # TODO: This is a temporary solution, we need to use a more efficient way to check if the user has liked the wishlist
         user_likes_wishlist = any(like.user_id == user_id for like in wishlist.likes)
 
     rating = Rating(like_count=len(wishlist.likes), is_liked=user_likes_wishlist)
