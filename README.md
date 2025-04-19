@@ -13,8 +13,6 @@ This is the backend service for the LMU App. It provides the necessary API endpo
   - [Tech Stack](#tech-stack)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-    - [Using Python Virtual Environment](#using-python-virtual-environment)
-    - [Using Docker Compose](#using-docker-compose)
   - [Environments](#environments)
     - [Development](#development)
     - [Staging](#staging)
@@ -47,12 +45,10 @@ Before you begin, ensure you have met the following requirements:
 
 ## Installation
 
-### Using Python Virtual Environment
-
 1. Clone the repository:
    ```
    git clone https://github.com/lmu-devs/lmu_app_backend.git
-   cd lmu-app-backend
+   cd lmu_app_backend
    ```
 
 2. Create a virtual environment:
@@ -75,27 +71,14 @@ Before you begin, ensure you have met the following requirements:
    pip install -r requirements.txt
    ```
 
-5. Run docker compose:
-   ```
-   docker compose up -d
-   ```
-
-### Using Docker Compose
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/lmu-devs/lmu_app_backend.git
-   cd lmu-app-backend
-   ```
-
-2. Copy the environment template (Ask a developer for the .env file):
+5. Copy the environment template (Ask a developer for the .env file):
    ```
    cp .env.template .env
    ```
 
-3. Build and run the Docker containers:
+6. Run docker compose:
    ```
-   docker compose up --build
+   docker compose up db api_dev data_fetcher_dev -d
    ```
 
 ## Environments
@@ -140,33 +123,31 @@ Available services:
 
 The application consists of several Docker services:
 
-1. **API Service** (`api`):
+1. **API** (`api`):
    - Main FastAPI application
    - Exposed on port 8001 (localhost)
    - Development mode available with hot-reload (`api_dev`)
 
-2. **Database** (`db`):
-   - PostgreSQL 16.4
-   - Exposed on port 5432
-   - Includes health checks
+2. **Data Fetcher** (`data_fetcher`):
+   - Background data processing service
+   - Development mode available (`data_fetcher_dev`)
 
-3. **Metabase** (`metabase`):
-   - Data analytics platform
-   - Exposed on port 3000
-   - Separate PostgreSQL instance (`db_mb`) on port 5433
+3. **Database** (`db`):
+   - PostgreSQL 16.4
+   - Centralized database for all services
 
 4. **PgAdmin** (`pgadmin`):
    - Database management interface
    - Configurable port through environment variables
 
-5. **Data Fetcher** (`data_fetcher`):
-   - Background data processing service
-   - Development mode available (`data_fetcher_dev`)
+5. **Metabase** (`metabase`):
+   - Data analytics platform
+   - Exposed on port 3000
+   - Separate PostgreSQL instance (`db_mb`) on port 5433
 
 6. **Nginx Proxy Manager** (`nginx`):
    - Reverse proxy and SSL management
    - Ports 80 and 443
-   - Includes Let's Encrypt integration
 
 ## Branching Strategy
 
@@ -188,8 +169,9 @@ GitHub Actions automation:
 
 1. **Continuous Integration**:
    - Runs on all pull requests
-   - Executes test suite
-   - Performs code quality checks
+   - Formats code
+   - Executes test suite (TODO)
+   - Performs code quality checks (TODO)
 
 2. **Staging Deployment**:
    - Triggered on `staging` branch updates
@@ -224,4 +206,3 @@ After deployment, the following services are available:
 - REST API: `http://localhost:8001/v1`
 - PgAdmin: `http://localhost:5050`
 - Metabase: `http://localhost:3000`
-- Nginx Proxy Manager: `http://localhost:81`

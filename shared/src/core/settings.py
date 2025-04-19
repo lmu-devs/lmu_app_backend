@@ -2,20 +2,15 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from shared.src.settings.llm_settings import (
-    AnthropicSettings,
-    GeminiSettings,
-    OpenAISettings,
-)
+from shared.src.settings.llm_settings import AnthropicConfig, OpenAIConfig
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     app_name: str = "LMU App Backend"
-    openai: OpenAISettings = OpenAISettings()
-    anthropic: AnthropicSettings = AnthropicSettings()
-    gemini: GeminiSettings = GeminiSettings()
+    openai_config: OpenAIConfig = OpenAIConfig()
+    anthropic_config: AnthropicConfig = AnthropicConfig()
 
     # Environment
     ENVIRONMENT: str
