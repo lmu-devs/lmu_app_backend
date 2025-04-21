@@ -10,6 +10,8 @@ This is the backend service for the LMU App. It provides the necessary API endpo
 - [LMU App Backend](#lmu-app-backend)
   - [Table of Contents](#table-of-contents)
   - [Structure](#structure)
+    - [High Level Structure](#high-level-structure)
+    - [Data Flow](#data-flow)
   - [Tech Stack](#tech-stack)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -24,7 +26,11 @@ This is the backend service for the LMU App. It provides the necessary API endpo
   - [Usage](#usage)
 
 ## Structure
-![alt text](documentation/assets/backend_structure.png)
+### High Level Structure
+![High Level Structure](documentation/assets/backend_structure.png)
+
+### Data Flow
+![Data Flow](documentation/assets/backend_data_flow.jpg)
 
 
 ## Tech Stack

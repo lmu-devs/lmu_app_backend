@@ -127,8 +127,8 @@ class TumScreeningCrawler:
 
         return year, custom_poster_url, tagline, description
 
-    def _is_garching_in_title(self, title: str) -> bool:
-        return "Garching" in title
+    def _is_garching_in_location(self, location: str) -> bool:
+        return "Garching" in location
 
     def crawl(self) -> list[ScreeningCrawl]:
         response = requests.get(self.rss_url)
@@ -144,7 +144,7 @@ class TumScreeningCrawler:
         for item in soup.find_all("item"):
             base_title = item.title.text
 
-            is_garching = self._is_garching_in_title(base_title)
+            is_garching = self._is_garching_in_location(item.find("location").text)
             self.cinema_id = CinemaEnum.TUM_GARCHING.value if is_garching else CinemaEnum.TUM.value
             title = self._clean_title(base_title)
             date = self._parse_date(item.pubDate.text)
