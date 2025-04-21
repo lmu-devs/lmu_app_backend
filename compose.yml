@@ -3,8 +3,6 @@ services:
         image: postgres:16.4-bookworm
         volumes:
             - postgres_data:/var/lib/postgresql/data/
-        env_file:
-            - .env
         container_name: db
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
@@ -14,7 +12,7 @@ services:
             POSTGRES_HOST: ${POSTGRES_HOST}
             PGDATABASE: ${POSTGRES_DB}
         ports:
-            - '5432:5432'
+            - '127.0.0.1:5432:5432'
         restart: always
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
@@ -23,13 +21,12 @@ services:
             retries: 5
         networks:
             - backend
+            - frontend
 
     db_mb:
         image: postgres:16.4-bookworm
         volumes:
             - postgres_metabase_data:/var/lib/postgresql/data/
-        env_file:
-            - .env
         container_name: db_mb
         environment:
             POSTGRES_DB: ${MB_DB_DBNAME}
@@ -47,25 +44,6 @@ services:
             retries: 5
         networks:
             - backend
-
-    pgadmin:
-        image: dpage/pgadmin4
-        container_name: pgadmin
-        env_file:
-            - .env
-        environment:
-            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
-            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
-        ports:
-            - '${PGADMIN_PORT}:80'
-        volumes:
-            - pgadmin_data:/var/lib/pgadmin
-        depends_on:
-            - db
-        networks:
-            - frontend
-            - backend
-        restart: always
 
     metabase:
         image: metabase/metabase:latest
