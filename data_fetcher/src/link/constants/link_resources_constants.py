@@ -422,24 +422,6 @@ link_resource_constants = [
         ],
     ),
     LinkResourceTable(
-        id="CENTRAL_STUDY_ADVICE",
-        url="https://www.lmu.de/de/studium/wichtige-kontakte/zentrale-studienberatung/index.html",
-        types=[LinkType.INTERNAL],
-        faculties=[],
-        translations=[
-            LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US,
-                title="Central Study Advice",
-                description="Questions about studying at LMU",
-            ),
-            LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN,
-                title="Zentrale Studienberatung",
-                description="Fragen rund um das Studium",
-            ),
-        ],
-    ),
-    LinkResourceTable(
         id="CAMPUS_NEWSPAPER",
         url="https://cazelmu.wordpress.com/",
         types=[LinkType.INTERNAL],
@@ -454,24 +436,6 @@ link_resource_constants = [
                 language=LanguageEnum.GERMAN,
                 title="Campuszeitung",
                 description="Artikel, Uni-Leben, etc.",
-            ),
-        ],
-    ),
-    LinkResourceTable(
-        id="COUNSELING_OFFERS",
-        url="https://www.lmu.de/de/die-lmu/arbeiten-an-der-lmu/zusaetzliche-angebote/diversity/wecare-lmu-2024/beratungsangebote/",
-        types=[LinkType.INTERNAL],
-        faculties=[],
-        translations=[
-            LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US,
-                title="Counseling Offers",
-                description="Psychological Counseling, Counseling Centers, etc.",
-            ),
-            LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN,
-                title="Beratungsangebote",
-                description="Psychologische Beratung, Anlauf- und Beratungsstellen",
             ),
         ],
     ),
@@ -562,24 +526,6 @@ link_resource_constants = [
                 language=LanguageEnum.GERMAN,
                 title="BAföG",
                 description="Studiumsfinanzierung",
-            ),
-        ],
-    ),
-    LinkResourceTable(
-        id="MECUM",
-        url="https://stadt.muenchen.de/service/info/bafoeg-antrag-ausbildungsfoerderung/1074970/n0/",
-        types=[LinkType.EXTERNAL],
-        faculties=[],
-        translations=[
-            LinkResourceTranslationTable(
-                language=LanguageEnum.ENGLISH_US,
-                title="MeCum",
-                description="Web Medicin",
-            ),
-            LinkResourceTranslationTable(
-                language=LanguageEnum.GERMAN,
-                title="MeCum",
-                description="Web-Angebote Medizin Studium",
             ),
         ],
     ),
