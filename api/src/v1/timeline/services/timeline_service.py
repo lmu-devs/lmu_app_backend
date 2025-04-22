@@ -40,6 +40,29 @@ class TimelineService:
                 type=EventTypeEnum.SEMESTER,
                 timeframe=Timeframe(start=datetime(2025, 7, 26), end=datetime(2025, 10, 12)),
             ),
+            Event(
+                title="Lange Nacht der Universitäten",
+                type=EventTypeEnum.EVENT,
+                timeframe=Timeframe(start=datetime(2025, 4, 30), end=datetime(2025, 4, 30)),
+            ),
+            Event(
+                title="StuStaCulum Festival",
+                type=EventTypeEnum.EVENT,
+                url="https://www.stustaculum.de/",
+                timeframe=Timeframe(start=datetime(2025, 5, 28), end=datetime(2025, 5, 31)),
+            ),
+            Event(
+                title="Uni Sommerfest",
+                type=EventTypeEnum.EVENT,
+                url="https://www.unikult.lmu.de/uni-sommerfest/",
+                timeframe=Timeframe(start=datetime(2025, 7, 4), end=datetime(2025, 7, 4)),
+            ),
+            Event(
+                title="Internationale Woche",
+                type=EventTypeEnum.EVENT,
+                url="https://www.lmu.de/de/newsroom/veranstaltungskalender/veranstaltung/internationale-woche.html",
+                timeframe=Timeframe(start=datetime(2025, 5, 7), end=datetime(2025, 5, 13)),
+            ),
             # Winter
             Event(
                 title="Vorlesungsbeginn",
@@ -50,11 +73,6 @@ class TimelineService:
                 title="Winterferien",
                 type=EventTypeEnum.SEMESTER,
                 timeframe=Timeframe(start=datetime(2025, 12, 24), end=datetime(2026, 1, 6)),
-            ),
-            Event(
-                title="Semesterbeitrag zahlen",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2025, 12, 1), end=datetime(2026, 2, 8)),
             ),
             # Sommer
             Event(
