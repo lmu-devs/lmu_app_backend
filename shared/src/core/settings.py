@@ -48,11 +48,6 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
 
-    # PgAdmin settings
-    PGADMIN_PORT: str = "5050"
-    PGADMIN_DEFAULT_EMAIL: str
-    PGADMIN_DEFAULT_PASSWORD: str
-
     # Metabase settings
     MB_DB_DBNAME: str
     MB_DB_USER: str

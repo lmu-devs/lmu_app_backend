@@ -4,7 +4,6 @@ from sqlalchemy import (
     Column,
     Date,
     DateTime,
-    Enum,
     ForeignKey,
     ForeignKeyConstraint,
     Integer,
@@ -14,7 +13,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
-from shared.src.enums import CanteenEnum
 
 
 class MenuDishAssociation(Base):
