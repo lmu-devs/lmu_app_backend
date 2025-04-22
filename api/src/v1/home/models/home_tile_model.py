@@ -36,9 +36,11 @@ class BaseHomeTile(BaseModel):
         description="The title of the tile",
     )
     description: str | None = Field(
+        default=None,
         description="The description of the tile",
     )
     data: Any | None = Field(
+        default=None,
         description="Optional data parameter for the tile. Can be used for deep linking, or other purposes.",
     )
 

@@ -295,4 +295,22 @@ link_resource_constants = [
             ),
         ],
     ),
+    LinkResourceTable(
+        id="INFORMATICS_GROUP_CHATS",
+        url="https://linktr.ee/lmu_info",
+        types=[LinkType.INTERNAL],
+        faculties=[FacultyEnum.MATH_INFO_STATS],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Informatics Group Chats",
+                description="WhatsApp groups for Informatics Students",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Informatik-Gruppen-Chats",
+                description="WhatsApp-Gruppen für Informatik-Studierende",
+            ),
+        ],
+    ),
 ]

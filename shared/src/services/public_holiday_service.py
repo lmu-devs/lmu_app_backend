@@ -76,3 +76,4 @@ if __name__ == "__main__":
     public_holiday_service = PublicHolidayService(LanguageEnum.GERMAN)
     print(public_holiday_service.is_university_holiday(date(2024, 12, 25)))
     print(public_holiday_service.get_holiday_name(date(2024, 12, 25)))
+    print(public_holiday_service.is_public_holiday())

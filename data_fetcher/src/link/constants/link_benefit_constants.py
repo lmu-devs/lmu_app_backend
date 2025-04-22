@@ -107,12 +107,12 @@ link_benefit_constants = [
             LinkBenefitTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
                 title="GitHub Education",
-                description="Free GitHub Pro, GitHub Copilot, GitHub Codespaces, GitHub Student Developer Pack",
+                description="Free GitHub Pro, Copilot, Codespaces, Student Developer Pack",
             ),
             LinkBenefitTranslationTable(
                 language=LanguageEnum.GERMAN,
                 title="GitHub Education",
-                description="Kostenloses GitHub Pro, GitHub Copilot, GitHub Codespaces, GitHub Student Developer Pack",
+                description="Kostenloses GitHub Pro, Copilot, Codespaces, Student Developer Pack",
             ),
         ],
     ),
@@ -132,6 +132,25 @@ link_benefit_constants = [
                 language=LanguageEnum.GERMAN,
                 title="Figma",
                 description="Design, Prototyping, Real-Time Collaboration",
+            ),
+        ],
+    ),
+    LinkBenefitTable(
+        id="JETBRAINS",
+        types=[BenefitType.SOFTWARE],
+        faculties=[],
+        url="https://www.jetbrains.com/student/",
+        image_url="https://resources.jetbrains.com/storage/desktop-art/general/jetbrains/Wallpapers/1366x768-jetbrains2024_1.png",
+        translations=[
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="JetBrains",
+                description="Free IDEs, IDE Extensions, and more",
+            ),
+            LinkBenefitTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="JetBrains",
+                description="Kostenlose IDEs, IDE-Erweiterungen und mehr",
             ),
         ],
     ),
