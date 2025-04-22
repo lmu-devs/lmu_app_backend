@@ -298,7 +298,7 @@ link_resource_constants = [
     LinkResourceTable(
         id="INFORMATICS_GROUP_CHATS",
         url="https://linktr.ee/lmu_info",
-        types=[LinkType.INTERNAL],
+        types=[LinkType.EXTERNAL],
         faculties=[FacultyEnum.MATH_INFO_STATS],
         translations=[
             LinkResourceTranslationTable(
@@ -310,6 +310,402 @@ link_resource_constants = [
                 language=LanguageEnum.GERMAN,
                 title="Informatik-Gruppen-Chats",
                 description="WhatsApp-Gruppen für Informatik-Studierende",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="INFORMATICS_EXAM_DATES",
+        url="https://studiengangskoordination.ifi.lmu.de/misc/klausuren.html",
+        types=[LinkType.INTERNAL],
+        faculties=[FacultyEnum.MATH_INFO_STATS],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Exam Dates",
+                description="Exam dates for Computer Science, Media Informatics, Bioinformatics and HCI Students",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Klausurtermine",
+                description="Klausurtermine für (Medien/Bio-)Informatik- und HCI-Studierende",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="UNI_RADIO",
+        url="http://www.m945.de/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Uni Radio",
+                description="Daily Shows, Music, News, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Uni Radio",
+                description="Daily Shows, Musik, Nachrichten, etc.",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="CAREER_SERVICE",
+        url="https://www.lmu.de/de/workspace-fuer-studierende/career-service/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Career Service",
+                description="Career Service, Auslandspraktikum, Jobbörse, Karriere-Events",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Karriere Service",
+                description="Karriere, Auslandspraktikum, Jobbörse, Karriere-Events",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="STELLENPORTAL",
+        url="https://www.lmu.de/de/die-lmu/arbeiten-an-der-lmu/stellenportal/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Job Portal",
+                description="Work at the University",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Stellenportal",
+                description="Arbeiten an der Universität",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="INTERNATIONAL_AFFAIRS",
+        url="https://www.lmu.de/en/study/important-contacts/international-office/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="International Affairs",
+                description="International Affairs, Exchange Programs, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Internationale Angelegenheiten",
+                description="Auslandssemester, Erasmus, LMUexchange",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="CENTRAL_STUDY_ADVICE",
+        url="https://www.lmu.de/de/studium/wichtige-kontakte/zentrale-studienberatung/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Central Study Advice",
+                description="Questions about studying at LMU",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Zentrale Studienberatung",
+                description="Fragen rund um das Studium",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="CENTRAL_STUDY_ADVICE",
+        url="https://www.lmu.de/de/studium/wichtige-kontakte/zentrale-studienberatung/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Central Study Advice",
+                description="Questions about studying at LMU",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Zentrale Studienberatung",
+                description="Fragen rund um das Studium",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="CAMPUS_NEWSPAPER",
+        url="https://cazelmu.wordpress.com/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Campus Newspaper",
+                description="Articles, University Life, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Campuszeitung",
+                description="Artikel, Uni-Leben, etc.",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="COUNSELING_OFFERS",
+        url="https://www.lmu.de/de/die-lmu/arbeiten-an-der-lmu/zusaetzliche-angebote/diversity/wecare-lmu-2024/beratungsangebote/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Counseling Offers",
+                description="Psychological Counseling, Counseling Centers, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Beratungsangebote",
+                description="Psychologische Beratung, Anlauf- und Beratungsstellen",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="COUNSELING_OFFERS",
+        url="https://www.lmu.de/de/die-lmu/arbeiten-an-der-lmu/zusaetzliche-angebote/diversity/wecare-lmu-2024/beratungsangebote/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Counseling Offers",
+                description="Psychological Counseling, Counseling Centers, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Beratungsangebote",
+                description="Psychologische Beratung, Anlauf- und Beratungsstellen",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="STUDYDRIVE",
+        url="https://www.studydrive.net/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="StudyDrive",
+                description="Study materials from other students",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="StudyDrive",
+                description="Lernmaterialien von anderen Studierenden",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="STUDOCU",
+        url="https://www.studocu.com/de",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Studocu",
+                description="Study materials from other students",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Studocu",
+                description="Lernmaterialien, Zusammenfassungen",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="STUDENT_HOUSING",
+        url="https://www.studierendenwerk-muenchen-oberbayern.de/wohnen/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Student Housing",
+                description="Accommodation, Application",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Studentisches Wohnen",
+                description="Studentenwohnheime, Bewerbung, Wohnen",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="BAFOEG",
+        url="https://stadt.muenchen.de/service/info/bafoeg-antrag-ausbildungsfoerderung/1074970/n0/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="BAföG",
+                description="Study Funding",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="BAföG",
+                description="Studiumsfinanzierung",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="MECUM",
+        url="https://stadt.muenchen.de/service/info/bafoeg-antrag-ausbildungsfoerderung/1074970/n0/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="MeCum",
+                description="Web Medicin",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="MeCum",
+                description="Web-Angebote Medizin Studium",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="MECUM",
+        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/zentrale-it-angebote/mecum-online/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="MeCum",
+                description="Web Medicin",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="MeCum",
+                description="Web-Angebote Medizin Studium",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="LMU_SHOP",
+        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/zentrale-it-angebote/mecum-online/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="LMU Shop",
+                description="Merchandise",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="LMU Shop",
+                description="Merchandise",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="UNI_KULT",
+        url="https://www.unikult.lmu.de/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="UniKult e.V.",
+                description="Events, Summer Festival, Ersti-Party",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="UniKult e.V.",
+                description="Uni-Events, Sommerfest, Ersti-Party",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="CDTM",
+        url="https://www.cdtm.de/",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="CDTM",
+                description="Center for Digital Technology and Management",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="CDTM",
+                description="Center for Digital Technology and Management",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="STIPENDIEN",
+        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/zentrale-it-angebote/mecum-online/",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="Scholarships",
+                description="Scholarships and financial aid",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Stipendien",
+                description="Stipendien und Finanzhilfe",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="BUNDESVERBAND_DEUTSCHER_STIFTUNGEN",
+        url="https://www.stiftungen.org/startseite.html",
+        types=[LinkType.EXTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="German Foundation Association",
+                description="Financial Aid, Scholarships, etc.",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="Bundesverband Deutscher Stiftungen",
+                description="Finanzierung, Stiftungen, Verbände",
+            ),
+        ],
+    ),
+    LinkResourceTable(
+        id="IT_SERVICEDESK",
+        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/index.html",
+        types=[LinkType.INTERNAL],
+        faculties=[],
+        translations=[
+            LinkResourceTranslationTable(
+                language=LanguageEnum.ENGLISH_US,
+                title="IT-Servicedesk",
+                description="IT-Support",
+            ),
+            LinkResourceTranslationTable(
+                language=LanguageEnum.GERMAN,
+                title="IT-Servicedesk",
+                description="IT-Support",
             ),
         ],
     ),
