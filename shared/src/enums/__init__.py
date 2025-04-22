@@ -9,3 +9,16 @@ from .opening_hours_enum import *
 from .rating_enums import *
 from .university_enums import *
 from .weekday_enum import *
+
+__all__ = [
+    "CanteenEnum",
+    "CinemaEnum",
+    "DishCategoryEnum",
+    "FacultyEnum",
+    "HomeTileEnum",
+    "ImageFormatEnum",
+    "LanguageEnum",
+    "OpeningHoursEnum",
+    "RatingEnum",
+    "UniversityEnum",
+]
