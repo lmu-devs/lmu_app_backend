@@ -10,6 +10,7 @@ class LLMProviderSettings(BaseSettings):
 class OpenAIConfig(LLMProviderSettings):
     api_key: str | None = Field(alias="OPENAI_API_KEY", default=None)
     default_model: str = "gpt-4o"
+    temperature: float = 0.7
 
 
 class AnthropicConfig(LLMProviderSettings):

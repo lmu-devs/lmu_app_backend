@@ -69,8 +69,8 @@ munich_locations = {
     ),
     CanteenEnum.STUBISTRO_OLYMPIACAMPUS: Location(
         address="Am Olympiacampus 11, 80809 München",
-        latitude=48.181983,
-        longitude=11.552184,
+        latitude=48.179918,
+        longitude=11.544748,
     ),
     # CanteenEnum.STULOUNGE_OLYMPIACAMPUS: Location(
     #     address="Am Olympiacampus 11, 80809 München",
