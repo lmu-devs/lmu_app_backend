@@ -36,11 +36,6 @@ class TimelineService:
                 timeframe=Timeframe(start=datetime(2025, 4, 23), end=datetime(2025, 4, 23)),
             ),
             Event(
-                title="Semesterferien",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2025, 7, 26), end=datetime(2025, 10, 12)),
-            ),
-            Event(
                 title="Lange Nacht der Universitäten",
                 type=EventTypeEnum.EVENT,
                 timeframe=Timeframe(start=datetime(2025, 4, 30), end=datetime(2025, 4, 30)),
@@ -52,16 +47,21 @@ class TimelineService:
                 timeframe=Timeframe(start=datetime(2025, 5, 28), end=datetime(2025, 5, 31)),
             ),
             Event(
+                title="Internationale Woche",
+                type=EventTypeEnum.EVENT,
+                url="https://www.lmu.de/de/newsroom/veranstaltungskalender/veranstaltung/internationale-woche.html",
+                timeframe=Timeframe(start=datetime(2025, 5, 7), end=datetime(2025, 5, 13)),
+            ),
+            Event(
                 title="Uni Sommerfest",
                 type=EventTypeEnum.EVENT,
                 url="https://www.unikult.lmu.de/uni-sommerfest/",
                 timeframe=Timeframe(start=datetime(2025, 7, 4), end=datetime(2025, 7, 4)),
             ),
             Event(
-                title="Internationale Woche",
-                type=EventTypeEnum.EVENT,
-                url="https://www.lmu.de/de/newsroom/veranstaltungskalender/veranstaltung/internationale-woche.html",
-                timeframe=Timeframe(start=datetime(2025, 5, 7), end=datetime(2025, 5, 13)),
+                title="Semesterferien",
+                type=EventTypeEnum.SEMESTER,
+                timeframe=Timeframe(start=datetime(2025, 7, 26), end=datetime(2025, 10, 12)),
             ),
             # Winter
             Event(
@@ -101,11 +101,11 @@ class TimelineService:
                 type=EventTypeEnum.SEMESTER,
                 timeframe=Timeframe(start=datetime(2026, 12, 13), end=datetime(2027, 1, 13)),
             ),
-            Event(
-                title="Semesterbeitrag zahlen",
-                type=EventTypeEnum.SEMESTER,
-                timeframe=Timeframe(start=datetime(2026, 12, 15), end=datetime(2027, 2, 8)),
-            ),
+            # Event(
+            #     title="Semesterbeitrag zahlen",
+            #     type=EventTypeEnum.SEMESTER,
+            #     timeframe=Timeframe(start=datetime(2026, 12, 15), end=datetime(2027, 2, 8)),
+            # ),
             # Event(
             # title="Semesterferien",
             # type=EventTypeEnum.SEMESTER,
