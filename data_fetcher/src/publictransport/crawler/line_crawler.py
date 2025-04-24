@@ -6,13 +6,8 @@ from typing import List, Optional
 
 from publictransport.models.line_models import MvvLine
 
-
-
-
 # Default path for the input CSV. Configure as needed.
-DEFAULT_MVV_CSV_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "24-12-mvvlines_openData.csv"
-)
+DEFAULT_MVV_CSV_PATH = os.path.join(os.path.dirname(__file__), "..", "24-12-mvvlines_openData.csv")
 
 
 class MvvCrawler:
@@ -57,9 +52,7 @@ class MvvCrawler:
 
                 # Verify headers or assume order
                 if not all(h in headers for h in expected_headers):
-                    print(
-                        f"CSV headers {headers} might not fully match expected {expected_headers}."
-                    )
+                    print(f"CSV headers {headers} might not fully match expected {expected_headers}.")
                     if len(headers) < 3:
                         raise ValueError(
                             "CSV file must contain at least LINIENNR_EFA, VERKEHRSMITTEL, BRANCH_NR columns"
@@ -179,9 +172,9 @@ class MvvCrawler:
             elif mittel == "Tram":
                 return f"{base_url}020{numeric_part_efa}.svg"
             elif mittel == "U-Bahn":
-                 # Ensure 'U' is removed before padding if needed, though U-Bahn numbers are single usually
-                u_num_part = efa.replace('U', '')
-                return f"{base_url}010{u_num_part}.svg" # e.g., 0101, 0106
+                # Ensure 'U' is removed before padding if needed, though U-Bahn numbers are single usually
+                u_num_part = efa.replace("U", "")
+                return f"{base_url}010{u_num_part}.svg"  # e.g., 0101, 0106
             elif mittel in ["Regionalzug", "RufTaxi"]:
                 return None  # No URL pattern known
             else:
@@ -258,7 +251,7 @@ class MvvCrawler:
                     # Map any extra fields if needed and defined in MvvLine model
                 )
                 processed_lines.append(mvv_line)
-            except Exception as e: # Catch potential Pydantic validation errors etc.
+            except Exception as e:  # Catch potential Pydantic validation errors etc.
                 print(f"Error creating MvvLine model for {raw_line}: {e}")
         return processed_lines
 
@@ -295,8 +288,8 @@ if __name__ == "__main__":
         crawler = MvvCrawler(csv_filepath=dummy_filepath)
         lines = crawler.get_lines()
         print(f"Successfully crawled {len(lines)} MVV lines.")
-        for line in lines[:5]: # Print first 5 lines
-             print(line.model_dump_json(indent=2))
+        for line in lines[:5]:  # Print first 5 lines
+            print(line.model_dump_json(indent=2))
 
     except (FileNotFoundError, ValueError, IOError) as e:
         print(f"Error during MVV crawl: {e}")

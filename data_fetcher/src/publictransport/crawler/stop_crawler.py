@@ -2,18 +2,17 @@
 
 import csv
 import os
-import re # Needed for validator in model   
+import re  # Needed for validator in model
 from typing import List, Optional
 
 # Adjust the import path based on your project structure
 # Assuming models.py is in publictransport/models/
-from publictransport.models.stop_models import MvvStop # Import model and logger
+from publictransport.models.stop_models import MvvStop  # Import model and logger
 from pydantic import ValidationError
-
 
 # Default path for the input CSV. Configure as needed.
 DEFAULT_MVV_STOP_CSV_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "MVV_HSTReport2412.csv" # Point to the stop report
+    os.path.dirname(__file__), "..", "MVV_HSTReport2412.csv"  # Point to the stop report
 )
 
 
@@ -54,18 +53,18 @@ class MvvStopCrawler:
 
                 # Define expected headers based on the model aliases
                 # Using aliases allows flexibility if CSV headers change slightly
-                expected_headers = list(MvvStop.__fields__.keys()) # Get model field names
+                expected_headers = list(MvvStop.__fields__.keys())  # Get model field names
                 aliases = {field.alias: name for name, field in MvvStop.__fields__.items()}
 
                 # Check if required headers (aliases) are present
                 missing_headers = [alias for alias in aliases if alias not in headers]
                 if missing_headers:
-                     raise ValueError(f"CSV file is missing required columns: {missing_headers}")
+                    raise ValueError(f"CSV file is missing required columns: {missing_headers}")
 
                 header_map = {alias: headers.index(alias) for alias in aliases}
 
                 for i, row in enumerate(reader):
-                    if not row or len(row) < len(headers): # Ensure row has enough columns
+                    if not row or len(row) < len(headers):  # Ensure row has enough columns
                         print(f"Skipping incomplete row {i+2}: {row}")
                         continue
 
@@ -75,7 +74,7 @@ class MvvStopCrawler:
                     # Add any extra columns not defined in the Pydantic model explicitly
                     for idx, header in enumerate(headers):
                         if header not in raw_stop_data and len(row) > idx:
-                             raw_stop_data[header] = row[idx].strip() # Add extra data
+                            raw_stop_data[header] = row[idx].strip()  # Add extra data
 
                     stops.append(raw_stop_data)
 
@@ -85,7 +84,7 @@ class MvvStopCrawler:
         except FileNotFoundError:
             print(f"Failed to find CSV file: {self.csv_filepath}")
             raise
-        except ValueError as ve: # Catch missing headers error
+        except ValueError as ve:  # Catch missing headers error
             print(f"Header validation failed for {self.csv_filepath}: {ve}")
             raise
         except Exception as e:
@@ -112,12 +111,12 @@ class MvvStopCrawler:
             except ValidationError as e:
                 validation_errors += 1
                 print(f"Validation failed for stop data at original row {i+2}: {raw_stop}. Error: {e}")
-            except Exception as e: # Catch other unexpected errors during model creation
-                 validation_errors += 1
-                 print(f"Failed to create MvvStop model for raw data at row {i+2}: {raw_stop}. Error: {e}")
+            except Exception as e:  # Catch other unexpected errors during model creation
+                validation_errors += 1
+                print(f"Failed to create MvvStop model for raw data at row {i+2}: {raw_stop}. Error: {e}")
 
         if validation_errors > 0:
-             print(f"Encountered {validation_errors} validation issues while processing stops.")
+            print(f"Encountered {validation_errors} validation issues while processing stops.")
         print(f"Successfully processed {len(processed_stops)} MVV stop entries into models.")
         return processed_stops
 
@@ -133,7 +132,7 @@ if __name__ == "__main__":
 "70";"Universität";"München";"de:09162:70";"11.580875";"48.150599"
 "9999";"Invalid Coord Stop";"Testort";"de:99999:1";"200.0";"100.0"
 "10000";"Missing Name";"";"de:10000:1";"11.5";"48.1"
-""" # Added invalid row for testing
+"""  # Added invalid row for testing
         with open(dummy_stop_filepath, "w", encoding="utf-8") as f:
             f.write(dummy_stop_file_content)
         print(f"Created dummy stop file: {dummy_stop_filepath}")
@@ -142,8 +141,8 @@ if __name__ == "__main__":
         stop_crawler = MvvStopCrawler(csv_filepath=dummy_stop_filepath)
         stops = stop_crawler.get_stops()
         print(f"Successfully crawled {len(stops)} MVV stops.")
-        for stop in stops[:5]: # Print first 5 stops
-             print(stop.model_dump_json(indent=2))
+        for stop in stops[:5]:  # Print first 5 stops
+            print(stop.model_dump_json(indent=2))
 
     except (FileNotFoundError, ValueError, IOError) as e:
         print(f"Error during MVV stop crawl: {e}")
