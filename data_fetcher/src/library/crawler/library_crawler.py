@@ -1,32 +1,28 @@
 import json
-import logging
 import re
 import time
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup, Tag
-from geopy.exc import GeocoderServiceError, GeocoderTimedOut
-from geopy.geocoders import Nominatim
+from pydantic import BaseModel, Field
 
-from shared.src.factories.llm_factory import LLMFactory
-from shared.src.models.llm_message_models import SystemMessage
-
-from ..models.library_model import (
-    Address,
-    CityEnum,
-    ContactInfo,
+from data_fetcher.src.library.models.library_model import (
+    Contact,
     DaySchedule,
     Library,
     OpeningHours,
 )
+from shared.src.core.logging import get_library_logger
+from shared.src.factories.llm_factory import LLMFactory
+from shared.src.models.llm_message_models import SystemMessage, UserMessage
+from shared.src.models.location_model import Location, Locations
+from shared.src.models.phone_model import Phones
+from shared.src.services.geocoding_service import GeocodingService
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
+logger = get_library_logger(__name__)
 
 
 class LibraryCrawler:
@@ -44,9 +40,6 @@ class LibraryCrawler:
         self.session = requests.Session()
         self.llm = LLMFactory(
             provider="openai",
-            system_message=SystemMessage(
-                content="You are a helpful assistant that can answer questions and help with tasks."
-            ),
         )
         # Set a more descriptive user agent
         self.session.headers.update(
@@ -54,9 +47,7 @@ class LibraryCrawler:
                 "User-Agent": "MunichLibraryFetcher/1.0 (https://github.com/lmu-dev/lmu_app_backend; admin@lmu-dev.org)"  # Replace with actual info
             }
         )
-        self.geolocator = Nominatim(
-            user_agent="MunichLibraryCrawler/1.0 (contact@example.com)"
-        )  # Use specific app name & contact
+        self.geocoding_service = GeocodingService(user_agent="MunichLibraryCrawler/1.0 (contact@example.com)")
 
     def _get_page(self, url: str) -> Optional[BeautifulSoup]:
         """Fetch a page and return its BeautifulSoup object."""
@@ -87,253 +78,65 @@ class LibraryCrawler:
         email_pattern = r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"
         return re.findall(email_pattern, text)
 
-    def _extract_phone_numbers(self, text: str) -> List[str]:
+    def _generate_phone_numbers(self, text: str) -> Phones:
         """Extract and normalize phone numbers."""
         if not text:
             return []
-        # More robust pattern to capture various formats, incl. extensions
-        # Allows spaces, dashes, dots, parens, slashes, and optional '+'
-        # Requires at least 5 digits total to reduce false positives
-        pattern = r"(?:\+\d{1,3}[\s.-]?)?\(?\d{1,5}\)?(?:[\s.-]?\d{1,}){2,}(?:[\s.-]?Durchwahl[\s.-]?\d+)?"
-        phones = re.findall(pattern, text)
-        cleaned_phones = []
-        for phone in phones:
-            # Normalize by removing non-digit chars, except leading '+' if present
-            digits_only = re.sub(r"\D", "", phone)
-            if len(digits_only) >= 5:  # Basic sanity check for minimum length
-                # Keep some formatting for readability? Or fully normalize?
-                # Let's do basic cleaning for now:
-                clean_phone = phone.strip().replace(".", "-").replace("/", "-")
-                clean_phone = re.sub(r"\s+", " ", clean_phone)
-                # Avoid adding duplicates if extraction yields overlapping results
-                if clean_phone not in cleaned_phones:
-                    cleaned_phones.append(clean_phone)
-        return cleaned_phones
 
-    def _get_coordinates(self, address: str) -> Optional[tuple[float, float]]:
-        """Get coordinates for an address using Nominatim with retries."""
-        if not address:
-            return None
-        retries = 2
-        for attempt in range(retries):
-            try:
-                logger.debug(f"Geocoding attempt {attempt + 1}/{retries} for: {address}")
-                location = self.geolocator.geocode(address, timeout=10)  # Add timeout
-                if location:
-                    logger.debug(f"Geocoded successfully: {location.latitude}, {location.longitude}")
-                    return (location.latitude, location.longitude)
-                # If geocode returns None, it means not found, don't retry necessarily
-                logger.warning(f"Could not geocode address: {address}")
-                return None  # Address not found by geocoder
-            except GeocoderTimedOut:
-                logger.warning(f"Geocoding timed out for address: {address}. Retrying ({attempt + 1}/{retries})...")
-                time.sleep(2 + attempt)  # Exponential backoff slightly
-            except GeocoderServiceError as e:
-                logger.error(f"Geocoding service error for {address}: {str(e)}. Retrying ({attempt + 1}/{retries})...")
-                time.sleep(3 + attempt)
-            except Exception as e:
-                logger.error(f"Unexpected error geocoding address {address}: {str(e)}")
-                return None  # Don't retry on unexpected errors
-        logger.error(f"Could not geocode address after {retries} attempts: {address}")
-        return None
+        class Response(BaseModel):
+            phones: Phones = Field(
+                description="The phone numbers of the library, in edge cases there might be multiple phone numbers"
+            )
 
-    def _parse_address(self, address_text: str) -> Address:
-        """Parse German address into Address model, cleaning room info for geocoding."""
+        response: Response = self.llm.create_completion(
+            model="gpt-4.1-mini",
+            messages=[
+                SystemMessage(
+                    content="You are a phone number parser. You are given a string of text that contains phone numbers. You need to parse the phone numbers into a structured format."
+                ),
+                UserMessage(content=text),
+            ],
+            response_model=Response,
+        )
+
+        return response.phones
+
+    def _generate_locations(self, address_text: str) -> Locations:
+        """Parse address into Locations model."""
         if not address_text:
-            return Address()
+            return []
 
-        address_lines = [line.strip() for line in address_text.split("\n") if line.strip()]
-        address_text_single_line = " ".join(address_lines)
-        logger.debug(f"Original Address Text: {address_text_single_line}")
+        class Address(BaseModel):
+            address: str = Field(
+                description="The address of the library. Format the address like this: 'Street Nr, Postal Code City, City'"
+            )
+            room: str | None = Field(description="The room/location of the library, if it is known")
 
-        # Check for multiple addresses
-        # Common indicators of multiple addresses
-        duplicate_indicators = [
-            (r"\b\d{5}\s+\w+.*?\b\d{5}\s+\w+", True),  # Two postal codes
-            (
-                r"(?:\b\w+straße|\bstr\.|\bplatz|\ballee)\b.*?(?:\b\w+straße|\bstr\.|\bplatz|\ballee)\b",
-                True,
-            ),  # Two streets
-            (
-                r"\b\d+\s*,\s*\d{5}.*?\b\d+\s*,\s*\d{5}",
-                True,
-            ),  # Two "number, postal code" patterns
-        ]
+        class Response(BaseModel):
+            addresses: List[Address] = Field(
+                description="The address of the library, in edge cases there might be multiple addresses"
+            )
 
-        contains_multiple_addresses = False
-        for pattern, is_regex in duplicate_indicators:
-            if is_regex and re.search(pattern, address_text_single_line, re.IGNORECASE):
-                contains_multiple_addresses = True
-                break
-            elif not is_regex and pattern in address_text_single_line:
-                contains_multiple_addresses = True
-                break
-
-        # Extract first address if multiple detected
-        if contains_multiple_addresses:
-            logger.warning(f"Multiple addresses detected in: {address_text_single_line}")
-
-            # Try to split at boundary between addresses
-            split_patterns = [
-                r"(\d{5}\s+[\w\s-]+?)(?=\s+\d+\s*,|\s+\w+straße|\s+\w+str\.|\s+\w+platz|\s+\w+allee)",  # Postal code+city followed by start of new address
-                r"(\w+str(?:aße|\.)\s+\d+\s*,\s*\d{5}\s+[\w\s-]+?)(?=\s+\w+str|\s+\d+\s*,)",  # Complete address followed by start of new one
-            ]
-
-            first_address = address_text_single_line
-            for pattern in split_patterns:
-                match = re.search(pattern, address_text_single_line, re.IGNORECASE)
-                if match:
-                    first_address = match.group(1).strip()
-                    logger.info(f"Split multiple addresses, using first: {first_address}")
-                    address_text_single_line = first_address
-                    break
-
-        # Expanded list of terms/patterns indicating specifics to remove for geocoding
-        remove_patterns_for_geo = [
-            # --- Room/Floor/Building/Specific Codes ---
-            r"\bRaum\s*[A-Z0-9./-]+",
-            r"\bZi\.?\s*\d+",
-            r"\bZimmer\s*\d+",
-            r"\d+\.\s*(?:Stock|Stockwerk|OG)\b",
-            r"\b(?:EG|Erdgeschoss)\b",
-            r"\bZwischengeschoss\b",
-            r"\bAnmeldung(?: Raum)?\s*[A-Z0-9.-]*",
-            r"\bRückgebäude\b",
-            r"\bVordergebäude\b",
-            r"\bRgb\.?\b",
-            r"\bVgb\.?\b",
-            r"\bGebäudeteil\s*[A-Z]\b",
-            r"\bVestibülbau\b",
-            r"\bLernraum\b",
-            r"\b[A-Z]\s?\d{3,}\b",  # Codes like M 218, A 093
-            r"\b[A-Z]{1,2}\d{1,}\.\d{1,}\b",  # Codes like 0a.021, U1.831
-            r"\b[A-Z]\d\.\d+\b",  # Codes like E 0.043
-            r"\b[UEG]\d+\s+\d+\b",  # Codes like U1 831
-            r"\b\d+[a-z]\.\d+\b",  # Codes like 0a.021
-            r"\s+\d+[a-z]\.\d+",  # Codes at end of line like 0a.021
-            r"\s+[UEG]\d+\s+\d+",  # Codes at end of line like U1 831
-            # --- Organizational/Descriptive Info ---
-            r"Evangelisch-Theologische Fakultät",
-            r"Abteilung\s*[\w\s-]+",
-            r"Standortnummer\s*\d+",
-            r"Freihandbestand\s+mit\s+Lehrbuchsammlung",
-            # Remove generic 'Bibliothek' etc. ONLY if likely prefixing street
-            r"^Bibliothek\s+",
-            r"^Teilbibliothek\s+",
-            r"^Fachbibliothek\s+",
-            r"Institut für[\w\s-]+",
-            # --- Access/Misc Info ---
-            r"Zugang über.*?(?=\d{5}|$)",  # Up to postal code or end of string
-            r"Eingang.*?(?=\d{5}|$)",
-            r"\([^)]*\)",
-            r"\[[^\]]*\]",
-            # --- Words likely cluttering city names ---
-            r"\bRäume\b",
-        ]
-
-        geocoding_address_text = address_text_single_line
-        for pattern in remove_patterns_for_geo:
-            geocoding_address_text = re.sub(pattern, "", geocoding_address_text, flags=re.IGNORECASE).strip()
-
-        # Look for remaining room codes that might be after the city name and postal code
-        # Pattern: postal code + city name + potential room code
-        # Important: Be careful not to remove part of the valid address
-        room_code_after_city_pattern = (
-            r"(\d{5}\s+[\w\s\-äöüÄÖÜß]+?)(\s+[\w\d\.\-]+\s*\d+\s*|\s+\w\d\s+\d+\s*|\s+\d+[a-zA-Z]\.\d+\s*)$"
+        response: Response = self.llm.create_completion(
+            model="gpt-4.1-mini",
+            messages=[
+                SystemMessage(
+                    content="You are a location parser. You are given a string of text that contains an address. You need to parse the address into a structured format."
+                ),
+                UserMessage(content=address_text),
+            ],
+            response_model=Response,
         )
-        match = re.search(room_code_after_city_pattern, geocoding_address_text)
-        if match:
-            # Keep city part, remove what looks like a room code
-            city_part = match.group(1).strip()
-            room_code = match.group(2).strip()
-            logger.debug(f"Removed room code '{room_code}' after city '{city_part}'")
-            geocoding_address_text = geocoding_address_text.replace(match.group(0), city_part)
 
-        # General cleanup after pattern removal
-        geocoding_address_text = re.sub(r"-\s*,", ",", geocoding_address_text)
-        geocoding_address_text = re.sub(r"\s*,\s*", ", ", geocoding_address_text)
-        geocoding_address_text = re.sub(r"\s{2,}", " ", geocoding_address_text).strip()
-        geocoding_address_text = re.sub(r"[,\s]+$", "", geocoding_address_text).strip(", ")
-        logger.debug(f"Cleaned Address for Parsing: {geocoding_address_text}")
+        print(response)
 
-        # --- Try to parse components ---
-        street = None
-        house_number = None
-        postal_code = None
-        city_str = None  # Store the string first
-        city_enum: Optional[CityEnum] = None  # Store the Enum
-
-        # Pattern: (Street Name) (Number) , (PLZ) (City Name)
-        # Street name: Allows dots, hyphens, spaces, äöüß. Ends with word char or dot/hyphen.
-        # House number: Flexible, allows letters, ranges.
-        # City name: Allows dots, hyphens, spaces, äöüß.
-        pattern = r"^(.*?[\w\.-])\s+(\d+[a-zA-Z]?\s?(?:[-–/]\s?\d+[a-zA-Z]?)?)\s*,?\s+(\d{5})\s+([\w\säöüÄÖÜß\.-]+)$"
-        match = re.search(pattern, geocoding_address_text)
-
-        if match:
-            street = match.group(1).strip(", ")
-            house_number = match.group(2).strip()
-            postal_code = match.group(3).strip()
-            city_str = match.group(4).strip()
-        else:
-            # Fallback: Try extracting PLZ + City first
-            pc_city_match = re.search(r"(\d{5})\s+([\w\säöüÄÖÜß\.-]+)", geocoding_address_text)
-            if pc_city_match:
-                postal_code = pc_city_match.group(1)
-                city_str = pc_city_match.group(2).strip(", ")
-                # Try to find street/number before the postal code
-                potential_street_part = geocoding_address_text[: pc_city_match.start()].strip(", ")
-                street_num_match = re.search(
-                    r"^(.*?[\w\.-])\s+(\d+[a-zA-Z]?\s?(?:[-–/]\s?\d+[a-zA-Z]?)?)$",
-                    potential_street_part,
-                )
-                if street_num_match:
-                    street = street_num_match.group(1).strip(", ")
-                    house_number = street_num_match.group(2).strip()
-
-        # --- Validate and Enumify City ---
-        if city_str:
-            city_enum = CityEnum.from_string(city_str)
-            if city_enum is None:
-                logger.warning(
-                    f"Extracted city '{city_str}' not found in CityEnum. Original address: {address_text_single_line}"
-                )
-        else:
-            logger.warning(f"Could not extract city name from cleaned address: '{geocoding_address_text}'")
-
-        # --- Construct final geocoding address ---
-        final_geocoding_address = None
-        # Use parsed components IF they seem valid (esp. postal code and city)
-        if street and house_number and postal_code and city_str:
-            # Use the *string* version of the city for geocoding
-            final_geocoding_address = f"{street} {house_number}, {postal_code} {city_str}, Germany"
-        elif geocoding_address_text:
-            # Fallback ONLY if cleaned text seems plausible
-            if re.search(r"\d{5}", geocoding_address_text) and len(geocoding_address_text.split()) > 2:
-                final_geocoding_address = f"{geocoding_address_text}, Germany"
-                logger.debug(f"Using potentially incomplete fallback geocoding address: {final_geocoding_address}")
-            else:
-                logger.warning(f"Cleaned address '{geocoding_address_text}' too incomplete for fallback geocoding.")
-
-        coordinates = None
-        if final_geocoding_address:
-            logger.info(f"Attempting to geocode: {final_geocoding_address}")
-            coordinates = self._get_coordinates(final_geocoding_address)
-            time.sleep(1.1)
-        else:
-            logger.warning(f"Skipping geocoding for original address: {address_text_single_line}")
-
-        # --- Return Pydantic Model ---
-        # Use the parsed components, including the city_enum
-        return Address(
-            street=street if street else None,
-            house_number=house_number if house_number else None,
-            postal_code=postal_code if postal_code else None,
-            city=city_enum,  # Store the Enum member
-            full_address=address_text_single_line,
-            additional_info=None,
-            coordinates=coordinates,
-        )
+        locations = []
+        for address in response.addresses:
+            location = self.geocoding_service.get_location(address.address)
+            # TODO: Add room to location?
+            if location:
+                locations.append(location)
+        return locations
 
     def _extract_section_content(self, section_tag: Tag, stop_tags=["h1", "h2", "h3", "h4"]) -> List[Union[Tag, str]]:
         """Extract sibling elements following a section tag until the next heading."""
@@ -391,7 +194,7 @@ class LibraryCrawler:
 
         return "\n".join(transport_text).strip() or None
 
-    def _parse_opening_hours(self, opening_hours_div: Tag) -> Optional[OpeningHours]:
+    def _generate_opening_hours(self, opening_hours_div: Tag) -> Optional[OpeningHours]:
         """Parse opening hours div into OpeningHours model."""
         if not opening_hours_div:
             return None
@@ -597,13 +400,15 @@ class LibraryCrawler:
 
         return opening_hours
 
-    def _clean_contact_info(self, contact_data: Dict[str, Any]) -> Optional[ContactInfo]:
+    def _clean_contact_info(self, contact_data: Dict[str, Any]) -> Optional[Contact]:
         """Clean and structure contact information into ContactInfo model."""
-        cleaned = ContactInfo()
+        cleaned = Contact()
+
+        print(contact_data)
 
         # Address parsing
         if contact_data.get("address"):
-            cleaned.address = self._parse_address(contact_data["address"])
+            cleaned.location = self._generate_locations(contact_data["address"])
 
         # Email extraction and validation
         emails = []
@@ -615,17 +420,17 @@ class LibraryCrawler:
                 valid_emails = self._extract_emails(email)  # Use extractor for validation
                 emails.extend(valid_emails)
         # Fallback: Extract from address if no email found yet
-        if not emails and cleaned.address and cleaned.address.full_address:
-            emails.extend(self._extract_emails(cleaned.address.full_address))
+        if not emails and cleaned.location and cleaned.location[0].address:
+            emails.extend(self._extract_emails(cleaned.location[0].address))
         cleaned.email = sorted(list(set(emails))) or None
 
         # Phone extraction and structuring
         phones = []
         if contact_data.get("phone"):
-            phones.extend(self._extract_phone_numbers(contact_data["phone"]))
+            phones.extend(self._generate_phone_numbers(contact_data["phone"]))
         # Fallback: Extract from address
-        if not phones and cleaned.address and cleaned.address.full_address:
-            phones.extend(self._extract_phone_numbers(cleaned.address.full_address))
+        if not phones and cleaned.location and cleaned.location[0].address:
+            phones.extend(self._generate_phone_numbers(cleaned.location[0].address))
         # Structure phone numbers
         unique_phones = sorted(list(set(p for p in phones if p)))
         if unique_phones:
@@ -634,12 +439,6 @@ class LibraryCrawler:
                 "main": unique_phones[0],
                 "additional": unique_phones[1:] if len(unique_phones) > 1 else None,
             }
-
-        # Fax extraction
-        faxes = []
-        if contact_data.get("fax"):
-            faxes.extend(self._extract_phone_numbers(contact_data["fax"]))
-        cleaned.fax = faxes[0] if faxes else None
 
         # Website validation
         website = contact_data.get("website")
@@ -654,9 +453,9 @@ class LibraryCrawler:
         # FIX: Access model_fields via class, not instance
         if not any(
             getattr(cleaned, field)
-            for field in ContactInfo.model_fields
-            if field != "address"
-            or (cleaned.address and any(getattr(cleaned.address, afield) for afield in Address.model_fields))
+            for field in Contact.model_fields
+            if field != "location"
+            or (cleaned.location and any(getattr(cleaned.location[0], afield) for afield in Location.model_fields))
         ):
             return None
 
@@ -720,7 +519,7 @@ class LibraryCrawler:
         # --- Extract Opening Hours ---
         opening_hours_div = content_div.find("div", {"class": "oeffnungszeiten"})
         if opening_hours_div:
-            details["opening_hours"] = self._parse_opening_hours(opening_hours_div)
+            details["opening_hours"] = self._generate_opening_hours(opening_hours_div)
         else:
             # Sometimes hours are under a simple H3/H2
             hours_header = content_div.find(["h2", "h3"], string=re.compile(r"Öffnungszeiten", re.IGNORECASE))
@@ -733,7 +532,7 @@ class LibraryCrawler:
                 # Simulate a div structure for the parser
                 pseudo_div = BeautifulSoup(f"<div>{hours_text}</div>", "html.parser").div
                 if pseudo_div:
-                    details["opening_hours"] = self._parse_opening_hours(pseudo_div)
+                    details["opening_hours"] = self._generate_opening_hours(pseudo_div)
 
         # --- Extract Transportation ---
         transport_header = content_div.find(
@@ -906,21 +705,28 @@ def save_data_to_file(data: Dict, filename: str = "libraries.json"):
 if __name__ == "__main__":
     logger.info("Munich Library Crawler script started.")
     crawler = LibraryCrawler()
-    libraries: List[Library] = crawler.get_libraries()
 
-    if libraries:
-        logger.info(f"Successfully crawled {len(libraries)} library entries.")
-        # Prepare final data structure for saving
-        output_data = {
-            "last_updated": datetime.now(UTC).isoformat(),
-            # Use model_dump for Pydantic models before saving
-            "libraries": [lib.model_dump(mode="json", exclude_none=True) for lib in libraries],
-        }
-        save_data_to_file(output_data, "libraries.json")  # Save in the current directory or specify a path
-        logger.info("Output saved to libraries.json")
-    else:
-        logger.error("Crawling returned no library data. File not saved.")
+    # locations = crawler._generate_locations("Ludwigstraße 25, 80539 München")
+    # print(locations)
+    phones = crawler._generate_phone_numbers("Telefon: 089 289-27686\n089 289-27546 Dr. Alexander Schütze")
+    print(phones)
+    # libraries: List[Library] = crawler.get_libraries()
 
-    logger.info("Munich Library Crawler script finished.")
+    # if libraries:
+    #     logger.info(f"Successfully crawled {len(libraries)} library entries.")
+    #     # Prepare final data structure for saving
+    #     output_data = {
+    #         "last_updated": datetime.now(UTC).isoformat(),
+    #         # Use model_dump for Pydantic models before saving
+    #         "libraries": [
+    #             lib.model_dump(mode="json", exclude_none=True) for lib in libraries
+    #         ],
+    #     }
+    #     save_data_to_file(
+    #         output_data, "libraries.json"
+    #     )  # Save in the current directory or specify a path
+    #     logger.info("Output saved to libraries.json")
+    # else:
+    #     logger.error("Crawling returned no library data. File not saved.")
 
-    logger.info("Munich Library Crawler script finished.")
+    # logger.info("Munich Library Crawler script finished.")

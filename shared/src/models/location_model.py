@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import LocationTable
 
@@ -15,3 +15,7 @@ class Location(BaseModel):
             latitude=location.latitude,
             longitude=location.longitude,
         )
+
+
+class Locations(RootModel):
+    root: list[Location]

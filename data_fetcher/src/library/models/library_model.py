@@ -3,6 +3,10 @@ from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
+from shared.src.models.link_model import Link
+from shared.src.models.location_model import Location
+from shared.src.models.phone_model import Phones
+
 
 class CityEnum(Enum):
     MUENCHEN = "München"
@@ -74,22 +78,11 @@ class DaySchedule(BaseModel):
     times: List[Dict[str, str]]
 
 
-class Address(BaseModel):
-    street: Optional[str] = None
-    house_number: Optional[str] = None
-    postal_code: Optional[str] = None
-    city: Optional[CityEnum] = None  # Use the Enum type
-    room: Optional[str] = None
-    full_address: Optional[str] = None
-    coordinates: Optional[tuple[float, float]] = None
-
-
-class ContactInfo(BaseModel):
-    address: Optional[Address] = None
+class Contact(BaseModel):
+    location: Optional[List[Location]] = None
     email: Optional[List[str]] = None
-    phone: Optional[Dict[str, Union[str, List[str]]]] = None
-    fax: Optional[str] = None
-    website: Optional[str] = None
+    phone: Optional[Phones] = None
+    website: Optional[Link] = None
 
 
 class OpeningHours(BaseModel):
@@ -101,12 +94,13 @@ class OpeningHours(BaseModel):
 
 class Library(BaseModel):
     name: str
-    location_number: List[str]
-    url: str
+    url: Optional[Link] = None
+    reservation_url: Optional[Link] = None
     details: Optional[Dict[str, Union[str, Dict, List]]] = None
-    contact: Optional[ContactInfo] = None
+    contact: Optional[Contact] = None
     opening_hours: Optional[OpeningHours] = None
     services: Optional[List[str]] = []
     subject_areas: Optional[List[str]] = []
     transportation: Optional[str] = None
+    notes: Optional[str] = None
     notes: Optional[str] = None

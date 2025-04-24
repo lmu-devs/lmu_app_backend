@@ -97,3 +97,12 @@ def get_sport_fetcher_logger(module_name: str):
 
 def get_translation_logger(module_name: str):
     return setup_logger(module_name, "translation", "translation")
+
+
+def get_library_logger(module_name: str):
+    return setup_logger(module_name, "library", "library")
+
+
+# Service Logger
+def get_service_logger(module_name: str):
+    return setup_logger(module_name, "service", "service")
