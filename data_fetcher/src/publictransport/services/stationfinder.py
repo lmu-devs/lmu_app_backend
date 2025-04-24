@@ -204,12 +204,12 @@ if __name__ == "__main__":
                     print(f"  Error fetching lines for {station_name}: {lines_data['error']}")
 
                 # --- Fetch Departures ---
-                departures_data = mvv_fetcher.get_departures(stop_id)
-                if not departures_data.get("error"):
-                    departures_by_station[station_name] = departures_data.get("departures", [])
-                else:
-                     print(f"  Error fetching departures for {station_name}: {departures_data['error']}")
-                     departures_by_station[station_name] = []
+                # departures_data = mvv_fetcher.get_departures(stop_id)
+                # if not departures_data.get("error"):
+                #     departures_by_station[station_name] = departures_data.get("departures", [])
+                # else:
+                #      print(f"  Error fetching departures for {station_name}: {departures_data['error']}")
+                #      departures_by_station[station_name] = []
 
             # --- Print Unique Lines Found ---
             if unique_lines_info:
