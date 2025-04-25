@@ -13,9 +13,9 @@ from pydantic import BaseModel, Field
 from data_fetcher.src.core.html_utils import html_to_markdown
 from data_fetcher.src.library.models.library_model import (
     Contact,
-    Equipment,
     Library,
     OpeningHours,
+    TextWithLink,
 )
 from shared.src.core.logging import get_library_logger
 from shared.src.factories.llm_factory import LLMFactory
@@ -55,21 +55,13 @@ class LibraryCrawler:
     def _get_page(self, url: str) -> Optional[BeautifulSoup]:
         """Fetch a page and return its BeautifulSoup object."""
         try:
-            response = self.session.get(url, timeout=15)  # Add timeout
+            response = self.session.get(url, timeout=15)
             response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
-            # Check content type to avoid parsing non-HTML content
             if "html" not in response.headers.get("Content-Type", "").lower():
                 logger.warning(f"Non-HTML content type received from {url}")
                 return None
             return BeautifulSoup(response.text, "html.parser")
-        except requests.exceptions.Timeout:
-            logger.error(f"Timeout while fetching {url}")
-            return None
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Error fetching {url}: {str(e)}")
-            return None
         except Exception as e:
-            # Catch potential BS4 parsing errors too
             logger.error(f"Error processing page {url}: {str(e)}")
             return None
 
@@ -111,7 +103,7 @@ class LibraryCrawler:
 
         class Address(BaseModel):
             address: str = Field(
-                description="The address of the library. Format the address like this: 'Street Nr, Postal Code City, City'"
+                description="The address of the library. Format the address like this: 'Street Nr, City'"
             )
             room: str | None = Field(description="The room/location of the library, if it is known")
 
@@ -249,7 +241,7 @@ class LibraryCrawler:
 
     def _generate_content_hash(self, soup: BeautifulSoup) -> str:
         """
-        Generate a hash of the entire webpage content.
+        Generate a hash of the content of the div with id="contentcontainer".
 
         Args:
             soup: BeautifulSoup object of the webpage
@@ -260,8 +252,12 @@ class LibraryCrawler:
         if not soup:
             return hashlib.sha256("empty".encode()).hexdigest()
 
+        content_container = soup.find("div", id="contentcontainer")
+        if not content_container:
+            return hashlib.sha256("empty".encode()).hexdigest()
+
         # Get all text content from the page, normalized
-        content = soup.get_text(separator=" ", strip=True)
+        content = content_container.get_text(separator=" ", strip=True)
         # Normalize whitespace and convert to lowercase for stable hashing
         content = " ".join(content.lower().split())
 
@@ -296,7 +292,10 @@ class LibraryCrawler:
                     # Website validation
                     parsed_url = urlparse(website)
                     if parsed_url.scheme in ["http", "https"] and parsed_url.netloc:
-                        contact.website = website
+                        contact.website = Link(
+                            title=website_link.get_text(strip=True) or "Website",
+                            url=website,
+                        )
                     else:
                         logger.warning(f"Invalid or relative website URL found and skipped: {website}")
 
@@ -308,32 +307,132 @@ class LibraryCrawler:
                 emails = self._extract_emails(contact_div.get_text())
 
             # Clean and validate emails
-            emails = []
-            if emails:
-                for email in emails:
-                    valid_emails = self._extract_emails(email)
-                    emails.extend(valid_emails)
+            valid_emails = []
+            for email in emails:
+                found_emails = self._extract_emails(email)
+                valid_emails.extend(found_emails)
+
             # Fallback: Extract from address if no email found yet
-            if not emails and contact.location and contact.location[0].address:
-                emails.extend(self._extract_emails(contact.location[0].address))
-            contact.email = sorted(list(set(emails))) or None
+            if not valid_emails and contact.location and contact.location[0].address:
+                valid_emails.extend(self._extract_emails(contact.location[0].address))
+
+            contact.email = sorted(list(set(valid_emails))) or None
 
             # Fallback phone extraction from address if not found earlier
             if not contact.phone and contact.location and contact.location[0].address:
                 phones = self._generate_phone_numbers(contact.location[0].address)
-                if phones:
-                    contact.phone = {
-                        "main": phones[0],
-                        "additional": phones[1:] if len(phones) > 1 else None,
-                    }
+                if phones and phones.root:  # Check if we have any phones
+                    contact.phone = phones
 
         return contact
+
+    def _parse_service_section(self, content_elements: List[Union[Tag, str]]) -> List[TextWithLink]:
+        """
+        Extract service text and their links from the service section.
+
+        Args:
+            content_elements: List of HTML elements containing service content
+
+        Returns:
+            List of TextWithLink objects containing the service text and optional URL
+        """
+        services = []
+
+        for elem in content_elements:
+            if isinstance(elem, Tag):
+                # Handle paragraphs and list items
+                if elem.name in ["p", "ul", "ol"]:
+                    # For lists, process each list item
+                    if elem.name in ["ul", "ol"]:
+                        for li in elem.find_all("li"):
+                            # Check for links in list item
+                            links = li.find_all("a", href=True)
+                            if links:
+                                for link in links:
+                                    href = link["href"]
+                                    # Make URL absolute if it's relative
+                                    if not href.startswith(("http://", "https://")):
+                                        href = urljoin(self.BASE_URL, href)
+                                    text = link.get_text(strip=True)
+                                    if text:
+                                        services.append(
+                                            TextWithLink(
+                                                title=text,
+                                                url=Link(title=text, url=href),
+                                            )
+                                        )
+                            else:
+                                # Get plain text from list item
+                                text = li.get_text(strip=True)
+                                if text:
+                                    services.append(TextWithLink(title=text))
+                    # For paragraphs, process as before
+                    else:
+                        links = elem.find_all("a", href=True)
+                        if links:
+                            for link in links:
+                                href = link["href"]
+                                # Make URL absolute if it's relative
+                                if not href.startswith(("http://", "https://")):
+                                    href = urljoin(self.BASE_URL, href)
+                                text = link.get_text(strip=True)
+                                if text:
+                                    services.append(TextWithLink(title=text, url=Link(title=text, url=href)))
+                        else:
+                            # If no links found, get the plain text content
+                            text = elem.get_text(strip=True)
+                            if text:
+                                services.append(TextWithLink(title=text))
+
+        return services
+
+    def _parse_equipment_section(self, content_elements: List[Union[Tag, str]]) -> List[TextWithLink]:
+        """
+        Extract equipment items and their links from the equipment section.
+        Items are separated by commas, and can either be plain text or linked text.
+
+        Args:
+            content_elements: List of HTML elements containing equipment content
+
+        Returns:
+            List of TextWithLink objects containing equipment items and their optional URLs
+        """
+        equipment = []
+
+        for elem in content_elements:
+            if isinstance(elem, Tag) and elem.name == "p":
+                # Split the paragraph content by commas, preserving HTML
+                # Convert NavigableString to string to avoid BS4 artifacts
+                content = str(elem)
+                items = content.split(",")
+
+                for item in items:
+                    # Convert back to BS4 for proper HTML parsing
+                    item_soup = BeautifulSoup(item, "html.parser")
+
+                    # Check if item has a link
+                    link = item_soup.find("a", href=True)
+                    if link:
+                        href = link["href"]
+                        # Make URL absolute if it's relative
+                        if not href.startswith(("http://", "https://")):
+                            href = urljoin(self.BASE_URL, href)
+                        text = link.get_text(strip=True)
+                        if text:
+                            equipment.append(TextWithLink(title=text, url=Link(title=text, url=href)))
+                    else:
+                        # Get plain text, removing any HTML tags
+                        text = item_soup.get_text(strip=True)
+                        if text:
+                            equipment.append(TextWithLink(title=text))
+
+        return equipment
 
     def _parse_library_details(self, url: str, name: str, location_number: List[str]) -> Library:
         """Parse detailed information from a library's individual page."""
         # Extract library ID from URL
         library_id = url.split("/")[-2] if url.split("/")[-1] == "index.html" else None
-
+        name = name.replace("Fachbibliothek ", "").strip()
         soup = self._get_page(url)
         if not soup:
             logger.warning(f"Failed to fetch or parse page for {name}: {url}")
@@ -364,11 +463,13 @@ class LibraryCrawler:
         # --- Initialize data ---
         opening_hours: OpeningHours | None = None
         contact: Contact = self._get_contact(content_div)
+        search_hints: List[Link] | None = None
+        reservation_url: Link | None = None
         transportation: str | None = None
         access_regulation: str | None = None
-        services: List[str] = []
+        services: List[TextWithLink] = []
         subject_areas: List[str] = []
-        equipment: List[Equipment] = []
+        equipment: List[TextWithLink] = []
 
         # --- Extract Opening Hours ---
         opening_hours_div = content_div.find("div", {"class": "oeffnungszeiten"})
@@ -378,9 +479,7 @@ class LibraryCrawler:
             opening_hours = self._generate_opening_hours(text_content)
 
         # --- Extract Transportation ---
-        transport_header = content_div.find(
-            ["h2", "h3"], string=re.compile(r"Verkehrsanbindung|Anfahrt", re.IGNORECASE)
-        )
+        transport_header = content_div.find(["h2", "h3"], string=re.compile(r"Verkehrsanbindung", re.IGNORECASE))
         if transport_header:
             transport_content = self._extract_section_content(transport_header)
             transportation = self._parse_transportation_section(transport_content)
@@ -391,41 +490,34 @@ class LibraryCrawler:
             access_content = self._extract_section_content(access_header)
             access_regulation, reservation_url = self._parse_access_regulation_section(access_content)
 
-        # --- Extract Services (Ausstattung) ---
+        # --- Extract Services ---
         service_header = content_div.find(["h2", "h3"], string=re.compile(r"Service", re.IGNORECASE))
         if service_header:
             service_content = self._extract_section_content(service_header)
-            services.extend(self._extract_list_items(service_content))
+            services = self._parse_service_section(service_content)
 
         # --- Extract Equipment ---
         equipment_header = content_div.find(["h2", "h3"], string=re.compile(r"Ausstattung", re.IGNORECASE))
-        equipment = []
         if equipment_header:
             equipment_content = self._extract_section_content(equipment_header)
-            equipment_text = html_to_markdown("\n".join(str(elem) for elem in equipment_content))
-            # Split by commas and clean up
-            equipment_items = [item.strip() for item in equipment_text.split(",")]
-            for item in equipment_items:
-                if item:
-                    # Check if item has a link
-                    url = None
-                    link_match = re.search(r"\[(.*?)\]\((.*?)\)", item)
-                    if link_match:
-                        name = link_match.group(1)
-                        url = link_match.group(2)
-                    else:
-                        name = item
-                    equipment.append(Equipment(name=name, url=url))
+            equipment = self._parse_equipment_section(equipment_content)
 
         # --- Extract Subject Areas (Sammelgebiete) ---
-        subject_header = content_div.find(["h2", "h3"], string=re.compile(r"Sammelgebiete|Fachgebiete", re.IGNORECASE))
+        subject_header = content_div.find(["h2", "h3"], string=re.compile(r"Sammelgebiete", re.IGNORECASE))
         if subject_header:
             subject_content = self._extract_section_content(subject_header)
             subject_areas.extend(self._extract_list_items(subject_content))
 
+        # # --- Extract Search Hints ---
+        # search_header = content_div.find(
+        #     ["h2", "h3"], string=re.compile(r"Fachspezifische Suchtipps", re.IGNORECASE)
+        # )
+        # if search_header:
+        #     search_content = self._extract_section_content(search_header)
+        #     search_hints = self._extract_search_hints(search_content)
+
         # --- Consolidate and Clean ---
         # Remove duplicates and empty strings
-        services = sorted(list(set(s for s in services if s))) or None
         subject_areas = sorted(list(set(s for s in subject_areas if s))) or None
 
         # --- Create Library Model ---
@@ -436,6 +528,8 @@ class LibraryCrawler:
                 hash=content_hash,
                 location_number=location_number,
                 url=url,
+                reservation_url=reservation_url,
+                search_hints=search_hints,
                 contact=contact,
                 access_regulation=access_regulation,
                 opening_hours=opening_hours,
@@ -465,9 +559,9 @@ class LibraryCrawler:
             logger.error("Could not fetch the main library list page. Aborting.")
             return base_libraries_info
 
-        tables = soup.find_all("table", {"class": "contenttable"})  # Target specific tables if possible
+        tables = soup.find_all("table", {"class": "g-table"})  # Target specific tables if possible
         if not tables:
-            logger.warning("No tables with class 'contenttable' found on the library list page.")
+            logger.warning("No tables with class 'g-table' found on the library list page.")
             # Fallback? Find all tables?
             tables = soup.find_all("table")
 
@@ -578,40 +672,34 @@ def save_data_to_file(data: Dict, filename: str = "libraries.json"):
 if __name__ == "__main__":
     logger.info("Munich Library Crawler script started.")
     crawler = LibraryCrawler()
-    crawler.get_libraries()
+    # crawler.get_libraries()
 
     # locations = crawler._generate_locations("Ludwigstraße 25, 80539 München")
     # print(locations)
     # phones = crawler._generate_phone_numbers("Telefon: 089 289-27686\n089 289-27546 Dr. Alexander Schütze")
     # print(phones)
-#     opening_hours = crawler._generate_opening_hours(
-#         """## Öffnungszeiten
+    #     opening_hours = crawler._generate_opening_hours(
+    #         """## Öffnungszeiten
 
-# Semester
-# Montag - Freitag 10:00 - 16:00 Uhr
+    # Semester
+    # Montag - Freitag 10:00 - 16:00 Uhr
 
-# Vorlesungsfreie Zeit
-# Nach Vereinbarung per E-Mail: [aegyptologie@aegyp.fak12.uni-muenchen.de](mailto:aegyptologie@aegyp.fak12.uni-muenchen.de "E-Mail senden an: aegyptologie@aegyp.fak12.uni-muenchen.de")"""
-#     )
-#     print(opening_hours)
+    # Vorlesungsfreie Zeit
+    # Nach Vereinbarung per E-Mail: [aegyptologie@aegyp.fak12.uni-muenchen.de](mailto:aegyptologie@aegyp.fak12.uni-muenchen.de "E-Mail senden an: aegyptologie@aegyp.fak12.uni-muenchen.de")"""
+    #     )
+    #     print(opening_hours)
 
-# libraries: List[Library] = crawler.get_libraries()
+    libraries: List[Library] = crawler.get_libraries()
 
-# if libraries:
-#     logger.info(f"Successfully crawled {len(libraries)} library entries.")
-#     # Prepare final data structure for saving
-#     output_data = {
-#         "last_updated": datetime.now(UTC).isoformat(),
-#         # Use model_dump for Pydantic models before saving
-#         "libraries": [
-#             lib.model_dump(mode="json", exclude_none=True) for lib in libraries
-#         ],
-#     }
-#     save_data_to_file(
-#         output_data, "libraries.json"
-#     )  # Save in the current directory or specify a path
-#     logger.info("Output saved to libraries.json")
-# else:
-#     logger.error("Crawling returned no library data. File not saved.")
+    if libraries:
+        logger.info(f"Successfully crawled {len(libraries)} library entries.")
+        # Prepare final data structure for saving
+        output_data = {
+            "libraries": [lib.model_dump(mode="json", exclude_none=True) for lib in libraries],
+        }
+        save_data_to_file(output_data, "libraries.json")  # Save in the current directory or specify a path
+        logger.info("Output saved to libraries.json")
+    else:
+        logger.error("Crawling returned no library data. File not saved.")
 
-# logger.info("Munich Library Crawler script finished.")
+    logger.info("Munich Library Crawler script finished.")
