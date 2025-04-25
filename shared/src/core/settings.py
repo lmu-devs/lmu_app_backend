@@ -71,6 +71,10 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str
     OPENAI_API_KEY: str
     
+    # Directus
+    DIRECTUS_ADMIN_EMAIL: str
+    DIRECTUS_ADMIN_PASSWORD: str
+    
     
     
     class ConfigDict:
