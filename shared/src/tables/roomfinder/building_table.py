@@ -20,7 +20,7 @@ class BuildingTable(Base):
     location = relationship("BuildingLocationTable", back_populates="building", uselist=False)
 
 
-class BuildingLocationTable(Base, LocationTable):
+class BuildingLocationTable(LocationTable):
     __tablename__ = "building_locations"
 
     building_id = Column(String, ForeignKey("buildings.building_part_id"), primary_key=True)

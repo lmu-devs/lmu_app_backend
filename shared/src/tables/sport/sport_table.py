@@ -95,7 +95,7 @@ class SportCourseTimeSlotTable(Base):
     sport_course = relationship("SportCourseTable", back_populates="time_slots")
 
 
-class SportCourseLocationTable(LocationTable, Base):
+class SportCourseLocationTable(LocationTable):
     __tablename__ = "sport_course_location"
 
     sport_course_id = Column(String, ForeignKey("sport_course.id", ondelete="CASCADE"), primary_key=True)
