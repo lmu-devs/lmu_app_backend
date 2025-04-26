@@ -13,6 +13,7 @@ from .v1.cinema.routers import cinema_router
 from .v1.feedback.routers import feedback_router
 from .v1.food.routers import canteen_router, dish_router, menu_router, taste_router
 from .v1.home.routers import home_router
+from .v1.library.routers import library_router
 from .v1.link.routers import link_router
 from .v1.log.routers import log_router
 from .v1.places.routers import places_router
@@ -74,11 +75,12 @@ def create_app():
     app.include_router(wishlist_router.router, prefix=prefix, tags=["wishlist"])
     app.include_router(cinema_router.router, prefix=f"{prefix}/cinema", tags=["cinema"])
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
-    app.include_router(places_router.router, prefix=prefix, tags=["places"])
+    app.include_router(places_router.router, prefix=prefix, tags=["place"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
     app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
+    app.include_router(library_router.router, prefix=f"{prefix}/library", tags=["library"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

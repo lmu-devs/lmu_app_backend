@@ -20,7 +20,7 @@ logger = get_links_logger(__name__)
     response_model=LinkResources,
     description="Get all resources for important LMU services",
 )
-async def get_all(
+async def get_all_resources(
     db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),
 ):
@@ -31,7 +31,7 @@ async def get_all(
 
 
 @router.get("/benefits", response_model=LinkBenefits, description="Get all student benefits")
-async def get_all(
+async def get_all_benefits(
     db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),
 ):

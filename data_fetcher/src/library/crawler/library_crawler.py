@@ -341,18 +341,6 @@ class LibraryCrawler:
                 found_emails = self._extract_emails(email)
                 valid_emails.extend(found_emails)
 
-            # Fallback: Extract from address if no email found yet
-            if not valid_emails and contact.location and contact.location.address:
-                valid_emails.extend(self._extract_emails(contact.location.address))
-
-            contact.email = sorted(list(set(valid_emails))) or None
-
-            # Fallback phone extraction from address if not found earlier
-            if not contact.phone and contact.location and contact.location.address:
-                phones = self._generate_phone_numbers(contact.location.address)
-                if phones and phones.root:  # Check if we have any phones
-                    contact.phone = phones
-
         return contact
 
     def _parse_service_section(self, content_elements: List[Union[Tag, str]]) -> TextsWithLink:

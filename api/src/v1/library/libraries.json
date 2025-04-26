@@ -1,0 +1,6114 @@
+{
+  "libraries": [
+    {
+      "id": "1204",
+      "name": "Ägyptologie",
+      "hash": "0bc207e5cc948b4f5682660572b4baaf4612c0259541162e9c5424f1a445b554",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1204/index.html",
+      "location": {
+        "address": "Katharina-von-Bora-Straße 10, München",
+        "latitude": 48.1446864,
+        "longitude": 11.5667305
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 289-2768",
+            "recipient": "Dr. Alexander Schütze"
+          },
+          {
+            "number": "089 289-2754"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.aegyptologie.uni-muenchen.de/institut/einrichtungen/bibliothek3/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Koptologie",
+        "Ägyptologie"
+      ]
+    },
+    {
+      "id": "0716",
+      "name": "Arbeits-, Sozial- und Umweltmedizin",
+      "hash": "8e909ba018e81238385fe0cf2fb2d77bcf02cde7520d97eb301c5cbda3ad91e6",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0716/index.html",
+      "location": {
+        "address": "Ziemssenstraße 1, München",
+        "latitude": 48.1316304,
+        "longitude": 11.5606027
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-52469"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Institut-und-Poliklinik-fuer-Arbeits-Sozial-und-Umweltmedizin/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Arbeitsmedizin",
+        "Betriebsmedizinische Fragen",
+        "Pneumologie",
+        "Reisemedizin",
+        "Sozialmedizin",
+        "Umweltmedizin",
+        "Versicherungsmedizin"
+      ]
+    },
+    {
+      "id": "1205",
+      "name": "Assyriologie und Hethitologie",
+      "hash": "49c8db0d0afe9ebd52493a3118783d057b219652536c913ef0e915a511315538",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1205/index.html",
+      "location": {
+        "address": "Schellingstraße 5, München",
+        "latitude": 48.1494564,
+        "longitude": 11.5785078
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3348"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.assyriologie.uni-muenchen.de/unser_institut/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit beschränkter Ausleihe"
+        },
+        {
+          "title": "Buchbestand vor 2000 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Altasienkunde",
+        "Altorientalische Philologie",
+        "Assyriologie",
+        "Hethitologie",
+        "Keilschrifttexte"
+      ]
+    },
+    {
+      "id": "1701",
+      "name": "Astronomie und Astrophysik mit Universitätssternwarte",
+      "hash": "c41fc7522c644f18f92cd8df29a970eefefe655a1a02febcdabc49ca8773bbf2",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1701/index.html",
+      "location": {
+        "address": "Scheinerstraße 1, München",
+        "latitude": 48.1453503,
+        "longitude": 11.6066768
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6000"
+          },
+          {
+            "number": "89 2180-6001"
+          }
+        ],
+        "website": {
+          "title": "Website der Einrichtung",
+          "url": "http://www.usm.uni-muenchen.de/index.php"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 2000 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Astronomie",
+        "Astrophysik"
+      ]
+    },
+    {
+      "id": "0734",
+      "name": "Augenklinik",
+      "hash": "e36aa5cc77b83aab102bdabcf8937f56ce4c8d09d6c6bfb5d7ca15d9885bdeb4",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0734/index.html",
+      "location": {
+        "address": "Mathildenstraße 8, München",
+        "latitude": 48.1353133,
+        "longitude": 11.5625433
+      },
+      "contact": {
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Augenklinik-und-Poliklinik/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Ophthalmologie"
+      ]
+    },
+    {
+      "id": "0907",
+      "name": "Bayerische und allgemeine Landesgeschichte",
+      "hash": "c6463023114794b82c584c76c2296cc098eeceb68d87286bd1709de3d8006ab3",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0907/index.html",
+      "location": {
+        "address": "Ludwigstraße 14, München",
+        "latitude": 48.1464292,
+        "longitude": 11.579695
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 28638-2800"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.bg.geschichte.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit Wochenendausleihe"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Allgemeine Landesgeschichte",
+        "Bayerische Geschichte",
+        "Geschichte (Grundlagenliteratur)",
+        "Geschichte angrenzender Länder"
+      ]
+    },
+    {
+      "id": "1207",
+      "name": "Bibliothek des Instituts für den Nahen und Mittleren Osten / Arabistik, Judaistik",
+      "hash": "8aa3241155f61c479e06a2e1bd5091dbeee5736832b98380d7fd7a2ecde2d3da",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1207/index.html",
+      "location": {
+        "address": "Veterinärstraße 1, München",
+        "latitude": 48.1504087,
+        "longitude": 11.5827224
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3039"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.naher-osten.uni-muenchen.de/institut/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand zum Teil nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Arabistik",
+        "Islamwissenschaft",
+        "Judaistik",
+        "Semitistik",
+        "arabische Kultur und Geschichte"
+      ]
+    },
+    {
+      "id": "1213",
+      "name": "Bibliothek des Instituts für den Nahen und Mittleren Osten / Turkologie, Iranistik",
+      "hash": "efbb3dbeec45d9e766786d4212cbca7b0834b3a0a6cac656cca2451c9f19a207",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1213/index.html",
+      "location": {
+        "address": "Veterinärstraße 1, München",
+        "latitude": 48.1504087,
+        "longitude": 11.5827224
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3039"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.naher-osten.uni-muenchen.de/institut/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand zum Teil nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Geschichte des Nahen Orients, vor allem des Osmanischen Reiches",
+        "Neu-Iranistik",
+        "Turkologie"
+      ]
+    },
+    {
+      "id": "1904",
+      "name": "Botanischer Garten München-Nymphenburg",
+      "hash": "95c9ec92f7d82fb6632122f624f7ffb23a64813aa79b8327f2f16f27e8c8995c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1904/index.html",
+      "location": {
+        "address": "Menzinger Straße 65, München",
+        "latitude": 48.1632652,
+        "longitude": 11.4998294
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 17861-327"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "https://botmuc.snsb.de/"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Floren",
+        "botanische Monographien",
+        "gärtnerische Fachliteratur"
+      ]
+    },
+    {
+      "id": "0722",
+      "name": "Chirurgische Klinik und Poliklinik Innenstadt (Bibliothek)",
+      "hash": "3cd2e42656d5da9caaff26608743972a7e05127f048e537a941267b72b47cb71",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0722/index.html",
+      "location": {
+        "address": "Nußbaumstraße 20, München",
+        "latitude": 48.1335286,
+        "longitude": 11.5614554
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-52647"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Klinik-fuer-Allgemeine-Unfall-und-Wiederherstellungschirurgie/de/studenten/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Abdominalchirurgie",
+        "Akupunktur",
+        "Anästhesiologie",
+        "Chirurgie",
+        "Gefäßchirurgie",
+        "Handchirurgie",
+        "Onkologie",
+        "Radiologie",
+        "Schmerz",
+        "Traumatologie",
+        "plastische Chirurgie"
+      ]
+    },
+    {
+      "id": "0811",
+      "name": "Chirurgische und Gynäkologische Kleintierklinik",
+      "hash": "c49643c9a3d63c3782c1238d59c5374f96479d45fd8d92dd6580d0a4e28e0a45",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0811/index.html",
+      "location": {
+        "address": "Veterinärstraße 13, München",
+        "latitude": 48.1502248,
+        "longitude": 11.585089
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2629"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.chir.vetmed.uni-muenchen.de/klinik/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Anästhesiologie",
+        "Chirurgie",
+        "Neurologie",
+        "Ophtalmologie der Kleintiere",
+        "Radiologie"
+      ]
+    },
+    {
+      "id": "3200",
+      "name": "DenkStätte Weiße Rose",
+      "hash": "6a0bf373e22c710bcc0ea5db446ad09a4e58ac01ef5b22266d1f4c1c11bb8978",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/3200/index.html",
+      "location": {
+        "address": "Geschwister-Scholl-Platz 1, München",
+        "latitude": 48.1509985,
+        "longitude": 11.5796007
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5359"
+          }
+        ],
+        "website": {
+          "title": "Website der Einrichtung",
+          "url": "https://www.weisse-rose-stiftung.de/die-weisse-rose-stiftung-e-v/"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Bibliograhie zur Weißen Rose",
+          "url": "https://weisse-rose.ub.uni-muenchen.de/"
+        }
+      ],
+      "equipment": []
+    },
+    {
+      "id": "0736",
+      "name": "Dermatologie und Allergologie",
+      "hash": "0a07d4ff78825fc52ec6cd1515605014fbd6ed61634d9fc3536fd57019dbdd3a",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0736/index.html",
+      "location": {
+        "address": "Frauenlobstraße 9-11, München",
+        "latitude": 48.1296395,
+        "longitude": 11.5639934
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-56081"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Klinik-und-Poliklinik-fuer-Dermatologie-und-Allergologie/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [],
+      "equipment": [],
+      "subject_areas": [
+        "Allergologie",
+        "Dermatologie",
+        "Immunologie"
+      ]
+    },
+    {
+      "id": "1906",
+      "name": "Didaktik der Biologie",
+      "hash": "4f5ee44842b1bea86930a222f31e0b636fe56ca9a3999f585986aaebe5f5f824",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1906/index.html",
+      "location": {
+        "address": "Winzererstraße 45, München",
+        "latitude": 48.1629976,
+        "longitude": 11.5619774
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6490"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.didaktik.biologie.uni-muenchen.de/bibliothek-sammlung/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit Wochenendausleihe"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Biologie",
+        "Didaktik der Biologie"
+      ]
+    },
+    {
+      "id": "0705",
+      "name": "Ethik, Geschichte und Theorie der Medizin",
+      "hash": "2f79e8cf8d90020bfe7bfe4da53e0c3d6b10a0fc1b7cf4395bed71d40707f286",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0705/index.html",
+      "location": {
+        "address": "Lessingstraße 2, München",
+        "latitude": 48.1334377,
+        "longitude": 11.5578767
+      },
+      "contact": {
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.egt.med.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Geschichte der Medizin einschließlich Grundlagenfächer",
+        "antike, orientalische und asiatische Medizingeschichte"
+      ]
+    },
+    {
+      "id": "0317",
+      "name": "Europäisches und Internationales Steuerrecht",
+      "hash": "86251694456946df7feafc9b745f72ec42e9e9bcd828ff21000f25d4e8fef263",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0317/index.html",
+      "location": {
+        "address": "Professor-Huber-Platz 2, München",
+        "latitude": 48.1508767,
+        "longitude": 11.582443
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2888"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.jura.uni-muenchen.de/fakultaet/lehrstuehle/drueen/bibliotheken/bib-f-eu-und-int-steuerrecht/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "deutsches Außensteuerrecht",
+        "europäisches Steuerrecht",
+        "innerstaatliches Steuerrecht des Auslands",
+        "internationales Steuerrecht, insbesondere Recht der Doppelbesteuerungsabkommen"
+      ]
+    },
+    {
+      "id": "0309",
+      "name": "Europäisches und Internationales Wirtschaftsrecht",
+      "hash": "873a786c153ae859f13e2400cbb6e34d68e60b892480b1d8c36c304ea92f7a8d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0309/index.html",
+      "location": {
+        "address": "Ludwigstraße 29, München",
+        "latitude": 48.1515655,
+        "longitude": 11.5814057
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3268"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Die Bibliothek ist zugleich Europäische Dokumentationsstelle.",
+        "Europäisches und internationales Wirtschaftsrecht",
+        "Kartellrecht",
+        "Medienrecht",
+        "Urheberrecht",
+        "Wettbewerbsrecht"
+      ]
+    },
+    {
+      "id": "0209",
+      "name": "Evangelisches Pressearchiv",
+      "hash": "50a6cf1ab66ed4bb5e4f9a09f89e86182eb6333687710a1d571e3f7f64ff1ed8",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0209/index.html",
+      "location": {
+        "address": "Geschwister-Scholl-Platz 1, München",
+        "latitude": 48.1509985,
+        "longitude": 11.5796007
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3627"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.pt1.evtheol.uni-muenchen.de/pressearchiv/index.html"
+        }
+      },
+      "services": [],
+      "equipment": []
+    },
+    {
+      "id": "1900",
+      "name": "Biologie und Biomedizin",
+      "hash": "a1914ecce37de0aa5f2f10f5eecdc67f222c2e407aaf1dfb73c1e5908a180905",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1900/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Großhaderner Straße 4, Planegg-Martinsried",
+        "latitude": 48.1094445,
+        "longitude": 11.459552
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-74436",
+            "recipient": "Präsenzbestand"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "07:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "07:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "07:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "07:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "07:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": []
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#biozentrum",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsraum",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Schließfächer",
+          "type": "LOCKERS",
+          "description": "Für die Nutzung benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Biologie",
+        "Medizinische Vorklinik: Physiologie"
+      ]
+    },
+    {
+      "id": "1800",
+      "name": "Chemie und Pharmazie",
+      "hash": "7b9ee396e81797a97aff1b68dba793e7e060ea7ed005a74409449b79153c6eb4",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1800/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Butenandtstraße 5-13, München",
+        "latitude": 48.1140323,
+        "longitude": 11.4670752
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-77060"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#cup",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Schließfächer",
+          "url": "https://lmu-shop.de/verkaufsautomat#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik).#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik.",
+          "type": "LOCKERS",
+          "description": "Für die Nutzung der Schließfächer benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Biochemie",
+        "Chemie",
+        "Gesamtverzeichnis der gedruckten Zeitschriften(531 kB),Liste der laufenden Zeitschriften(0,97 MB)",
+        "Pharmazie"
+      ]
+    },
+    {
+      "id": "1212",
+      "name": "Englischer Garten",
+      "hash": "68996da070f7571cc28b519ad23bfdc04ebe1c22b40560b5e3716631e3dbe9c2",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1212/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Oettingenstraße 67, München",
+        "latitude": 48.1499333,
+        "longitude": 11.5939736
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-9753"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#engl-garten",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "BOOK_SCANNER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Schließfächer",
+          "type": "LOCKERS",
+          "description": "Zur Nutzung benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Computerlinguistik",
+        "Ethnologie",
+        "Informatik",
+        "Japanologie",
+        "Kommunikationswissenschaft",
+        "Politikwissenschaft",
+        "Sammlung Pressemedien",
+        "Volkskunde"
+      ]
+    },
+    {
+      "id": "2001",
+      "name": "Geowissenschaften",
+      "hash": "47aefba4e0de2ba7ce696497baff5ea4164905096c70035e7f683a3f25a4f379",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/2001/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Luisenstraße 37, München",
+        "latitude": 48.1476078,
+        "longitude": 11.5640961
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6522"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "BOOK_SCANNER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Schließfächer",
+          "type": "LOCKERS",
+          "description": "Zur Nutzung benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Geographie",
+        "Geologie, Geowissenschaften",
+        "Wirtschafts- und Sozialgeographie"
+      ]
+    },
+    {
+      "id": "0900",
+      "name": "Historicum",
+      "hash": "eec9fd7b4578163e24ebc7ffa8932f5f7fa4bbcb95160fc0d5c4cb26fb5705ec",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0900/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Schellingstrasse 12, München",
+        "latitude": 48.1497579,
+        "longitude": 11.5786408
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5586",
+            "recipient": "Aufsicht"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#historicum"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#historicum",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsraum",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        }
+      ],
+      "subject_areas": [
+        "Archäologie",
+        "Byzantinistik",
+        "Geschichte"
+      ]
+    },
+    {
+      "id": "0910",
+      "name": "Kunstwissenschaften",
+      "hash": "e716adb296c4211de858ec04a9e1d897ca57484077bf013ade37ffd260678d2b",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0910/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Zentnerstraße 31, München",
+        "latitude": 48.1583318,
+        "longitude": 11.5641635
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5312",
+            "recipient": "Abteilung Kunstgeschichte und Theaterwissenschaft"
+          },
+          {
+            "number": "089 2180-3759",
+            "recipient": "Abteilung Musikwissenschaft"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek (Abteilung Musikwissenschaft) auf der Website des Instituts",
+          "url": "https://www.musikwissenschaft.uni-muenchen.de/institut/bibliothek/zugang_oeffnungszeiten/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        },
+        {
+          "title": "ergänzende Regelung für den Magazinbestand und die Abteilung Musikwissenschaft",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#kuwi"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#kuwi",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsraum",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Pausenraum",
+          "type": "OTHER_ROOMS"
+        }
+      ],
+      "subject_areas": [
+        "Kunstgeschichte",
+        "Musikwissenschaft",
+        "Theaterwissenschaft"
+      ]
+    },
+    {
+      "id": "1600",
+      "name": "Mathematik und Physik",
+      "hash": "8be53a04bc6ad8acb9b8adfc08eafa6552f79546ae666a00d15fbb7aaa8b1889",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1600/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Theresienstraße 37, München",
+        "latitude": 48.1479353,
+        "longitude": 11.5734736
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-4501"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#mathe-physik"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#mathe",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Aufladestation für die LMUcard und die Legic-Karte",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/bezahlen/index.html",
+          "type": "MISC"
+        },
+        {
+          "title": "Vorhängeschloss",
+          "url": "https://lmu-shop.de/verkaufsautomat#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik",
+          "type": "LOCKERS",
+          "description": "Benötigt eine Bügelstärke von 6-7 mm und eine Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Mathematik (inkl. Mathematikdidaktik)",
+        "Meteorologie",
+        "Physik (inkl. Physikdidaktik)"
+      ]
+    },
+    {
+      "id": "0700",
+      "name": "Medizinische Lesehalle",
+      "hash": "e9d5f841c11eba5effed019dc2ff0a571f197e0b7fd71701ba233c7a7d8935fb",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0700/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Beethovenplatz 1, München",
+        "latitude": 48.133499,
+        "longitude": 11.5581371
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-73921"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        },
+        {
+          "title": "ergänzende Regelung zur Ausleihe von Magazinbestand",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#med-lesehalle"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#med-lesehalle",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "BOOK_SCANNER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsraum",
+          "type": "OTHER_ROOMS"
+        },
+        {
+          "title": "Cafés",
+          "type": "FOOD_AND_DRINKS"
+        },
+        {
+          "title": "Snack- und Getränkeautomaten",
+          "type": "FOOD_AND_DRINKS"
+        }
+      ],
+      "subject_areas": [
+        "Humanmedizin",
+        "Zahnmedizin"
+      ]
+    },
+    {
+      "id": "1300",
+      "name": "Philologicum",
+      "hash": "b7051e29c391d423f628616bece81ea423646cae1b24a0e1abd20f1c5462455d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1300/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Ludwigstraße 25, München",
+        "latitude": 48.1487579,
+        "longitude": 11.5800245
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-1858"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#philologicum",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Einzelcarrels",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/lesesaal/index.html",
+          "type": "INDIVIDUAL_WORK_ROOMS"
+        },
+        {
+          "title": "Sehbehindertenarbeitsplatz",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Eltern-Kind-Raum",
+          "type": "OTHER_ROOMS"
+        },
+        {
+          "title": "Wickelraum",
+          "type": "OTHER_ROOMS",
+          "description": "3. OG im Behinderten-WC"
+        },
+        {
+          "title": "Ausstellungsfläche",
+          "type": "MISC"
+        },
+        {
+          "title": "Veranstaltungsraum",
+          "type": "MISC"
+        },
+        {
+          "title": "Multifunktionsraum",
+          "type": "MISC"
+        },
+        {
+          "title": "Kopierer",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/kopieren/index.html",
+          "type": "COPIER"
+        },
+        {
+          "title": "Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/scannen/index.html",
+          "type": "BOOK_SCANNER",
+          "description": "Bitte eigenen USB-Stick mitbringen"
+        },
+        {
+          "title": "Beamerausleihe",
+          "type": "BEAMER_RENTAL"
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "LMU-Shop-Automat",
+          "url": "https://lmu-shop.de/verkaufsautomat",
+          "type": "MISC"
+        },
+        {
+          "title": "Cafés",
+          "type": "MISC"
+        },
+        {
+          "title": "Snack- und Getränkeautomaten",
+          "type": "MISC"
+        },
+        {
+          "title": "Schließfächer",
+          "type": "LOCKERS",
+          "description": "Zur Nutzung benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Albanologie",
+        "Amerikanistik",
+        "Englische Philologie",
+        "Finnougristik / Uralistik",
+        "Germanistik",
+        "Klassische Philologie",
+        "Komparatistik",
+        "Lateinische Philologie des Mittelalters",
+        "Nordische Philologie",
+        "Romanische und Italienische Philologie",
+        "Slavische Philologie",
+        "Vergleichende und Indogermanische Sprachwissenschaften"
+      ]
+    },
+    {
+      "id": "1100",
+      "name": "Psychologie, Pädagogik und Soziologie",
+      "hash": "4914b7c3983207267519c9f62f2b3d65c5912a08dcb31bb70751154b970d5e85",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1100/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Leopoldstraße 13, München",
+        "latitude": 48.1558728,
+        "longitude": 11.5830134
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5292"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        },
+        {
+          "title": "ergänzende Regelung für den Magazinbestand",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#pps"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#pps",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        }
+      ],
+      "subject_areas": [
+        "Psychologie",
+        "Pädagogik",
+        "Soziologie"
+      ]
+    },
+    {
+      "id": "0100",
+      "name": "Theologie und Philosophie",
+      "hash": "fb79483ab0e4add0f8684869fa025827f1f4abcedcd5064d209a4f3c46d67ca5",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0100/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Geschwister-Scholl-Platz 1, München",
+        "latitude": 48.1509985,
+        "longitude": 11.5796007
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3486"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#theophil",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsraum",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Schließfach",
+          "url": "https://lmu-shop.de/verkaufsautomat#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik.",
+          "type": "LOCKERS",
+          "description": "Benötigt ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Philosophie",
+        "Religionswissenschaft",
+        "Theologie"
+      ]
+    },
+    {
+      "id": "0800",
+      "name": "Tiermedizin",
+      "hash": "b2301ef2202c9a7e6ee37a9dcd2773c5c5ee96ff013b101e2da7ed95f093dd19",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0800/index.html",
+      "location": {
+        "address": "Königinstraße 10b, München",
+        "latitude": 48.1520977,
+        "longitude": 11.5858472
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2671"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Kopierer",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Cloud Printing, Scannen, Kopieren"
+        },
+        {
+          "title": "Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "BOOK_SCANNER",
+          "description": "Cloud Printing, Scannen, Kopieren"
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI",
+          "description": "Internet & WLAN"
+        }
+      ],
+      "subject_areas": [
+        "Tiermedizin"
+      ]
+    },
+    {
+      "id": "0500",
+      "name": "Wirtschaftswissenschaften und Statistik",
+      "hash": "146273f38afcc215e6bb66ca37910fef213622398644ef9330a69ecbbb611fe0",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0500/index.html",
+      "reservation_url": "https://auth.anny.eu/start-session?entityId=https://lmuidp.lrz.de/idp/shibboleth",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2601"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#allgemeine"
+        },
+        {
+          "title": "ergänzende Regelung zur Ausleihe von Magazinbestand",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#wiwi"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html#wiwi",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Gruppenarbeitsräume",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/gruppenarbeitsraeume/index.html",
+          "type": "GROUP_WORK_ROOMS"
+        },
+        {
+          "title": "Schließfächer",
+          "url": "https://lmu-shop.de/verkaufsautomat#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik",
+          "type": "LOCKERS",
+          "description": "Für die Nutzung benötigen Sie ein eigenes Vorhängeschloss mit einer Bügelstärke von 6-7 mm und einer Bügelbreite (innen) von mindestens 16 mm."
+        }
+      ],
+      "subject_areas": [
+        "Betriebswirtschaftslehre",
+        "Statistik",
+        "Volkswirtschaftslehre"
+      ]
+    },
+    {
+      "id": "0323",
+      "name": "Forschungsstelle für Vergaberecht und Verwaltungskooperationen",
+      "hash": "7b63aa8442fd8a686fa64e5fba5ed4c7220c2d8f3cd9ce0ca12d57c8f476da43",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0323/index.html",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6295"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "VergaberechtVerwaltungskooperationen"
+      ]
+    },
+    {
+      "id": "2006",
+      "name": "Geophysikalisches Observatorium",
+      "hash": "d03c5330a4c8c7142d7bdc1f19768407f4fa84cd9359bd34fef0a5c9a57dc43d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/2006/index.html",
+      "location": {
+        "address": "Ludwigshöhe 8, Fürstenfeldbruck",
+        "latitude": 48.1646414,
+        "longitude": 11.2759345
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-73960"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.geophysik.uni-muenchen.de/observatory"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Erdbeben",
+        "Erdmagnetismus"
+      ]
+    },
+    {
+      "id": "0732",
+      "name": "Haunersches Kinderspital",
+      "hash": "b00be5ec947c4df26ecd21d64677c37bd39c78f46d09581ac74e610b7e98b015",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0732/index.html",
+      "location": {
+        "address": "Lindwurmstraße 4, München",
+        "latitude": 48.1302821,
+        "longitude": 11.5592053
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-53171"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Kinderklinik-und-Kinderpoliklinik-im-Dr-von-Haunerschen-Kinderspital/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "16:30:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "16:30:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "15:30:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "15:30:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Pädiatrie"
+      ]
+    },
+    {
+      "id": "0017",
+      "name": "Herzogliches Georgianum",
+      "hash": "9517d8d85b87ad214f8dcf4b0bfd968c3fbeff0ef9ffb5c5c11323a3e72ce36c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0017/index.html",
+      "location": {
+        "address": "Professor-Huber-Platz 1, München",
+        "latitude": 48.1500897,
+        "longitude": 11.5820212
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2435",
+            "recipient": "Lesesaal Altes Buch der Zentralbibliothek"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.herzoglichesgeorgianum.de/"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "PräsenzbibliothekEine Benutzung der Bestände vor Ort ist Angehörigen des Georgianums und anderen Interessierten für wissenschaftliche Forschungszwecke möglich."
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Schwerpunkt: Theologie",
+        "umfangreicher historischer Buchbestand (gut 40.000 Bände mit Erscheinungsjahr vor 1900)"
+      ]
+    },
+    {
+      "id": "0712",
+      "name": "Hygiene und Medizinische Mikrobiologie",
+      "hash": "e0191e2f836ea591f07db773b36799b40e552f886dd9711c3c9dd95e2a45aa7c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0712/index.html",
+      "location": {
+        "address": "Pettenkoferstr. 9a, München",
+        "latitude": 48.1339864,
+        "longitude": 11.5621896
+      },
+      "contact": {
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.mvp.uni-muenchen.de/"
+        }
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (nur für Beschäftigte des Instituts)"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Bakteriologie",
+        "Virologie"
+      ]
+    },
+    {
+      "id": "1302",
+      "name": "Indologie und Tibetologie",
+      "hash": "559ec419aedc31afdefe1c3a3465984fb5bb68e55761ad5c7842ddc6899f5571",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1302/index.html",
+      "location": {
+        "address": "Ludwigstraße 31, München",
+        "latitude": 48.1518141,
+        "longitude": 11.5815171
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2353"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.indologie.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "13:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "13:00:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand weitgehend im Online-Katalog nachgewiesen"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Indische Archäologie",
+        "Indische Kunst",
+        "Indologie",
+        "Iranistik",
+        "Tibetologie"
+      ]
+    },
+    {
+      "id": "0325",
+      "name": "Institut für Digitalisierung und das Recht der Inneren Sicherheit (IDRIS)",
+      "hash": "9c6019839318141586b2c5889abb1101e4f8dbcac8c310b5da4e88a21351a3ff",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0325/index.html",
+      "location": {
+        "address": "Ludwigstraße 29, München",
+        "latitude": 48.1515655,
+        "longitude": 11.5814057
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3856"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "https://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Bekämpfung von Terrorismus und Extremismus",
+        "Digitalisierung",
+        "Nachrichtendienstrecht",
+        "Polizei- und Ordnungsrecht",
+        "Strafprozessrecht"
+      ]
+    },
+    {
+      "id": "0503",
+      "name": "Internationale Wirtschaftsbeziehungen",
+      "hash": "6f762b5572de6382d432aa3f134c548d2512600a483b6046abba882ba8d53f18",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0503/index.html",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2446"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.iwb.econ.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "14:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "14:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1990 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Corporate Finance, Banking and Industrial Organization",
+        "Eastern Europe and Transition Economics",
+        "Econometrics and Statistics",
+        "International Economics",
+        "Macroeconomics, Growth and Technical Change",
+        "Microeconomics and Game Theory"
+      ]
+    },
+    {
+      "id": "1706",
+      "name": "Kern- und Teilchenphysik",
+      "hash": "587db1ad5822d5aab21655ac0df1c5c1d6e6fcebe348b3bcb4f622a7a9d09f24",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1706/index.html",
+      "location": {
+        "address": "Am Coulombwall 1, Garching",
+        "latitude": 48.2687526,
+        "longitude": 11.6736679
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 289-14147"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Die Monographien dieses Standorts sind derzeit nicht zugänglich. Der Zugang zu den gedruckten Zeitschriften ist möglich."
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Elementarteilchenphysik",
+        "Kernphysik",
+        "Laserphysik"
+      ]
+    },
+    {
+      "id": "0742",
+      "name": "Kinder- und Jugendpsychiatrie",
+      "hash": "c0a48606b8a0a182284414417eb013c9aa0be2206a37caf3d34ee6b8a1037a9d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0742/index.html",
+      "location": {
+        "address": "Nußbaumstraße 5a, München",
+        "latitude": 48.1324307,
+        "longitude": 11.5601822
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-55901"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.kjp.med.uni-muenchen.de/"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Entwicklung",
+        "Kinderpsychiatrie",
+        "Kinderpsychologie"
+      ]
+    },
+    {
+      "id": "0304",
+      "name": "Kirchenrecht",
+      "hash": "a7cce96dae78f3dacb340e05e4ebc3655db6e48d506c302072cdde3768986eb9",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0304/index.html",
+      "location": {
+        "address": "Professor-Huber-Platz 2, München",
+        "latitude": 48.1508767,
+        "longitude": 11.582443
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2737"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Allgemeines Verwaltungsrecht",
+        "Evangelisches Kirchenrecht",
+        "Kirchliche Rechtsgeschichte",
+        "Staatskirchenrecht",
+        "Öffentliches Recht"
+      ]
+    },
+    {
+      "id": "1201",
+      "name": "Klassische Archäologie",
+      "hash": "c1bbc3470c997be9ef5d2e5dc26096ead4553b534f830a1503d9aac05535b21c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1201/index.html",
+      "location": {
+        "address": "Katharina-von-Bora-Straße 10, München",
+        "latitude": 48.1446864,
+        "longitude": 11.5667305
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 289-27686"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.klass-archaeologie.uni-muenchen.de/d-content-boxen/bibliothek12/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Epigraphik",
+        "Klassische Archäologie",
+        "Kultur der griechisch-römischen Antike"
+      ]
+    },
+    {
+      "id": "0807",
+      "name": "Klinik für Vögel, Kleinsäuger, Reptilien und Zierfische",
+      "hash": "7786079d33be9f6794cabf0a4d786e146dbf0811bea15fe2caeab02a79ccb335",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0807/index.html",
+      "location": {
+        "address": "Sonnenstraße 18, Oberschleißheim",
+        "latitude": 48.2485327,
+        "longitude": 11.5487303
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-76070"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.vogelklinik.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Fischerei",
+        "Fischkrankheiten",
+        "Geflügelkrankheiten"
+      ]
+    },
+    {
+      "id": "0817",
+      "name": "Klinik für Wiederkäuer",
+      "hash": "3981e73728e6c36a8a5b64af4ca16a0c04be36e7d70f1997d1035cfbc97e5312",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0817/index.html",
+      "location": {
+        "address": "Sonnenstraße 16, Oberschleißheim",
+        "latitude": 48.2474261,
+        "longitude": 11.5482838
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-78850"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "https://www.wdk.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Bestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Bestandsbetreuung",
+        "Epidemiologie",
+        "Reproduktionsmedizin",
+        "Wiederkäuerkrankheiten"
+      ]
+    },
+    {
+      "id": "0509",
+      "name": "Komparative Wirtschaftsforschung",
+      "hash": "c53df61a3daa5ca55707dc0f5d2a0e98969305b67469d7a97913351b39230dca",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0509/index.html",
+      "location": {
+        "address": "Akademiestraße 1, München",
+        "latitude": 48.1522468,
+        "longitude": 11.5813326
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2766"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.compecon.econ.uni-muenchen.de/service/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1900 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Außenhandel",
+        "Banken und Kapitalmärkte",
+        "Direktinvestitionen",
+        "Entwicklung, Transformation",
+        "Internationale Verschuldung",
+        "Privatisierung",
+        "Wirtschaftspolitik"
+      ]
+    },
+    {
+      "id": "0314",
+      "name": "Kriminologie, Jugendstrafrecht und Strafvollzug",
+      "hash": "96c1ca4b3df792a8184408f92c51b22abef47065b014417123e371f5610f46f1",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0314/index.html",
+      "location": {
+        "address": "Veterinärstraße 1, München",
+        "latitude": 48.1504087,
+        "longitude": 11.5827224
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5087"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "https://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "23:45:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "23:45:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "23:45:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "23:45:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "23:45:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Jugendrecht",
+        "Kriminologie",
+        "Strafvollzug"
+      ]
+    },
+    {
+      "id": "0322",
+      "name": "Lehrstuhl für Deutsches, Europäisches und Internationales Strafrecht",
+      "hash": "f66ba563628025e7c5473b6ede21f6b055123d1bf3fbde3b1b7021c827dfebcd",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0322/index.html",
+      "location": {
+        "address": "Professor-Huber-Platz 2, München",
+        "latitude": 48.1508767,
+        "longitude": 11.582443
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-1446"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "14:00:00",
+                "end_time": "16:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Europäisches, internationales und ausländisches Strafprozessrecht",
+        "Europäisches, internationales und ausländisches Strafrecht"
+      ]
+    },
+    {
+      "id": "0803",
+      "name": "Lehrstuhl für Lebensmittelsicherheit",
+      "hash": "978b1370bccfdfe60c83933b6889b7c2bdfe293065e4b73a650ec62ae7bffed9",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0803/index.html",
+      "location": {
+        "address": "Schönleutnerstraße 8, Oberschleißheim",
+        "latitude": 48.2489285,
+        "longitude": 11.5519704
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-78500"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.ls.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbibliothek)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Hygiene der Lebensmittel",
+        "Technologie der Lebensmittel tierischen Ursprungs"
+      ]
+    },
+    {
+      "id": "0320",
+      "name": "Lehrstuhl für Öffentliches Recht, Europarecht und Rechtsphilosophie",
+      "hash": "ccac23534279714a6363006c4286897c3b0dfac518acacc70b02cba88cc44703",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0320/index.html",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3335"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website der Fakultät",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/bibliotheken/oeffrechtbib_details/0320.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit Kurzausleihe"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Europarecht",
+        "Verfassungsgeschichte",
+        "Öffentliches Recht"
+      ]
+    },
+    {
+      "id": "0324",
+      "name": "Lehrstuhl für Öffentliches Recht und Staatsphilosophie",
+      "hash": "744f6bfac28d3db52da17845d3bd7814c2238a81f88d88fe57b4ef939268f5b0",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0324/index.html",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3576"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Verwaltungslehre"
+      ]
+    },
+    {
+      "id": "0050",
+      "name": "Lernzentrum Leo 13",
+      "hash": "60de9775638b4fd772b6a93c24a9ffe8276472deb607543b108049e6ada3c4ed",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0050/index.html",
+      "location": {
+        "address": "Leopoldstr. 13, München",
+        "latitude": 48.1558728,
+        "longitude": 11.5830134
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-9489"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Ausleihberechtigungen und Leihfristen der Lehrbücher",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/index.html"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Cloud Printing, Scannen, Kopieren"
+        },
+        {
+          "title": "Internet-PCs",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/pc-plaetze/index.html",
+          "type": "MISC",
+          "description": "PC-Räume"
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI",
+          "description": "Internet & WLAN"
+        }
+      ],
+      "subject_areas": [
+        "Allgemeine IT-Handbücher der Informatik",
+        "Jura"
+      ]
+    },
+    {
+      "id": "1409",
+      "name": "Lyrikbibliothek - Stiftung Lyrik Kabinett",
+      "hash": "df71bca8391ec839035be0f9880c884729242427594477982af3d08eda7dce60",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1409/index.html",
+      "location": {
+        "address": "Amalienstraße 83, München",
+        "latitude": 48.1512492,
+        "longitude": 11.5789025
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 346299"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website der Einrichtung",
+          "url": "https://www.lyrik-kabinett.de/bibliothek"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Internationale Lyrik"
+      ]
+    },
+    {
+      "id": "0750",
+      "name": "Medizinische Informationsverarbeitung, Biometrie und Epidemiologie",
+      "hash": "5cfc51ad6cf6bfd9ee54a3a0508a6663b3d0b1f2b1cc332af400f5a6bc24e51c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0750/index.html",
+      "location": {
+        "address": "Marchioninistraße 15, München",
+        "latitude": 48.1090781,
+        "longitude": 11.4735768
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-74481"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.ibe.med.uni-muenchen.de/services/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:30:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 2005 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Biomathematik",
+        "Epidemiologie",
+        "Public Health",
+        "medizinische Informatik",
+        "medizinische Statistik"
+      ]
+    },
+    {
+      "id": "0116",
+      "name": "Orthodoxe Theologie",
+      "hash": "03d5b64576edf290f24d7821720b9baaf8a4b377028ed3b45f95bd316332281d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0116/index.html",
+      "location": {
+        "address": "Ludwigstraße 29, München",
+        "latitude": 48.1515655,
+        "longitude": 11.5814057
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3228"
+          },
+          {
+            "number": "089 2180-5376"
+          },
+          {
+            "number": "089 2180-5780"
+          }
+        ],
+        "website": {
+          "title": "Website der Fakultät",
+          "url": "http://www.orththeol.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Kirchen von Ost- und Westeuropa",
+        "Orthodoxe Theologie",
+        "byzantinische Theologiegeschichte",
+        "griechische Patristik"
+      ]
+    },
+    {
+      "id": "0808",
+      "name": "Paläoanatomie und Geschichte der Tiermedizin",
+      "hash": "22ea2a7600031242e007d79091b8e841743facbcded3c26ae45897266816c8f5",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0808/index.html",
+      "location": {
+        "address": "Kaulbachstraße 37, München",
+        "latitude": 48.1496334,
+        "longitude": 11.583521
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5710"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.palaeo.vetmed.uni-muenchen.de/ueber_uns/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Archäozoologie",
+        "Domestikationsforschung",
+        "Geschichte der Tiermedizin",
+        "Paläoanatomie",
+        "Veterinärmedizinhistorika"
+      ]
+    },
+    {
+      "id": "2002",
+      "name": "Paläontologie und Geobiologie",
+      "hash": "756c197e0f66d81f2c8a4bf9c23cbc6cfc470dbf9d3e5c47f8993ea2526f214b",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/2002/index.html",
+      "location": {
+        "address": "Richard-Wagner-Str. 10, München",
+        "latitude": 48.147544,
+        "longitude": 11.5635807
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6636"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://bspg.snsb.de/bibliothek/"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1982 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Geologie",
+        "Historische Geologie",
+        "Paläontologie"
+      ]
+    },
+    {
+      "id": "0709",
+      "name": "Pathologie",
+      "hash": "a0e4c90b838cb22b6a6ed9c285323ce013a789a38c3ea691208518b9d638951b",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0709/index.html",
+      "location": {
+        "address": "Thalkirchner Straße 36, München",
+        "latitude": 48.13005,
+        "longitude": 11.5649786
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-73602"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "https://www.med.lmu.de/pathologie/de"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Pathologie",
+        "spezielle pathologische Anatomie"
+      ]
+    },
+    {
+      "id": "0737",
+      "name": "Psychiatrie und Psychotherapie",
+      "hash": "f518ec59fecb0959ddab59509a55bb2d846aa956e44c1d8b91e4915145941ac4",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0737/index.html",
+      "location": {
+        "address": "Nußbaumstraße 7, München",
+        "latitude": 48.1324398,
+        "longitude": 11.5588301
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-53335"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Klinik-und-Poliklinik-fuer-Psychiatrie-und-Psychotherapie/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:30:00",
+                "end_time": "13:30:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Neurochemie",
+        "Neurologie",
+        "Psychiatrie",
+        "Psychopharmakologie",
+        "Psychosomatik",
+        "Psychotherapie",
+        "klinische Psychologie"
+      ]
+    },
+    {
+      "id": "3400",
+      "name": "Rachel Carson Center for Environment and Society",
+      "hash": "df77f7b376a6f03472c970904380f167134decc0137d768e351dcce8198eda3b",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/3400/index.html",
+      "location": {
+        "address": "Leopoldstraße 11a, München",
+        "latitude": 48.1550595,
+        "longitude": 11.5829297
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-72387"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Webseite des Institutes",
+          "url": "https://www.carsoncenter.uni-muenchen.de/library/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "14:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Umweltgeschichte"
+      ]
+    },
+    {
+      "id": "0714",
+      "name": "Rechtsmedizin",
+      "hash": "6844a72a28dba4a1a1739a22710b456cebeaed94c2d14be37af1657e4afca5f6",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0714/index.html",
+      "location": {
+        "address": "Nußbaumstraße 26, München",
+        "latitude": 48.1332126,
+        "longitude": 11.5601706
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-73040"
+          },
+          {
+            "number": "089 2180-73011"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.rechtsmedizin.med.uni-muenchen.de/institut/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Biomechanik",
+        "Gesetzestexte",
+        "Humanmedizin",
+        "Kriminalistik und Kriminologie",
+        "Rechtsmedizin",
+        "Toxikologie",
+        "Verkehrsmedizin",
+        "Verkehrsunfallforschung"
+      ]
+    },
+    {
+      "id": "0315",
+      "name": "Rechtsphilosophie",
+      "hash": "0c96ed0e219b505c3687676534cb33c412044ea75cc75499ee0707e09a81c182",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0315/index.html",
+      "location": {
+        "address": "Ludwigstraße 29, München",
+        "latitude": 48.1515655,
+        "longitude": 11.5814057
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-9477"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Praktische Philosophie",
+        "Rechtsphilosophie",
+        "Rechtstheorie",
+        "Wissenschaftstheorie"
+      ]
+    },
+    {
+      "id": "0308",
+      "name": "Rechtsvergleichung",
+      "hash": "9970bf9e4d8adcf8dac705eb50d8513a8792a93f7b5048ffaa0c83f8a61c37eb",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0308/index.html",
+      "location": {
+        "address": "Veterinärstraße 5, München",
+        "latitude": 48.150313,
+        "longitude": 11.5831838
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2723"
+          }
+        ],
+        "website": {
+          "title": "Übersicht über die juristischen Bibliotheken",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/bibliotheken/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": []
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Internationales Privatrecht",
+        "Privatrechtsvergleichung",
+        "Rechtssoziologie"
+      ]
+    },
+    {
+      "id": "0412",
+      "name": "Risikomanagement und Versicherung",
+      "hash": "663542d124d400896d18b032df9a05b270959c9e93261938290171c827c9c906",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0412/index.html",
+      "location": {
+        "address": "Schackstraße 4, München",
+        "latitude": 48.1518516,
+        "longitude": 11.5837494
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3882"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.inriver.bwl.uni-muenchen.de/forschung/literatur/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand vor 1990 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Risikomanagement",
+        "Versicherungswirtschaft"
+      ]
+    },
+    {
+      "id": "1506",
+      "name": "Sammlung Pressemedien",
+      "hash": "b90b8c761bfaed59468129d31282a018d1821cfc774a6a3214581d1529db51b0",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1506/index.html",
+      "location": {
+        "address": "Oettingenstraße 67, München",
+        "latitude": 48.1499333,
+        "longitude": 11.5939736
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-9753"
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "beg@ub.uni-muenchen.de",
+          "url": "mailto:beg@ub.uni-muenchen.de"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Deutsche Lizenzzeitungen (Schwerpunkt amerikanische Besatzungszone)",
+        "Deutschsprachige Publikumsmagazine",
+        "Münchner Tageszeitungen (TZ, AZ, SZ, Münchner Merkur)",
+        "Sondersammlungen (bspw. Karikaturzeitschriften, Bavarica, Kriegsflugblätter)",
+        "Wissenschaftliche Zeitschriften im Bereich Medien- und Zeitungsforschung",
+        "Überregionale deutschsprachige und internationale Presse"
+      ]
+    },
+    {
+      "id": "1305",
+      "name": "Shakespeare-Forschungsbibliothek",
+      "hash": "4ae62882adb0ed78e61dc4e4f0e9143b87ad9372f815f12212ae09f52a06c3b7",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1305/index.html",
+      "location": {
+        "address": "Amalienstr. 83, München",
+        "latitude": 48.1512492,
+        "longitude": 11.5789025
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-3358"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website der Einrichtung",
+          "url": "http://www.shakespeare-library.uni-muenchen.de/index.php?/pages/bibliothek.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Deutsche Shakespeare-Rezeption",
+        "Englische Literatur des 16./17. Jahrhunderts",
+        "Literatur von und zu Shakespeare",
+        "Shakespeare im Unterricht",
+        "Theorie und Geschichte des Dramas"
+      ]
+    },
+    {
+      "id": "1214",
+      "name": "Sinologie",
+      "hash": "4ec1ed272dd553670625db72e3e60fd9e9bb2a5e7fb0bd0580cead9e63e65594",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1214/index.html",
+      "location": {
+        "address": "Kaulbachstraße 51a, München",
+        "latitude": 48.1514739,
+        "longitude": 11.5843497
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "08921803218"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "http://www.sinologie.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Der Buchbestand und ein Teil des Zeitschriftenbestands sind nicht im Online-Katalog verzeichnet."
+        },
+        {
+          "title": "Der Gesamtbestand ist in einem eigenen Online-Katalog erfasst, der über die Homepage des Insituts aufgerufen werden kann."
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Koreanistik",
+        "Mongolistik",
+        "Sinologie",
+        "Thai",
+        "Vietnamesisch"
+      ]
+    },
+    {
+      "id": "0506",
+      "name": "Sozial- und Wirtschaftsgeschichte",
+      "hash": "dd7246f8e8b452c19436f283de3ec49a99cab0b4f94e14a2fcea2447b9046696",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0506/index.html",
+      "location": {
+        "address": "Ludwigstraße 33, München",
+        "latitude": 48.1520681,
+        "longitude": 11.581635
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2756"
+          },
+          {
+            "number": "089 2180-3169"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.econhist.econ.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "12:00:00",
+                "end_time": "15:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "11:30:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit Kurzausleihe"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Sozialgeschichte",
+        "Wirtschaftsgeschichte"
+      ]
+    },
+    {
+      "id": "0401",
+      "name": "Strategische Unternehmensführung",
+      "hash": "1e6b6b2be83cc83b2c7fab645c45f81249f1c6b5134e1ea267f36a9daba9c947",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0401/index.html",
+      "location": {
+        "address": "Ludwigstraße 28, München",
+        "latitude": 48.1513056,
+        "longitude": 11.582877
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2770"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "https://www.som.lmu.de/ism/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "10:00:00",
+                "end_time": "12:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Allgemeine Betriebswirtschaftslehre und Industriebetriebslehre",
+        "Controlling",
+        "Personalwesen, Management und Informationswesen",
+        "Philosophie",
+        "Planungswissenschaft",
+        "Produktion und Absatzwirtschaft",
+        "gesellschaftspolitische Fragen"
+      ]
+    },
+    {
+      "id": "1903",
+      "name": "Systematik, Biodiversität und Evolution der Pflanzen",
+      "hash": "f2b36fb6bf05223b93797bc214e984810a713a159c97a23283d8ed325c53d0f3",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/1903/index.html",
+      "location": {
+        "address": "Menzinger Straße 67, München",
+        "latitude": 48.1641544,
+        "longitude": 11.5012172
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 17861-255"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Floren",
+        "Pflanzengeographie",
+        "Systematische Botanik"
+      ]
+    },
+    {
+      "id": "0801",
+      "name": "Tieranatomie",
+      "hash": "914d7fae17372754cf859e663b8fd73c999825c74965de08c0c8ebaba75185a1",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0801/index.html",
+      "location": {
+        "address": "Veterinärstraße 13, München",
+        "latitude": 48.1502248,
+        "longitude": 11.585089
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2563"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.anat.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Tieranatomie"
+      ]
+    },
+    {
+      "id": "0814",
+      "name": "Tierpathologie",
+      "hash": "0b076e32484e3c619572a8d97d1b133c905a4916ee64b76d621c0f86c94931de",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0814/index.html",
+      "location": {
+        "address": "Veterinärstraße 13, München",
+        "latitude": 48.1502248,
+        "longitude": 11.585089
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2530"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.patho.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Pathologie",
+        "Veterinärpathologie"
+      ]
+    },
+    {
+      "id": "0805",
+      "name": "Tierschutz, Verhaltenskunde, Tierhygiene und Tierhaltung",
+      "hash": "fd306dfb2de224855d90adaa02f1f95dbb9b93845c27c1cde8118971801248ae",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0805/index.html",
+      "location": {
+        "address": "Veterinärstraße 13, München",
+        "latitude": 48.1502248,
+        "longitude": 11.585089
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-78300"
+          }
+        ],
+        "website": {
+          "title": "Website des Instituts",
+          "url": "http://www.tierhyg.vetmed.uni-muenchen.de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenzbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Tierhygiene",
+        "Tierschutz",
+        "Verhaltenskunde"
+      ]
+    },
+    {
+      "id": "0804",
+      "name": "Tierzucht und allgemeine Landwirtschaftslehre",
+      "hash": "5b6e770b5bcb7dd4539a3ab58db63ef5040e65297f928e95093466fe2df56aba",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0804/index.html",
+      "location": {
+        "address": "Veterinärstraße 13, München",
+        "latitude": 48.1502248,
+        "longitude": 11.585089
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-5710"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Handbibliothek (Präsenbestand)"
+        },
+        {
+          "title": "Buchbestand nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Erbe-Umwelt-Wechselwirkung",
+        "Evolution",
+        "Geschichte der Landwirtschaft (Primärtexte)",
+        "Rassenkunde",
+        "Tierzucht",
+        "allgemeine Genetik, Haustiergenetik"
+      ]
+    },
+    {
+      "id": "0310",
+      "name": "Völker- und Europarecht",
+      "hash": "892836442be0f998fd9b2e74b3335679dbda44651abebf7ecc5b403444907fff",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0310/index.html",
+      "location": {
+        "address": "Professor-Huber-Platz 2, München",
+        "latitude": 48.1508767,
+        "longitude": 11.582443
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2742"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Webseite der Fakultät",
+          "url": "http://www.jura.uni-muenchen.de/fakultaet/lehrstuehle/walter/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:30:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:30:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:30:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:30:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:30:00"
+              },
+              {
+                "start_time": "14:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Europarecht",
+        "Internationale Beziehungen",
+        "Völkerrecht"
+      ]
+    },
+    {
+      "id": "0760",
+      "name": "Wissenschaftliche Bibliothek Klinikum Großhadern",
+      "hash": "224748309cbb2410affaadb0515e354527e0a1545c6ed9a4bdf73c53d9b8b500",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0760/index.html",
+      "location": {
+        "address": "Marchioninistraße 15, München",
+        "latitude": 48.1090781,
+        "longitude": 11.4735768
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-74587"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "16:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "13:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit eingeschränkter Ausleihmöglichkeit."
+        },
+        {
+          "title": "Ausleihberechtigungen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihe-fb/index.html#klinikum-gh"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Internet-PCs",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/cip-pools-pc-arbeitsplaetze.html",
+          "type": "INDIVIDUAL_WORK_ROOMS",
+          "description": "PC-Räume & PC-Arbeitsplätze"
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI",
+          "description": "Kostenfreier Internetzugang"
+        },
+        {
+          "title": "Farbscanner",
+          "type": "COPIER",
+          "description": "Kostenfrei nutzbarer Farbscanner (USB-Stick mitbringen!)"
+        },
+        {
+          "title": "Farbkopierer",
+          "type": "COPIER",
+          "description": "Farbkopierer verfügbar"
+        },
+        {
+          "title": "Schwarz-Weiß-Kopierer",
+          "type": "COPIER",
+          "description": "Schwarz-Weiß-Kopierer verfügbar, Nutzung nur mit Kopierkarten"
+        }
+      ],
+      "subject_areas": [
+        "HumanmedizinGesamtverzeichnis der gedruckten Zeitschriften(911 kB)"
+      ]
+    },
+    {
+      "id": "0738",
+      "name": "Zahn-, Mund- und Kieferkrankheiten",
+      "hash": "e752f612f597f9f4fc319d2cd01458df932d993417b0e74343cebec17a937a0d",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0738/index.html",
+      "location": {
+        "address": "Goethestraße 70, München",
+        "latitude": 48.1316296,
+        "longitude": 11.5577036
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 4400-59444"
+          }
+        ],
+        "website": {
+          "title": "Website der Klinik",
+          "url": "http://www.klinikum.uni-muenchen.de/Poliklinik-fuer-Zahnerhaltung-und-Parodontologie/de/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:15:00",
+                "end_time": "17:30:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:15:00",
+                "end_time": "17:30:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:15:00",
+                "end_time": "17:30:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "12:00:00"
+              },
+              {
+                "start_time": "13:15:00",
+                "end_time": "17:30:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": []
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": []
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek mit einem Ausleihkontingent für Studierende"
+        },
+        {
+          "title": "Buchbestand vor 1985 nicht im Online-Katalog"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Zahn-, Mund- und Kieferheilkunde"
+      ]
+    },
+    {
+      "id": "0001",
+      "name": "Zentralbibliothek",
+      "hash": "dd9385e9bad300ef0de81d6ac5cde8eaa8115110922834b7733e4ceebb275f6a",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0001/index.html",
+      "reservation_url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/leseplatzreservierung/index.html",
+      "location": {
+        "address": "Geschwister-Scholl-Platz 1, München",
+        "latitude": 48.1509985,
+        "longitude": 11.5796007
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-2427"
+          }
+        ]
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "06:30:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "06:30:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "06:30:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "06:30:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "06:30:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "17:00:00"
+              },
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SATURDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "22:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          },
+          {
+            "day": "SUNDAY",
+            "time_ranges": [
+              {
+                "start_time": "08:00:00",
+                "end_time": "20:00:00"
+              },
+              {
+                "start_time": "10:00:00",
+                "end_time": "20:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [
+        {
+          "title": "Zur Ausleihe aus dem Magazinbestand sind alle Benutzerinnen und Benutzer mit einer LMUcard oder einem gültigen Bibliotheksausweis berechtigt."
+        },
+        {
+          "title": "Weitere Informationen und Leihfristen",
+          "url": "https://www.ub.uni-muenchen.de/ausleihe-online/ausleihe/ausleihen-zb/index.html"
+        }
+      ],
+      "equipment": [
+        {
+          "title": "Barrierefreier Zugang",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/lernumgebung/barrierefrei/index.html",
+          "type": "ACCESSIBILITY"
+        },
+        {
+          "title": "Kopierer, Buchscanner",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/index.html",
+          "type": "COPIER",
+          "description": "Verfügbar in beiden PC-Räumen. Bitte eigenen USB-Stick mitbringen."
+        },
+        {
+          "title": "Internet-PCs",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/arbeitsplaetze/pc-plaetze/index.html",
+          "type": "INDIVIDUAL_WORK_ROOMS"
+        },
+        {
+          "title": "WLAN",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/internet/index.html",
+          "type": "WIFI"
+        },
+        {
+          "title": "Aufladestation für die Legic-Karte",
+          "url": "https://www.ub.uni-muenchen.de/arbeiten/drucken/bezahlen/index.html",
+          "type": "MISC"
+        },
+        {
+          "title": "EC-Terminal",
+          "type": "MISC"
+        },
+        {
+          "title": "Vorhängeschloss",
+          "url": "https://lmu-shop.de/verkaufsautomat#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik).#:~:text=Der%20LMU%20Verkaufsautomat&text=Campus%20erworben%20werden.-,Dazu%20steht%20im%20Eingangsbereich%20des%20Philologicums%20an%20der%20Ludwigstra%C3%9Fe%2025,Smartphone%20mit%20NFC%2DTechnik)",
+          "type": "LOCKERS",
+          "description": "Für die Nutzung der Schließfächer in den Gebäudeteilen F und D. Bügelstärke von 6-7 mm und Bügelbreite von mindestens 16 mm erforderlich."
+        }
+      ],
+      "subject_areas": [
+        "Spezialbestand „Altes Buch”",
+        "Wissenschaftliche Allgemeinbibliothek"
+      ]
+    },
+    {
+      "id": "0321",
+      "name": "Zentrum für Arbeitsbeziehungen und Arbeitsrecht an der Ludwig-Maximilians-Universität (ZAAR)",
+      "hash": "652ed9d3349e293fcf4dac36388940f66135f782cbc0cd0b62fc4b9274e16144",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/0321/index.html",
+      "location": {
+        "address": "Destouchesstraße 68, München",
+        "latitude": 48.1652991,
+        "longitude": 11.5710757
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2050883-05"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Zentrums",
+          "url": "http://www.zaar.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": [
+          {
+            "day": "MONDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "TUESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "WEDNESDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "THURSDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "18:00:00"
+              }
+            ]
+          },
+          {
+            "day": "FRIDAY",
+            "time_ranges": [
+              {
+                "start_time": "09:00:00",
+                "end_time": "17:00:00"
+              }
+            ]
+          }
+        ]
+      },
+      "services": [],
+      "equipment": [],
+      "subject_areas": [
+        "Deutsches, europäisches und internationales Arbeitsrecht",
+        "Sozialversicherungsrecht"
+      ]
+    },
+    {
+      "id": "3300",
+      "name": "Zentrum für Ethik und Philosophie in der Praxis",
+      "hash": "49bced3986615084d34e23b30ede992c6461d51f08d661d23a8dad8a8750e55c",
+      "url": "https://www.ub.uni-muenchen.de/bibliotheken/bibs-a-bis-z/3300/index.html",
+      "location": {
+        "address": "Geschwister-Scholl-Platz 1, München",
+        "latitude": 48.1509985,
+        "longitude": 11.5796007
+      },
+      "contact": {
+        "phone": [
+          {
+            "number": "089 2180-6083"
+          }
+        ],
+        "website": {
+          "title": "Die Bibliothek auf der Website des Instituts",
+          "url": "https://www.zepp.uni-muenchen.de/bibliothek/index.html"
+        }
+      },
+      "opening_hours": {
+        "days": []
+      },
+      "services": [
+        {
+          "title": "Präsenzbibliothek"
+        }
+      ],
+      "equipment": [],
+      "subject_areas": [
+        "Allgemeine und angewandte Ethik",
+        "Geschichte der Ethik und angrenzende Forschungsbereiche",
+        "Metaethik"
+      ]
+    }
+  ]
+}
