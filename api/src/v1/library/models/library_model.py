@@ -2,6 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
+from shared.src.models.image_model import Images
 from shared.src.models.location_model import Location
 
 
@@ -50,6 +51,7 @@ class Library(BaseModel):
     name: str
     hash: str
     url: str
+    images: Images | None = Images(root=[])
     location: Location | None = None
     contact: Contact | None = None
     opening_hours: OpeningHours | None = None
