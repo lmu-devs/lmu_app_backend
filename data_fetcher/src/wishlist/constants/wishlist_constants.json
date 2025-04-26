@@ -381,6 +381,63 @@
     "images": []
 }
 
+,
+
+{
+    "translations": [
+        {
+            "title": "Bibliotheken",
+            "description_short": "Öffnungszeiten, Kontakte, Räume",
+            "description": "Ihr habt euch gewünscht: Übersicht über alle Bibliotheken der Universität und deren Öffnungszeiten, Kontakte und Räume. Danke für euer Feedback! 🫶🏼",
+            "language": "de-DE"
+        },
+        {
+            "title": "Libraries",
+            "description_short": "Opening hours, contacts, rooms",
+            "description": "You wished: Overview of all libraries of the university and their opening hours, contacts and rooms. Thank you for your feedback! 🫶🏼",
+            "language": "en-US"
+        }
+    ],
+    "status": "DEVELOPMENT",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": [
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_library_01.webp",
+            "name": "Libraries Wishlist Features 1",
+            "blurhash": null
+        },
+        {
+            "url": "https://api.lmu-dev.org/images/wishlist/wishlist_library_02.webp",
+            "name": "Libraries Wishlist Features 2",
+            "blurhash": null
+        }
+    ]
+}
+
+,
+
+{
+    "translations": [
+        {
+            "title": "Jobcenter",
+            "description_short": "Jobsuche, Stellenausschreibungen, Bewerbungen",
+            "description": "Jobangebote, Stellenausschreibungen, Bewerbungen und speziell für Studierende.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Jobcenter",
+            "description_short": "Job offers, job ads, applications",
+            "description": "Job offers, job ads, applications and specifically for students.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
 
 
 ]
