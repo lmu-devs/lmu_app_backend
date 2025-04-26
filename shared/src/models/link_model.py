@@ -8,3 +8,12 @@ class Link(BaseModel):
 
 class Links(RootModel):
     root: list[Link]
+
+
+class TextWithLink(BaseModel):
+    title: str
+    url: str | None = None
+
+
+class TextsWithLink(RootModel):
+    root: list[TextWithLink]

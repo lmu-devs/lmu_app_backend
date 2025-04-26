@@ -1,7 +1,6 @@
 import hashlib
 import json
 import re
-import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from urllib.parse import urljoin, urlparse
@@ -13,15 +12,15 @@ from pydantic import BaseModel, Field
 from data_fetcher.src.core.html_utils import html_to_markdown
 from data_fetcher.src.library.models.library_model import (
     Contact,
+    Equipments,
     Library,
     OpeningHours,
-    TextWithLink,
 )
 from shared.src.core.logging import get_library_logger
 from shared.src.factories.llm_factory import LLMFactory
-from shared.src.models.link_model import Link
+from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.llm_message_models import SystemMessage, UserMessage
-from shared.src.models.location_model import Locations
+from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
 from shared.src.services.geocoding_service import GeocodingService
 
@@ -43,6 +42,7 @@ class LibraryCrawler:
         self.session = requests.Session()
         self.llm = LLMFactory(
             provider="openai",
+            model="gpt-4o-mini",
         )
         # Set a more descriptive user agent
         self.session.headers.update(
@@ -84,7 +84,6 @@ class LibraryCrawler:
             )
 
         response: Response = self.llm.create_completion(
-            model="gpt-4.1-mini",
             messages=[
                 SystemMessage(
                     content="You are a phone number parser. You are given a string of text that contains phone numbers. You need to parse the phone numbers into a structured format."
@@ -96,10 +95,10 @@ class LibraryCrawler:
 
         return response.phones
 
-    def _generate_locations(self, address_text: str) -> Locations:
-        """Parse address into Locations model."""
+    def _generate_location(self, address_text: str) -> Location:
+        """Parse address into Location model."""
         if not address_text:
-            return []
+            return None
 
         class Address(BaseModel):
             address: str = Field(
@@ -107,31 +106,19 @@ class LibraryCrawler:
             )
             room: str | None = Field(description="The room/location of the library, if it is known")
 
-        class Response(BaseModel):
-            addresses: List[Address] = Field(
-                description="The address of the library, in edge cases there might be multiple addresses"
-            )
-
-        response: Response = self.llm.create_completion(
-            model="gpt-4.1-mini",
+        response: Address = self.llm.create_completion(
             messages=[
                 SystemMessage(
                     content="You are a location parser. You are given a string of text that contains an address. You need to parse the address into a structured format."
                 ),
                 UserMessage(content=address_text),
             ],
-            response_model=Response,
+            response_model=Address,
         )
 
-        print(response)
-
-        locations = []
-        for address in response.addresses:
-            location = self.geocoding_service.get_location(address.address)
-            # TODO: Add room to location?
-            if location:
-                locations.append(location)
-        return locations
+        location = self.geocoding_service.get_location(response.address)
+        # TODO: Add room to location?
+        return location
 
     def _generate_opening_hours(self, opening_hours_text: str) -> OpeningHours | None:
         """Parse opening hours div into OpeningHours model."""
@@ -139,7 +126,6 @@ class LibraryCrawler:
             return None
 
         response: OpeningHours = self.llm.create_completion(
-            model="gpt-4.1-mini",
             messages=[
                 SystemMessage(
                     content="You are a opening hours parser. You are given a string of text that contains opening hours. You need to parse the opening hours into a structured format."
@@ -150,6 +136,41 @@ class LibraryCrawler:
         )
 
         return response
+
+    def _generate_equipment_section(self, content_elements: List[Tag | str]) -> Equipments:
+        """
+        Extract equipment items and their links from the equipment section.
+        Items are separated by commas, and can either be plain text or linked text.
+        """
+        if not content_elements:
+            return Equipments()
+
+        # Process each element to properly handle links before converting to markdown
+        processed_elements = []
+        for elem in content_elements:
+            if isinstance(elem, Tag):
+                # Find all links and convert them to absolute URLs
+                for link in elem.find_all("a", href=True):
+                    if not link["href"].startswith(("http://", "https://")):
+                        link["href"] = urljoin(self.BASE_URL, link["href"])
+            processed_elements.append(html_to_markdown(elem))
+
+        content = "\n".join(processed_elements)
+
+        class EquipmentResponse(BaseModel):
+            equipment: Equipments = Field(description="List of equipment items found in the text.")
+
+        response: EquipmentResponse = self.llm.create_completion(
+            messages=[
+                SystemMessage(
+                    content="You are a equipment parser. You are given a string of text that contains equipment. You need to parse the equipment into a structured format. Be language sensitive. Write friendly, personal and concise."
+                ),
+                UserMessage(content=content),
+            ],
+            response_model=EquipmentResponse,
+        )
+
+        return response.equipment
 
     def _extract_section_content(self, section_tag: Tag, stop_tags=["h1", "h2", "h3", "h4"]) -> List[Union[Tag, str]]:
         """Extract sibling elements following a section tag until the next heading."""
@@ -239,7 +260,7 @@ class LibraryCrawler:
 
         return ("\n".join(access_text).strip() or None, reservation_url)
 
-    def _generate_content_hash(self, soup: BeautifulSoup) -> str:
+    def _hash_content(self, soup: BeautifulSoup) -> str:
         """
         Generate a hash of the content of the div with id="contentcontainer".
 
@@ -263,9 +284,8 @@ class LibraryCrawler:
 
         return hashlib.sha256(content.encode()).hexdigest()
 
-    def _get_contact(self, content_div: Tag) -> Optional[Contact]:
-        """Clean and structure contact information into ContactInfo model."""
-        contact = Contact()
+    def _get_location(self, content_div: Tag) -> Optional[Location]:
+        """Clean and structure location information into Location model."""
 
         # Extract contact info from content div
         contact_div = content_div.find("div", {"class": "bd-kontakt"})
@@ -274,8 +294,17 @@ class LibraryCrawler:
             address_elem = contact_div.find("address", {"class": "g-address"})
             if address_elem:
                 address = address_elem.get_text(separator="\n").strip()
-                contact.location = self._generate_locations(address)
+                location = self._generate_location(address)
 
+        return location
+
+    def _get_contact(self, content_div: Tag) -> Optional[Contact]:
+        """Clean and structure contact information into ContactInfo model."""
+        contact = Contact()
+
+        # Extract contact info from content div
+        contact_div = content_div.find("div", {"class": "bd-kontakt"})
+        if contact_div:
             # Phone
             phone_elem = contact_div.find("p", {"class": "telefon"})
             if phone_elem:
@@ -313,20 +342,20 @@ class LibraryCrawler:
                 valid_emails.extend(found_emails)
 
             # Fallback: Extract from address if no email found yet
-            if not valid_emails and contact.location and contact.location[0].address:
-                valid_emails.extend(self._extract_emails(contact.location[0].address))
+            if not valid_emails and contact.location and contact.location.address:
+                valid_emails.extend(self._extract_emails(contact.location.address))
 
             contact.email = sorted(list(set(valid_emails))) or None
 
             # Fallback phone extraction from address if not found earlier
-            if not contact.phone and contact.location and contact.location[0].address:
-                phones = self._generate_phone_numbers(contact.location[0].address)
+            if not contact.phone and contact.location and contact.location.address:
+                phones = self._generate_phone_numbers(contact.location.address)
                 if phones and phones.root:  # Check if we have any phones
                     contact.phone = phones
 
         return contact
 
-    def _parse_service_section(self, content_elements: List[Union[Tag, str]]) -> List[TextWithLink]:
+    def _parse_service_section(self, content_elements: List[Union[Tag, str]]) -> TextsWithLink:
         """
         Extract service text and their links from the service section.
 
@@ -356,11 +385,9 @@ class LibraryCrawler:
                                     text = link.get_text(strip=True)
                                     if text:
                                         services.append(
-                                            TextWithLink(
-                                                title=text,
-                                                url=Link(title=text, url=href),
-                                            )
+                                            TextWithLink(title=text, url=href),
                                         )
+
                             else:
                                 # Get plain text from list item
                                 text = li.get_text(strip=True)
@@ -377,56 +404,14 @@ class LibraryCrawler:
                                     href = urljoin(self.BASE_URL, href)
                                 text = link.get_text(strip=True)
                                 if text:
-                                    services.append(TextWithLink(title=text, url=Link(title=text, url=href)))
+                                    services.append(TextWithLink(title=text, url=href))
                         else:
                             # If no links found, get the plain text content
                             text = elem.get_text(strip=True)
                             if text:
                                 services.append(TextWithLink(title=text))
 
-        return services
-
-    def _parse_equipment_section(self, content_elements: List[Union[Tag, str]]) -> List[TextWithLink]:
-        """
-        Extract equipment items and their links from the equipment section.
-        Items are separated by commas, and can either be plain text or linked text.
-
-        Args:
-            content_elements: List of HTML elements containing equipment content
-
-        Returns:
-            List of TextWithLink objects containing equipment items and their optional URLs
-        """
-        equipment = []
-
-        for elem in content_elements:
-            if isinstance(elem, Tag) and elem.name == "p":
-                # Split the paragraph content by commas, preserving HTML
-                # Convert NavigableString to string to avoid BS4 artifacts
-                content = str(elem)
-                items = content.split(",")
-
-                for item in items:
-                    # Convert back to BS4 for proper HTML parsing
-                    item_soup = BeautifulSoup(item, "html.parser")
-
-                    # Check if item has a link
-                    link = item_soup.find("a", href=True)
-                    if link:
-                        href = link["href"]
-                        # Make URL absolute if it's relative
-                        if not href.startswith(("http://", "https://")):
-                            href = urljoin(self.BASE_URL, href)
-                        text = link.get_text(strip=True)
-                        if text:
-                            equipment.append(TextWithLink(title=text, url=Link(title=text, url=href)))
-                    else:
-                        # Get plain text, removing any HTML tags
-                        text = item_soup.get_text(strip=True)
-                        if text:
-                            equipment.append(TextWithLink(title=text))
-
-        return equipment
+        return TextsWithLink(root=services)
 
     def _parse_library_details(self, url: str, name: str, location_number: List[str]) -> Library:
         """Parse detailed information from a library's individual page."""
@@ -446,7 +431,7 @@ class LibraryCrawler:
             )
 
         # Generate content hash first
-        content_hash = self._generate_content_hash(soup)
+        content_hash = self._hash_content(soup)
 
         # Find the main content area (adjust selectors if needed)
         content_div = soup.find("div", {"class": "content content-einrichtung"}) or soup.find("div", id="content")
@@ -463,13 +448,14 @@ class LibraryCrawler:
         # --- Initialize data ---
         opening_hours: OpeningHours | None = None
         contact: Contact = self._get_contact(content_div)
-        search_hints: List[Link] | None = None
+        location: Location | None = self._get_location(content_div)
         reservation_url: Link | None = None
-        transportation: str | None = None
         access_regulation: str | None = None
         services: List[TextWithLink] = []
         subject_areas: List[str] = []
-        equipment: List[TextWithLink] = []
+        equipment: Equipments = Equipments()
+        # transportation: str | None = None
+        # search_hints: List[Link] | None = None
 
         # --- Extract Opening Hours ---
         opening_hours_div = content_div.find("div", {"class": "oeffnungszeiten"})
@@ -478,11 +464,13 @@ class LibraryCrawler:
             text_content = html_to_markdown(opening_hours_div)
             opening_hours = self._generate_opening_hours(text_content)
 
-        # --- Extract Transportation ---
-        transport_header = content_div.find(["h2", "h3"], string=re.compile(r"Verkehrsanbindung", re.IGNORECASE))
-        if transport_header:
-            transport_content = self._extract_section_content(transport_header)
-            transportation = self._parse_transportation_section(transport_content)
+        # # --- Extract Transportation ---
+        # transport_header = content_div.find(
+        #     ["h2", "h3"], string=re.compile(r"Verkehrsanbindung", re.IGNORECASE)
+        # )
+        # if transport_header:
+        #     transport_content = self._extract_section_content(transport_header)
+        #     transportation = self._parse_transportation_section(transport_content)
 
         # --- Extract Access Regulation ---
         access_header = content_div.find(["h2", "h3"], string=re.compile(r"Zugangsregelung", re.IGNORECASE))
@@ -500,7 +488,9 @@ class LibraryCrawler:
         equipment_header = content_div.find(["h2", "h3"], string=re.compile(r"Ausstattung", re.IGNORECASE))
         if equipment_header:
             equipment_content = self._extract_section_content(equipment_header)
-            equipment = self._parse_equipment_section(equipment_content)
+            equipment = self._generate_equipment_section(equipment_content)
+        else:
+            print("NO EQUIPMENT HEADER")
 
         # --- Extract Subject Areas (Sammelgebiete) ---
         subject_header = content_div.find(["h2", "h3"], string=re.compile(r"Sammelgebiete", re.IGNORECASE))
@@ -526,17 +516,17 @@ class LibraryCrawler:
                 id=library_id,
                 name=name,
                 hash=content_hash,
-                location_number=location_number,
                 url=url,
                 reservation_url=reservation_url,
-                search_hints=search_hints,
+                location=location,
                 contact=contact,
                 access_regulation=access_regulation,
                 opening_hours=opening_hours,
                 services=services,
                 equipment=equipment,
                 subject_areas=subject_areas,
-                transportation=transportation,
+                # search_hints=search_hints,
+                # transportation=transportation,
             )
             print(library.model_dump_json(indent=2))
             return library
@@ -560,12 +550,8 @@ class LibraryCrawler:
             return base_libraries_info
 
         tables = soup.find_all("table", {"class": "g-table"})  # Target specific tables if possible
-        if not tables:
-            logger.warning("No tables with class 'g-table' found on the library list page.")
-            # Fallback? Find all tables?
-            tables = soup.find_all("table")
 
-        processed_urls = set()  # Avoid processing the same library page multiple times
+        processed_urls = set()
 
         for table in tables:
             for row in table.find_all("tr"):
@@ -614,43 +600,38 @@ class LibraryCrawler:
         logger.info(f"Found {len(base_libraries_info)} potential libraries from the list page.")
         return base_libraries_info
 
-    def get_libraries(self) -> List[Library]:
+    def get_library(self, base_library: Dict[str, Any]) -> Library:
         """
-        Fetches the list of libraries, then crawls each library's detail page.
+        Fetches and processes a single library's detail page.
+
+        Args:
+            base_library: Dictionary containing basic library info (name, url, location_numbers)
 
         Returns:
-            List[Library]: A list of populated Library models.
+            Library: A populated Library model.
         """
         logger.info("Starting library crawl process...")
-        libraries_data: List[Library] = []
 
-        # 1. Get the basic list of libraries (Name, URL, Location Numbers)
-        base_library_list = self._parse_libraries_list()
+        if not base_library:
+            logger.error("No library info provided. Cannot proceed.")
+            return None
 
-        if not base_library_list:
-            logger.error("No libraries found from the A-Z list page. Cannot proceed.")
-            return libraries_data
-
-        # 2. Crawl details for each library
-        total = len(base_library_list)
-        for i, lib_info in enumerate(base_library_list):
-            logger.info(f"[{i + 1}/{total}] Processing: {lib_info['name']} ({lib_info['url']})")
-            try:
-                library_details = self._parse_library_details(
-                    url=lib_info["url"],
-                    name=lib_info["name"],
-                    location_number=lib_info["location_numbers"],  # Pass list of numbers
-                )
-                libraries_data.append(library_details)
-            except Exception as e:
-                # Log error for this specific library but continue with others
-                logger.error(
-                    f"Unexpected error parsing details for {lib_info['name']} ({lib_info['url']}): {e}",
-                    exc_info=True,
-                )
-
-        logger.info(f"Finished processing details for {len(libraries_data)} libraries.")
-        return libraries_data
+        logger.info(f"Processing: {base_library['name']} ({base_library['url']})")
+        try:
+            library_details = self._parse_library_details(
+                url=base_library["url"],
+                name=base_library["name"],
+                location_number=base_library["location_numbers"],
+            )
+            logger.info("Finished processing library details.")
+            return library_details
+        except Exception as e:
+            # Log error for this library
+            logger.error(
+                f"Unexpected error parsing details for {base_library['name']} ({base_library['url']}): {e}",
+                exc_info=True,
+            )
+            return None
 
 
 # --- Main execution block ---
@@ -672,30 +653,21 @@ def save_data_to_file(data: Dict, filename: str = "libraries.json"):
 if __name__ == "__main__":
     logger.info("Munich Library Crawler script started.")
     crawler = LibraryCrawler()
-    # crawler.get_libraries()
 
-    # locations = crawler._generate_locations("Ludwigstraße 25, 80539 München")
-    # print(locations)
-    # phones = crawler._generate_phone_numbers("Telefon: 089 289-27686\n089 289-27546 Dr. Alexander Schütze")
-    # print(phones)
-    #     opening_hours = crawler._generate_opening_hours(
-    #         """## Öffnungszeiten
+    libraries = crawler._parse_libraries_list()
+    libraries_data: List[Library] = []
+    total = len(libraries)
+    for i, library in enumerate(libraries):
+        logger.info(f"[{i + 1}/{total}] Processing library")
+        result = crawler.get_library(library)
+        if result:
+            libraries_data.append(result)
 
-    # Semester
-    # Montag - Freitag 10:00 - 16:00 Uhr
-
-    # Vorlesungsfreie Zeit
-    # Nach Vereinbarung per E-Mail: [aegyptologie@aegyp.fak12.uni-muenchen.de](mailto:aegyptologie@aegyp.fak12.uni-muenchen.de "E-Mail senden an: aegyptologie@aegyp.fak12.uni-muenchen.de")"""
-    #     )
-    #     print(opening_hours)
-
-    libraries: List[Library] = crawler.get_libraries()
-
-    if libraries:
-        logger.info(f"Successfully crawled {len(libraries)} library entries.")
+    if libraries_data:
+        logger.info(f"Successfully crawled {len(libraries_data)} library entries.")
         # Prepare final data structure for saving
         output_data = {
-            "libraries": [lib.model_dump(mode="json", exclude_none=True) for lib in libraries],
+            "libraries": [lib.model_dump(mode="json", exclude_none=True) for lib in libraries_data],
         }
         save_data_to_file(output_data, "libraries.json")  # Save in the current directory or specify a path
         logger.info("Output saved to libraries.json")

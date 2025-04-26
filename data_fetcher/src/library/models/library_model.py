@@ -2,31 +2,40 @@ from datetime import time
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, RootModel
 
 from shared.src.enums import WeekdayEnum
-from shared.src.models.link_model import Link
+from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
 
 
-class Equipment(str, Enum):
-    ACCESSIBILITY = "Barrierefreier Zugang"
-    GROUP_WORK_ROOMS = "Gruppenarbeitsräume"
-    INDIVIDUAL_WORK_ROOMS = "Einzelcarrels"
-    SEH_BEHINDERED_WORK_PLACE = "Sehbehindertenarbeitsplatz"
-    PARENT_CHILD_ROOM = "Eltern-Kind-Raum"
-    WHEELCHAIR_ROOM = "Wickelraum (3. OG im Behinderten-WC)"
-    GALLERY = "Ausstellungsfläche"
-    EVENT_ROOM = "Veranstaltungsraum"
-    MULTI_FUNCTION_ROOM = "Multifunktionsraum"
-    COPIER = "Kopierer"
-    BOOK_SCANNER = "Buchscanner (bitte eigenen USB-Stick mitbringen)"
-    BEAMER_RENTAL = "Beamerausleihe"
-    WIFI = "WLAN"
-    LMU_SHOP_AUTOMAT = "LMU-Shop-Automat"
-    CAFE = "Cafés"
-    SNACK_AND_DRINK_AUTOMAT = "Snack- und Getränkeautomaten"
+class EquipmentEnum(str, Enum):
+    ACCESSIBILITY = "ACCESSIBILITY"
+    LOCKERS = "LOCKERS"
+    GROUP_WORK_ROOMS = "GROUP_WORK_ROOMS"
+    INDIVIDUAL_WORK_ROOMS = "INDIVIDUAL_WORK_ROOMS"
+    PARENTING = "PARENTING"
+    COPIER = "COPIER"
+    BOOK_SCANNER = "BOOK_SCANNER"
+    BEAMER_RENTAL = "BEAMER_RENTAL"
+    WIFI = "WIFI"
+    FOOD_AND_DRINKS = "FOOD_AND_DRINKS"
+    OTHER_ROOMS = "OTHER_ROOMS"
+    MISC = "MISC"
+
+
+class Equipment(TextWithLink):
+    type: EquipmentEnum = Field(..., description="The type of equipment")
+    description: str | None = Field(
+        None, description="The description of the equipment, if there is additional information. Make it concise."
+    )
+
+
+class Equipments(RootModel):
+    root: List[Equipment] = Field(
+        default_factory=list, description="A list of equipments, Include locker when it is mentioned."
+    )
 
 
 class TimeSlot(BaseModel):
@@ -35,13 +44,7 @@ class TimeSlot(BaseModel):
     end_time: time
 
 
-class TextWithLink(BaseModel):
-    title: str
-    url: Optional[Link] = None
-
-
 class Contact(BaseModel):
-    location: Optional[Location] = None
     email: Optional[List[str]] = None
     phone: Optional[Phones] = None
     website: Optional[Link] = None
@@ -67,10 +70,11 @@ class Library(BaseModel):
     hash: str
     url: str | None = None
     reservation_url: str | None = None
+    location: Optional[Location] = None
     contact: Contact | None = None
     opening_hours: OpeningHours | None = None
-    services: List[TextWithLink] | None = []
-    equipment: List[TextWithLink] | None = []
+    services: TextsWithLink | None = None
+    equipment: Equipments | None = None
     subject_areas: List[str] | None = []
-    search_hints: List[Link] | None = []
-    transportation: str | None = None
+    # search_hints: List[Link] | None = []
+    # transportation: str | None = None

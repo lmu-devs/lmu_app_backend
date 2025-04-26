@@ -549,7 +549,7 @@ link_resource_constants = [
     ),
     LinkResourceTable(
         id="LMU_SHOP",
-        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/zentrale-it-angebote/mecum-online/",
+        url="https://lmu-shop.de/",
         types=[LinkType.INTERNAL],
         faculties=[],
         translations=[

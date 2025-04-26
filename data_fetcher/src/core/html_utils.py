@@ -3,13 +3,12 @@ Utilities for handling HTML content and conversions.
 """
 
 import re
-from typing import Union
 
 from bs4 import Tag
 from markdownify import markdownify as md
 
 
-def html_to_markdown(html_content: Union[str, Tag], **options) -> str:
+def html_to_markdown(html_content: Tag | str, **options) -> str:
     """
     Convert HTML content to Markdown while preserving essential formatting.
 
