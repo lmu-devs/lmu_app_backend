@@ -33,7 +33,6 @@ class AliasGenerationService:
             model="gpt-4o-mini",
             messages=[
                 UserMessage(content=context),
-                UserMessage(content=content),
             ],
         )
 

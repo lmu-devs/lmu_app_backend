@@ -4,12 +4,11 @@ from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 
+from data_fetcher.src.cinema.constants.location_constants import CinemaLocationConstants
+from data_fetcher.src.cinema.constants.url_constants import LMU_CINEMA_URL
+from data_fetcher.src.cinema.models.screening_model import ScreeningCrawl
 from shared.src.core.logging import get_cinema_fetcher_logger
 from shared.src.enums import CinemaEnum, UniversityEnum
-
-from ..constants.location_constants import CinemaLocationConstants
-from ..constants.url_constants import LMU_CINEMA_URL
-from ..models.screening_model import ScreeningCrawl
 
 # Initialize logger
 logger = get_cinema_fetcher_logger(__name__)

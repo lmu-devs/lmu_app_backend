@@ -67,7 +67,7 @@ class CanteenStatusTable(Base):
         return f"<CanteenStatus(canteen_id='{self.canteen_id}', is_closed='{self.is_closed}', is_temporary_closed='{self.is_temporary_closed}', is_lecture_free='{self.is_lecture_free}')>"
 
 
-class CanteenLocationTable(LocationTable, Base):
+class CanteenLocationTable(LocationTable):
     __tablename__ = "canteen_locations"
 
     canteen_id = Column(String, ForeignKey("canteens.id", ondelete="CASCADE"), primary_key=True)

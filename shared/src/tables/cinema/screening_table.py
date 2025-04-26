@@ -44,7 +44,7 @@ class MovieScreeningTable(Base):
     __table_args__ = (UniqueConstraint("date", "movie_id", name="uix_date_movie_id"),)
 
 
-class MovieLocationTable(LocationTable, Base):
+class MovieLocationTable(LocationTable):
     __tablename__ = "movie_locations"
 
     screening_id = Column(

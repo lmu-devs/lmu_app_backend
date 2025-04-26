@@ -9,18 +9,19 @@ from shared.src.core.exceptions import APIException
 from shared.src.core.logging import get_food_logger
 from shared.src.core.settings import get_settings
 
-from .cinema.routers import cinema_router
-from .feedback.routers import feedback_router
-from .food.routers import canteen_router, dish_router, menu_router, taste_router
-from .home.routers import home_router
-from .link.routers import link_router
-from .log.routers import log_router
-from .places.routers import places_router
-from .roomfinder.routers import roomfinder_router
-from .sport.routers import sport_router
-from .timeline.routers import timeline_router
-from .user.routers import user_router
-from .wishlist.routers import wishlist_router
+from .v1.cinema.routers import cinema_router
+from .v1.feedback.routers import feedback_router
+from .v1.food.routers import canteen_router, dish_router, menu_router, taste_router
+from .v1.home.routers import home_router
+from .v1.library.routers import library_router
+from .v1.link.routers import link_router
+from .v1.log.routers import log_router
+from .v1.places.routers import places_router
+from .v1.roomfinder.routers import roomfinder_router
+from .v1.sport.routers import sport_router
+from .v1.timeline.routers import timeline_router
+from .v1.user.routers import user_router
+from .v1.wishlist.routers import wishlist_router
 
 api_logger = get_food_logger(__name__)
 
@@ -74,11 +75,12 @@ def create_app():
     app.include_router(wishlist_router.router, prefix=prefix, tags=["wishlist"])
     app.include_router(cinema_router.router, prefix=f"{prefix}/cinema", tags=["cinema"])
     app.include_router(home_router.router, prefix=prefix, tags=["home"])
-    app.include_router(places_router.router, prefix=prefix, tags=["places"])
+    app.include_router(places_router.router, prefix=prefix, tags=["place"])
     app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
     app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
+    app.include_router(library_router.router, prefix=f"{prefix}/library", tags=["library"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

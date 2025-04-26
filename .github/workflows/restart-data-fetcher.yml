@@ -1,0 +1,28 @@
+name: Restart Data Fetcher
+
+on:
+    workflow_dispatch:
+
+jobs:
+    restart-data-fetcher:
+        runs-on: ubuntu-latest
+        environment: production
+        steps:
+            - name: Set up SSH
+              uses: webfactory/ssh-agent@v0.7.0
+              with:
+                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+            - name: Add host key
+              run: |
+                  mkdir -p ~/.ssh
+                  ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+            - name: Restart data_fetcher service
+              run: |
+                  echo "Restarting data_fetcher service..."
+                  ssh ${{ secrets.USER }}@${{ secrets.HOST }} "cd ${{ vars.APP_PATH }} && docker compose restart data_fetcher"
+
+            - name: Notify restart success
+              if: success()
+              run: echo "Data fetcher service restart successful"

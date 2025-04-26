@@ -415,6 +415,29 @@
     ]
 }
 
+,
+
+{
+    "translations": [
+        {
+            "title": "Jobcenter",
+            "description_short": "Jobsuche, Stellenausschreibungen, Bewerbungen",
+            "description": "Jobangebote, Stellenausschreibungen, Bewerbungen und speziell für Studierende.",
+            "language": "de-DE"
+        },
+        {
+            "title": "Jobcenter",
+            "description_short": "Job offers, job ads, applications",
+            "description": "Job offers, job ads, applications and specifically for students.",
+            "language": "en-US"
+        }
+    ],
+    "status": "NONE",
+    "prototype_url": "",
+    "release_date": "2025-11-19T11:53:31.756000",
+    "images": []
+}
+
 
 
 ]

@@ -33,7 +33,7 @@ class CinemaImageTable(ImageTable, Base):
     cinema = relationship("CinemaTable", back_populates="images")
 
 
-class CinemaLocationTable(LocationTable, Base):
+class CinemaLocationTable(LocationTable):
     __tablename__ = "cinema_locations"
 
     cinema_id = Column(String, ForeignKey("cinemas.id"), primary_key=True)
