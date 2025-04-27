@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, RootModel
 
 from shared.src.enums import WeekdayEnum
+from shared.src.models.image_model import Images
 from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
@@ -68,6 +69,7 @@ class Library(BaseModel):
     id: str
     name: str
     hash: str
+    images: Images = Images([])
     url: str | None = None
     reservation_url: str | None = None
     location: Optional[Location] = None

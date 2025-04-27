@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.models.image_model import Images
 from shared.src.models.location_model import Location
@@ -60,5 +60,5 @@ class Library(BaseModel):
     subject_areas: List[str] = []
 
 
-class Libraries(BaseModel):
-    libraries: List[Library]
+class Libraries(RootModel):
+    root: List[Library]

@@ -16,6 +16,7 @@ from .v1.home.routers import home_router
 from .v1.library.routers import library_router
 from .v1.link.routers import link_router
 from .v1.log.routers import log_router
+from .v1.map.routers import map_router
 from .v1.places.routers import places_router
 from .v1.roomfinder.routers import roomfinder_router
 from .v1.sport.routers import sport_router
@@ -81,6 +82,7 @@ def create_app():
     app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
     app.include_router(library_router.router, prefix=f"{prefix}/library", tags=["library"])
+    app.include_router(map_router.router, prefix=f"{prefix}/map", tags=["map"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
