@@ -538,7 +538,7 @@ link_resource_constants = [
             LinkResourceTranslationTable(
                 language=LanguageEnum.ENGLISH_US,
                 title="MeCum",
-                description="Web Medicin",
+                description="Web offers for medicine studies",
             ),
             LinkResourceTranslationTable(
                 language=LanguageEnum.GERMAN,
@@ -603,7 +603,7 @@ link_resource_constants = [
     ),
     LinkResourceTable(
         id="STIPENDIEN",
-        url="https://www.lmu.de/de/die-lmu/struktur/zentrale-universitaetsverwaltung/informations-und-kommunikationstechnik-dezernat-vi/it-servicedesk/zentrale-it-angebote/mecum-online/",
+        url="https://www.lmu.de/en/workspace-for-students/student-support-services/finance-your-studies/scholarships/",
         types=[LinkType.INTERNAL],
         faculties=[],
         translations=[
