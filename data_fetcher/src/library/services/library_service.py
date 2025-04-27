@@ -8,6 +8,7 @@ from shared.src.core.logging import get_library_logger
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.translation_service import TranslationService
 from shared.src.tables.library.library_table import (
+    LibraryLocationTable,
     LibraryOpeningHoursTable,
     LibraryTable,
     LibraryTranslationTable,
@@ -25,10 +26,35 @@ class LibraryService:
     def run(self):
         self._get_library_data()
 
-    def check_if_content_changed(self, library: Library):
-        library_data = self.db.query(LibraryTable).filter(LibraryTable.id == library.id).first()
+    def _get_library_data(self):
+        libraries = self.crawler._parse_libraries_list()
+        total = len(libraries)
+        for i, library in enumerate(libraries):
+            # try:
+            logger.info(f"[{i + 1}/{total}] Processing library")
+            has_changed = self.has_library_changed(self.crawler.current_id, library["url"])
+            if has_changed:
+                logger.info(f"📝 Library {library.get('name')} has changed. Updating...")
+                result = self.crawler.get_library(library)
+                if result:
+                    self._update_library_data(result)
+            else:
+                logger.info(f"⏭️ Library {library.get('name')} has not changed. Skipping update.")
+        # except Exception as e:
+        #     logger.error(f"🚨 Error crawling library {library}: {e}")
+
+        logger.info("Munich Library Crawler script finished.")
+
+    def has_library_changed(self, library_id: str, url: str) -> bool:
+        """
+        Check if the content of the library has changed.
+        When the content has changed, the library data is updated.
+        """
+        library_data = self.db.query(LibraryTable).filter(LibraryTable.id == library_id).first()
+        self.crawler.set_page_hash_id(url)
         if library_data:
-            if library_data.hash == library.hash:
+            print(library_data.hash, self.crawler.current_hash)
+            if library_data.hash == self.crawler.current_hash:
                 return False
         return True
 
@@ -44,41 +70,67 @@ class LibraryService:
     #     )
 
     def _update_library_data(self, library: Library):
-        if not self.check_if_content_changed(library):
-            return
+        logger.info(f"🔄 Updating library {library.name}")
+        # delete all data for this library
+        self.db.query(LibraryTable).filter(LibraryTable.id == library.id).delete()
+        self.db.flush()
 
         translation = LibraryTranslationTable(
             library_id=library.id,
             name=library.name,
             language=LanguageEnum.GERMAN,
-            services=library.services,
-            equipment=library.equipment,
+            services=library.services.model_dump() if library.services else None,
+            equipment=library.equipment.model_dump() if library.equipment else None,
             subject_areas=library.subject_areas,
         )
 
         opening_hours = []
-        for day in library.opening_hours.days:
-            opening_hours.append(
-                LibraryOpeningHoursTable(
-                    weekday=day.day,
-                    time_ranges=day.time_ranges,
+        if library.opening_hours:
+            for day in library.opening_hours.days:
+                opening_hours.append(
+                    LibraryOpeningHoursTable(
+                        weekday=day.day,
+                        time_ranges=[tr.model_dump(mode="json") for tr in day.time_ranges],
+                    )
                 )
+
+        location = None
+        if library.location:
+            location = LibraryLocationTable(
+                library_id=library.id,
+                address=library.location.address,
+                latitude=library.location.latitude,
+                longitude=library.location.longitude,
             )
+
+        images = None
+        if library.images:
+            images = library.images.model_dump()
+
+        external_url = None
+        if library.contact and library.contact.website:
+            external_url = library.contact.website.url
+
+        email = None
+        if library.contact and library.contact.email:
+            email = library.contact.email[0]
+
+        phone = None
+        if library.contact and library.contact.phone:
+            phone = library.contact.phone.model_dump()
 
         table = LibraryTable(
             id=library.id,
-            name=library.name,
             hash=library.hash,
-            images=library.images,
+            images=images,
             url=library.url,
             reservation_url=library.reservation_url,
-            location=library.location,
-            contact=library.contact,
+            location=location,
+            external_url=external_url,
+            email=email,
+            phone=phone,
             opening_hours=opening_hours,
-            services=library.services,
-            equipment=library.equipment,
-            subject_areas=library.subject_areas,
-            translation=translation,
+            translations=[translation],
         )
 
         self.db.add(table)
@@ -87,20 +139,3 @@ class LibraryService:
         # self.db.add_all(translations)
         self.db.commit()
         self.db.refresh(table)
-
-    def _get_library_data(self):
-        libraries = self.crawler._parse_libraries_list()
-        libraries_data: List[Library] = []
-        total = len(libraries)
-        for i, library in enumerate(libraries):
-            logger.info(f"[{i + 1}/{total}] Processing library")
-            result = self.crawler.get_library(library)
-            if result:
-                self._update_library_data(result)
-
-        if libraries_data:
-            logger.info(f"Successfully crawled {len(libraries_data)} library entries.")
-        else:
-            logger.error("Crawling returned no library data. File not saved.")
-
-        logger.info("Munich Library Crawler script finished.")

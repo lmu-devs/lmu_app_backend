@@ -1,12 +1,10 @@
-from datetime import time
 from typing import List
 
-from sqlalchemy import JSON, Boolean, Column, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import ARRAY, JSON, Column, Enum, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 
 from shared.src.core.database import Base
 from shared.src.enums import WeekdayEnum
-from shared.src.tables import TimeRange
 from shared.src.tables.language_table import LanguageTable
 from shared.src.tables.like_table import LikeTable
 from shared.src.tables.location_table import LocationTable
@@ -24,8 +22,16 @@ class LibraryTable(Base):
     images = Column(JSON, nullable=True)
 
     location: Mapped["LibraryLocationTable"] = relationship(back_populates="library")
-    opening_hours: Mapped["LibraryOpeningHoursTable"] = relationship(back_populates="library")
-    translations: Mapped["LibraryTranslationTable"] = relationship(back_populates="library")
+    opening_hours: Mapped[List["LibraryOpeningHoursTable"]] = relationship(
+        "LibraryOpeningHoursTable",
+        back_populates="library",
+        cascade="all, delete-orphan",
+    )
+    translations: Mapped[List["LibraryTranslationTable"]] = relationship(
+        back_populates="library", cascade="all, delete-orphan"
+    )
+    # likes: Mapped["LibraryLikeTable"] = relationship(back_populates="library")
+    likes = relationship("LibraryLikeTable", back_populates="library", cascade="all, delete-orphan")
 
 
 class LibraryTranslationTable(LanguageTable):
@@ -35,7 +41,7 @@ class LibraryTranslationTable(LanguageTable):
     name = Column(String)
     services = Column(JSON)
     equipment = Column(JSON)
-    subject_areas = Column(List[String])
+    subject_areas = Column(ARRAY(String))
 
     library = relationship("LibraryTable", back_populates="translations")
 
@@ -57,31 +63,13 @@ class LibraryLikeTable(LikeTable):
     user = relationship("UserTable", back_populates="liked_libraries")
 
 
-class LibraryTimeRange(TimeRange):
-    __tablename__ = "library_time_ranges"
-
-    library_opening_hours_id = Column(Integer, ForeignKey("library_opening_hours.id"))
-
-    # Relationship to parent OpeningHours
-    library_opening_hours = relationship("LibraryOpeningHoursTable", back_populates="time_ranges")
-
-
 class LibraryOpeningHoursTable(Base):
     __tablename__ = "library_opening_hours"
 
     id = Column(Integer, primary_key=True, index=True)
+    library_id = Column(String, ForeignKey("libraries.id", ondelete="CASCADE"), nullable=False)
     weekday = Column(Enum(WeekdayEnum), nullable=False)
+    time_ranges = Column(JSON)
 
     # Relationships
-    library: Mapped["LibraryTable"] = relationship(
-        "LibraryTable", back_populates="opening_hours", cascade="all, delete-orphan"
-    )
-    time_ranges: Mapped[List[LibraryTimeRange]] = relationship(
-        "LibraryTimeRange", back_populates="library_opening_hours", cascade="all, delete-orphan"
-    )
-
-    def add_time_range(self, start_time: time, end_time: time) -> LibraryTimeRange:
-        """Add a new time range to the opening hours."""
-        time_range = LibraryTimeRange(library_opening_hours_id=self.id, start_time=start_time, end_time=end_time)
-        self.time_ranges.append(time_range)
-        return time_range
+    library: Mapped["LibraryTable"] = relationship("LibraryTable", back_populates="opening_hours")
