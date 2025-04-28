@@ -1,7 +1,7 @@
 """auto
 
 Revision ID: 6b602622d099
-Revises: 
+Revises:
 Create Date: 2025-04-19 20:45:22.545206
 
 """

@@ -12,3 +12,4 @@ class HomeTileEnum(str, Enum):
     ROOMFINDER = "ROOMFINDER"
     WISHLIST = "WISHLIST"
     FEEDBACK = "FEEDBACK"
+    LIBRARY = "LIBRARY"

@@ -17,12 +17,12 @@ from data_fetcher.src.library.models.library_model import (
     OpeningHours,
 )
 from shared.src.core.logging import get_library_logger
-from shared.src.factories.llm_factory import LLMFactory
 from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.llm_message_models import SystemMessage, UserMessage
 from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
 from shared.src.services.geocoding_service import GeocodingService
+from shared.src.services.llm_service import LLMService
 
 logger = get_library_logger(__name__)
 
@@ -43,7 +43,7 @@ class LibraryCrawler:
         self.current_hash = None
         self.current_id = None
         self.session = requests.Session()
-        self.llm = LLMFactory(
+        self.llm = LLMService(
             provider="openai",
             model="gpt-4o-mini",
         )

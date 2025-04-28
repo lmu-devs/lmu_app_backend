@@ -2,8 +2,8 @@ from typing import List
 
 from pydantic import BaseModel, Field
 
-from shared.src.factories.llm_factory import LLMFactory
 from shared.src.models.llm_message_models import SystemMessage, UserMessage
+from shared.src.services.llm_service import LLMService
 
 
 class AliasGenerationResponse(BaseModel):
@@ -15,7 +15,7 @@ class AliasGenerationResponse(BaseModel):
 
 
 class AliasGenerationService:
-    def __init__(self, llm_factory: LLMFactory | None = None):
+    def __init__(self, llm_factory: LLMService | None = None):
         system_message = SystemMessage(
             content="""You are a helpful assistant that generates aliases for a given input. 
             Be sensitive to the language of the input and generate aliases in the same language.
@@ -24,7 +24,7 @@ class AliasGenerationService:
             SINGLE WORDS ONLY. DONT USE CAMEL CASE. NO "lmu", "munich", "student", "university" in the aliases.
             """
         )
-        self.llm_factory = llm_factory or LLMFactory(provider="openai", system_message=system_message)
+        self.llm_factory = llm_factory or LLMService(provider="openai", system_message=system_message)
 
     def generate_alias(self, content: str, context: str | None = None) -> AliasGenerationResponse:
         context = f"This is the context: {context}" if context else ""
@@ -46,16 +46,19 @@ if __name__ == "__main__":
     )
     print(
         alias_generation_service.generate_alias(
-            "Hochschulsport", "This is the context: Hochschulsport is a sports club at LMU Munich"
+            "Hochschulsport",
+            "This is the context: Hochschulsport is a sports club at LMU Munich",
         )
     )
     print(
         alias_generation_service.generate_alias(
-            "Raumfinder", "This is the context: Raumfinder is a room finder at LMU Munich"
+            "Raumfinder",
+            "This is the context: Raumfinder is a room finder at LMU Munich",
         )
     )
     print(
         alias_generation_service.generate_alias(
-            "Benutzerkonto", "This is the context: Benutzerkonto is a user account at LMU Munich"
+            "Benutzerkonto",
+            "This is the context: Benutzerkonto is a user account at LMU Munich",
         )
     )

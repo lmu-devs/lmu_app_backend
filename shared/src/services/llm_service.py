@@ -12,7 +12,7 @@ LLMSettings = OpenAIConfig | AnthropicConfig
 T = TypeVar("T", bound=BaseModel)
 
 
-class LLMFactory(Generic[T]):
+class LLMService(Generic[T]):
     def __init__(
         self,
         provider: LLMProviders,
@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     try:
         # Create factory with default model
-        factory = LLMFactory[CompletionResponse](
+        factory = LLMService[CompletionResponse](
             provider="openai",
             system_message=SystemMessage(content="Be concise and accurate."),
             model="gpt-4o-mini",  # Default model

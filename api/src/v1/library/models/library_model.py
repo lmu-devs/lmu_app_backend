@@ -1,19 +1,16 @@
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel, RootModel
 
 from shared.src.models.image_model import Images
+from shared.src.models.link_model import Link
 from shared.src.models.location_model import Location
-
-
-class TimeRange(BaseModel):
-    start_time: str
-    end_time: str
+from shared.src.models.timeframe_model import Timeframe
 
 
 class OpeningDay(BaseModel):
     day: str
-    time_ranges: List[TimeRange]
+    timeframes: List[Timeframe]
 
 
 class OpeningHours(BaseModel):
@@ -22,28 +19,24 @@ class OpeningHours(BaseModel):
 
 class PhoneContact(BaseModel):
     number: str
-    recipient: Optional[str] = None
-
-
-class Website(BaseModel):
-    title: str
-    url: str
+    recipient: str | None = None
 
 
 class Contact(BaseModel):
     phone: List[PhoneContact] = []
-    website: Optional[Website] = None
+    website: Link | None = None
 
 
 class Service(BaseModel):
     title: str
+    description: str | None = None
 
 
 class Equipment(BaseModel):
     title: str
-    url: Optional[str] = None
-    type: Optional[str] = None
-    description: Optional[str] = None
+    url: str | None = None
+    type: str | None = None
+    description: str | None = None
 
 
 class Library(BaseModel):

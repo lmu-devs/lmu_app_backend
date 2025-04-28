@@ -28,7 +28,8 @@ class Place(BaseModel):
 
     @classmethod
     def places_to_pydantic(
-        cls, places: List[BuildingLocationTable | CanteenLocationTable | CinemaLocationTable]
+        cls,
+        places: List[BuildingLocationTable | CanteenLocationTable | CinemaLocationTable],
     ) -> List["Place"]:
         places_pydantic = []
         for place in places:

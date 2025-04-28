@@ -73,12 +73,16 @@ class LibraryService:
         self.db.query(LibraryTable).filter(LibraryTable.id == library.id).delete()
         self.db.flush()
 
+        services = library.services.model_dump() if library.services else None
+        print(services)
+        equipment = library.equipment.model_dump() if library.equipment else None
+        print(equipment)
         translation = LibraryTranslationTable(
             library_id=library.id,
             name=library.name,
             language=LanguageEnum.GERMAN,
-            services=library.services.model_dump() if library.services else None,
-            equipment=library.equipment.model_dump() if library.equipment else None,
+            services=services,
+            equipment=equipment,
             subject_areas=library.subject_areas,
         )
 

@@ -29,13 +29,15 @@ class EquipmentEnum(str, Enum):
 class Equipment(TextWithLink):
     type: EquipmentEnum = Field(..., description="The type of equipment")
     description: str | None = Field(
-        None, description="The description of the equipment, if there is additional information. Make it concise."
+        None,
+        description="The description of the equipment, if there is additional information. Make it concise.",
     )
 
 
 class Equipments(RootModel):
     root: List[Equipment] = Field(
-        default_factory=list, description="A list of equipments, Include locker when it is mentioned."
+        default_factory=list,
+        description="A list of equipments, Include locker when it is mentioned.",
     )
 
 

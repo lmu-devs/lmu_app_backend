@@ -16,7 +16,11 @@ class LikeTable(Base):
 
     @declared_attr
     def user_id(cls):
-        return Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+        return Column(
+            UUID(as_uuid=True),
+            ForeignKey("users.id", ondelete="CASCADE"),
+            primary_key=True,
+        )
 
     @declared_attr
     def created_at(cls):
