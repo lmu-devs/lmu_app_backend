@@ -1,5 +1,3 @@
-from typing import List
-
 from sqlalchemy.orm import Session
 
 from data_fetcher.src.library.crawler.library_crawler import LibraryCrawler
@@ -32,7 +30,8 @@ class LibraryService:
         for i, library in enumerate(libraries):
             # try:
             logger.info(f"[{i + 1}/{total}] Processing library")
-            has_changed = self.has_library_changed(self.crawler.current_id, library["url"])
+            self.crawler.set_page_hash_id(library["url"])
+            has_changed = self.has_library_changed()
             if has_changed:
                 logger.info(f"📝 Library {library.get('name')} has changed. Updating...")
                 result = self.crawler.get_library(library)
@@ -45,13 +44,12 @@ class LibraryService:
 
         logger.info("Munich Library Crawler script finished.")
 
-    def has_library_changed(self, library_id: str, url: str) -> bool:
+    def has_library_changed(self) -> bool:
         """
         Check if the content of the library has changed.
         When the content has changed, the library data is updated.
         """
-        library_data = self.db.query(LibraryTable).filter(LibraryTable.id == library_id).first()
-        self.crawler.set_page_hash_id(url)
+        library_data = self.db.query(LibraryTable).filter(LibraryTable.id == self.crawler.current_id).first()
         if library_data:
             print(library_data.hash, self.crawler.current_hash)
             if library_data.hash == self.crawler.current_hash:
