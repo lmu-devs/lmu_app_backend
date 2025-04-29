@@ -33,6 +33,10 @@ class LibraryTable(Base):
     # likes: Mapped["LibraryLikeTable"] = relationship(back_populates="library")
     likes = relationship("LibraryLikeTable", back_populates="library", cascade="all, delete-orphan")
 
+    @property
+    def like_count(self):
+        return len(self.likes)
+
 
 class LibraryTranslationTable(LanguageTable):
     __tablename__ = "library_translations"

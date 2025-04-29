@@ -77,6 +77,7 @@ class LibraryService:
         print(services)
         equipment = library.equipment.model_dump() if library.equipment else None
         print(equipment)
+
         translation = LibraryTranslationTable(
             library_id=library.id,
             name=library.name,

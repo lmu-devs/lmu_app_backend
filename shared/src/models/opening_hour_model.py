@@ -1,4 +1,4 @@
-from datetime import time as datetime_time
+from datetime import time
 from typing import List, Optional
 
 from pydantic import BaseModel, ConfigDict
@@ -9,8 +9,8 @@ from shared.src.tables.food.canteen_table import CanteenOpeningHoursTable
 
 class OpeningHour(BaseModel):
     day: WeekdayEnum
-    start_time: Optional[datetime_time]
-    end_time: Optional[datetime_time]
+    start_time: Optional[time]
+    end_time: Optional[time]
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
