@@ -26,6 +26,7 @@ class BaseHomeTile(BaseModel):
         HomeTileEnum.CINEMAS,
         HomeTileEnum.TIMELINE,
         HomeTileEnum.LINKS,
+        HomeTileEnum.LIBRARY,
     ]
     size: int = Field(
         description="The size of the tile, 1 is the smallest and 3 is the largest",
