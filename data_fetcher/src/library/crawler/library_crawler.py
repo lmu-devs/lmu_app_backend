@@ -17,12 +17,12 @@ from data_fetcher.src.library.models.library_model import (
     OpeningHours,
 )
 from shared.src.core.logging import get_library_logger
-from shared.src.factories.llm_factory import LLMFactory
 from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.llm_message_models import SystemMessage, UserMessage
 from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
 from shared.src.services.geocoding_service import GeocodingService
+from shared.src.services.llm_service import LLMService
 
 logger = get_library_logger(__name__)
 
@@ -39,8 +39,11 @@ class LibraryCrawler:
 
     def __init__(self):
         """Initializes the crawler session and geolocator."""
+        self.current_soup = None
+        self.current_hash = None
+        self.current_id = None
         self.session = requests.Session()
-        self.llm = LLMFactory(
+        self.llm = LLMService(
             provider="openai",
             model="gpt-4o-mini",
         )
@@ -260,7 +263,7 @@ class LibraryCrawler:
 
         return ("\n".join(access_text).strip() or None, reservation_url)
 
-    def _hash_content(self, soup: BeautifulSoup) -> str:
+    def _set_content_hash(self, soup: BeautifulSoup) -> str:
         """
         Generate a hash of the content of the div with id="contentcontainer".
 
@@ -401,36 +404,32 @@ class LibraryCrawler:
 
         return TextsWithLink(root=services)
 
-    def _parse_library_details(self, url: str, name: str, location_number: List[str]) -> Library:
+    def _set_library_id(self, url: str) -> str:
+        """Generate a library ID from the URL."""
+        self.current_id = url.split("/")[-2] if url.split("/")[-1] == "index.html" else None
+        return self.current_id
+
+    def get_library(self, library: Dict[str, Any]) -> Library:
         """Parse detailed information from a library's individual page."""
         # Extract library ID from URL
-        library_id = url.split("/")[-2] if url.split("/")[-1] == "index.html" else None
-        name = name.replace("Fachbibliothek ", "").strip()
-        soup = self._get_page(url)
-        if not soup:
-            logger.warning(f"Failed to fetch or parse page for {name}: {url}")
-            # Return minimal Library object on failure
-            return Library(
-                id=library_id,
-                name=name,
-                location_number=location_number,
-                url=url,
-                hash="error_fetching_page",
-            )
-
-        # Generate content hash first
-        content_hash = self._hash_content(soup)
+        library_url: str = library["url"]
+        library_name: str = library["name"]
+        location_numbers: List[str] = library["location_numbers"]
+        library_id: str = self._set_library_id(library_url)
+        name: str = library_name.replace("Fachbibliothek ", "").strip()
 
         # Find the main content area (adjust selectors if needed)
-        content_div = soup.find("div", {"class": "content content-einrichtung"}) or soup.find("div", id="content")
+        content_div = self.current_soup.find("div", {"class": "content content-einrichtung"}) or self.current_soup.find(
+            "div", id="content"
+        )
         if not content_div:
-            logger.warning(f"Could not find main content div for {name}: {url}")
+            logger.warning(f"Could not find main content div for {name}: {library_url}")
             return Library(
                 id=library_id,  # Add ID here
                 name=name,
-                location_number=location_number,
-                url=url,
-                hash=content_hash,
+                location_number=location_numbers,
+                url=library_url,
+                hash=self.current_hash,
             )
 
         # --- Initialize data ---
@@ -503,8 +502,8 @@ class LibraryCrawler:
             library = Library(
                 id=library_id,
                 name=name,
-                hash=content_hash,
-                url=url,
+                hash=self.current_hash,
+                url=library_url,
                 reservation_url=reservation_url,
                 location=location,
                 contact=contact,
@@ -519,13 +518,13 @@ class LibraryCrawler:
             print(library.model_dump_json(indent=2))
             return library
         except Exception as e:
-            logger.error(f"Failed to instantiate Library model for {name} ({url}): {e}")
+            logger.error(f"Failed to instantiate Library model for {name} ({library_url}): {e}")
             # Return minimal object on model error
             return Library(
                 id=library_id,
                 name=name,
-                location_number=location_number,
-                url=url,
+                location_number=location_numbers,
+                url=library_url,
                 hash="error_creating_model",
             )
 
@@ -537,7 +536,7 @@ class LibraryCrawler:
             logger.error("Could not fetch the main library list page. Aborting.")
             return base_libraries_info
 
-        tables = soup.find_all("table", {"class": "g-table"})  # Target specific tables if possible
+        tables = soup.find_all("table", {"class": "g-table"})
 
         processed_urls = set()
 
@@ -588,38 +587,14 @@ class LibraryCrawler:
         logger.info(f"Found {len(base_libraries_info)} potential libraries from the list page.")
         return base_libraries_info
 
-    def get_library(self, base_library: Dict[str, Any]) -> Library:
-        """
-        Fetches and processes a single library's detail page.
-
-        Args:
-            base_library: Dictionary containing basic library info (name, url, location_numbers)
-
-        Returns:
-            Library: A populated Library model.
-        """
-        logger.info("Starting library crawl process...")
-
-        if not base_library:
-            logger.error("No library info provided. Cannot proceed.")
-            return None
-
-        logger.info(f"Processing: {base_library['name']} ({base_library['url']})")
-        try:
-            library_details = self._parse_library_details(
-                url=base_library["url"],
-                name=base_library["name"],
-                location_number=base_library["location_numbers"],
-            )
-            logger.info("Finished processing library details.")
-            return library_details
-        except Exception as e:
-            # Log error for this library
-            logger.error(
-                f"Unexpected error parsing details for {base_library['name']} ({base_library['url']}): {e}",
-                exc_info=True,
-            )
-            return None
+    def set_page_hash_id(self, url: str) -> bool:
+        soup = self._get_page(url)
+        if not soup:
+            return False
+        self.current_soup = soup
+        self.current_hash = self._set_content_hash(soup)
+        self.current_id = self._set_library_id(url)
+        return True
 
 
 # --- Main execution block ---
@@ -647,6 +622,7 @@ if __name__ == "__main__":
     total = len(libraries)
     for i, library in enumerate(libraries):
         logger.info(f"[{i + 1}/{total}] Processing library")
+        crawler.set_page_hash_id(library["url"])
         result = crawler.get_library(library)
         if result:
             libraries_data.append(result)

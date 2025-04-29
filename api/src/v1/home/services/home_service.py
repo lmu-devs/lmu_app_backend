@@ -38,9 +38,9 @@ class HomeService:
         return HomeTiles(
             root=[
                 BaseHomeTile(
-                    type=HomeTileEnum.TIMELINE,
+                    type=HomeTileEnum.LIBRARY,
                     size=1,
-                    title="Timeline",
+                    title="Library",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.ROOMFINDER,
@@ -68,9 +68,9 @@ class HomeService:
                     title="Benefits",
                 ),
                 BaseHomeTile(
-                    type=HomeTileEnum.WISHLIST,
+                    type=HomeTileEnum.TIMELINE,
                     size=1,
-                    title="Wishlist",
+                    title="Timeline",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.FEEDBACK,

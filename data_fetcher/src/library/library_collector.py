@@ -10,4 +10,4 @@ class LibraryCollector(ScheduledCollector):
 
     async def _collect_data(self, db):
         service = LibraryService(db)
-        service.update_library_data()
+        service.run()

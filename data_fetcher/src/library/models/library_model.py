@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, Field, RootModel
 
 from shared.src.enums import WeekdayEnum
+from shared.src.models.image_model import Images
 from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
 from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
@@ -28,13 +29,15 @@ class EquipmentEnum(str, Enum):
 class Equipment(TextWithLink):
     type: EquipmentEnum = Field(..., description="The type of equipment")
     description: str | None = Field(
-        None, description="The description of the equipment, if there is additional information. Make it concise."
+        None,
+        description="The description of the equipment, if there is additional information. Make it concise.",
     )
 
 
 class Equipments(RootModel):
     root: List[Equipment] = Field(
-        default_factory=list, description="A list of equipments, Include locker when it is mentioned."
+        default_factory=list,
+        description="A list of equipments, Include locker when it is mentioned.",
     )
 
 
@@ -68,6 +71,7 @@ class Library(BaseModel):
     id: str
     name: str
     hash: str
+    images: Images = Images([])
     url: str | None = None
     reservation_url: str | None = None
     location: Optional[Location] = None

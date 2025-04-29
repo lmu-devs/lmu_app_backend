@@ -2,6 +2,7 @@ from .cinema import *
 from .faculty_table import *
 from .feedback_table import *
 from .food import *
+from .library import *
 from .link import *
 from .location_table import *
 from .roomfinder import *

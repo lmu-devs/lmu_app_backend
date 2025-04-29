@@ -66,6 +66,23 @@ class LmuScreeningCrawler:
             date_str, full_title = date_match.groups()
             date = self._parse_date(date_str)
 
+            # Check if this is a nested movie (has a sub-list)
+            if item.find("ul"):
+                # For the main movie, only use the text before the nested list
+                main_text = ""
+                for content in item.contents:
+                    if content.name == "ul":
+                        break
+                    if hasattr(content, "get_text"):
+                        main_text += content.get_text()
+                    else:
+                        main_text += str(content)
+                main_text = main_text.strip()
+
+                date_match = re.match(r"(\d{2}\.\d{2}\.\d{2}): (.+)", main_text)
+                if date_match:
+                    _, full_title = date_match.groups()
+
             # Extract year and clean title
             year_match = re.search(r"\(.*?(\d{4})\)", full_title)
             year = int(year_match.group(1)) if year_match else None

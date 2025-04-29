@@ -155,4 +155,20 @@ home_tiles = [
             ),
         ],
     ),
+    HomeTile(
+        type=HomeTileEnum.LIBRARY,
+        size=1,
+        translations=[
+            HomeTileTranslation(
+                language=LanguageEnum.GERMAN,
+                title="Feedback",
+                description="Feedback",
+            ),
+            HomeTileTranslation(
+                language=LanguageEnum.ENGLISH_US,
+                title="Feedback",
+                description="Feedback",
+            ),
+        ],
+    ),
 ]
