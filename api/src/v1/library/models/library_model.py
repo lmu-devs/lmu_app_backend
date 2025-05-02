@@ -3,10 +3,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.enums import WeekdayEnum
 from shared.src.models.image_model import Images
 from shared.src.models.location_model import Location
 from shared.src.models.rating_model import Rating
+from shared.src.tables.library.library_area_table import (
+    LibraryAreaOpeningHoursTable,
+    LibraryAreaTable,
+)
 from shared.src.tables.library.library_table import (
     LibraryTable,
     LibraryTranslationTable,
@@ -22,9 +25,63 @@ class OpeningDay(BaseModel):
     day: str
     timeframes: List[TimeRange]
 
+    @classmethod
+    def from_table(cls, opening_hours: LibraryAreaOpeningHoursTable):
+        if not opening_hours:
+            return None
+
+        # Convert from 'start_time'/'end_time' format to 'start'/'end' format
+        formatted_timeframes = []
+        for time_range in opening_hours.time_ranges:
+            formatted_timeframes.append(TimeRange(start=time_range.get("start_time"), end=time_range.get("end_time")))
+
+        return cls(day=opening_hours.weekday, timeframes=formatted_timeframes)
+
 
 class OpeningHours(BaseModel):
     days: List[OpeningDay]
+
+    @classmethod
+    def from_table(cls, opening_hours: List[LibraryAreaOpeningHoursTable]):
+        if not opening_hours:
+            return None
+        return cls(days=[OpeningDay.from_table(day) for day in opening_hours])
+
+
+class LibraryArea(BaseModel):
+    id: int
+    name: str
+    opening_hours: OpeningHours | None = None
+
+    @classmethod
+    def from_table(cls, area: LibraryAreaTable):
+        """Convert a single area table to LibraryArea model"""
+        if not area:
+            return None
+        if not area.translations:
+            return None
+        for translation in area.translations:
+            return cls(
+                id=area.id,
+                name=translation.name,
+                opening_hours=OpeningHours.from_table(area.opening_hours),
+            )
+
+
+class LibraryAreas(RootModel):
+    root: List[LibraryArea]
+
+    @classmethod
+    def from_table(cls, areas: List[LibraryAreaTable]) -> List["LibraryArea"]:
+        """Convert a list of area tables to a list of LibraryArea models"""
+        if not areas:
+            return []
+        result = []
+        for area in areas:
+            area_model = LibraryArea.from_table(area)
+            if area_model:
+                result.append(area_model)
+        return result
 
 
 class PhoneContact(BaseModel):
@@ -70,7 +127,7 @@ class Library(BaseModel):
     images: Images | None = Images(root=[])
     location: Location | None = None
     phones: List[PhoneContact] = []
-    opening_hours: OpeningHours | None = None
+    areas: List[LibraryArea] = []
     services: List[Service] = []
     equipment: List[Equipment] = []
     subject_areas: List[str] = []
@@ -98,35 +155,18 @@ class Library(BaseModel):
 
         # Create images model
         images = Images.from_table(library.images)
-        location = Location.from_table(library.location)
+
+        location = None
+        if library.location:
+            location = Location.from_table(library.location)
 
         # Create contact model
         phone = []
         if library.phone:
             phone = PhoneContact.from_table(library.phone)
 
-        # Create opening hours model
-        opening_hours = None
-        if library.opening_hours:
-            days = []
-            for weekday in WeekdayEnum:
-                day_hours = [oh for oh in library.opening_hours if oh.weekday == weekday]
-                if day_hours:
-                    timeframes = []
-                    for oh in day_hours:
-                        if oh.time_ranges:
-                            for time_range in oh.time_ranges:
-                                if time_range.get("start_time") and time_range.get("end_time"):
-                                    timeframes.append(
-                                        TimeRange(
-                                            start=time_range.get("start_time"),
-                                            end=time_range.get("end_time"),
-                                        )
-                                    )
-                    if timeframes:  # Only add days that have actual timeframes
-                        days.append(OpeningDay(day=weekday.value, timeframes=timeframes))
-            if days:  # Only create OpeningHours if we have days with timeframes
-                opening_hours = OpeningHours(days=days)
+        # Create areas from table - using the new from_areas method for the list
+        areas = LibraryAreas.from_table(library.areas)
 
         # Determine if user has liked this library
         user_likes_library = None
@@ -146,8 +186,8 @@ class Library(BaseModel):
             rating=rating,
             images=images,
             location=location,
-            phone=phone,
-            opening_hours=opening_hours,
+            phones=phone,
+            areas=areas,
             services=services,
             equipment=equipment,
             subject_areas=subject_areas,

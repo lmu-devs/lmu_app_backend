@@ -436,7 +436,7 @@ class LibraryCrawler:
             )
 
         # --- Initialize data ---
-        areas: Areas | None = None
+        areas: Areas = []
         contact: Contact = self._get_contact(content_div)
         location: Location | None = self._get_location(content_div)
         reservation_url: Link | None = None

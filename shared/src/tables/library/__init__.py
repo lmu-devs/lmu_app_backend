@@ -1,7 +1,11 @@
+from .library_area_table import (
+    LibraryAreaOpeningHoursTable,
+    LibraryAreaTable,
+    LibraryAreaTranslationTable,
+)
 from .library_table import (
     LibraryLikeTable,
     LibraryLocationTable,
-    LibraryOpeningHoursTable,
     LibraryTable,
     LibraryTranslationTable,
 )
@@ -11,5 +15,7 @@ __all__ = [
     "LibraryTranslationTable",
     "LibraryLocationTable",
     "LibraryLikeTable",
-    "LibraryOpeningHoursTable",
+    "LibraryAreaTranslationTable",
+    "LibraryAreaOpeningHoursTable",
+    "LibraryAreaTable",
 ]

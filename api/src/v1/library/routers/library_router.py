@@ -46,14 +46,14 @@ async def get_libraries(
 
 
 @router.post(
-    "/libraries/toggle-like",
+    "/toggle-like",
     response_model=bool,
     description="Authenticated user can toggle like for a library. Returns True if the library was liked, False if it was unliked.",
 )
 async def toggle_like(
-    library_id: str = Query(
+    id: str = Query(
         ...,
-        description="Library ID to toggle like",
+        description="Specific library ID to toggle like",
         example="1204",
         title="Library ID",
     ),
@@ -61,4 +61,4 @@ async def toggle_like(
     current_user: UserTable = Depends(APIKey.verify_user_api_key),
 ) -> bool:
     library_service = LibraryService(db)
-    return await library_service.toggle_like(library_id, current_user.id)
+    return await library_service.toggle_like(id, current_user.id)

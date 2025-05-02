@@ -1,11 +1,11 @@
 from typing import List
 
-from sqlalchemy import ARRAY, JSON, Column, Enum, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, JSON, Column, ForeignKey, String
 from sqlalchemy.orm import Mapped, relationship
 
 from shared.src.core.database import Base
-from shared.src.enums import WeekdayEnum
 from shared.src.tables.language_table import LanguageTable
+from shared.src.tables.library.library_area_table import LibraryAreaTable
 from shared.src.tables.like_table import LikeTable
 from shared.src.tables.location_table import LocationTable
 
@@ -22,16 +22,15 @@ class LibraryTable(Base):
     images = Column(JSON, nullable=True)
 
     location: Mapped["LibraryLocationTable"] = relationship(back_populates="library")
-    opening_hours: Mapped[List["LibraryOpeningHoursTable"]] = relationship(
-        "LibraryOpeningHoursTable",
+    areas: Mapped[List["LibraryAreaTable"]] = relationship(
+        "LibraryAreaTable",
         back_populates="library",
         cascade="all, delete-orphan",
     )
     translations: Mapped[List["LibraryTranslationTable"]] = relationship(
         back_populates="library", cascade="all, delete-orphan"
     )
-    # likes: Mapped["LibraryLikeTable"] = relationship(back_populates="library")
-    likes = relationship("LibraryLikeTable", back_populates="library", cascade="all, delete-orphan")
+    likes = relationship("LibraryLikeTable", back_populates="library")
 
     @property
     def like_count(self):
@@ -65,15 +64,3 @@ class LibraryLikeTable(LikeTable):
 
     library = relationship("LibraryTable", back_populates="likes")
     user = relationship("UserTable", back_populates="liked_libraries")
-
-
-class LibraryOpeningHoursTable(Base):
-    __tablename__ = "library_opening_hours"
-
-    id = Column(Integer, primary_key=True, index=True)
-    library_id = Column(String, ForeignKey("libraries.id", ondelete="CASCADE"), nullable=False)
-    weekday = Column(Enum(WeekdayEnum), nullable=False)
-    time_ranges = Column(JSON)
-
-    # Relationships
-    library: Mapped["LibraryTable"] = relationship("LibraryTable", back_populates="opening_hours")

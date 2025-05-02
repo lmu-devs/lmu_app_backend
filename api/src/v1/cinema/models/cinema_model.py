@@ -2,6 +2,7 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
+from shared.src.enums import CinemaEnum
 from shared.src.models.image_model import Images
 from shared.src.models.location_model import Location
 from shared.src.tables import CinemaTable
@@ -39,4 +40,15 @@ class Cinemas(RootModel):
 
     @classmethod
     def from_table(cls, cinemas: List[CinemaTable]) -> "Cinemas":
-        return Cinemas(root=[Cinema.from_table(cinema) for cinema in cinemas])
+        cinemas = Cinemas.sort_by_custom_order([Cinema.from_table(cinema) for cinema in cinemas])
+        return Cinemas(root=cinemas)
+
+    @classmethod
+    def sort_by_custom_order(cls, cinemas: List[Cinema]) -> List[Cinema]:
+        custom_order = [
+            CinemaEnum.LMU,
+            CinemaEnum.TUM,
+            CinemaEnum.TUM_GARCHING,
+            CinemaEnum.HM,
+        ]
+        return sorted(cinemas, key=lambda x: custom_order.index(x.id))

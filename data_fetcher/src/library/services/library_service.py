@@ -5,9 +5,13 @@ from data_fetcher.src.library.models.library_model import Library
 from shared.src.core.logging import get_library_logger
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.translation_service import TranslationService
+from shared.src.tables.library.library_area_table import (
+    LibraryAreaOpeningHoursTable,
+    LibraryAreaTable,
+    LibraryAreaTranslationTable,
+)
 from shared.src.tables.library.library_table import (
     LibraryLocationTable,
-    LibraryOpeningHoursTable,
     LibraryTable,
     LibraryTranslationTable,
 )
@@ -87,13 +91,28 @@ class LibraryService:
             subject_areas=library.subject_areas,
         )
 
-        opening_hours = []
-        if library.opening_hours:
-            for day in library.opening_hours.days:
-                opening_hours.append(
-                    LibraryOpeningHoursTable(
-                        weekday=day.day,
-                        time_ranges=[tr.model_dump(mode="json") for tr in day.time_ranges],
+        areas = []
+        if library.areas:
+            for area in library.areas:
+                opening_hours = []
+                if area.opening_hours:
+                    for day in area.opening_hours.days:
+                        opening_hours.append(
+                            LibraryAreaOpeningHoursTable(
+                                weekday=day.day,
+                                time_ranges=[tr.model_dump(mode="json") for tr in day.time_ranges],
+                            )
+                        )
+
+                area_translation = LibraryAreaTranslationTable(
+                    name=area.name,
+                    language=LanguageEnum.GERMAN,
+                )
+                areas.append(
+                    LibraryAreaTable(
+                        library_id=library.id,
+                        opening_hours=opening_hours,
+                        translations=[area_translation],
                     )
                 )
 
@@ -132,7 +151,7 @@ class LibraryService:
             external_url=external_url,
             email=email,
             phone=phone,
-            opening_hours=opening_hours,
+            areas=areas,
             translations=[translation],
         )
 

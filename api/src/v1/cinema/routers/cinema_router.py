@@ -1,7 +1,7 @@
 import uuid
-from typing import List, Optional
+from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.database import get_async_db
@@ -40,8 +40,8 @@ async def get_movie_screenings(
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     language: LanguageEnum = Depends(get_language),
 ):
-    screening_service = ScreeningService(db, language)
-    screenings = await screening_service.get_movie_screenings()
+    screening_service = ScreeningService(db)
+    screenings = await screening_service.get_movie_screenings(language)
     return MovieScreenings.from_table(screenings)
 
 
@@ -52,6 +52,25 @@ async def get_cinemas(
     current_user: UserTable = Depends(APIKey.verify_user_api_key_soft),
     language: LanguageEnum = Depends(get_language),
 ):
-    cinema_service = CinemaService(db, language)
-    cinemas = await cinema_service.get_cinemas(id)
+    cinema_service = CinemaService(db)
+    cinemas = await cinema_service.get_cinemas(id, language)
     return Cinemas.from_table(cinemas)
+
+
+@router.post(
+    "/screenings/toggle-like",
+    response_model=bool,
+    description="Authenticated user can toggle like for a cinema. Returns True if the cinema was liked, False if it was unliked.",
+)
+async def toggle_like(
+    id: str = Query(
+        ...,
+        description="Specific cinema ID to toggle like",
+        example="1204",
+        title="Cinema ID",
+    ),
+    db: AsyncSession = Depends(get_async_db),
+    current_user: UserTable = Depends(APIKey.verify_user_api_key),
+) -> bool:
+    screening_service = ScreeningService(db)
+    return await screening_service.toggle_like(id, current_user.id)

@@ -12,16 +12,17 @@ from ..models import Cinema
 
 
 class CinemaService:
-    def __init__(self, db: AsyncSession, language: LanguageEnum):
+    def __init__(self, db: AsyncSession):
         self.db = db
-        self.language = language
 
-    async def get_cinemas(self, cinema_id) -> List[Cinema]:
-        query = self._get_cinemas_query(cinema_id)
+    async def get_cinemas(
+        self, cinema_id: Optional[str] = None, language: LanguageEnum = LanguageEnum.GERMAN
+    ) -> List[Cinema]:
+        query = self._get_cinemas_query(cinema_id, language)
         result = await self.db.execute(query)
         return result.scalars().unique().all()
 
-    def _get_cinemas_query(self, cinema_id: Optional[str] = None):
+    def _get_cinemas_query(self, cinema_id: Optional[str] = None, language: LanguageEnum = LanguageEnum.GERMAN):
         query = (
             select(CinemaTable)
             .outerjoin(CinemaTable.images)
@@ -36,4 +37,4 @@ class CinemaService:
         if cinema_id:
             query = query.filter(CinemaTable.id == cinema_id)
 
-        return query.order_by(create_translation_order_case(CinemaTranslationTable, self.language))
+        return query.order_by(create_translation_order_case(CinemaTranslationTable, language))

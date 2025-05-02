@@ -32,7 +32,7 @@ class DishTable(Base):
     # Relationship
     menu_associations = relationship("MenuDishAssociation", back_populates="dish")
     prices = relationship("DishPriceTable", back_populates="dish", cascade="all, delete-orphan")
-    likes = relationship("DishLikeTable", back_populates="dish", cascade="all, delete-orphan")
+    likes = relationship("DishLikeTable", back_populates="dish")
     translations = relationship("DishTranslationTable", back_populates="dish", cascade="all, delete-orphan")
     images = relationship("DishImageTable", back_populates="dish", cascade="all, delete-orphan")
 

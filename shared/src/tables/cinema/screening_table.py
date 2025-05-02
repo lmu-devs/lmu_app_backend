@@ -15,6 +15,7 @@ from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.enums import UniversityEnum
+from shared.src.tables.like_table import LikeTable
 from shared.src.tables.location_table import LocationTable
 
 
@@ -40,6 +41,11 @@ class MovieScreeningTable(Base):
     university = relationship("UniversityTable", back_populates="screenings")
     cinema = relationship("CinemaTable", back_populates="screenings")
     location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
+    likes = relationship("ScreeningLikeTable", back_populates="screening")
+
+    @property
+    def like_count(self):
+        return len(self.likes)
 
     __table_args__ = (UniqueConstraint("date", "movie_id", name="uix_date_movie_id"),)
 
@@ -54,3 +60,16 @@ class MovieLocationTable(LocationTable):
     )
 
     screening = relationship("MovieScreeningTable", back_populates="location")
+
+
+class ScreeningLikeTable(LikeTable):
+    __tablename__ = "movie_screening_likes"
+
+    movie_screening_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("movie_screenings.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+
+    screening = relationship("MovieScreeningTable", back_populates="likes")
+    user = relationship("UserTable", back_populates="liked_screenings")
