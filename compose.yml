@@ -154,7 +154,6 @@ services:
 volumes:
     postgres_data:
     postgres_metabase_data:
-    pgadmin_data:
 
 networks:
     backend:
