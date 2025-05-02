@@ -1,5 +1,4 @@
 import os
-import time
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -33,7 +32,6 @@ class CanteenImageService:
         for file in files:
             # Get filename without extension
             name = os.path.splitext(file)[0]
-            file_path = os.path.join(self.directory_path, file)
 
             # Try to match the filename with a canteen enum
             try:
@@ -44,16 +42,13 @@ class CanteenImageService:
                 display_name = f"{base_name.replace('-', ' ').title()} {number}"
 
                 full_image_url = f"{self.image_url_prefix}{file}"
-                blurhash = self.blurhash_service.encode_image(file_path)
 
                 image_table = CanteenImageTable(
                     canteen_id=canteen_enum,
                     url=full_image_url,
                     name=display_name,
-                    blurhash=blurhash,
                 )
                 image_tables.append(image_table)
-                time.sleep(3)
 
             except StopIteration:
                 logger.warning(f"Could not match image {file} to any canteen")
