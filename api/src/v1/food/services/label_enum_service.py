@@ -66,6 +66,7 @@ taste_profile = {
                 "FISH",
                 "SHELLFISH",
                 "GELATIN",
+                "MOLLUSCS",
             ],
         },
         {
@@ -85,6 +86,7 @@ taste_profile = {
                 "LACTOSE",
                 "CHICKEN_EGGS",
                 "GELATIN",
+                "MOLLUSCS",
             ],
         },
     ],

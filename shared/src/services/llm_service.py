@@ -76,6 +76,7 @@ class LLMService(Generic[T]):
 
         if self.provider == "openai" and response_model:
             params["response_format"] = {"type": "json_object"}
+            # print(response_model.model_json_schema())
 
         try:
             response = litellm.completion(**{k: v for k, v in params.items() if v is not None})

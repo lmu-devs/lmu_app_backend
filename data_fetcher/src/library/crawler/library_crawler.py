@@ -11,10 +11,10 @@ from pydantic import BaseModel, Field
 
 from data_fetcher.src.core.html_utils import html_to_markdown
 from data_fetcher.src.library.models.library_model import (
+    Areas,
     Contact,
     Equipments,
     Library,
-    OpeningHours,
 )
 from shared.src.core.logging import get_library_logger
 from shared.src.models.link_model import Link, TextsWithLink, TextWithLink
@@ -123,22 +123,25 @@ class LibraryCrawler:
         # TODO: Add room to location?
         return location
 
-    def _generate_opening_hours(self, opening_hours_text: str) -> OpeningHours | None:
+    def _generate_areas(self, opening_hours_text: str) -> Areas | None:
         """Parse opening hours div into OpeningHours model."""
         if not opening_hours_text:
             return None
 
-        response: OpeningHours = self.llm.create_completion(
+        response: Areas = self.llm.create_completion(
             messages=[
                 SystemMessage(
-                    content="You are a opening hours parser. You are given a string of text that contains opening hours. You need to parse the opening hours into a structured format."
+                    content="""You are a opening hours parser. You are given a string of text that contains opening hours. 
+                    You need to parse the opening hours into a structured format.
+                    The opening hours are separated by areas. Each area has a name, opening hours and lecture free hours.
+                    """
                 ),
                 UserMessage(content=opening_hours_text),
             ],
-            response_model=OpeningHours,
+            response_model=Areas,
         )
 
-        return response
+        return response.areas
 
     def _generate_equipment_section(self, content_elements: List[Tag | str]) -> Equipments:
         """
@@ -426,14 +429,14 @@ class LibraryCrawler:
             logger.warning(f"Could not find main content div for {name}: {library_url}")
             return Library(
                 id=library_id,  # Add ID here
-                name=name,
+                title=name,
                 location_number=location_numbers,
                 url=library_url,
                 hash=self.current_hash,
             )
 
         # --- Initialize data ---
-        opening_hours: OpeningHours | None = None
+        areas: Areas | None = None
         contact: Contact = self._get_contact(content_div)
         location: Location | None = self._get_location(content_div)
         reservation_url: Link | None = None
@@ -449,7 +452,7 @@ class LibraryCrawler:
         if opening_hours_div:
             # Convert opening hours to clean markdown text
             text_content = html_to_markdown(opening_hours_div)
-            opening_hours = self._generate_opening_hours(text_content)
+            areas = self._generate_areas(text_content)
 
         # # --- Extract Transportation ---
         # transport_header = content_div.find(
@@ -501,28 +504,28 @@ class LibraryCrawler:
         try:
             library = Library(
                 id=library_id,
-                name=name,
+                title=name,
                 hash=self.current_hash,
                 url=library_url,
                 reservation_url=reservation_url,
                 location=location,
                 contact=contact,
                 access_regulation=access_regulation,
-                opening_hours=opening_hours,
+                areas=areas,
                 services=services,
                 equipment=equipment,
                 subject_areas=subject_areas,
                 # search_hints=search_hints,
                 # transportation=transportation,
             )
-            print(library.model_dump_json(indent=2))
+            print(library.model_dump_json(indent=3))
             return library
         except Exception as e:
             logger.error(f"Failed to instantiate Library model for {name} ({library_url}): {e}")
             # Return minimal object on model error
             return Library(
                 id=library_id,
-                name=name,
+                title=name,
                 location_number=location_numbers,
                 url=library_url,
                 hash="error_creating_model",

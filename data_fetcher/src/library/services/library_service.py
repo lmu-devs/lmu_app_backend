@@ -68,7 +68,7 @@ class LibraryService:
     #     )
 
     def _update_library_data(self, library: Library):
-        logger.info(f"🔄 Updating library {library.name}")
+        logger.info(f"🔄 Updating library {library.title}")
         # delete all data for this library
         self.db.query(LibraryTable).filter(LibraryTable.id == library.id).delete()
         self.db.flush()
@@ -80,7 +80,7 @@ class LibraryService:
 
         translation = LibraryTranslationTable(
             library_id=library.id,
-            name=library.name,
+            name=library.title,
             language=LanguageEnum.GERMAN,
             services=services,
             equipment=equipment,

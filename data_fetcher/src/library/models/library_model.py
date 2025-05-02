@@ -59,7 +59,9 @@ class TimeRange(BaseModel):
 
 
 class OpeningHoursDays(BaseModel):
-    day: WeekdayEnum
+    day: WeekdayEnum = Field(
+        ..., description="The day of the week, ONLY USE MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY"
+    )
     time_ranges: List[TimeRange]
 
 
@@ -67,16 +69,38 @@ class OpeningHours(BaseModel):
     days: List[OpeningHoursDays]
 
 
+class Area(BaseModel):
+    name: str = Field("DEFAULT", description="The name of the area, if there is no name, use DEFAULT")
+    opening_hours: OpeningHours | None = Field(
+        None,
+        description="The opening hours for the area, if there are any.",
+    )
+    lecture_free_hours: OpeningHours | None = Field(
+        None,
+        description="The lecture free hours for the area, if there are any.",
+    )
+
+
+class Areas(BaseModel):
+    areas: List[Area] = Field(
+        default=[],
+        description="""A list of library areas with different opening hours. 
+        If there is only one area, use the name DEFAULT.
+        If there is no area/opening hours, return an empty list.
+        """,
+    )
+
+
 class Library(BaseModel):
     id: str
-    name: str
+    title: str
     hash: str
+    areas: List[Area] = []
     images: Images = Images([])
     url: str | None = None
     reservation_url: str | None = None
     location: Optional[Location] = None
     contact: Contact | None = None
-    opening_hours: OpeningHours | None = None
     services: TextsWithLink | None = None
     equipment: Equipments | None = None
     subject_areas: List[str] | None = []

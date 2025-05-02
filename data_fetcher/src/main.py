@@ -21,7 +21,7 @@ class DataCollectorApp:
         self.settings = get_settings()
         self.is_running = True
         self.collectors = [
-            LibraryCollector(),
+            # LibraryCollector(),
             LinkCollector(),
             UniversityCollector(),
             RoomfinderCollector(),
