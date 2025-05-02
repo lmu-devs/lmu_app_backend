@@ -1,4 +1,5 @@
 import os
+import time
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -52,6 +53,7 @@ class CanteenImageService:
                     blurhash=blurhash,
                 )
                 image_tables.append(image_table)
+                time.sleep(3)
 
             except StopIteration:
                 logger.warning(f"Could not match image {file} to any canteen")

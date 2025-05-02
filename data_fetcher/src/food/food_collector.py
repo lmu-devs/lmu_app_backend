@@ -21,7 +21,7 @@ class FoodCollector(ScheduledCollector):
         """Fetches data for the next 28 days for all canteens"""
         try:
             # Update canteen data
-            # CanteenService(db).update_canteen_database()
+            CanteenService(db).update_canteen_database()
 
             menu_service = MenuFetcher(db)
 
