@@ -71,9 +71,10 @@ class CanteenService:
                 self._store_opening_hours(canteen)
                 self.db.merge(canteen_obj)
 
+            self.db.commit()
+
             image_service = CanteenImageService(self.db)
             image_service.update_all_canteen_images()
-            self.db.commit()
 
         except Exception as e:
             self.db.rollback()
