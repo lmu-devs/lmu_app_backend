@@ -85,3 +85,33 @@ class LikeService:
             await self.db.rollback()
             logger.error(f"Failed to toggle like status: {str(e)}")
             raise DatabaseError(detail="Failed to toggle like status", extra={"original_error": str(e)})
+
+    async def get_user_likes(
+        self,
+        like_table: Type[Any],
+        user_id: uuid.UUID,
+        entity_id_column: str = None,
+    ) -> list[Any]:
+        """
+        Get all likes for a specific user and like table
+
+        Args:
+            like_table: The like table class (e.g., WishlistLikeTable)
+            user_id: User ID
+            entity_id_column: Name of the entity ID column (defaults to table name without 'likes' + '_id')
+
+        Returns:
+            list: List of entity IDs that the user has liked
+        """
+        try:
+            if entity_id_column is None:
+                entity_id_column = f"{like_table.__tablename__[:-6]}_id"
+
+            stmt = select(getattr(like_table, entity_id_column)).where(like_table.user_id == user_id)
+
+            result = await self.db.execute(stmt)
+            return result.scalars().all()
+
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to fetch user likes: {str(e)}")
+            raise DatabaseError(detail="Failed to fetch user likes", extra={"original_error": str(e)})

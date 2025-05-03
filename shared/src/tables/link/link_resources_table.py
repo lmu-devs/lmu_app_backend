@@ -1,10 +1,9 @@
 from enum import Enum
 
-from sqlalchemy import ARRAY, Column, ForeignKey, Integer, String
+from sqlalchemy import ARRAY, Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from shared.src.core.database import Base
-from shared.src.tables.language_table import LanguageTable
+from shared.src.tables.like_table import LikeTable
 from shared.src.tables.link.link_table import LinkTable, LinkTranslationTable
 
 
@@ -20,11 +19,37 @@ class LinkResourceTable(LinkTable):
     faculties = Column(ARRAY(String), nullable=True)
 
     translations = relationship("LinkResourceTranslationTable", back_populates="link")
+    likes = relationship("LinkResourceLikeTable", back_populates="link")
+
+    @property
+    def like_count(self):
+        return len(self.likes)
+
+    # This property will be set dynamically by the service
+    # It's not stored in the database
+    _is_liked = False
+
+    @property
+    def is_liked(self):
+        return self._is_liked
+
+    @is_liked.setter
+    def is_liked(self, value):
+        self._is_liked = value
 
 
 class LinkResourceTranslationTable(LinkTranslationTable):
     __tablename__ = "link_resource_translations"
 
-    link_id = Column(String, ForeignKey("link_resources.id"), primary_key=True)
+    link_resource_id = Column(String, ForeignKey("link_resources.id"), primary_key=True)
 
     link = relationship("LinkResourceTable", back_populates="translations")
+
+
+class LinkResourceLikeTable(LikeTable):
+    __tablename__ = "link_resource_likes"
+
+    link_resource_id = Column(String, ForeignKey("link_resources.id", ondelete="CASCADE"), primary_key=True)
+
+    link = relationship("LinkResourceTable", back_populates="likes")
+    user = relationship("UserTable", back_populates="liked_link_resources")

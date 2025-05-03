@@ -31,7 +31,7 @@ async def get_wishlists(
 
 
 @router.post("/wishlists/toggle-like", response_model=bool)
-async def toggle_wishlist_like(
+async def toggle_like(
     id: int,
     db: AsyncSession = Depends(get_async_db),
     user: UserTable = Depends(APIKey.verify_user_api_key),

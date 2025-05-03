@@ -10,6 +10,7 @@ from data_fetcher.src.link.constants.link_resources_constants import (
 from shared.src.core.logging import get_translation_logger
 from shared.src.services.translation_service import TranslationService
 from shared.src.tables.link.link_resources_table import (
+    LinkResourceLikeTable,
     LinkResourceTable,
     LinkResourceTranslationTable,
 )
@@ -37,7 +38,12 @@ class LinkResourceService:
 
         # First delete translations for links that aren't in constants
         self.db.query(LinkResourceTranslationTable).filter(
-            ~LinkResourceTranslationTable.link_id.in_(constant_link_ids)
+            ~LinkResourceTranslationTable.link_resource_id.in_(constant_link_ids)
+        ).delete(synchronize_session=False)
+
+        # Then delete likes for links that aren't in constants
+        self.db.query(LinkResourceLikeTable).filter(
+            ~LinkResourceLikeTable.link_resource_id.in_(constant_link_ids)
         ).delete(synchronize_session=False)
 
         # Then delete the links that aren't in constants
@@ -58,13 +64,13 @@ class LinkResourceService:
         # Then merge the translations
         for link in self.link_constants:
             for translation in link.translations:
-                translation.link_id = link.id
+                translation: LinkResourceTranslationTable
+                translation.link_resource_id = link.id
                 self.db.merge(translation)
 
         self.db.commit()
 
     def _add_missing_aliases(self):
-
         link_translations = (
             self.db.query(LinkResourceTranslationTable).filter(LinkResourceTranslationTable.aliases.is_(None)).all()
         )
@@ -86,7 +92,6 @@ class LinkResourceService:
         self.db.commit()
 
     def _add_missing_favicon_urls(self):
-
         link_favicon_urls = self.db.query(LinkResourceTable).filter(LinkResourceTable.favicon_url.is_(None)).all()
         for link in link_favicon_urls:
             link.favicon_url = self.favicon_service.get_favicon_url(link.url)
