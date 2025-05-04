@@ -43,9 +43,12 @@ class MovieScreeningTable(Base):
     location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
     likes = relationship("ScreeningLikeTable", back_populates="screening")
 
+    # not stored in the database
     @property
     def like_count(self):
         return len(self.likes)
+
+    is_liked = False
 
     __table_args__ = (UniqueConstraint("date", "movie_id", name="uix_date_movie_id"),)
 

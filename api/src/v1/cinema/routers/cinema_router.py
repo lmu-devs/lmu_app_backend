@@ -41,7 +41,7 @@ async def get_movie_screenings(
     language: LanguageEnum = Depends(get_language),
 ):
     screening_service = ScreeningService(db)
-    screenings = await screening_service.get_movie_screenings(language)
+    screenings = await screening_service.get_movie_screenings(language, current_user.id)
     return MovieScreenings.from_table(screenings)
 
 

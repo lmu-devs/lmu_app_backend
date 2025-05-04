@@ -4,6 +4,7 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
+from shared.src.models.rating_model import Rating
 from shared.src.tables import MovieScreeningTable
 
 from ...university.models.university_model import University
@@ -22,11 +23,13 @@ class MovieScreening(BaseModel):
     subtitles: str | None
     external_link: str | None
     note: str | None
+    rating: Rating
     movie: Movie
 
     @classmethod
     def from_table(cls, screening: MovieScreeningTable) -> "MovieScreening":
         movie = Movie.from_table(screening.movie)
+        rating = Rating(like_count=screening.like_count, is_liked=screening.is_liked)
 
         return MovieScreening(
             id=screening.id,
@@ -42,6 +45,7 @@ class MovieScreening(BaseModel):
             external_link=screening.external_link,
             booking_link=screening.booking_link,
             note=screening.note,
+            rating=rating,
         )
 
 

@@ -25,17 +25,7 @@ class LinkResourceTable(LinkTable):
     def like_count(self):
         return len(self.likes)
 
-    # This property will be set dynamically by the service
-    # It's not stored in the database
-    _is_liked = False
-
-    @property
-    def is_liked(self):
-        return self._is_liked
-
-    @is_liked.setter
-    def is_liked(self, value):
-        self._is_liked = value
+    is_liked = False
 
 
 class LinkResourceTranslationTable(LinkTranslationTable):

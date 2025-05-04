@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, selectinload
 
 from api.src.v1.core.service.like_service import LikeService
 from shared.src.enums import LanguageEnum
@@ -27,14 +27,28 @@ class ScreeningService:
         self.db = db
         self.like_service = LikeService(db)
 
-    async def get_movie_screenings(self, language: LanguageEnum) -> list[MovieScreeningTable]:
+    async def get_movie_screenings(
+        self, language: LanguageEnum, user_id: str | None = None
+    ) -> list[MovieScreeningTable]:
         query = self._get_movie_screenings_query(language)
         result = await self.db.execute(query)
-        return result.scalars().unique().all()
+        screenings = result.scalars().unique().all()
+
+        # Add is_liked property if user_id is provided
+        if user_id:
+            liked_ids = await self.like_service.get_user_likes(ScreeningLikeTable, user_id)
+            for screening in screenings:
+                screening.is_liked = screening.id in liked_ids
+
+        return screenings
 
     def _get_movie_screenings_query(self, language: LanguageEnum):
         query = (
             select(MovieScreeningTable)
+            # Load likes relationship for counting
+            .options(
+                selectinload(MovieScreeningTable.likes),
+            )
             # Movie and its relationships
             .join(MovieScreeningTable.movie)
             .outerjoin(MovieTable.translations)
