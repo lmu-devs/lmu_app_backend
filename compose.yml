@@ -159,3 +159,4 @@ networks:
     backend:
         internal: true
     frontend:
+        external: true
