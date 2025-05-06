@@ -4,7 +4,7 @@ certifi==2024.7.4
 charset-normalizer==3.3.2
 click==8.1.7
 fastapi==0.115.11
-h11==0.14.0
+h11==0.16.0
 idna==3.7
 psycopg2-binary==2.9.9
 pydantic==2.8.2
