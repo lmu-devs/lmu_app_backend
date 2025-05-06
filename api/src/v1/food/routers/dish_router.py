@@ -1,16 +1,15 @@
-from typing import Annotated, List
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session
 
 from api.src.v1.food.models.dish_date_model import DishDates
 from api.src.v1.food.models.dish_model import Dish, Dishes
-from shared.src.core.database import get_async_db, get_db
+from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_food_logger
 from shared.src.enums import LanguageEnum
-from shared.src.tables import CanteenTable, UserTable
+from shared.src.tables import UserTable
 
 from ...core import APIKey
 from ...core.language import get_language

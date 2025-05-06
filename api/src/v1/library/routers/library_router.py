@@ -46,7 +46,7 @@ async def get_libraries(
 
 
 @router.post(
-    "/toggle-like",
+    "/libraries/toggle-like",
     response_model=bool,
     description="Authenticated user can toggle like for a library. Returns True if the library was liked, False if it was unliked.",
 )

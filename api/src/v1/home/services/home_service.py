@@ -42,11 +42,11 @@ class HomeService:
                     size=1,
                     title="Timeline",
                 ),
-                # BaseHomeTile(
-                #     type=HomeTileEnum.LIBRARY,
-                #     size=1,
-                #     title="Library",
-                # ),
+                BaseHomeTile(
+                    type=HomeTileEnum.LIBRARY,
+                    size=1,
+                    title="Library",
+                ),
                 BaseHomeTile(
                     type=HomeTileEnum.ROOMFINDER,
                     size=1,
@@ -72,11 +72,11 @@ class HomeService:
                     size=1,
                     title="Benefits",
                 ),
-                BaseHomeTile(
-                    type=HomeTileEnum.WISHLIST,
-                    size=1,
-                    title="Wishlist",
-                ),
+                # BaseHomeTile(
+                #     type=HomeTileEnum.WISHLIST,
+                #     size=1,
+                #     title="Wishlist",
+                # ),
                 BaseHomeTile(
                     type=HomeTileEnum.FEEDBACK,
                     size=1,
