@@ -113,7 +113,32 @@ class Equipment(BaseModel):
     @classmethod
     def from_table(cls, equipment_data: List[dict]):
         """Convert equipment data from translation to Equipment objects."""
-        return [cls(**equip) for equip in equipment_data] if equipment_data else []
+        equipment_list = [cls(**equip) for equip in equipment_data] if equipment_data else []
+        return cls.sort_by_priority(equipment_list)
+
+    @staticmethod
+    def sort_by_priority(equipment_list: List["Equipment"]) -> List["Equipment"]:
+        """Sort equipment list with priority:
+        1. Items with both links and descriptions
+        2. Items with only descriptions
+        3. Items with only links
+        4. The rest
+        """
+
+        def get_priority(item: "Equipment") -> int:
+            has_url = item.url is not None and item.url != ""
+            has_description = item.description is not None and item.description != ""
+
+            if has_url and has_description:
+                return 0  # Highest priority
+            elif has_description:
+                return 1
+            elif has_url:
+                return 2
+            else:
+                return 3  # Lowest priority
+
+        return sorted(equipment_list, key=get_priority)
 
 
 class Library(BaseModel):
@@ -151,7 +176,7 @@ class Library(BaseModel):
             if translation.equipment:
                 equipment = Equipment.from_table(translation.equipment)
             if translation.subject_areas:
-                subject_areas = translation.subject_areas
+                subject_areas = sorted(translation.subject_areas)
 
         # Create images model
         images = Images.from_table(library.images)
