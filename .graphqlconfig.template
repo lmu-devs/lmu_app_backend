@@ -1,0 +1,15 @@
+# GraphQL config template
+# To use VSCode with GraphQL and autocomplete, install the GraphQL extension and remove the .template from the filename.
+# Then replace the <DIRECTUS_ACCESS_TOKEN FROM .env> with the actual token from your .env file.
+
+{
+  "dotEnvPath": ".env",
+  "schema": {
+    "https://cms.lmu-dev.org/graphql": {
+      "headers": {
+        "Authorization": "Bearer <DIRECTUS_ACCESS_TOKEN FROM .env>"
+      }
+    }
+  },
+  "documents": "**/*.{graphql,js,ts,jsx,tsx}"
+}

@@ -23,6 +23,8 @@ This is the backend service for the LMU App. It provides the necessary API endpo
   - [Branching Strategy](#branching-strategy)
   - [CI/CD Pipeline](#cicd-pipeline)
   - [Deployment Workflow](#deployment-workflow)
+  - [Directus \& GraphQL](#directus--graphql)
+    - [GraphQL](#graphql)
   - [Usage](#usage)
 
 ## Structure
@@ -203,6 +205,21 @@ GitHub Actions automation:
 3. **Production**:
    - Automatic deployment from `main` branch
    - Manual: `docker compose up db api data_fetcher --build`
+
+## Directus & GraphQL
+The directus cms is used to manage the content for the application.  
+The graphql api is used to query the data from the database.
+
+### GraphQL
+
+To setup a nice developer experience for the graphql api, we recommend installing the [GraphQL: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql) extension for VSCode. 
+
+Setup:
+- Copy the .graphqlconfig.example file to .graphqlconfig
+- Replace the `<DIRECTUS_ACCESS_TOKEN FROM .env>` with your directus access token
+- Press `Ctrl+Shift+P` and select `VSCode GraphQL: Manual Restart`
+- Autocomplete should work now
+
 
 ## Usage
 

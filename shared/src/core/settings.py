@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from shared.src.settings.llm_settings import AnthropicConfig, OpenAIConfig
@@ -64,6 +65,13 @@ class Settings(BaseSettings):
     # AI Keys
     GEMINI_API_KEY: str
     OPENAI_API_KEY: str
+
+    # CMS
+    DIRECTUS_ACCESS_TOKEN: str
+    DIRECTUS_BASE_URL: str = Field(
+        default="http://directus:8055",
+        description="Using internal docker container for production, set to https://cms.lmu-dev.org in .env for local development",
+    )
 
     class ConfigDict:
         env_file = ".env"

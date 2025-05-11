@@ -3,7 +3,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.src.v1.core.api_key import APIKey
 from api.src.v1.core.language import get_language
-from api.src.v1.link.models.link_benefits_model import LinkBenefits
 from api.src.v1.link.models.link_resources_model import LinkResources
 from api.src.v1.link.services.link_benefit_service import LinkBenefitService
 from shared.src.core.database import get_async_db
@@ -49,12 +48,10 @@ async def toggle_like(
     return is_liked
 
 
-@router.get("/benefits", response_model=LinkBenefits, description="Get all student benefits")
+@router.get("/benefits", description="Get all student benefits")
 async def get_all_benefits(
-    db: AsyncSession = Depends(get_async_db),
     language: LanguageEnum = Depends(get_language),
 ):
-    link_benefit_service = LinkBenefitService(db, language)
+    link_benefit_service = LinkBenefitService(language)
     benefits = await link_benefit_service.get_benefits()
-    benefits = LinkBenefits.from_table(benefits)
     return benefits

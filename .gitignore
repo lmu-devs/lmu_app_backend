@@ -95,6 +95,9 @@ docs/_build/
 # Models
 .bin
 
+# graphql config
+.graphqlconfig
+
 # Mac OS-specific storage files
 .DS_Store
 .DS_Store?
