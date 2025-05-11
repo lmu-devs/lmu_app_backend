@@ -38,20 +38,10 @@ class OpeningDay(BaseModel):
         return cls(day=opening_hours.weekday, timeframes=formatted_timeframes)
 
 
-class OpeningHours(BaseModel):
-    days: List[OpeningDay]
-
-    @classmethod
-    def from_table(cls, opening_hours: List[LibraryAreaOpeningHoursTable]):
-        if not opening_hours:
-            return None
-        return cls(days=[OpeningDay.from_table(day) for day in opening_hours])
-
-
 class LibraryArea(BaseModel):
     id: int
     name: str
-    opening_hours: OpeningHours | None = None
+    opening_hours: List[OpeningDay] | None = None
 
     @classmethod
     def from_table(cls, area: LibraryAreaTable):
@@ -61,10 +51,11 @@ class LibraryArea(BaseModel):
         if not area.translations:
             return None
         for translation in area.translations:
+            opening_hours = [OpeningDay.from_table(day) for day in area.opening_hours] if area.opening_hours else None
             return cls(
                 id=area.id,
                 name=translation.name,
-                opening_hours=OpeningHours.from_table(area.opening_hours),
+                opening_hours=opening_hours,
             )
 
 
