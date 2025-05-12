@@ -10,7 +10,7 @@ from shared.src.enums import LanguageEnum
 from shared.src.tables import UserTable
 
 from ..pydantics import wishlist_to_pydantic
-from ..schemas import Wishlist, WishlistCreate, WishlistUpdate
+from ..schemas import Wishlist
 from ..services.wishlist_service import WishlistService
 
 router = APIRouter()
@@ -38,36 +38,3 @@ async def toggle_like(
 ):
     wishlist_service = WishlistService(db)
     return await wishlist_service.toggle_like(id, user.id)
-
-
-@router.post("/wishlists", response_model=Wishlist)
-async def create_wishlist(
-    wishlist: WishlistCreate,
-    db: AsyncSession = Depends(get_async_db),
-    authorized: bool = Depends(APIKey.verify_admin_api_key),
-):
-    wishlist_service = WishlistService(db)
-    new_wishlist = await wishlist_service.create_wishlist(wishlist.model_dump())
-    return await wishlist_to_pydantic(new_wishlist)
-
-
-@router.put("/wishlists", response_model=Wishlist)
-async def update_wishlist(
-    id: int,
-    wishlist: WishlistUpdate,
-    db: AsyncSession = Depends(get_async_db),
-    authorized: bool = Depends(APIKey.verify_admin_api_key),
-):
-    wishlist_service = WishlistService(db)
-    updated_wishlist = await wishlist_service.update_wishlist(id, wishlist.model_dump())
-    return await wishlist_to_pydantic(updated_wishlist)
-
-
-@router.delete("/wishlists")
-async def delete_wishlist(
-    id: int,
-    db: AsyncSession = Depends(get_async_db),
-    authorized: bool = Depends(APIKey.verify_admin_api_key),
-):
-    wishlist_service = WishlistService(db)
-    return await wishlist_service.delete_wishlist(id)

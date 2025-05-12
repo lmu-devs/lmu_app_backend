@@ -15,18 +15,6 @@ class WishlistTranslation(BaseModel):
     language: LanguageEnum
 
 
-class WishlistCreate(BaseModel):
-    status: WishlistStatus
-    release_date: Optional[datetime] = None
-    prototype_url: Optional[str] = None
-    images: Images = Field(default_factory=Images)
-    translations: List[WishlistTranslation] = Field(default_factory=list)
-
-
-class WishlistUpdate(WishlistCreate):
-    pass
-
-
 class Wishlist(BaseModel):
     id: int
     title: str
