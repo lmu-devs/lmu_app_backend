@@ -25,7 +25,7 @@ class DataCollectorApp:
             UniversityCollector(),
             RoomfinderCollector(),
             LibraryCollector(),
-            FoodCollector(),
+            # FoodCollector(),
             SportCollector(),
             CinemaCollector(),
         ]

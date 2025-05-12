@@ -1,3 +1,7 @@
+setup:
+	docker network create shared
+	docker compose up api_dev data_fetcher_dev
+
 pytest:
 	python -m pytest
 

@@ -63,7 +63,6 @@ class Settings(BaseSettings):
     FIREBASE_CREDENTIALS: str
 
     # AI Keys
-    GEMINI_API_KEY: str
     OPENAI_API_KEY: str
 
     # CMS
