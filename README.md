@@ -225,7 +225,7 @@ Setup:
 
 After deployment, the following services are available:
 
-- API Documentation: `http://localhost:8001/v1/docs`
+- API Documentation: `http://localhost:8001/docs`
 - REST API: `http://localhost:8001/v1`
 - PgAdmin: `http://localhost:5050`
 - Metabase: `http://localhost:3000`

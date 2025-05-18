@@ -66,44 +66,9 @@ def flatten_response(response: Dict[str, Any]) -> Union[Dict[str, Any], List[Any
 
         return data
 
-    def _flatten_image_objects(
-        data: Union[Dict[str, Any], List[Any]],
-    ) -> Union[Dict[str, Any], List[Any]]:
-        if isinstance(data, dict):
-            result = {}
-
-            # Handle directus_files_id if present
-            if "directus_files_id" in data and isinstance(data["directus_files_id"], dict):
-                # Copy directus_files_id fields to parent level
-                for key, value in data["directus_files_id"].items():
-                    if value is not None:  # Only copy non-null values
-                        result[key] = value
-                # Remove the directus_files_id key
-                data = {k: v for k, v in data.items() if k != "directus_files_id"}
-
-            # Process all other keys recursively
-            for key, value in data.items():
-                if key == "images" and isinstance(value, list):
-                    # Process images specially
-                    result[key] = [_flatten_image_objects(img) for img in value]
-                elif isinstance(value, (dict, list)):
-                    result[key] = _flatten_image_objects(value)
-                else:
-                    result[key] = value
-
-            return result
-
-        elif isinstance(data, list):
-            return [_flatten_image_objects(item) for item in data]
-
-        return data
-
     # First remove the data wrapper if it exists
     if isinstance(response, dict) and "data" in response:
         response = response["data"]
 
     # Then flatten all translations
-    flattened_translations = _flatten_translations(response)
-
-    # Then flatten all image objects
-    return _flatten_image_objects(flattened_translations)
+    return _flatten_translations(response)

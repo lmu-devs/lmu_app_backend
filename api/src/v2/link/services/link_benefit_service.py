@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from api.src.v1.core.flatten_response_util import flatten_response
+from api.src.v2.core.flatten_response_util import flatten_response
+from api.src.v2.core.transform_images_response_utils import transform_images_response
 from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
@@ -20,6 +21,8 @@ class LinkBenefitService:
                 variables={"languageCode": self.language.value},
             )
 
-            return flatten_response(response)
+            transformed_response = transform_images_response(response)
+
+            return flatten_response(transformed_response)
         except Exception as e:
             raise e

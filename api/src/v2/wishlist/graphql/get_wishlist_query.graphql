@@ -1,0 +1,28 @@
+query GetWishlist($languageCode: String!) {
+    wishlists(
+        sort: ["translations.title"]
+        filter: {
+            status: {
+                _in: ["NONE", "DEVELOPMENT", "BETA"]
+            }
+        }
+        ) {
+        id
+        status
+        images {
+            directus_files_id {
+                id
+                title
+            }
+        }
+        release_date
+        prototype_url
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+            description
+            content
+        }
+        date_created
+        date_updated
+    }
+}
