@@ -13,7 +13,7 @@ class LinkBenefit(BaseModel):
     image: Image | None = None
     faculties: List = []
     types: List = []
-    aliases: List[str] = []
+    # aliases: List[str] = []
 
 
 class LinkBenefits(RootModel):

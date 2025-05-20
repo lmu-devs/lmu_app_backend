@@ -2,6 +2,7 @@ from pathlib import Path
 
 from api.src.v2.core.flatten_response_util import flatten_response
 from api.src.v2.core.transform_images_response_utils import transform_images_response
+from api.src.v2.link.models.link_benefits_model import LinkBenefitResponse
 from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
@@ -22,7 +23,8 @@ class LinkBenefitService:
             )
 
             transformed_response = transform_images_response(response)
+            flattened_response = flatten_response(transformed_response)
 
-            return flatten_response(transformed_response)
+            return LinkBenefitResponse(**flattened_response)
         except Exception as e:
             raise e

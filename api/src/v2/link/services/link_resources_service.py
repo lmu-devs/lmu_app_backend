@@ -6,18 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.src.v2.core.flatten_response_util import flatten_response
 from api.src.v2.core.service.like_service import LikeService
-from api.src.v2.university.models.faculty_model import Faculties
 from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.models.rating_model import Rating
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.link.link_resources_table import LinkResourceLikeTable
 
-from ..models.link_resources_model import (
-    LinkResource,
-    LinkResourceResponse,
-    LinkResources,
-)
+from ..models.link_resources_model import LinkResource, LinkResourceResponse
 
 
 class LinkResourceService:
@@ -39,8 +34,6 @@ class LinkResourceService:
                 query_file_path=query_path,
                 variables={"languageCode": language.value},
             )
-
-            print(response)
 
             # Flatten the response
             flattened_response = flatten_response(response)
@@ -74,13 +67,10 @@ class LinkResourceService:
                 # Create validated link object
                 processed_links.append(LinkResource(**link))
 
-            # Create validated faculty objects
-            validated_faculties = [{"id": f["id"], "title": f["title"]} for f in faculties]
-
             # Return the complete response
             return LinkResourceResponse(
-                links=LinkResources(root=processed_links),
-                faculties=Faculties(root=validated_faculties),
+                links=processed_links,
+                faculties=faculties,
             )
 
         except Exception as e:

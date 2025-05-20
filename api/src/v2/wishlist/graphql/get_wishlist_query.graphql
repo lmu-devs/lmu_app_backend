@@ -22,7 +22,6 @@ query GetWishlist($languageCode: String!) {
             description
             content
         }
-        date_created
         date_updated
     }
 }

@@ -18,7 +18,6 @@ class Wishlist(BaseModel):
     prototype_url: Optional[str]
     rating: Rating
     images: Images
-    date_created: datetime
     date_updated: datetime
 
 
