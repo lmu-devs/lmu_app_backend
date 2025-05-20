@@ -35,6 +35,10 @@ class WishlistTable(Base):
         cascade="all, delete-orphan",
     )
 
+    @property
+    def like_count(self):
+        return len(self.likes)
+
 
 class WishlistImageTable(ImageTable, Base):
     __tablename__ = "wishlist_images"

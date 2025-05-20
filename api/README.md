@@ -100,7 +100,7 @@ pytest tests/
 
 When the server is running, documentation is available at:
 
-- Swagger UI: `/v1/docs`
+- Swagger UI: `/docs`
 
 
 ### Rate Limiting

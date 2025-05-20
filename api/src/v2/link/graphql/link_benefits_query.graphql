@@ -17,11 +17,12 @@ query GetBenefits($languageCode: String!) {
             id
         }
         url
+        favicon_url
         translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
             title
             description
         }
-        type {
+        types {
             benefit_types_id {
                 id
             }

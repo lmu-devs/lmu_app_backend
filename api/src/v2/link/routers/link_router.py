@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.src.v1.core.api_key import APIKey
-from api.src.v1.core.language import get_language
-from api.src.v1.link.models.link_resources_model import LinkResources
+from api.src.v2.core.api_key import APIKey
+from api.src.v2.core.language import get_language
+from api.src.v2.link.models.link_benefits_model import LinkBenefitResponse
+from api.src.v2.link.models.link_resources_model import LinkResourceResponse
+from api.src.v2.link.services.link_benefit_service import LinkBenefitService
 from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_links_logger
 from shared.src.enums import LanguageEnum
@@ -17,7 +19,7 @@ logger = get_links_logger(__name__)
 
 @router.get(
     "/resources",
-    response_model=LinkResources,
+    response_model=LinkResourceResponse,
     description="Get all resources for important LMU services",
 )
 async def get_all_resources(
@@ -28,8 +30,7 @@ async def get_all_resources(
     link_service = LinkResourceService(db)
     user_id = user.id if user else None
     links = await link_service.get_links(language, user_id)
-    links_model = LinkResources.from_table(links)
-    return links_model
+    return links
 
 
 @router.get(
@@ -45,3 +46,12 @@ async def toggle_like(
     link_service = LinkResourceService(db)
     is_liked = await link_service.toggle_like(id, user.id)
     return is_liked
+
+
+@router.get("/benefits", description="Get all student benefits", response_model=LinkBenefitResponse)
+async def get_all_benefits(
+    language: LanguageEnum = Depends(get_language),
+):
+    link_benefit_service = LinkBenefitService(language)
+    benefits = await link_benefit_service.get_benefits()
+    return benefits

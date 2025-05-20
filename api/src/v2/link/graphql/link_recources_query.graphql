@@ -1,0 +1,23 @@
+query GetLinkResources($languageCode: String!) {
+    links(sort: ["translations.title"]) {
+        id
+        url
+        favicon_url
+        aliases
+        faculties {
+            faculties_id {
+                id
+            }
+        }
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+            description
+        }
+    }
+    faculties {
+        id
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+        }
+    }
+}

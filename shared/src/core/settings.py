@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     # Base URL for the eat API
     API_BASE_URL: str = "https://api.lmu-dev.org"
     API_V1_PREFIX: str = "/v1"
+    API_V2_PREFIX: str = "/v2"
     MIN_APP_VERSION: str = "1.0.0"
 
     # Base URL for the images

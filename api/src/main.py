@@ -23,19 +23,22 @@ from .v1.sport.routers import sport_router
 from .v1.timeline.routers import timeline_router
 from .v1.user.routers import user_router
 from .v1.wishlist.routers import wishlist_router
+from .v2.link.routers import link_router as link_router_v2
+from .v2.wishlist.routers import wishlist_router as wishlist_router_v2
 
 api_logger = get_food_logger(__name__)
 
 
 def create_app():
     settings = get_settings()
-    prefix = settings.API_V1_PREFIX
+    prefix_v1 = settings.API_V1_PREFIX
+    prefix_v2 = settings.API_V2_PREFIX
 
     app = FastAPI(
         title="lmu-dev-api",
         description="API for Students App in Munich.",
         version="0.2.0",
-        docs_url=f"{prefix}/docs",
+        docs_url="/docs",
         contact={"name": "LMU Developers", "email": "contact@lmu-dev.org"},
     )
 
@@ -66,23 +69,25 @@ def create_app():
     )
 
     # Include routers
-    app.include_router(canteen_router.router, prefix=f"{prefix}/food", tags=["food"])
-    app.include_router(menu_router.router, prefix=f"{prefix}/food", tags=["food"])
-    app.include_router(dish_router.router, prefix=f"{prefix}/food", tags=["food"])
-    app.include_router(taste_router.router, prefix=f"{prefix}/food", tags=["food"])
-    app.include_router(user_router.router, prefix=prefix, tags=["user"])
-    app.include_router(log_router.router, prefix=prefix, tags=["log"])
-    app.include_router(feedback_router.router, prefix=prefix, tags=["feedback"])
-    app.include_router(wishlist_router.router, prefix=prefix, tags=["wishlist"])
-    app.include_router(cinema_router.router, prefix=f"{prefix}/cinema", tags=["cinema"])
-    app.include_router(home_router.router, prefix=prefix, tags=["home"])
-    app.include_router(places_router.router, prefix=prefix, tags=["place"])
-    app.include_router(sport_router.router, prefix=prefix, tags=["sport"])
-    app.include_router(roomfinder_router.router, prefix=f"{prefix}/roomfinder", tags=["roomfinder"])
-    app.include_router(timeline_router.router, prefix=prefix, tags=["timeline"])
-    app.include_router(link_router.router, prefix=f"{prefix}/link", tags=["link"])
-    app.include_router(library_router.router, prefix=f"{prefix}/library", tags=["library"])
-    app.include_router(map_router.router, prefix=f"{prefix}/map", tags=["map"])
+    app.include_router(canteen_router.router, prefix=f"{prefix_v1}/food", tags=["food"])
+    app.include_router(menu_router.router, prefix=f"{prefix_v1}/food", tags=["food"])
+    app.include_router(dish_router.router, prefix=f"{prefix_v1}/food", tags=["food"])
+    app.include_router(taste_router.router, prefix=f"{prefix_v1}/food", tags=["food"])
+    app.include_router(user_router.router, prefix=prefix_v1, tags=["user"])
+    app.include_router(log_router.router, prefix=prefix_v1, tags=["log"])
+    app.include_router(feedback_router.router, prefix=prefix_v1, tags=["feedback"])
+    app.include_router(wishlist_router.router, prefix=prefix_v1, tags=["wishlist"])
+    app.include_router(wishlist_router_v2.router, prefix=prefix_v2, tags=["wishlist"])
+    app.include_router(cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"])
+    app.include_router(home_router.router, prefix=prefix_v1, tags=["home"])
+    app.include_router(places_router.router, prefix=prefix_v1, tags=["place"])
+    app.include_router(sport_router.router, prefix=prefix_v1, tags=["sport"])
+    app.include_router(roomfinder_router.router, prefix=f"{prefix_v1}/roomfinder", tags=["roomfinder"])
+    app.include_router(timeline_router.router, prefix=prefix_v1, tags=["timeline"])
+    app.include_router(link_router.router, prefix=f"{prefix_v1}/link", tags=["link"])
+    app.include_router(link_router_v2.router, prefix=f"{prefix_v2}/link", tags=["link"])
+    app.include_router(library_router.router, prefix=f"{prefix_v1}/library", tags=["library"])
+    app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
@@ -127,9 +132,9 @@ def create_app():
             response.headers["content-type"] = "application/json; charset=utf-8"
         return response
 
-    @app.get("/", include_in_schema=False)
-    async def root():
-        return {"message": "Hello Wörld"}
+    @app.get("/health", include_in_schema=False)
+    async def health():
+        return {"message": "OK"}
 
     # Initialize the database
     try:
