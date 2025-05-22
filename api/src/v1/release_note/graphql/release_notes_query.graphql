@@ -1,0 +1,8 @@
+query GetReleaseNotes($languageCode: String!, $version: String!) {
+    release_notes(filter: { version: { _eq: $version } }) {
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            highlights
+            details
+        }
+    }
+}
