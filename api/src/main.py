@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from api.src.v1.release_note.routers import release_notes_router
 from shared.src.core.database import Database
 from shared.src.core.error_handlers import api_error_handler
 from shared.src.core.exceptions import APIException
@@ -90,6 +91,8 @@ def create_app():
     app.include_router(library_router.router, prefix=f"{prefix_v1}/library", tags=["library"])
     app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
     app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
+    app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
+
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
         CORSMiddleware,
