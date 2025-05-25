@@ -6,13 +6,14 @@ from api.src.v2.core.models.image_model import Image
 
 
 class LinkBenefit(BaseModel):
+    id: str
     title: str
     description: str
     url: str
     favicon_url: str | None = None
     image: Image | None = None
-    faculties: List = []
-    types: List = []
+    # types: List = []
+    # faculties: List = []
     # aliases: List[str] = []
 
 
@@ -25,6 +26,7 @@ class LinkBenefitType(BaseModel):
     title: str
     description: str | None = None
     emoji: str
+    benefit_ids: List[str]
 
 
 class LinkBenefitTypes(RootModel):
