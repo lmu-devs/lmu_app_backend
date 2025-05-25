@@ -9,6 +9,7 @@ from shared.src.core.logging import get_links_logger
 from shared.src.enums import LanguageEnum
 from shared.src.tables.user_table import UserTable
 
+from ..constants.benefits_constants import benefits_constants
 from ..services.link_resources_service import LinkResourceService
 
 router = APIRouter()
@@ -45,3 +46,14 @@ async def toggle_like(
     link_service = LinkResourceService(db)
     is_liked = await link_service.toggle_like(id, user.id)
     return is_liked
+
+
+@router.get(
+    "/benefits",
+    description="Get all benefits for important LMU services",
+)
+async def get_all_benefits(
+    db: AsyncSession = Depends(get_async_db),
+    language: LanguageEnum = Depends(get_language),
+):
+    return benefits_constants
