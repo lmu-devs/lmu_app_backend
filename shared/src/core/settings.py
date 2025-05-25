@@ -50,15 +50,15 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
 
-    # Metabase settings
-    MB_DB_DBNAME: str
-    MB_DB_USER: str
-    MB_DB_PASSWORD: str
-    MB_DB_HOST: str
-    MB_DB_PORT: str
+    # # Metabase settings
+    # MB_DB_DBNAME: str
+    # MB_DB_USER: str
+    # MB_DB_PASSWORD: str
+    # MB_DB_HOST: str
+    # MB_DB_PORT: str
 
-    MB_EMAIL: str
-    MB_PASSWORD: str
+    # MB_EMAIL: str
+    # MB_PASSWORD: str
 
     # Firebase
     FIREBASE_CREDENTIALS: str
