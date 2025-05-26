@@ -37,10 +37,15 @@ class HomeService:
         # screenings = MovieScreenings.from_table(screenings)
         return HomeTiles(
             root=[
+                # BaseHomeTile(
+                #     type=HomeTileEnum.LIBRARY,
+                #     size=1,
+                #     title="Library",
+                # ),
                 BaseHomeTile(
-                    type=HomeTileEnum.LIBRARY,
+                    type=HomeTileEnum.TIMELINE,
                     size=1,
-                    title="Library",
+                    title="Timeline",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.ROOMFINDER,
@@ -67,15 +72,10 @@ class HomeService:
                     size=1,
                     title="Benefits",
                 ),
-                # BaseHomeTile(
-                #     type=HomeTileEnum.WISHLIST,
-                #     size=1,
-                #     title="Wishlist",
-                # ),
                 BaseHomeTile(
-                    type=HomeTileEnum.TIMELINE,
+                    type=HomeTileEnum.WISHLIST,
                     size=1,
-                    title="Timeline",
+                    title="Wishlist",
                 ),
                 BaseHomeTile(
                     type=HomeTileEnum.FEEDBACK,
