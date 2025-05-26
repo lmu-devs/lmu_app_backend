@@ -50,7 +50,7 @@ def transform_images_response(
         }
     """
     settings = get_settings()
-    base_url = settings.DIRECTUS_BASE_URL.rstrip("/")
+    base_url = settings.DIRECTUS_EXTERNAL_URL.rstrip("/")
 
     def _flatten_translations(
         data: Union[Dict[str, Any], List[Any]],

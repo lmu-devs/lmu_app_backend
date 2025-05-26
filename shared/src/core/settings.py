@@ -69,9 +69,10 @@ class Settings(BaseSettings):
     # CMS
     DIRECTUS_ACCESS_TOKEN: str
     DIRECTUS_BASE_URL: str = Field(
-        default="http://directus:8055",
-        description="Using internal docker container for production, set to https://cms.lmu-dev.org in .env for local development",
+        default="https://cms.lmu-dev.org",
+        description="Using internal docker container for production (http://directus:8055)",
     )
+    DIRECTUS_EXTERNAL_URL: str = "https://cms.lmu-dev.org"
 
     class ConfigDict:
         env_file = ".env"
