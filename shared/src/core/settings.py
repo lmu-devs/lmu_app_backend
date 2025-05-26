@@ -7,7 +7,7 @@ from shared.src.settings.llm_settings import AnthropicConfig, OpenAIConfig
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_name: str = "LMU App Backend"
     openai_config: OpenAIConfig = OpenAIConfig()

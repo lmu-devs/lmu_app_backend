@@ -1,7 +1,7 @@
 import uuid
 from typing import Any, Optional, Type
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -115,3 +115,41 @@ class LikeService:
         except SQLAlchemyError as e:
             logger.error(f"Failed to fetch user likes: {str(e)}")
             raise DatabaseError(detail="Failed to fetch user likes", extra={"original_error": str(e)})
+
+    async def get_like_counts(
+        self,
+        like_table: Type[Any],
+        entity_ids: list[Any],
+        entity_id_column: str = None,
+    ) -> dict[Any, int]:
+        """
+        Get like counts for multiple entities at once
+
+        Args:
+            like_table: The like table class (e.g., WishlistLikeTable)
+            entity_ids: List of entity IDs to get counts for
+            entity_id_column: Name of the entity ID column (defaults to table name without 'likes' + '_id')
+
+        Returns:
+            dict: Mapping of entity IDs to their like counts
+        """
+        try:
+            if entity_id_column is None:
+                entity_id_column = f"{like_table.__tablename__[:-6]}_id"
+
+            entity_col = getattr(like_table, entity_id_column)
+            stmt = (
+                select(entity_col, func.count(like_table.user_id).label("like_count"))
+                .where(entity_col.in_(entity_ids))
+                .group_by(entity_col)
+            )
+
+            result = await self.db.execute(stmt)
+            counts = {entity_id: count for entity_id, count in result.all()}
+
+            # Ensure all requested entity IDs have an entry in the result dictionary
+            return {entity_id: counts.get(entity_id, 0) for entity_id in entity_ids}
+
+        except SQLAlchemyError as e:
+            logger.error(f"Failed to fetch like counts: {str(e)}")
+            raise DatabaseError(detail="Failed to fetch like counts", extra={"original_error": str(e)})
