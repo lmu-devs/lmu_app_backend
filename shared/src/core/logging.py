@@ -102,6 +102,9 @@ def get_translation_logger(module_name: str):
 def get_library_logger(module_name: str):
     return setup_logger(module_name, "library", "library")
 
+def get_calendar_logger(module_name: str):
+    return setup_logger(module_name, "calendar", "calendar")
+
 
 # Service Logger
 def get_service_logger(module_name: str):

@@ -1,4 +1,5 @@
 from .cinema import *
+from .calendar_table import*
 from .faculty_table import *
 from .feedback_table import *
 from .food import *

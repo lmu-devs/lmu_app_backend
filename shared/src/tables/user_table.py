@@ -25,6 +25,7 @@ class UserTable(Base):
     liked_screenings = relationship("ScreeningLikeTable", back_populates="user", cascade="all, delete-orphan")
     liked_link_resources = relationship("LinkResourceLikeTable", back_populates="user", cascade="all, delete-orphan")
     feedback = relationship("FeedbackTable", back_populates="user")
+    calendar = relationship("CalendarTable", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(id='{self.id}')>"
