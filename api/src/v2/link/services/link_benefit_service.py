@@ -28,7 +28,11 @@ class LinkBenefitService:
             # Transform benefit_ids from the GraphQL response structure and filter empty types
             benefit_types_with_benefits = []
             for benefit_type in flattened_response["benefit_types"]:
-                benefit_ids = [benefit["benefits_id"]["id"] for benefit in benefit_type.pop("benefits", [])]
+                benefit_ids = [
+                    benefit["benefits_id"]["id"]
+                    for benefit in benefit_type.pop("benefits", [])
+                    if benefit.get("benefits_id")
+                ]
                 if benefit_ids:  # Only include types that have benefits
                     benefit_type["benefit_ids"] = benefit_ids
                     benefit_types_with_benefits.append(benefit_type)
