@@ -1,7 +1,8 @@
 from datetime import datetime
 from uuid import UUID
+from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel
 
 from shared.src.tables import EventType, RepeatType, CalendarTable
 
@@ -13,10 +14,10 @@ class CalendarCreate(BaseModel):
     """
 
     # event data
-    title: str | None = None
+    title: str
     description: str | None = None
     #location: str | None = None
-    event_type: EventType | None = None
+    event_type: EventType
     start_time: datetime
     end_time: datetime
 
@@ -26,7 +27,7 @@ class CalendarCreate(BaseModel):
     # repeat_end_time: datetime   # end date for repeat?? optional?
     # repeat_cout: Integer        # limit -> shouldn't be here since we want it dynamic 
 
-class Calendar(CalendarCreate):
+class CalendarEntry(CalendarCreate):
     """
     Calendar entry.
     """
@@ -36,9 +37,9 @@ class Calendar(CalendarCreate):
     created_at: datetime
     updated_at: datetime
 
-    @staticmethod
-    def from_table(calendar: CalendarTable) -> "Calendar":
-        return Calendar(
+    @classmethod
+    def from_table(calendar: CalendarTable) -> "CalendarEntry":
+        return CalendarEntry(
             id=calendar.id,
             user_id=calendar.user_id,
             created_at=calendar.created_at,
@@ -49,5 +50,12 @@ class Calendar(CalendarCreate):
             event_type=calendar.event_type,
             start_time=calendar.start_time,
             end_time=calendar.end_time,
-            repeat_type=calendar.repeat_type
+            repeat_type=calendar.repeat_type,
         )
+    
+class CalendarEntries(RootModel):
+    root: List[CalendarEntry]
+
+    @classmethod
+    def from_table(cls, data: List[CalendarTable]) -> "CalendarEntries":
+        return CalendarEntries(root=[CalendarEntry.from_table(entry) for entry in data])

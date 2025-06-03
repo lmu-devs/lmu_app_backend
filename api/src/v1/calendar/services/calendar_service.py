@@ -38,13 +38,12 @@ class CalendarService:
             entry = CalendarTable(
                 id=uuid.uuid4(),
                 user_id=user_id,
-                
                 title=calendar_data["title"],
                 description=calendar_data.get("description"),
-                event_type=calendar_data.get("event_type"),
-                repeat_type=calendar_data("repeat_type"),
-                start_time=calendar_data.get("start_time"),
-                end_time=calendar_data.get("end_time"),
+                event_type=calendar_data["event_type"],
+                start_time=calendar_data["start_time"],
+                end_time=calendar_data["end_time"],
+                repeat_type=calendar_data["repeat_type"],
             )
 
             self.db.add(entry)
@@ -104,7 +103,7 @@ class CalendarService:
             raise DatabaseError(detail="Failed to update calendar entry", extra={"original_error": str(e)})
         
 
-    async def get_all( # TODO: Implement router, Implement daily, weekly, etc -> set max limit for one event
+    async def get_all(
         self,
         user_id: uuid.UUID,
         event_type: Optional[str] = None,
