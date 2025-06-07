@@ -6,7 +6,8 @@ from pydantic import BaseModel, RootModel
 
 from shared.src.tables import EventType, RepeatType, CalendarTable
 
-update_blacklist: list[str] =  [ "id", "user_id", "created_at"]
+UPDATE_BLACKLIST: list[str] =  [ "id", "user_id", "created_at"] # items that should not be updated
+REPEAT_LIMIT: int = 10  # default limit, used if repeat_end_time == None
 
 class CalendarCreate(BaseModel):
     """
@@ -20,12 +21,12 @@ class CalendarCreate(BaseModel):
     event_type: EventType
     start_time: datetime
     end_time: datetime
+    all_day: bool = False
 
     # repeat data
     repeat_type: RepeatType
-    # repeat_interval: Integer    # every two weeks: epeat_type=WEEKLY, repeat_interval=2
-    # repeat_end_time: datetime   # end date for repeat?? optional?
-    # repeat_cout: Integer        # limit -> shouldn't be here since we want it dynamic 
+    repeat_interval: int | None = None          # e.g. every two weeks: repeat_type=WEEKLY, repeat_interval=2
+    repeat_end_time: datetime | None = None     # end date for repeat, used when available. Otherwise the REPEAT_LIMIT is used
 
 class CalendarEntry(CalendarCreate):
     """
@@ -50,7 +51,11 @@ class CalendarEntry(CalendarCreate):
             event_type=calendar.event_type,
             start_time=calendar.start_time,
             end_time=calendar.end_time,
+            all_day=calendar.all_day,
+
             repeat_type=calendar.repeat_type,
+            repeat_interval=calendar.repeat_interval,
+            repeat_end_time=calendar.repeat_end_time
         )
     
 class CalendarEntries(RootModel):
