@@ -16,7 +16,7 @@ router = APIRouter()
     response_model=Faculties,
     description="Get all faculty titles and names",
 )
-async def get_faculties(languagecode: str = "de-DE"):
+async def get_faculties(languagecode: str = "en-US"):
     university_service = UniversityService(languagecode)
     faculties = await university_service.get_faculties()
     return faculties
@@ -27,7 +27,7 @@ async def get_faculties(languagecode: str = "de-DE"):
     response_model=Universities,
     description="Get all universities",
 )
-async def get_universities(language_code: str = "de-DE"):
+async def get_universities(language_code: str = "en-US"):
     university_service = UniversityService(language_code)
     university_service = await university_service.get_universities()
     return university_service

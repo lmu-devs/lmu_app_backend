@@ -3,7 +3,7 @@ query Faculty($languageCode: String!){
     filter: { languages_code: { code: { _eq: $languageCode} } }
   ) {
     faculties_id{
-        id
+      id
     }
     title
   }

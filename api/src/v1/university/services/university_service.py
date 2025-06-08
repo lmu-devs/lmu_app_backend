@@ -9,10 +9,12 @@ from ..models.faculty_model import Faculty
 from ..models.faculty_model import Faculties
 from ..models.university_model import Universities
 from ..models.university_model import University
+from ..models.university_model import UniversityEnum
 
 
 GRAPHQL_FOLDER_NAME = "graphql"
-FACULTY_GRAPHQL_QUERY_NAME = "faculty_query.graphql"
+FACULTY_QUERY_NAME = "faculty_query.graphql"
+UNIVERSITY_QUERY_NAME = "university_query.graphql"
 
 
 class UniversityService:
@@ -24,7 +26,7 @@ class UniversityService:
     async def get_faculties(self) -> Faculties:
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
-        query_name = FACULTY_GRAPHQL_QUERY_NAME
+        query_name = FACULTY_QUERY_NAME
         query_path = base_path / folder / query_name
 
         response = self.directus.execute_query_file(
@@ -41,5 +43,22 @@ class UniversityService:
         )
 
     async def get_universities(self) -> Universities:
+        base_path = Path(__file__).parent.parent
+        folder = GRAPHQL_FOLDER_NAME
+        query_name = UNIVERSITY_QUERY_NAME
+        query_path = base_path / folder / query_name
 
-        return Universities()
+        response = self.directus.execute_query_file(
+            query_file_path=query_path,
+            variables={"languageCode": self.language_code},
+        )
+        universities_raw = flatten_response(response)
+        return Universities(
+            root=[
+                University(
+                    id=UniversityEnum(u["universities_id"]["abbreviation"]),
+                    title=u["title"],
+                )
+                for u in universities_raw["universities_translations"]
+            ]
+        )

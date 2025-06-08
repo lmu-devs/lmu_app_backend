@@ -4,13 +4,10 @@ from typing import List
 from shared.src.enums import UniversityEnum
 from shared.src.tables import UniversityTable, UniversityTranslationTable
 
-from .faculty_model import Faculties
-
 
 class University(BaseModel):
     id: UniversityEnum
     title: str
-    faculties: Faculties | None = None
 
     @classmethod
     def from_table(cls, university: UniversityTable) -> "University":
