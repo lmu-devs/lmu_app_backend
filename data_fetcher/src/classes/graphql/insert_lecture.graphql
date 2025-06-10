@@ -1,9 +1,5 @@
 mutation InsertLecture($title: String!, $publish_id: Int!, $paths: JSON!) {
-  create_lecture_item(data: {
-    name: $title,
-    publish_id: $publish_id,
-    tree_paths: {data: $paths}
-  }) {
-    id
-  }
+    create_lecture_item(data: { name: $title, publish_id: $publish_id, tree_paths: { data: $paths } }) {
+        id
+    }
 }

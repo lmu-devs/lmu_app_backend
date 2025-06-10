@@ -99,37 +99,31 @@ class LSFCrawler:
         return class_types
 
     def _crawl_tree_path(self, url: str) -> list[list[str]]:
-        html_content = requests.get(url, self.headers).content
+        html_content = requests.get(url, headers=self.headers).content
         tree = html.fromstring(html_content)
         nodes = tree.xpath("//div[contains(@style, 'padding-left')]/a")
-
         paths = []
-        current_path = []
-        previous_indent = -10
+        indent_stack = []
 
         for node in nodes:
-
-            text = node.text_content().strip()
             parent_div = node.getparent()
             style = parent_div.attrib.get("style", "")
-            indent = int(style.split("padding-left:")[1].split("px")[0].strip())
+            text = node.text_content().strip()
 
-            if indent > previous_indent:
-                current_path.append(text)
-            elif indent == previous_indent:
-                current_path[-1] = text
-            else:
-                steps_back = (previous_indent - indent) // 10
-                current_path = current_path[: len(current_path) - steps_back]
-                current_path[-1] = text
+            try:
+                indent = int(style.split("padding-left:")[1].split("px")[0].strip())
+            except Exception:
+                continue
 
-            previous_indent = indent
+            while indent_stack and indent_stack[-1][0] >= indent:
+                indent_stack.pop()
 
-            warn = parent_div.xpath(".//span[@class='warnung']")
-            if warn:
-                paths.append(list(current_path))
+            indent_stack.append((indent, text))
 
-        return paths if len(paths) > 0 else None
+            if parent_div.xpath(".//span[@class='warnung']"):
+                current_path = [text for _, text in indent_stack]
+                paths.append(current_path)
+        return paths if paths else None
 
 
 def main() -> None:

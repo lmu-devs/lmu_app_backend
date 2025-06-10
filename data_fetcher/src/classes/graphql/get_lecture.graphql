@@ -1,0 +1,5 @@
+query GetLecture($publish_id: GraphQLStringOrFloat!) {
+    lecture(filter: { publish_id: { _eq: $publish_id } }) {
+        id
+    }
+}
