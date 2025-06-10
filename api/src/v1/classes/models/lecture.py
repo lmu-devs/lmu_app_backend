@@ -13,10 +13,8 @@ class Lecture(BaseModel):
     tree_paths: Optional[List[TreePath]]
 
     @classmethod
-    def from_tuple(cls, raw: Tuple[str, str, List[List[str]]]) -> "Lecture":
-        title, url, paths = raw
-        match = re.search(r"publishid=(\d+)", url)
-        publish_id = int(match.group(1)) if match else None
+    def from_tuple(cls, raw: Tuple[str, int, List[List[str]]]) -> "Lecture":
+        title, publish_id, paths = raw
         tree_paths = [TreePath(path=p) for p in paths] if paths else None
         return cls(title=title, publish_id=publish_id, tree_paths=tree_paths)
 

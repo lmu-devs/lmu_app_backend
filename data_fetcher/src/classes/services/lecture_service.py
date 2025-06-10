@@ -34,7 +34,7 @@ class LectureFetcher:
         return {
             "publish_id": lecture.publish_id,
             "title": lecture.title,
-            "paths": json.dumps(tree_paths),
+            "paths": tree_paths,
         }
 
     def build_update_lecture_variables(self, lecture: Lecture, id: str) -> dict:
@@ -44,7 +44,7 @@ class LectureFetcher:
         return {
             "id": id,
             "title": lecture.title,
-            "paths": json.dumps(tree_paths),
+            "paths": tree_paths,
         }
 
     def insert_lecture(self, lecture: Lecture) -> None:

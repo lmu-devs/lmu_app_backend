@@ -1,4 +1,4 @@
-mutation UpdateLecture($id: ID!, $title: String!, $paths: JSON!) {
+mutation UpdateLecture($id: ID!, $title: String!, $paths: JSON) {
     update_lecture_item(id: $id, data: { name: $title, tree_paths: $paths }) {
         id
     }
