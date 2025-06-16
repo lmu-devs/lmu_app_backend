@@ -1,6 +1,6 @@
 import uuid
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,7 +12,7 @@ from shared.src.models.rating_model import Rating
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.link.link_resources_table import LinkResourceLikeTable
 
-from ..models.link_resources_model import LinkResource, LinkResourceResponse
+from ..models.link_resources_model import LinkResource
 
 
 class LinkResourceService:
@@ -26,7 +26,7 @@ class LinkResourceService:
         self,
         language: LanguageEnum = LanguageEnum.GERMAN,
         user_id: Optional[uuid.UUID] = None,
-    ) -> LinkResourceResponse:
+    ) -> List[LinkResource]:
         try:
             # Execute GraphQL query
             query_path = Path(__file__).parent.parent / "graphql" / "link_recources_query.graphql"
@@ -38,7 +38,6 @@ class LinkResourceService:
             # Flatten the response
             flattened_response = flatten_response(response)
             links = flattened_response["links"]
-            faculties = flattened_response["faculties"]
 
             # Get like counts for all links
             like_counts = await self.like_service.get_like_counts(LinkResourceLikeTable, [link["id"] for link in links])
@@ -68,10 +67,7 @@ class LinkResourceService:
                 processed_links.append(LinkResource(**link))
 
             # Return the complete response
-            return LinkResourceResponse(
-                links=processed_links,
-                faculties=faculties,
-            )
+            return processed_links
 
         except Exception as e:
             raise e

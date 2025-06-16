@@ -65,9 +65,7 @@ class LinkResourceService:
                     if faculty.get("faculties_id")
                 ]
 
-                # Convert aliases string to list
-                if "aliases" in link and isinstance(link["aliases"], str):
-                    link["aliases"] = [alias.strip() for alias in link["aliases"].split(",")]
+                link["aliases"] = []
 
                 # Create validated link object
                 processed_links.append(LinkResource(**link))
