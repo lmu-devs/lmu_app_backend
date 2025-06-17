@@ -29,7 +29,9 @@ class LectureFetcher:
 
     def build_lecture_variables(self, lecture: Lecture) -> dict:
         tree_paths = (
-            [p.path for p in lecture.tree_paths] if lecture.tree_paths else None
+            [p.path for p in lecture.tree_paths]
+            if lecture.tree_paths
+            else None
         )
         return {
             "publish_id": lecture.publish_id,
@@ -37,9 +39,13 @@ class LectureFetcher:
             "paths": tree_paths,
         }
 
-    def build_update_lecture_variables(self, lecture: Lecture, id: str) -> dict:
+    def build_update_lecture_variables(
+        self, lecture: Lecture, id: str
+    ) -> dict:
         tree_paths = (
-            [p.path for p in lecture.tree_paths] if lecture.tree_paths else None
+            [p.path for p in lecture.tree_paths]
+            if lecture.tree_paths
+            else None
         )
         return {
             "id": id,
@@ -55,7 +61,7 @@ class LectureFetcher:
 
         response = self.directus.execute_query_file(
             query_file_path=query_path,
-            variables=self.build_lecture_variables(lecture),
+            variables=lecture.to_dict(),
         )
         if response.get("errors"):
             raise Exception(f"Error inserting lecture: {response['errors']}")
@@ -75,7 +81,9 @@ class LectureFetcher:
 
     def update_lecture(self, lecture: Lecture, id: str) -> None:
         if not self.lecture_exists(lecture.publish_id):
-            raise Exception(f"No Lecture with publish_id {lecture.publish_id} exist.")
+            raise Exception(
+                f"No Lecture with publish_id {lecture.publish_id} exist."
+            )
 
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
@@ -84,7 +92,7 @@ class LectureFetcher:
 
         response = self.directus.execute_query_file(
             query_file_path=query_path,
-            variables=self.build_update_lecture_variables(lecture, id),
+            variables={"id": id} | lecture.to_dict(),
         )
         if response.get("errors"):
             raise Exception(f"Error updating lecture: {response['errors']}")

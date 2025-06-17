@@ -8,5 +8,7 @@ class ClassesCollecter(ScheduledCollector):
         # super().__init__(job_schedule=schedule.every().day.at("09:00"))
         self.lecture_fetcher = LectureFetcher()
 
-    async def _collect_data(self):
-        self.lecture_fetcher.store_lectures(2025, SemesterTypeEnum.SUMMER)
+    async def _collect_data(self, db):
+        self.lecture_fetcher.store_lectures(
+            2025, SemesterTypeEnum.SUMMER_SEMESTER
+        )

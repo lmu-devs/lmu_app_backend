@@ -1,0 +1,7 @@
+query GetLectureByFaculty{
+  lecture(limit: 5000){
+    name
+    publish_id
+    tree_paths
+  }
+}

@@ -1,21 +1,235 @@
 import re
-from pydantic import BaseModel
+from datetime import time, date as Date
+from pydantic import BaseModel, Field
 from typing import List, Tuple, Optional
+
+from shared.src.enums.weekday_enum import WeekdayEnum
+from shared.src.enums.classes_enum import LectureStartTypeEnum
 
 
 class TreePath(BaseModel):
     path: List[str]
 
 
+class AssociatedProgram(BaseModel):
+    program_name: Optional[str]
+    module_classification: Optional[str]
+    ects: Optional[int]
+    degree: Optional[str]
+
+
+class ClassBaseInfo(BaseModel):
+    persons: Optional[list[str]]
+    institutions: Optional[list[str]]
+    class_type: Optional[str] = Field(alias="Veranstaltungsart", default=None)
+    class_id: Optional[str] = Field(alias="Veranstaltungsnummer", default=None)
+    class_cylce: Optional[str] = Field(alias="Rhythmus", default=None)
+    semester: Optional[str] = Field(alias="Semester", default=None)
+    sws: Optional[float] = Field(alias="SWS", default=None)
+    max_participants: Optional[int] = Field(
+        alias="Max. Teilnehmer/-innen", default=None
+    )
+    in_person_event_type: Optional[str] = Field(
+        alias="Veranstaltungstyp", default=None
+    )
+    language: Optional[str] = Field(alias="Sprache", default=None)
+    for_exchange_students: Optional[str] = Field(
+        alias="für Austauschstudierende", default=None
+    )
+    links: Optional[str] = Field(alias="Weitere Links", default=None)
+    sigel: Optional[str] = Field(alias="Sigel", default=None)
+
+
+class ClassSession(BaseModel):
+    caption: Optional[str]
+    weekday: Optional[WeekdayEnum]
+    starting_time: Optional[time]
+    ending_time: Optional[time]
+    timing_type: Optional[LectureStartTypeEnum]
+    rhythm: Optional[str]
+    duration_start: Optional[Date]
+    duration_end: Optional[Date]
+    room: Optional[str]
+    lecturer: Optional[str]
+    remark: Optional[str]
+    cancelled_dates: Optional[str]
+
+
+class ClassMaterial(BaseModel):
+    valid_from: Optional[Date]
+    valid_to: Optional[Date]
+    file_name: Optional[str]
+    description: Optional[str]
+
+
+class AssociatedExam(BaseModel):
+    module_name: Optional[str]
+    program_name: Optional[str]
+    ects: Optional[int]
+    module_classification: Optional[str]
+    degree: Optional[str]
+    module_id: Optional[str]
+    exam_id: Optional[str]
+    po_version: Optional[str]
+
+
+class AdditionInformation(BaseModel):
+    remark: Optional[str] = Field(default=None, alias="Bemerkung")
+    literature: Optional[str] = Field(default=None, alias="Literatur")
+    date: Optional[str] = Field(default=None, alias="Datum")
+    registration: Optional[str] = Field(default=None, alias="Anmeldung")
+    format: Optional[str] = Field(default=None, alias="Form")
+    content: Optional[str] = Field(default=None, alias="Inhalt")
+    learning_content: Optional[str] = Field(default=None, alias="Lerninhalte")
+    target_group: Optional[str] = Field(default=None, alias="Zielgruppe")
+    location: Optional[str] = Field(default=None, alias="Ort")
+    comment: Optional[str] = Field(default=None, alias="Kommentar")
+    assessment: Optional[str] = Field(default=None, alias="Leistungsnachweis")
+    time: Optional[str] = Field(default=None, alias="Uhrzeit")
+    topic: Optional[str] = Field(default=None, alias="Thema")
+    short_comment: Optional[str] = Field(default=None, alias="Kurzkommentar")
+    prerequisites: Optional[str] = Field(default=None, alias="Voraussetzungen")
+    number: Optional[str] = Field(default=None, alias="Nr.")
+    type: Optional[str] = Field(default=None, alias="Typ")
+
+
+class ExamInformation(BaseModel):
+    ects: Optional[int] = Field(None, alias="ECTS")
+    examiner: Optional[str] = Field(None, alias="Prüfer/-in")
+    degree_program: Optional[str] = Field(None, alias="Studiengang")
+    faculty_code: Optional[str] = Field(None, alias="KzFa")
+    registration_start: Optional[Date] = Field(None)
+    registration_end: Optional[Date] = Field(None)
+    exam_number: Optional[str] = Field(None, alias="Prüfungsnummer")
+    version: Optional[str] = Field(None, alias="Pversion")
+    degree_awarded: Optional[str] = Field(None, alias="Abschluss")
+    date: Optional[Date] = Field(None, alias="Datum")
+
+
+class AssociatedClass(BaseModel):
+    description: Optional[str] = Field(None, alias="Beschreibung")
+    weekly_hours: Optional[float] = Field(None)
+    number: Optional[str] = Field(None)
+
+
+class AssociatedTutorial(BaseModel):
+    description: Optional[str] = Field(None, alias="Beschreibung")
+    weekly_hours: Optional[float] = Field(None)
+    number: Optional[str] = Field(None)
+
+
+class EnrollmentDeadline(BaseModel):
+    program_associated_deadline: Optional[str] = Field(None)
+    other_deadlines: Optional[str] = Field(None)
+
+
 class Lecture(BaseModel):
     publish_id: int
     title: str
     tree_paths: Optional[List[TreePath]]
+    base_info: Optional[ClassBaseInfo]
+    additional_information: Optional[AdditionInformation]
+    enrollment_deadline: Optional[EnrollmentDeadline]
+    associated_programs: Optional[List[AssociatedProgram]]
+    class_materials: Optional[List[ClassMaterial]]
+    associated_exams: Optional[List[AssociatedExam]]
+    exam_informations: Optional[List[ExamInformation]]
+    class_sessions: Optional[List[ClassSession]]
+    associated_tutorials: Optional[List[AssociatedTutorial]]
+    associated_classes: Optional[List[AssociatedClass]]
 
     @classmethod
-    def from_tuple(cls, raw: Tuple[str, str, List[List[str]]]) -> "Lecture":
+    def from_tuple(
+        cls,
+        raw: Tuple[str, str, Optional[List[List[str]]]],
+        base_info: Optional[ClassBaseInfo] = None,
+        additional_information: Optional[AdditionInformation] = None,
+        enrollment_deadline: Optional[EnrollmentDeadline] = None,
+        associated_programs: Optional[List[AssociatedProgram]] = None,
+        class_materials: Optional[List[ClassMaterial]] = None,
+        associated_exams: Optional[List[AssociatedExam]] = None,
+        exam_informations: Optional[List[ExamInformation]] = None,
+        class_sessions: Optional[List[ClassSession]] = None,
+        associated_tutorials: Optional[List[AssociatedTutorial]] = None,
+        associated_classes: Optional[List[AssociatedClass]] = None,
+    ) -> "Lecture":
         title, url, paths = raw
         match = re.search(r"publishid=(\d+)", url)
-        publish_id = int(match.group(1)) if match else None
+        assert match, "Could not initiate Lecture, invalid tuple supplied"
+        publish_id = int(match.group(1))
         tree_paths = [TreePath(path=p) for p in paths] if paths else None
-        return cls(title=title, publish_id=publish_id, tree_paths=tree_paths)
+
+        return cls(
+            title=title,
+            publish_id=publish_id,
+            tree_paths=tree_paths,
+            base_info=base_info,
+            additional_information=additional_information,
+            enrollment_deadline=enrollment_deadline,
+            associated_programs=associated_programs,
+            class_materials=class_materials,
+            associated_exams=associated_exams,
+            exam_informations=exam_informations,
+            class_sessions=class_sessions,
+            associated_tutorials=associated_tutorials,
+            associated_classes=associated_classes,
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "publish_id": self.publish_id,
+            "title": self.title,
+            "tree_paths": (
+                [tp.model_dump_json() for tp in self.tree_paths]
+                if self.tree_paths
+                else None
+            ),
+            "base_info": (
+                self.base_info.model_dump_json() if self.base_info else None
+            ),
+            "additional_information": (
+                self.additional_information.model_dump_json()
+                if self.additional_information
+                else None
+            ),
+            "enrollment_deadline": (
+                self.enrollment_deadline.model_dump_json()
+                if self.enrollment_deadline
+                else None
+            ),
+            "associated_programs": (
+                [prog.model_dump_json() for prog in self.associated_programs]
+                if self.associated_programs
+                else None
+            ),
+            "class_materials": (
+                [mat.model_dump_json() for mat in self.class_materials]
+                if self.class_materials
+                else None
+            ),
+            "associated_exams": (
+                [exam.model_dump_json() for exam in self.associated_exams]
+                if self.associated_exams
+                else None
+            ),
+            "exam_informations": (
+                [info.model_dump_json() for info in self.exam_informations]
+                if self.exam_informations
+                else None
+            ),
+            "class_sessions": (
+                [session.model_dump_json() for session in self.class_sessions]
+                if self.class_sessions
+                else None
+            ),
+            "associated_tutorials": (
+                [tut.model_dump_json() for tut in self.associated_tutorials]
+                if self.associated_tutorials
+                else None
+            ),
+            "associated_classes": (
+                [clss.model_dump_json() for clss in self.associated_classes]
+                if self.associated_classes
+                else None
+            ),
+        }

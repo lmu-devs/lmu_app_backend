@@ -1,5 +1,35 @@
-mutation UpdateLecture($id: ID!, $title: String!, $paths: JSON) {
-    update_lecture_item(id: $id, data: { name: $title, tree_paths: $paths }) {
+mutation UpdateLecture(
+    $id: ID!
+    $title: String!
+    $paths: JSON
+    $add_info: update_additional_information_input
+    $base_info: update_lecture_base_info_input
+    $enrollment_deadline: update_enrollment_deadline_input
+    $exam_informations: [update_exam_information_input]
+    $associated_classes: [update_associated_class_input]
+    $associated_exams: [update_associated_exam_input]
+    $associated_programs: [update_associated_program_input]
+    $associated_tutorials: [update_associated_tutorial_input]
+    $class_materials: [update_class_material_input]
+    $class_sessions: [update_class_session_input]
+) {
+    update_lecture_item(
+        id: $id
+        data: {
+            name: $title
+            tree_paths: $paths
+            class_sessions: $class_sessions
+            base_info: $base_info
+            enrollment_deadline: $enrollment_deadline
+            exam_informations: $exam_informations
+            associated_classes: $associated_classes
+            associated_exams: $associated_exams
+            associated_programs: $associated_programs
+            associated_tutorials: $associated_tutorials
+            class_materials: $class_materials
+            additional_information: $add_info
+        }
+    ) {
         id
     }
 }

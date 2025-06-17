@@ -1,39 +1,78 @@
+import codecs
+from collections import defaultdict
+from typing import Any, Optional
 import tqdm
 import requests
 import re
+from datetime import time, date as Date, datetime as dt
+from urllib.parse import urlparse, parse_qs, unquote
 from lxml import html
+import random
 
-from shared.src.enums.classes_enum import SemesterTypeEnum
-from ..models.lecture import Lecture
+from shared.src.enums.classes_enum import (
+    LectureStartTypeEnum,
+    SemesterTypeEnum,
+)
+from shared.src.enums.weekday_enum import WeekdayEnum
+from ..models.lecture import (
+    AdditionInformation,
+    AssociatedClass,
+    AssociatedExam,
+    AssociatedProgram,
+    AssociatedTutorial,
+    ClassBaseInfo,
+    ClassMaterial,
+    ClassSession,
+    EnrollmentDeadline,
+    ExamInformation,
+    Lecture,
+)
 
 
 class LSFCrawler:
     def __init__(self) -> None:
         self.headers = {"User-Agent": "Mozilla/5.0"}
-        self.year: int = None
-        self.semster_type: SemesterTypeEnum = None
+        self.year: Optional[int] = None
+        self.semster_type: Optional[SemesterTypeEnum] = None
 
     def crawl_all_lectures(
         self, year: int, semester_type: SemesterTypeEnum
     ) -> list[Lecture]:
         self.year = year
         self.semester_type = semester_type
-        lectures = []
+        lectures: list[tuple[str, str]] = []
         class_types = self.crawl_class_types()
 
-        for type_id in tqdm.tqdm(class_types.keys(), desc="Collecting lectures"):
+        for type_id in tqdm.tqdm(
+            class_types.keys(), desc="Collecting lectures"
+        ):
             if self._is_class_type_to_big(type_id):
                 lectures += self._split_crawl_with_alpabet(type_id)
             else:
                 lectures += self._crawl_lectures("", type_id)
 
         return [
-            Lecture.from_tuple((name, url, self._crawl_tree_path(url)))
-            for name, url in tqdm.tqdm(lectures, desc="Collecting tree paths")
+            Lecture.from_tuple(
+                (name, url, self._crawl_tree_path(url)),
+                self.crawl_class_base_info(url),
+                self.crawl_additional_information(url),
+                self.crawl_enrollment_deadlines(url),
+                self.crawl_associated_programs(url),
+                self.crawl_class_material(url),
+                self.crawl_associated_exams(url),
+                self.crawl_exam_information(url),
+                self.crawl_class_session(url),
+                self.crawl_associated_tutorials(url),
+                self.crawl_associated_classes(url),
+            )
+            for name, url in tqdm.tqdm(
+                random.sample(lectures, k=20),
+                desc="Collecting and parsing lecutre information",
+            )
         ]
 
     def _split_crawl_with_alpabet(self, type_id: int) -> list[tuple[str, str]]:
-        lectures = []
+        lectures: list[tuple[str, str]] = []
         german_chars = list("abcdefghijklmnopqrstuvwxyzäöüß")
         for ch in german_chars:
             lectures += self._crawl_lectures(ch, type_id)
@@ -60,9 +99,12 @@ class LSFCrawler:
         classes = tree.xpath('//a[@class="regular" and @title]')
         info = tree.xpath('//div[@class="InfoLeiste"]')
         assert len(classes) == self._parse_class_count(info)
-        return [[c.text, c.get("href")] for c in classes]
+        return [
+            (self.clean_string(c.text), self.clean_string(c.get("href")))
+            for c in classes
+        ]
 
-    def _parse_class_count(self, info: str) -> int:
+    def _parse_class_count(self, info: Any) -> int:
         class_count = re.search(r"(\d+)\s+Treffer", info[0].text)
         assert class_count, f"Error parsing class count: {info}"
         return int(class_count.group(1))
@@ -98,7 +140,7 @@ class LSFCrawler:
                 class_types[class_id] = class_type
         return class_types
 
-    def _crawl_tree_path(self, url: str) -> list[list[str]]:
+    def _crawl_tree_path(self, url: str) -> Optional[list[list[str]]]:
         html_content = requests.get(url, headers=self.headers).content
         tree = html.fromstring(html_content)
         nodes = tree.xpath("//div[contains(@style, 'padding-left')]/a")
@@ -108,10 +150,12 @@ class LSFCrawler:
         for node in nodes:
             parent_div = node.getparent()
             style = parent_div.attrib.get("style", "")
-            text = node.text_content().strip()
+            text = self.clean_string(node.text_content().strip())
 
             try:
-                indent = int(style.split("padding-left:")[1].split("px")[0].strip())
+                indent = int(
+                    style.split("padding-left:")[1].split("px")[0].strip()
+                )
             except Exception:
                 continue
 
@@ -125,10 +169,560 @@ class LSFCrawler:
                 paths.append(current_path)
         return paths if paths else None
 
+    def crawl_associated_tutorials(
+        self,
+        url: str,
+    ) -> Optional[list[AssociatedTutorial]]:
+        tables = self.crawl_table_content_from_summary(
+            url, "Zugehörige Übungen"
+        )
+        if not tables:
+            return None
+        for table in tables:
+            number = table["Nr."]
+            hours = table["SWS"]
+            table["number"] = number if number else None
+            table["weekly_hours"] = float(hours) if hours else None
+        return [AssociatedTutorial(**table) for table in tables]
+
+    def crawl_associated_classes(
+        self, url: str
+    ) -> Optional[list[AssociatedClass]]:
+        tables = self.crawl_table_content_from_summary(
+            url, "Zugehörige Veranstaltungen"
+        )
+        if not tables:
+            return None
+        for table in tables:
+            number = table["Nr."]
+            hours = table["SWS"]
+            table["number"] = number if number else None
+            table["weekly_hours"] = float(hours) if hours else None
+        return [AssociatedClass(**table) for table in tables]
+
+    def crawl_enrollment_deadlines(
+        self,
+        url: str,
+    ) -> Optional[EnrollmentDeadline]:
+        html_content = requests.get(url, headers=self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(
+            "//table[@summary='Übersicht über die zugehörigen Belegfristen'"
+            + "and not(ancestor::table)]"
+        )
+
+        if len(tables) != 1:
+            return None
+
+        rows = tables[0].xpath("./tr")
+        program_rows = []
+        other_rows = []
+        current_section = None
+
+        for row in rows:
+            if row.xpath("./td[@colspan]"):
+                text = row.text_content().strip().lower()
+                if "studiengangsbezogene fristen" in text:
+                    current_section = "program"
+                elif "sonstige fristen" in text:
+                    current_section = "other"
+                else:
+                    current_section = None
+                continue
+            row_html = html.tostring(row, encoding="unicode")
+            if current_section == "program":
+                program_rows.append(row_html)
+            elif current_section == "other":
+                other_rows.append(row_html)
+
+        def wrap_table(rows: list[str]) -> Optional[str]:
+            lines = "\n".join(rows)
+            return f"<table>{lines}</table>" if rows else None
+
+        return EnrollmentDeadline(
+            program_associated_deadline=wrap_table(program_rows),
+            other_deadlines=wrap_table(other_rows),
+        )
+
+    def crawl_exam_information(
+        self, url: str
+    ) -> Optional[list[ExamInformation]]:
+        tables = self.crawl_table_content_from_summary(
+            url, "Übersicht über die zugehörigen PORG"
+        )
+        if not tables:
+            return None
+        for table in tables:
+            registration_duration = table["Anmeldungszeitraum"]
+            table["registration_start"] = (
+                self.parse_duration_start(registration_duration)
+                if registration_duration
+                else None
+            )
+            table["registration_end"] = (
+                self.parse_duration_end(registration_duration)
+                if registration_duration
+                else None
+            )
+            table["ECTS"] = (
+                self.parse_ects_from_text(table["ECTS"])
+                if table["ECTS"]
+                else None
+            )
+            table["Datum"] = (
+                dt.strptime(table["Datum"], "%d.%m.%Y")
+                if table["Datum"]
+                else None
+            )
+        return [ExamInformation(**data) for data in tables]
+
+    def crawl_additional_information(
+        self, url: str
+    ) -> Optional[AdditionInformation]:
+        html_content = requests.get(url, headers=self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(
+            "//table[@summary='Weitere Angaben zur Veranstaltung'"
+            + "and not(ancestor::table)]"
+        )
+        data: defaultdict = defaultdict(lambda: None)
+
+        if not tables:
+            return None
+        assert len(tables) == 1
+        table = tables[0]
+
+        for tr in table.xpath(".//tr"):
+            th = tr.xpath("./th")
+            td = tr.xpath("./td")
+            if th and td:
+                key = str(th[0].text_content().strip())
+                if len(td[0]):
+                    inner_html = "".join(
+                        str(html.tostring(child, encoding="unicode"))
+                        for child in td[0]
+                    )
+                else:
+                    inner_html = str(td[0].text_content().strip())
+                data[key] = inner_html
+        return AdditionInformation(**data)
+
+    def crawl_table_content_from_summary(
+        self, url: str, summary: str
+    ) -> Optional[list[dict]]:
+        html_content = requests.get(url, self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(f"//table[@summary='{summary}']")
+        content = []
+        if len(tables) == 0:
+            return None
+
+        for table in tables:
+            headers = [
+                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
+            ]
+            for tr in table.xpath(".//tr[position()>1]"):
+                cells = [
+                    (
+                        data
+                        if (
+                            (data := self.clean_string(td.text_content()))
+                            != ""
+                            and data != "-"
+                        )
+                        else None
+                    )
+                    for td in tr.xpath("td")
+                ]
+                content.append(dict(zip(headers, cells)))
+        return content
+
+    def crawl_associated_exams(
+        self, url: str
+    ) -> Optional[list[AssociatedExam]]:
+        html_content = requests.get(url, self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(
+            "//table[@summary=" + "'Übersicht über die zugehörigen Prüfungen']"
+        )
+        exams = []
+        if len(tables) == 0:
+            return None
+
+        for table in tables:
+            headers = [
+                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
+            ]
+            rows = []
+            for tr in table.xpath(".//tr[position()>1]"):
+                cells = [
+                    (
+                        data
+                        if (
+                            (data := self.clean_string(td.text_content()))
+                            != ""
+                        )
+                        else None
+                    )
+                    for td in tr.xpath("td")
+                ]
+                row_data = dict(zip(headers, cells))
+                rows.append(row_data)
+            exams += [
+                AssociatedExam(
+                    module_name=self.remove_ects_from_text(row["Modul"]),
+                    program_name=row["Stg"],
+                    ects=self.parse_ects_from_text(
+                        row["ECTS"] or "" + row["Modul"] or ""
+                    ),
+                    module_classification=row["KzFa"],
+                    degree=row["Abschl"],
+                    module_id=row["Modulnr"],
+                    exam_id=row["Pnr"],
+                    po_version=row["Version"],
+                )
+                for row in rows
+            ]
+        return exams
+
+    @staticmethod
+    def remove_ects_from_text(text: str) -> str:
+        return re.sub(r"\s*\(?\d+\s*ECTS\)?", "", text).strip()
+
+    @staticmethod
+    def parse_int(raw_int: str) -> Optional[int]:
+        try:
+            return int(raw_int)
+        except Exception:
+            return None
+
+    @staticmethod
+    def parse_float(raw_float: str) -> Optional[float]:
+        try:
+            return float(raw_float)
+        except Exception:
+            return None
+
+    @staticmethod
+    def parse_ects_from_text(text: str) -> Optional[int]:
+        match = re.search(r"(\d+)\s*ECTS", text)
+        if match:
+            return int(match.group(1))
+        return None
+
+    def crawl_class_material(self, url: str) -> Optional[list[ClassMaterial]]:
+        html_content = requests.get(url, self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(
+            "//table[@summary="
+            + "'Übersicht über die zugehörigen Medien oder so ähnlich']"
+        )
+        material = []
+        if len(tables) == 0:
+            return None
+
+        for table in tables:
+            headers = [
+                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
+            ]
+            rows = []
+            for tr in table.xpath(".//tr[position()>1]"):
+                cells = [
+                    (
+                        data
+                        if (
+                            (data := self.clean_string(td.text_content()))
+                            != ""
+                        )
+                        else None
+                    )
+                    for td in tr.xpath("td")
+                ]
+                row_data = dict(zip(headers, cells))
+                rows.append(row_data)
+
+            material += [
+                ClassMaterial(
+                    valid_from=(
+                        dt.strptime(row["gültig von"], "%d.%m.%Y").date()
+                        if row["gültig von"]
+                        else None
+                    ),
+                    valid_to=(
+                        dt.strptime(row["gültig bis"], "%d.%m.%Y").date()
+                        if row["gültig bis"]
+                        else None
+                    ),
+                    file_name=row["Dateiname"],
+                    description=row["Beschreibung"],
+                )
+                for row in rows
+            ]
+        return material
+
+    def crawl_associated_programs(
+        self, url: str
+    ) -> Optional[list[AssociatedProgram]]:
+        html_content = requests.get(url, self.headers).content
+        tree = html.fromstring(html_content)
+        tables = tree.xpath(
+            "//table[@summary='Übersicht über die zugehörigen Studiengänge']"
+        )
+        programs = []
+        if len(tables) == 0:
+            return None
+
+        for table in tables:
+            headers = [
+                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
+            ]
+            rows = []
+            for tr in table.xpath(".//tr[position()>1]"):
+                cells = [
+                    self.clean_string(td.text_content())
+                    for td in tr.xpath("td")
+                ]
+                row_data = dict(zip(headers, cells))
+                rows.append(row_data)
+
+            programs += [
+                AssociatedProgram(
+                    program_name=row["Studiengang"],
+                    ects=self.parse_int(row["ECTS"].split(" ")[0]),
+                    degree=row["Abschluss"],
+                    module_classification=row["KzFa"],
+                )
+                for row in rows
+            ]
+        return programs
+
+    def crawl_class_session(self, url: str) -> Optional[list[ClassSession]]:
+        full_html = requests.get(url, self.headers).content
+        tree = html.fromstring(full_html)
+        tables = tree.xpath(
+            "//table[@summary='Übersicht über alle Veranstaltungstermine']"
+        )
+        sessions = []
+        if len(tables) == 0:
+            return None
+
+        for table in tables:
+            headers = [
+                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
+            ]
+            caption = c[0] if (c := table.xpath(".//caption/text()")) else None
+            rows = []
+            for tr in table.xpath(".//tr[position()>1]"):
+                cells = [
+                    self.clean_string(td.text_content())
+                    for td in tr.xpath("td")
+                ]
+                row_data = dict(zip(headers, cells))
+                rows.append(row_data)
+
+            sessions += [
+                ClassSession(
+                    caption=caption,
+                    weekday=self.parse_weekday(row["Tag"]),
+                    starting_time=self.parse_start_time(row["Zeit"]),
+                    ending_time=self.parse_end_time(row["Zeit"]),
+                    timing_type=self.parse_time_type(row["Zeit"]),
+                    rhythm=row["Rhythmus"] or None,
+                    duration_start=self.parse_duration_start(row["Dauer"]),
+                    duration_end=self.parse_duration_end(row["Dauer"]),
+                    room=self.parse_room(row["Raum"]),
+                    lecturer=row["Lehrperson"] or None,
+                    remark=row["Bemerkung"] or None,
+                    cancelled_dates=row["fällt aus am"] or None,
+                )
+                for row in rows
+            ]
+        return sessions
+
+    @staticmethod
+    def parse_room(room: str) -> Optional[str]:
+        if room == "":
+            return None
+        return re.sub(r"\s+Geschossplan", "", room)
+
+    @staticmethod
+    def extract_times(time_str):
+        parts = time_str.split()
+        time_regex = re.compile(r"\d{1,2}:\d{2}")
+        times = [part for part in parts if time_regex.match(part)]
+        return times
+
+    @staticmethod
+    def extract_dates(date_str):
+        parts = date_str.split()
+        date_regex = re.compile(r"\d{2}\.\d{2}\.\d{4}")
+        dates = [part for part in parts if date_regex.match(part)]
+        return dates
+
+    def parse_duration_end(self, time: str) -> Optional[Date]:
+        if len(dates := self.extract_dates(time)) < 2:
+            return None
+        end = dates[1]
+        return dt.strptime(end, "%d.%m.%Y").date()
+
+    def parse_duration_start(self, time: str) -> Optional[Date]:
+        if len(dates := self.extract_dates(time)) < 1:
+            return None
+        start = dates[0]
+        return dt.strptime(start, "%d.%m.%Y").date()
+
+    @staticmethod
+    def parse_time_type(time: str) -> Optional[LectureStartTypeEnum]:
+        if "s.t." in time:
+            return LectureStartTypeEnum.SINE_TEMPORE
+        if "c.t." in time:
+            return LectureStartTypeEnum.CUM_TEMPORE
+        return None
+
+    @staticmethod
+    def convert_midnight(time: str) -> str:
+        return "00:00" if time == "24:00" else time
+
+    def parse_end_time(self, time: str) -> Optional[time]:
+        if len(time_points := self.extract_times(time)) < 2:
+            return None
+        end_time = self.convert_midnight(time_points[1])
+        return dt.strptime(end_time, "%H:%M").time()
+
+    def parse_start_time(self, time: str) -> Optional[time]:
+        if len(time_points := self.extract_times(time)) < 1:
+            return None
+        start_time = self.convert_midnight(time_points[0])
+        return dt.strptime(start_time, "%H:%M").time()
+
+    @staticmethod
+    def parse_weekday(day: str) -> Optional[WeekdayEnum]:
+        mapping = {
+            "Mo.": WeekdayEnum.MONDAY,
+            "Di.": WeekdayEnum.TUESDAY,
+            "Mi.": WeekdayEnum.WEDNESDAY,
+            "Do.": WeekdayEnum.THURSDAY,
+            "Fr.": WeekdayEnum.FRIDAY,
+            "Sa.": WeekdayEnum.SATURDAY,
+            "So.": WeekdayEnum.SUNDAY,
+        }
+        return mapping[day] if day in mapping else None
+
+    def crawl_class_base_info(self, class_url: str) -> ClassBaseInfo:
+        html_text = requests.get(class_url, headers=self.headers).content
+        base_info_dict: dict[str, Any] = {
+            "persons": self.get_persons_from_lecture_html(str(html_text)),
+            "institutions": self.get_institutions_from_lecture_html(
+                str(html_text)
+            ),
+        }
+        return ClassBaseInfo(
+            **(base_info_dict | self.get_basic_info_from_html(str(html_text)))
+        )
+
+    def get_institutions_from_lecture_html(
+        self,
+        html_content: str,
+    ) -> Optional[list[str]]:
+        tree = html.fromstring(html_content)
+        rows = tree.xpath(
+            "//table[@summary='Übersicht über die zugehörigen Einrichtungen']//tr"
+        )
+        institutions = []
+        for row in rows:
+            link = row.xpath(".//a[@class='regular']")
+            if link:
+                name = self.clean_string(link[0].text_content().strip())
+                institutions.append(name)
+        return institutions
+
+    def get_basic_info_from_html(
+        self, html_text: str
+    ) -> dict[str, Optional[Any]]:
+        base_info_dict: dict[str, Optional[Any]] = {
+            "Weitere Links": "",
+            "Sigel": "",
+        }
+        tree = html.fromstring(html_text)
+        base_info_table = tree.xpath('//table[caption[text()="Grunddaten"]]')[
+            0
+        ]
+
+        for row in base_info_table.xpath(".//tr"):
+            headers = row.xpath(".//th")
+            values = row.xpath(".//td")
+
+            for header, data in zip(headers, values):
+                key = str(header.text_content().strip())
+                value = self.clean_string(data.text_content())
+
+                if key == "Weitere Links":
+                    base_info_dict[key] = self.parse_link(data)
+                    continue
+                if key == "SWS":
+                    base_info_dict[key] = self.parse_float(value)
+                    continue
+                if key == "Max. Teilnehmer/-innen":
+                    base_info_dict[key] = self.parse_int(value)
+                base_info_dict[key] = None if value == "" else value
+        return base_info_dict
+
+    def parse_link(self, data) -> Optional[str]:
+        link = data.xpath(".//a[contains(text(), 'Course Information')]/@href")
+        if not link:
+            return None
+
+        raw_href = link[0]
+        parsed = urlparse(raw_href)
+        query = parse_qs(parsed.query)
+        if "destination" in query:
+            final_url = unquote(query["destination"][0])
+            return final_url
+        else:
+            return raw_href
+
+    @staticmethod
+    def clean_string(raw: str) -> str:
+        unescaped = (
+            codecs.decode(raw, "unicode_escape")
+            .encode("latin1")
+            .decode("utf-8")
+        )
+        return re.sub(r"\s+", " ", unescaped).strip()
+
+    def get_persons_from_lecture_html(
+        self, html_text: str
+    ) -> Optional[list[str]]:
+        tree = html.fromstring(html_text)
+        persons_table = tree.xpath(
+            '//table[@summary="Verantwortliche Dozenten"]'
+        )
+        if len(persons_table) == 0:
+            return None
+
+        persons = []
+        for row in persons_table:
+            if len(row_entrys := row.xpath(".//td")) == 0:
+                continue
+            person_raw = row_entrys[0].text_content().strip()
+
+            if person_raw == "keine öffentliche Person":
+                continue
+            persons.append(self.clean_string(person_raw))
+
+        return persons if len(persons) > 0 else None
+
 
 def main() -> None:
     crawler = LSFCrawler()
-    print(crawler.crawl_all_lectures(2025, SemesterTypeEnum.SUMMER_SEMESTER))
+    print(
+        [
+            l.to_dict()
+            for l in crawler.crawl_all_lectures(
+                2025, SemesterTypeEnum.SUMMER_SEMESTER
+            )
+        ]
+    )
 
 
 if __name__ == "__main__":

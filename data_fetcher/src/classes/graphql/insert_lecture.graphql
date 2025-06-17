@@ -1,5 +1,35 @@
-mutation InsertLecture($title: String!, $publish_id: Int!, $paths: JSON) {
-    create_lecture_item(data: { name: $title, publish_id: $publish_id, tree_paths: { data: $paths } }) {
+mutation CreateLecture(
+    $title: String!
+    $publish_id: Int!
+    $paths: JSON
+    $add_info: create_additional_information_input
+    $base_info: create_lecture_base_info_input
+    $enrollment_deadline: create_enrollment_deadline_input
+    $exam_informations: [create_exam_information_input]
+    $associated_classes: [create_associated_class_input]
+    $associated_exams: [create_associated_exam_input]
+    $associated_programs: [create_associated_program_input]
+    $associated_tutorials: [create_associated_tutorial_input]
+    $class_materials: [create_class_material_input]
+    $class_sessions: [create_class_session_input]
+) {
+    create_lecture_item(
+        data: {
+            publish_id: $publish_id
+            name: $title
+            tree_paths: $paths
+            class_sessions: $class_sessions
+            base_info: $base_info
+            enrollment_deadline: $enrollment_deadline
+            exam_informations: $exam_informations
+            associated_classes: $associated_classes
+            associated_exams: $associated_exams
+            associated_programs: $associated_programs
+            associated_tutorials: $associated_tutorials
+            class_materials: $class_materials
+            additional_information: $add_info
+        }
+    ) {
         id
     }
 }

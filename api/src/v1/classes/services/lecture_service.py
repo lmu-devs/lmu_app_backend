@@ -1,5 +1,5 @@
-from typing import List
 from pathlib import Path
+from typing import List
 
 from api.src.v1.core.flatten_response_util import flatten_response
 from shared.src.core.settings import get_settings
@@ -9,10 +9,11 @@ from sqlalchemy import text
 
 
 from ..models.lecture import Lectures
-from shared.src.enums.faculty_enums import FacultyEnum
+from shared.src.enums.faculty_enums import FacultyEnum, faculty_translations, LanguageEnum
 
 GRAPHQL_FOLDER_NAME = "graphql"
 ALL_LECTURE_QERRY_NAME = "all_lectures.graphql"
+LECTURE_BY_FACULTY_NAME = "faculty_lectures.graphql"
 
 
 class LectureService:
@@ -34,19 +35,37 @@ class LectureService:
     async def get_lectures_from_faculty(
         self, faculty_id: str, db: AsyncSession
     ) -> Lectures:
-        sql = """
+        """
             SELECT * FROM lecture WHERE jsonb_path_exists(
                 tree_paths, 
-                '$[*] ? (@[0] == $target || @[1] == $target)'
+                '$[*] ? (@[1] == $target)'
             )
         """
-        await self.debug_tables(db)
-        await self.debug_directus_tables(db)
-        await self.find_lecture_in_all_schemas(db)
-        # result = await db.execute(text(sql), {"target": faculty_id})
-        # rows = result.fetchall()
-        # print(rows)
-        return Lectures()
+        base_path = Path(__file__).parent.parent
+        folder = GRAPHQL_FOLDER_NAME
+        query_name = LECTURE_BY_FACULTY_NAME
+        query_path = base_path / folder / query_name
+        faculty = faculty_translations[FacultyEnum(faculty_id)][LanguageEnum.GERMAN]
+        response = self.directus.execute_query_file(
+            query_file_path=query_path,
+        )
+        lectures_raw = [
+            tuple(x.values()) for x in response["data"]["lecture"]
+        ]
+        return Lectures.from_raw(self.filter_lectures_by_target(lectures_raw, faculty))
+   
+    
+    def filter_lectures_by_target(self, lectures: List[tuple[str, str, List[List[str]]]], target: str) -> List[tuple[str, str, List[List[str]]]]:
+        filtered: list[tuple[str, str, List[List[str]]]] = []
+        for lec in lectures:
+            print(lec)
+            tree_paths = lec[2]
+            if not tree_paths:
+                continue
+            if any(len(item) > 1 and item[1] == target for item in tree_paths):
+                filtered.append(lec)
+        return filtered   
+        
 
     async def debug_tables(self, db: AsyncSession):
         sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"
