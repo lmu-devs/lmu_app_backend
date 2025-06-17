@@ -45,7 +45,7 @@ def test_weekly_1():
         rule=CalendarRule(
             frequency=Frequency.WEEKLY,
             interval=1,
-            until_time=base_time + timedelta(weeks=9),
+            until_time=None,
         ),
         start_time=base_time,
         end_time=base_time + timedelta(hours=2),
@@ -73,7 +73,7 @@ def test_weekly_2():
         rule=CalendarRule(
             frequency=Frequency.WEEKLY,
             interval=3,
-            until_time=base_time + timedelta(weeks=30),
+            until_time=None,
         ),
         start_time=base_time,
         end_time=base_time + timedelta(hours=2),
@@ -85,7 +85,7 @@ def test_weekly_2():
         updated_at=base_time,
     )
 
-    events = CalendarService().generate_repeat_events(base_event)
+    events = CalendarService().generate_repeat_events(base_event, 11)
 
     assert len(events) == 11
     for i, event in enumerate(events):
@@ -103,7 +103,7 @@ def test_daily_2():
         rule=CalendarRule(
             frequency=Frequency.DAILY,
             interval=2,
-            until_time=base_time + timedelta(days=34),
+            until_time=base_time + timedelta(days=35),
         ),
         start_time=base_time,
         end_time=base_time + timedelta(hours=1),
@@ -133,7 +133,7 @@ def test_monthly_1():
         rule=CalendarRule(
             frequency=Frequency.MONTHLY,
             interval=1,
-            until_time=datetime(2025, 10, 15, tzinfo=timezone.utc),
+            until_time=None,
         ),
         start_time=base_time,
         end_time=base_time + timedelta(hours=2),
@@ -166,7 +166,7 @@ def test_yearly_1():
         rule=CalendarRule(
             frequency=Frequency.YEARLY,
             interval=1,
-            until_time=datetime(2034, 1, 1, tzinfo=timezone.utc),
+            until_time=None,
         ),
         start_time=base_time,
         end_time=base_time + timedelta(hours=3),
