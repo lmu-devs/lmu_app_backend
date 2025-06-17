@@ -1,0 +1,21 @@
+query GetCalendarEvents($filter: calendar_event_filter) {
+  calendar_event(filter: $filter) {
+    id
+    user_id
+    date_created
+    date_updated
+    title
+    description
+    address
+    all_day
+    event_type
+    start_time
+    end_time
+    rule {
+      id
+      frequency
+      interval
+      until_time
+    }
+  }
+}
