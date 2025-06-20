@@ -1,10 +1,13 @@
 import codecs
 from collections import defaultdict
+import threading
 from typing import Any, Optional
+import concurrent.futures
 import tqdm
 import requests
 import re
-from datetime import time, date as Date, datetime as dt
+import time
+from datetime import time as Time, date as Date, datetime as dt
 from urllib.parse import urlparse, parse_qs, unquote
 from lxml import html
 import random
@@ -25,51 +28,106 @@ from ..models.lecture import (
     ClassSession,
     EnrollmentDeadline,
     ExamInformation,
+    Institution,
     Lecture,
+    Person,
 )
 
 
 class LSFCrawler:
     def __init__(self) -> None:
         self.headers = {"User-Agent": "Mozilla/5.0"}
+        self.workers = 1
         self.year: Optional[int] = None
         self.semster_type: Optional[SemesterTypeEnum] = None
-
-    def crawl_all_lectures(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> list[Lecture]:
+    
+    def crawl_all_lectures(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         self.year = year
         self.semester_type = semester_type
-        lectures: list[tuple[str, str]] = []
+        lecture_urls = self.crawl_lecture_urls()
+        return self.crawl_lectures(random.sample(lecture_urls, 10))
+        
+    def crawl_lecture_urls(self) -> list[tuple[str, str]]:
+        lecture_urls = []
+        class_type_ids = self.crawl_class_types().keys()
+        for type_id in tqdm.tqdm(class_type_ids, desc="Getting lecture urls"):
+            lecture_urls += self.crawl_lectures_of_type(type_id)
+        return lecture_urls 
+    
+    def crawl_lectures(self, urls: list[tuple[str, str]]) -> list[Lecture]:
+        lectures = []
+        for url in tqdm.tqdm(urls, desc="Crawling lecture informations"):
+            tqdm.tqdm.write(f"Processing lecture: {url}")
+            lectures += [self.build_lecture(url)]
+        return lectures
+        
+    def start_watchdog(self, interval: int = 10):
+        def watchdog_loop():
+            while True:
+                tqdm.tqdm.write(f"[watchdog] Still alive at {time.strftime('%H:%M:%S')}")
+                time.sleep(interval)
+        t = threading.Thread(target=watchdog_loop, daemon=True)
+        t.start()
+    
+    def crawl_lectures_of_type(self, type_id: int) -> list[tuple[str,str]]:
+        if self._is_class_type_to_big(type_id):
+            return self._split_crawl_with_alpabet(type_id)
+        else:
+            return self._crawl_lectures("", type_id)
+
+    def build_lecture(self, name_url: tuple[str, str]) -> Lecture:
+        name, url = name_url
+        return Lecture.from_tuple(
+            (name, url, self._crawl_tree_path(url)),
+            self.crawl_class_base_info(url),
+            self.crawl_additional_information(url),
+            self.crawl_enrollment_deadlines(url),
+            self.crawl_associated_programs(url),
+            self.crawl_class_material(url),
+            self.crawl_associated_exams(url),
+            self.crawl_exam_information(url),
+            self.crawl_class_session(url),
+            self.crawl_associated_tutorials(url),
+            self.crawl_associated_classes(url),
+        )
+
+    def crawl_all_lectures_parallel(
+        self, year: int, semester_type: SemesterTypeEnum
+    ) -> list[Lecture]:
+        self.start_watchdog()
+        self.year = year
+        self.semester_type = semester_type
+        lecture_urls = self.crawl_lecture_urls_parallel()
+        return self.crawl_lectures_parallel(lecture_urls)
+    
+    def crawl_lecture_urls_parallel(self) -> list[tuple[str, str]]:
         class_types = self.crawl_class_types()
+        all_lecture_tuples: list[tuple[str, str]] = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
+            futures = {
+                executor.submit(self.crawl_lectures_of_type, type_id): type_id
+                for type_id in class_types.keys()
+            }
+            for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Collecting lectures"):
+                all_lecture_tuples.extend(future.result())
+        return all_lecture_tuples 
 
-        for type_id in tqdm.tqdm(
-            class_types.keys(), desc="Collecting lectures"
-        ):
-            if self._is_class_type_to_big(type_id):
-                lectures += self._split_crawl_with_alpabet(type_id)
-            else:
-                lectures += self._crawl_lectures("", type_id)
+   
+    
+    def crawl_lectures_parallel(self, lecture_urls: list[tuple[str, str]]) -> list[Lecture]:
+        lectures = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
+            futures = {
+                executor.submit(self.build_lecture, name_url): name_url
+                for name_url in lecture_urls
+            }
+            for future in tqdm.tqdm(concurrent.futures.as_completed(futures), total=len(futures), desc="Collecting and parsing lecture information"):
+                try:
+                    lectures.append(future.result())
+                except Exception as e:
+                    raise Exception(f"❌ Error while building lecture: {e}")
 
-        return [
-            Lecture.from_tuple(
-                (name, url, self._crawl_tree_path(url)),
-                self.crawl_class_base_info(url),
-                self.crawl_additional_information(url),
-                self.crawl_enrollment_deadlines(url),
-                self.crawl_associated_programs(url),
-                self.crawl_class_material(url),
-                self.crawl_associated_exams(url),
-                self.crawl_exam_information(url),
-                self.crawl_class_session(url),
-                self.crawl_associated_tutorials(url),
-                self.crawl_associated_classes(url),
-            )
-            for name, url in tqdm.tqdm(
-                random.sample(lectures, k=20),
-                desc="Collecting and parsing lecutre information",
-            )
-        ]
+        return lectures
 
     def _split_crawl_with_alpabet(self, type_id: int) -> list[tuple[str, str]]:
         lectures: list[tuple[str, str]] = []
@@ -229,7 +287,7 @@ class LSFCrawler:
                 else:
                     current_section = None
                 continue
-            row_html = html.tostring(row, encoding="unicode")
+            row_html = self.clean_string(str(html.tostring(row, encoding="unicode")))
             if current_section == "program":
                 program_rows.append(row_html)
             elif current_section == "other":
@@ -299,11 +357,11 @@ class LSFCrawler:
                 key = str(th[0].text_content().strip())
                 if len(td[0]):
                     inner_html = "".join(
-                        str(html.tostring(child, encoding="unicode"))
+                        self.clean_string(str(html.tostring(child, encoding="unicode")))
                         for child in td[0]
                     )
                 else:
-                    inner_html = str(td[0].text_content().strip())
+                    inner_html = self.clean_string(str(td[0].text_content().strip()))
                 data[key] = inner_html
         return AdditionInformation(**data)
 
@@ -527,7 +585,7 @@ class LSFCrawler:
                     starting_time=self.parse_start_time(row["Zeit"]),
                     ending_time=self.parse_end_time(row["Zeit"]),
                     timing_type=self.parse_time_type(row["Zeit"]),
-                    rhythm=row["Rhythmus"] or None,
+                    rythm=row["Rhythmus"] or None,
                     duration_start=self.parse_duration_start(row["Dauer"]),
                     duration_end=self.parse_duration_end(row["Dauer"]),
                     room=self.parse_room(row["Raum"]),
@@ -546,7 +604,7 @@ class LSFCrawler:
         return re.sub(r"\s+Geschossplan", "", room)
 
     @staticmethod
-    def extract_times(time_str):
+    def extract_times(time_str: str) -> list[str]:
         parts = time_str.split()
         time_regex = re.compile(r"\d{1,2}:\d{2}")
         times = [part for part in parts if time_regex.match(part)]
@@ -583,13 +641,13 @@ class LSFCrawler:
     def convert_midnight(time: str) -> str:
         return "00:00" if time == "24:00" else time
 
-    def parse_end_time(self, time: str) -> Optional[time]:
+    def parse_end_time(self, time: str) -> Optional[Time]:
         if len(time_points := self.extract_times(time)) < 2:
             return None
         end_time = self.convert_midnight(time_points[1])
         return dt.strptime(end_time, "%H:%M").time()
 
-    def parse_start_time(self, time: str) -> Optional[time]:
+    def parse_start_time(self, time: str) -> Optional[Time]:
         if len(time_points := self.extract_times(time)) < 1:
             return None
         start_time = self.convert_midnight(time_points[0])
@@ -611,33 +669,33 @@ class LSFCrawler:
     def crawl_class_base_info(self, class_url: str) -> ClassBaseInfo:
         html_text = requests.get(class_url, headers=self.headers).content
         base_info_dict: dict[str, Any] = {
-            "persons": self.get_persons_from_lecture_html(str(html_text)),
-            "institutions": self.get_institutions_from_lecture_html(
-                str(html_text)
-            ),
+            "persons": self.get_persons_from_lecture_html(html_text),
+            "institutions": self.get_institutions_from_lecture_html(html_text)
+            ,
         }
         return ClassBaseInfo(
-            **(base_info_dict | self.get_basic_info_from_html(str(html_text)))
+            **(base_info_dict | self.get_basic_info_from_html(html_text))
         )
 
     def get_institutions_from_lecture_html(
         self,
-        html_content: str,
-    ) -> Optional[list[str]]:
+        html_content: Any,
+    ) -> Optional[list[Institution]]:
         tree = html.fromstring(html_content)
         rows = tree.xpath(
             "//table[@summary='Übersicht über die zugehörigen Einrichtungen']//tr"
         )
+
         institutions = []
         for row in rows:
             link = row.xpath(".//a[@class='regular']")
             if link:
-                name = self.clean_string(link[0].text_content().strip())
-                institutions.append(name)
+                name = self.clean_string(link[0].text_content())
+                institutions.append(Institution(name=name))
         return institutions
 
     def get_basic_info_from_html(
-        self, html_text: str
+        self, html_text: Any
     ) -> dict[str, Optional[Any]]:
         base_info_dict: dict[str, Optional[Any]] = {
             "Weitere Links": "",
@@ -691,8 +749,8 @@ class LSFCrawler:
         return re.sub(r"\s+", " ", unescaped).strip()
 
     def get_persons_from_lecture_html(
-        self, html_text: str
-    ) -> Optional[list[str]]:
+        self, html_text: Any
+    ) -> Optional[list[Person]]:
         tree = html.fromstring(html_text)
         persons_table = tree.xpath(
             '//table[@summary="Verantwortliche Dozenten"]'
@@ -708,7 +766,11 @@ class LSFCrawler:
 
             if person_raw == "keine öffentliche Person":
                 continue
-            persons.append(self.clean_string(person_raw))
+            persons.append(
+                Person.from_str(
+                    self.clean_string(person_raw)
+                )
+            )
 
         return persons if len(persons) > 0 else None
 
@@ -718,7 +780,7 @@ def main() -> None:
     print(
         [
             l.to_dict()
-            for l in crawler.crawl_all_lectures(
+            for l in crawler.crawl_all_lectures_parallel(
                 2025, SemesterTypeEnum.SUMMER_SEMESTER
             )
         ]

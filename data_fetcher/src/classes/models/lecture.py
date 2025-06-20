@@ -1,35 +1,65 @@
 import re
 from datetime import time, date as Date
 from pydantic import BaseModel, Field
-from typing import List, Tuple, Optional
+from typing import Any, List, Tuple, Optional
 
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
 
+class Person(BaseModel):
+    first_name: str
+    surname: str
+    title: Optional[str]
+
+    @classmethod
+    def from_str(cls, person: str) -> "Person":
+        parts = person.split(",")
+        if len(parts) == 2:
+            surname = parts[0].strip()
+            first_name = parts[1].strip()
+            return cls(first_name=first_name, surname=surname, title=None)
+        if len(parts) >= 3:
+            surname = parts[0].removeprefix(parts[2]).strip()
+            first_name = parts[1].strip()
+            title = parts[2].strip()
+            return cls(first_name=first_name, surname=surname, title=title)
+        raise RuntimeError("Invalid string to create person") 
+
+class Institution(BaseModel):
+    name: str
+
+class PathElement(BaseModel):
+    value: str
+    index: int
 
 class TreePath(BaseModel):
-    path: List[str]
-
-
+    path_elements: List[PathElement]
+    
+    @classmethod
+    def from_list(cls, raw: list[str]) -> "TreePath":
+        path_elements:List[PathElement] = []
+        for (i, v) in enumerate(raw):
+            path_elements += [PathElement(value=v, index=i)]
+        return cls(path_elements=path_elements)
+    
 class AssociatedProgram(BaseModel):
     program_name: Optional[str]
     module_classification: Optional[str]
     ects: Optional[int]
     degree: Optional[str]
 
-
 class ClassBaseInfo(BaseModel):
-    persons: Optional[list[str]]
-    institutions: Optional[list[str]]
+    persons: Optional[list[Person]]
+    institutions: Optional[list[Institution]]
     class_type: Optional[str] = Field(alias="Veranstaltungsart", default=None)
     class_id: Optional[str] = Field(alias="Veranstaltungsnummer", default=None)
-    class_cylce: Optional[str] = Field(alias="Rhythmus", default=None)
+    class_cycle: Optional[str] = Field(alias="Rhythmus", default=None)
     semester: Optional[str] = Field(alias="Semester", default=None)
     sws: Optional[float] = Field(alias="SWS", default=None)
     max_participants: Optional[int] = Field(
         alias="Max. Teilnehmer/-innen", default=None
     )
-    in_person_event_type: Optional[str] = Field(
+    in_person_type: Optional[str] = Field(
         alias="Veranstaltungstyp", default=None
     )
     language: Optional[str] = Field(alias="Sprache", default=None)
@@ -46,7 +76,7 @@ class ClassSession(BaseModel):
     starting_time: Optional[time]
     ending_time: Optional[time]
     timing_type: Optional[LectureStartTypeEnum]
-    rhythm: Optional[str]
+    rythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
     room: Optional[str]
@@ -97,11 +127,11 @@ class ExamInformation(BaseModel):
     ects: Optional[int] = Field(None, alias="ECTS")
     examiner: Optional[str] = Field(None, alias="Prüfer/-in")
     degree_program: Optional[str] = Field(None, alias="Studiengang")
-    faculty_code: Optional[str] = Field(None, alias="KzFa")
+    kzfa: Optional[str] = Field(None, alias="KzFa")
     registration_start: Optional[Date] = Field(None)
     registration_end: Optional[Date] = Field(None)
-    exam_number: Optional[str] = Field(None, alias="Prüfungsnummer")
-    version: Optional[str] = Field(None, alias="Pversion")
+    exam_id: Optional[str] = Field(None, alias="Prüfungsnummer")
+    program_version: Optional[str] = Field(None, alias="Pversion")
     degree_awarded: Optional[str] = Field(None, alias="Abschluss")
     date: Optional[Date] = Field(None, alias="Datum")
 
@@ -157,7 +187,7 @@ class Lecture(BaseModel):
         match = re.search(r"publishid=(\d+)", url)
         assert match, "Could not initiate Lecture, invalid tuple supplied"
         publish_id = int(match.group(1))
-        tree_paths = [TreePath(path=p) for p in paths] if paths else None
+        tree_paths = [TreePath.from_list(p) for p in paths] if paths else None
 
         return cls(
             title=title,
@@ -178,58 +208,56 @@ class Lecture(BaseModel):
     def to_dict(self) -> dict:
         return {
             "publish_id": self.publish_id,
-            "title": self.title,
-            "tree_paths": (
-                [tp.model_dump_json() for tp in self.tree_paths]
-                if self.tree_paths
-                else None
-            ),
+            "name": self.title,
+            "tree_paths": [path.model_dump(mode="json") for path in self.tree_paths]
+            if self.tree_paths else None,
             "base_info": (
-                self.base_info.model_dump_json() if self.base_info else None
+                self.base_info.model_dump(mode="json") if self.base_info else None
             ),
             "additional_information": (
-                self.additional_information.model_dump_json()
+                self.additional_information.model_dump(mode="json")
                 if self.additional_information
                 else None
             ),
             "enrollment_deadline": (
-                self.enrollment_deadline.model_dump_json()
+                self.enrollment_deadline.model_dump(mode="json")
                 if self.enrollment_deadline
                 else None
             ),
             "associated_programs": (
-                [prog.model_dump_json() for prog in self.associated_programs]
+                [prog.model_dump(mode="json") for prog in self.associated_programs]
                 if self.associated_programs
                 else None
             ),
             "class_materials": (
-                [mat.model_dump_json() for mat in self.class_materials]
+                [mat.model_dump(mode="json") for mat in self.class_materials]
                 if self.class_materials
                 else None
             ),
             "associated_exams": (
-                [exam.model_dump_json() for exam in self.associated_exams]
+                [exam.model_dump(mode="json") for exam in self.associated_exams]
                 if self.associated_exams
                 else None
             ),
             "exam_informations": (
-                [info.model_dump_json() for info in self.exam_informations]
+                [info.model_dump(mode="json") for info in self.exam_informations]
                 if self.exam_informations
                 else None
             ),
             "class_sessions": (
-                [session.model_dump_json() for session in self.class_sessions]
+                [session.model_dump(mode="json") for session in self.class_sessions]
                 if self.class_sessions
                 else None
             ),
             "associated_tutorials": (
-                [tut.model_dump_json() for tut in self.associated_tutorials]
+                [tut.model_dump(mode="json") for tut in self.associated_tutorials]
                 if self.associated_tutorials
                 else None
             ),
             "associated_classes": (
-                [clss.model_dump_json() for clss in self.associated_classes]
+                [clss.model_dump(mode="json") for clss in self.associated_classes]
                 if self.associated_classes
                 else None
             ),
         }
+        

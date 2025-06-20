@@ -22,36 +22,11 @@ class LectureFetcher:
     def store_lectures(self, year: int, semester: SemesterTypeEnum) -> None:
         lectures = self.lsf_crawler.crawl_all_lectures(year, semester)
         for lecture in tqdm.tqdm(lectures, desc="Storing lectures"):
+            tqdm.tqdm.write(f"Processing lecture: {lecture.to_dict()}")
             if not (id := self.lecture_exists(lecture.publish_id)):
                 self.insert_lecture(lecture)
             else:
                 self.update_lecture(lecture, id)
-
-    def build_lecture_variables(self, lecture: Lecture) -> dict:
-        tree_paths = (
-            [p.path for p in lecture.tree_paths]
-            if lecture.tree_paths
-            else None
-        )
-        return {
-            "publish_id": lecture.publish_id,
-            "title": lecture.title,
-            "paths": tree_paths,
-        }
-
-    def build_update_lecture_variables(
-        self, lecture: Lecture, id: str
-    ) -> dict:
-        tree_paths = (
-            [p.path for p in lecture.tree_paths]
-            if lecture.tree_paths
-            else None
-        )
-        return {
-            "id": id,
-            "title": lecture.title,
-            "paths": tree_paths,
-        }
 
     def insert_lecture(self, lecture: Lecture) -> None:
         base_path = Path(__file__).parent.parent

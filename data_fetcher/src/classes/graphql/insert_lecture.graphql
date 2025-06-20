@@ -1,8 +1,8 @@
 mutation CreateLecture(
-    $title: String!
+    $name: String!
     $publish_id: Int!
-    $paths: JSON
-    $add_info: create_additional_information_input
+    $tree_paths: [create_tree_path_input]
+    $additional_information: create_additional_information_input
     $base_info: create_lecture_base_info_input
     $enrollment_deadline: create_enrollment_deadline_input
     $exam_informations: [create_exam_information_input]
@@ -16,8 +16,8 @@ mutation CreateLecture(
     create_lecture_item(
         data: {
             publish_id: $publish_id
-            name: $title
-            tree_paths: $paths
+            name: $name
+            tree_paths: $tree_paths
             class_sessions: $class_sessions
             base_info: $base_info
             enrollment_deadline: $enrollment_deadline
@@ -27,9 +27,17 @@ mutation CreateLecture(
             associated_programs: $associated_programs
             associated_tutorials: $associated_tutorials
             class_materials: $class_materials
-            additional_information: $add_info
+            additional_information: $additional_information
         }
     ) {
         id
+        tree_paths {
+            id
+            path_elements {
+                id
+                value
+                index
+            }
+        }
     }
 }
