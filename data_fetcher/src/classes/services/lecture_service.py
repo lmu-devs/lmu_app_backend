@@ -1,4 +1,6 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+import time
 from typing import List
 import json
 import tqdm
@@ -18,15 +20,92 @@ class LectureFetcher:
     def __init__(self) -> None:
         self.directus = DirectusService()
         self.lsf_crawler = LSFCrawler()
+        self.workers: int = 5
+
+    def store_lectures_if_not_exist_parallel(
+        self, year: int, semester: SemesterTypeEnum
+    ) -> None:
+        lecture_list = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
+
+        def process_lecture(lecture):
+            for attempt in range(5):
+                try:
+                    if self.lecture_exists(lecture.publish_id):
+                        return f"[SKIP] {lecture.title} ({lecture.publish_id}) already exists"
+
+                    self.insert_lecture(lecture)
+                    return f"[OK] {lecture.title} ({lecture.publish_id}) inserted"
+                except Exception as e:
+                    wait = 2**attempt
+                    tqdm.tqdm.write(
+                        f"[RETRY {attempt+1}/5] {lecture.title} ({lecture.publish_id}) failed: {e} — retrying in {wait}s"
+                    )
+                    time.sleep(wait)
+            return f"[FAIL] {lecture.title} ({lecture.publish_id}) failed permanently after 5 attempts"
+
+        with ThreadPoolExecutor(max_workers=self.workers) as executor:
+            futures = [executor.submit(process_lecture, lec) for lec in lecture_list]
+            for future in tqdm.tqdm(
+                as_completed(futures), total=len(futures), desc="Inserting lectures"
+            ):
+                result = future.result()
+                tqdm.tqdm.write(result)
+
+    def store_lectures_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
+        lecture_list = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
+
+        def process_lecture(lecture):
+            for attempt in range(5):
+                try:
+                    if self.lecture_exists(lecture.publish_id):
+                        self.update_lecture(lecture, lecture.publish_id)
+                        return f"[UPDATED] {lecture.title} ({lecture.publish_id}) already exists"
+
+                    self.insert_lecture(lecture)
+                    return f"[INSERTED] {lecture.title} ({lecture.publish_id}) inserted"
+                except Exception as e:
+                    wait = 2**attempt
+                    tqdm.tqdm.write(
+                        f"[RETRY {attempt+1}/5] {lecture.title} ({lecture.publish_id}) failed: {e} — retrying in {wait}s"
+                    )
+                    time.sleep(wait)
+            return f"[FAIL] {lecture.title} ({lecture.publish_id}) failed permanently after 5 attempts"
+
+        with ThreadPoolExecutor(max_workers=self.workers) as executor:
+            futures = [executor.submit(process_lecture, lec) for lec in lecture_list]
+            for future in tqdm.tqdm(
+                as_completed(futures), total=len(futures), desc="Inserting lectures"
+            ):
+                result = future.result()
+                tqdm.tqdm.write(result)
+
+    def store_lectures_if_not_exist(
+        self, year: int, semester: SemesterTypeEnum
+    ) -> None:
+        self.lsf_crawler.year = year
+        self.lsf_crawler.semester_type = semester
+        lecture_urls = self.lsf_crawler.crawl_lecture_urls()
+        for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
+            tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
+            publish_id = Lecture.publish_id_from_url(url)
+            if self.lecture_exists(publish_id):
+                continue
+            lecture = self.lsf_crawler.build_lecture((name, url))
+            self.insert_lecture(lecture)
+            tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
 
     def store_lectures(self, year: int, semester: SemesterTypeEnum) -> None:
-        lectures = self.lsf_crawler.crawl_all_lectures(year, semester)
-        for lecture in tqdm.tqdm(lectures, desc="Storing lectures"):
-            tqdm.tqdm.write(f"Processing lecture: {lecture.to_dict()}")
-            if not (id := self.lecture_exists(lecture.publish_id)):
-                self.insert_lecture(lecture)
-            else:
+        self.lsf_crawler.year = year
+        self.lsf_crawler.semester_type = semester
+        lecture_urls = self.lsf_crawler.crawl_lecture_urls()
+        for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
+            tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
+            lecture = self.lsf_crawler.build_lecture((name, url))
+            if id := self.lecture_exists(lecture.publish_id):
                 self.update_lecture(lecture, id)
+            else:
+                self.insert_lecture(lecture)
+            tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
 
     def insert_lecture(self, lecture: Lecture) -> None:
         base_path = Path(__file__).parent.parent
@@ -56,9 +135,7 @@ class LectureFetcher:
 
     def update_lecture(self, lecture: Lecture, id: str) -> None:
         if not self.lecture_exists(lecture.publish_id):
-            raise Exception(
-                f"No Lecture with publish_id {lecture.publish_id} exist."
-            )
+            raise Exception(f"No Lecture with publish_id {lecture.publish_id} exist.")
 
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
@@ -75,7 +152,7 @@ class LectureFetcher:
 
 def main():
     fetcher = LectureFetcher()
-    fetcher.store_lectures(2025, SemesterTypeEnum.SUMMER_SEMESTER)
+    fetcher.store_lectures_if_not_exist_parallel(2025, SemesterTypeEnum.SUMMER_SEMESTER)
 
 
 if __name__ == "__main__":

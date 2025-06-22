@@ -9,7 +9,11 @@ from sqlalchemy import text
 
 
 from ..models.lecture import Lectures
-from shared.src.enums.faculty_enums import FacultyEnum, faculty_translations, LanguageEnum
+from shared.src.enums.faculty_enums import (
+    FacultyEnum,
+    faculty_translations,
+    LanguageEnum,
+)
 
 GRAPHQL_FOLDER_NAME = "graphql"
 ALL_LECTURE_QERRY_NAME = "all_lectures.graphql"
@@ -29,33 +33,31 @@ class LectureService:
         response = self.directus.execute_query_file(
             query_file_path=query_path,
         )
+        print("Response from Directus:", response)
         lectures_raw = [tuple(x.values()) for x in response["data"]["lecture"]]
         return Lectures.from_raw(lectures_raw)
 
     async def get_lectures_from_faculty(
         self, faculty_id: str, db: AsyncSession
     ) -> Lectures:
-        """
-            SELECT * FROM lecture WHERE jsonb_path_exists(
-                tree_paths, 
-                '$[*] ? (@[1] == $target)'
-            )
-        """
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
         query_name = LECTURE_BY_FACULTY_NAME
         query_path = base_path / folder / query_name
         faculty = faculty_translations[FacultyEnum(faculty_id)][LanguageEnum.GERMAN]
+        print(faculty)
         response = self.directus.execute_query_file(
             query_file_path=query_path,
+            variables={"facultyString": faculty},
         )
-        lectures_raw = [
-            tuple(x.values()) for x in response["data"]["lecture"]
-        ]
+        print("Response from Directus:", response)
+        print("amount of lectures:", len(response["data"]["lecture"]))
+        lectures_raw = [tuple(x.values()) for x in response["data"]["lecture"]]
         return Lectures.from_raw(self.filter_lectures_by_target(lectures_raw, faculty))
-   
-    
-    def filter_lectures_by_target(self, lectures: List[tuple[str, str, List[List[str]]]], target: str) -> List[tuple[str, str, List[List[str]]]]:
+
+    def filter_lectures_by_target(
+        self, lectures: List[tuple[str, str, List[List[str]]]], target: str
+    ) -> List[tuple[str, str, List[List[str]]]]:
         filtered: list[tuple[str, str, List[List[str]]]] = []
         for lec in lectures:
             print(lec)
@@ -64,8 +66,7 @@ class LectureService:
                 continue
             if any(len(item) > 1 and item[1] == target for item in tree_paths):
                 filtered.append(lec)
-        return filtered   
-        
+        return filtered
 
     async def debug_tables(self, db: AsyncSession):
         sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'"

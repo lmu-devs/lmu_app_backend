@@ -6,6 +6,7 @@ from typing import Any, List, Tuple, Optional
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
 
+
 class Person(BaseModel):
     first_name: str
     surname: str
@@ -23,30 +24,35 @@ class Person(BaseModel):
             first_name = parts[1].strip()
             title = parts[2].strip()
             return cls(first_name=first_name, surname=surname, title=title)
-        raise RuntimeError("Invalid string to create person") 
+        raise RuntimeError("Invalid string to create person")
+
 
 class Institution(BaseModel):
     name: str
+
 
 class PathElement(BaseModel):
     value: str
     index: int
 
+
 class TreePath(BaseModel):
     path_elements: List[PathElement]
-    
+
     @classmethod
     def from_list(cls, raw: list[str]) -> "TreePath":
-        path_elements:List[PathElement] = []
-        for (i, v) in enumerate(raw):
+        path_elements: List[PathElement] = []
+        for i, v in enumerate(raw):
             path_elements += [PathElement(value=v, index=i)]
         return cls(path_elements=path_elements)
-    
+
+
 class AssociatedProgram(BaseModel):
     program_name: Optional[str]
     module_classification: Optional[str]
     ects: Optional[int]
     degree: Optional[str]
+
 
 class ClassBaseInfo(BaseModel):
     persons: Optional[list[Person]]
@@ -59,9 +65,7 @@ class ClassBaseInfo(BaseModel):
     max_participants: Optional[int] = Field(
         alias="Max. Teilnehmer/-innen", default=None
     )
-    in_person_type: Optional[str] = Field(
-        alias="Veranstaltungstyp", default=None
-    )
+    in_person_type: Optional[str] = Field(alias="Veranstaltungstyp", default=None)
     language: Optional[str] = Field(alias="Sprache", default=None)
     for_exchange_students: Optional[str] = Field(
         alias="für Austauschstudierende", default=None
@@ -168,6 +172,13 @@ class Lecture(BaseModel):
     associated_tutorials: Optional[List[AssociatedTutorial]]
     associated_classes: Optional[List[AssociatedClass]]
 
+    @staticmethod
+    def publish_id_from_url(url: str) -> int:
+        match = re.search(r"publishid=(\d+)", url)
+        if not match:
+            raise ValueError("Invalid URL format, 'publishid' not found")
+        return int(match.group(1))
+
     @classmethod
     def from_tuple(
         cls,
@@ -184,14 +195,11 @@ class Lecture(BaseModel):
         associated_classes: Optional[List[AssociatedClass]] = None,
     ) -> "Lecture":
         title, url, paths = raw
-        match = re.search(r"publishid=(\d+)", url)
-        assert match, "Could not initiate Lecture, invalid tuple supplied"
-        publish_id = int(match.group(1))
         tree_paths = [TreePath.from_list(p) for p in paths] if paths else None
 
         return cls(
             title=title,
-            publish_id=publish_id,
+            publish_id=cls.publish_id_from_url(url),
             tree_paths=tree_paths,
             base_info=base_info,
             additional_information=additional_information,
@@ -209,8 +217,11 @@ class Lecture(BaseModel):
         return {
             "publish_id": self.publish_id,
             "name": self.title,
-            "tree_paths": [path.model_dump(mode="json") for path in self.tree_paths]
-            if self.tree_paths else None,
+            "tree_paths": (
+                [path.model_dump(mode="json") for path in self.tree_paths]
+                if self.tree_paths
+                else None
+            ),
             "base_info": (
                 self.base_info.model_dump(mode="json") if self.base_info else None
             ),
@@ -260,4 +271,3 @@ class Lecture(BaseModel):
                 else None
             ),
         }
-        

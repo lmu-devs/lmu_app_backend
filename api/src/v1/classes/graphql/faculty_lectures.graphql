@@ -1,7 +1,15 @@
-query GetLectureByFaculty{
-  lecture(limit: 5000){
+query GetLectureByFaculty($facultyString: String!) {
+  lecture(limit: 10000, 
+    filter:{
+      tree_paths:{
+        path_elements:{
+          index: {_eq: 1}
+          value: {_eq: $facultyString}
+        }
+      }
+    }
+  ){
     name
     publish_id
-    tree_paths
   }
 }
