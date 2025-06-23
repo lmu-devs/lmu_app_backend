@@ -10,14 +10,13 @@ from sqlalchemy import text
 
 from ..models.lecture import Lectures
 from shared.src.enums.faculty_enums import (
-    FacultyEnum,
-    faculty_translations,
     LanguageEnum,
 )
 
 GRAPHQL_FOLDER_NAME = "graphql"
 ALL_LECTURE_QERRY_NAME = "all_lectures.graphql"
 LECTURE_BY_FACULTY_NAME = "faculty_lectures.graphql"
+FACULTY_BY_ID_QUERY_NAME = "faculty_title_by_id.graphql"
 
 
 class LectureService:
@@ -38,41 +37,34 @@ class LectureService:
         )
         return Lectures.from_directus_dict(response["data"]["lecture"])
 
-    async def get_lectures_from_faculty(self, facutlty_id: int) -> Lectures:
+    async def get_lectures_from_faculty(self, faculty_id: int) -> Lectures:
         """Get all lectures from a specified faculty."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
         query_name = LECTURE_BY_FACULTY_NAME
         query_path = base_path / folder / query_name
-        faculty_enum = self.get_faculty_from_id(facutlty_id)
-        faculty = faculty_translations[faculty_enum][LanguageEnum.GERMAN]
+        faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
+
         response = self.directus.execute_query_file(
             query_file_path=query_path,
-            variables={"facultyString": faculty},
+            variables={"facultyString": faculty_title},
         )
-        print(len(response["data"]["lecture"]))
+
         return Lectures.from_directus_dict(response["data"]["lecture"])
 
-    def get_faculty_from_id(self, faculty_id: int) -> FacultyEnum:
-        """Get the faculty enum from its ID."""
-        faculty_mapping = {
-            1: FacultyEnum.CATHOLIC_THEOLOGY,
-            2: FacultyEnum.PROTESTANT_THEOLOGY,
-            3: FacultyEnum.LAW,
-            4: FacultyEnum.BUSINESS_ADMIN,
-            5: FacultyEnum.ECONOMICS,
-            7: FacultyEnum.MEDICINE,
-            8: FacultyEnum.VETERINARY_MEDICINE,
-            9: FacultyEnum.HISTORY_ARTS,
-            10: FacultyEnum.PHILOSOPHY,
-            11: FacultyEnum.PSYCHOLOGY_EDUCATION,
-            12: FacultyEnum.CULTURE_STUDIES,
-            13: FacultyEnum.LANGUAGES_LITERATURE,
-            15: FacultyEnum.SOCIAL_SCIENCES,
-            16: FacultyEnum.MATH_INFO_STATS,
-            17: FacultyEnum.PHYSICS,
-            18: FacultyEnum.CHEMISTRY_PHARMACY,
-            19: FacultyEnum.BIOLOGY,
-            20: FacultyEnum.GEOSCIENCES,
-        }
-        return faculty_mapping[faculty_id]
+    async def get_faculty_from_id(self, faculty_id: int, language: LanguageEnum) -> str:
+        """Get the faculty title from its ID using directus."""
+        base_path = Path(__file__).parent.parent
+        folder = GRAPHQL_FOLDER_NAME
+        query_name = FACULTY_BY_ID_QUERY_NAME
+        query_path = base_path / folder / query_name
+        variables = {"facultyID": str(faculty_id), "languageCode": language.value}
+
+        response = self.directus.execute_query_file(
+            query_file_path=query_path,
+            variables=variables,
+        )
+        if not (faculties := response["data"]["faculties_translations"]):
+            raise ValueError(f"No faculty found with ID {faculty_id} in language {language.value}")
+
+        return faculties[0]["title"]

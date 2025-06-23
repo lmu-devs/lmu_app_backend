@@ -7,7 +7,6 @@ from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
 
 
-
 class Person(BaseModel):
     first_name: str
     surname: str
@@ -139,6 +138,8 @@ class Lecture(BaseModel):
     publish_id: int
     title: str = Field(alias="name")
     sws: Optional[float]
+    class_type: Optional[str]
+    language: Optional[str]
 
 
 class Lectures(RootModel):
@@ -160,6 +161,12 @@ class Lectures(RootModel):
                 "name": l["name"],
                 "publish_id": l["publish_id"],
                 "sws": l["base_info"]["sws"] if l["base_info"] else None,
+                "class_type": (
+                    l["base_info"]["class_type"]
+                    if (l["base_info"] and l["base_info"]["class_type"] != "n/a")
+                    else None
+                ),
+                "language": l["base_info"]["language"] if l["base_info"] else None,
             }
             for l in raw
         ]
