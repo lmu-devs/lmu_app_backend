@@ -107,7 +107,7 @@ def create_app():
     app.include_router(
         university_router.router, prefix=f"{prefix_v1}", tags=["university"]
     )
-    app.include_router(lecture_router.router, prefix=f"{prefix_v1}", tags=["classes"])
+    app.include_router(lecture_router.router, prefix=f"{prefix_v1}", tags=["courses"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

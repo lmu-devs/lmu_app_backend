@@ -2,11 +2,8 @@ query GetAllLectures {
     lecture(limit: 1000) {
         name
         publish_id
-        tree_paths {
-            path_elements {
-                index
-                value
-            }
+        base_info {
+            sws
         }
     }
 }

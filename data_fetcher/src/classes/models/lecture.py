@@ -14,7 +14,9 @@ class Person(BaseModel):
 
     @classmethod
     def from_str(cls, person: str) -> "Person":
+        """Create a Person instance from a string representation."""
         parts = person.split(",")
+
         if len(parts) == 2:
             surname = parts[0].strip()
             first_name = parts[1].strip()
@@ -24,6 +26,7 @@ class Person(BaseModel):
             first_name = parts[1].strip()
             title = parts[2].strip()
             return cls(first_name=first_name, surname=surname, title=title)
+
         raise RuntimeError("Invalid string to create person")
 
 
@@ -41,9 +44,12 @@ class TreePath(BaseModel):
 
     @classmethod
     def from_list(cls, raw: list[str]) -> "TreePath":
+        """Create a TreePath instance from a list of strings."""
         path_elements: List[PathElement] = []
+
         for i, v in enumerate(raw):
             path_elements += [PathElement(value=v, index=i)]
+
         return cls(path_elements=path_elements)
 
 
@@ -62,14 +68,10 @@ class ClassBaseInfo(BaseModel):
     class_cycle: Optional[str] = Field(alias="Rhythmus", default=None)
     semester: Optional[str] = Field(alias="Semester", default=None)
     sws: Optional[float] = Field(alias="SWS", default=None)
-    max_participants: Optional[int] = Field(
-        alias="Max. Teilnehmer/-innen", default=None
-    )
+    max_participants: Optional[int] = Field(alias="Max. Teilnehmer/-innen", default=None)
     in_person_type: Optional[str] = Field(alias="Veranstaltungstyp", default=None)
     language: Optional[str] = Field(alias="Sprache", default=None)
-    for_exchange_students: Optional[str] = Field(
-        alias="für Austauschstudierende", default=None
-    )
+    for_exchange_students: Optional[str] = Field(alias="für Austauschstudierende", default=None)
     links: Optional[str] = Field(alias="Weitere Links", default=None)
     sigel: Optional[str] = Field(alias="Sigel", default=None)
 
@@ -158,6 +160,8 @@ class EnrollmentDeadline(BaseModel):
 
 
 class Lecture(BaseModel):
+    """Model representing a lecture with various associated data."""
+
     publish_id: int
     title: str
     tree_paths: Optional[List[TreePath]]
@@ -174,6 +178,7 @@ class Lecture(BaseModel):
 
     @staticmethod
     def publish_id_from_url(url: str) -> int:
+        """Extract the publish ID from a lecture URL."""
         match = re.search(r"publishid=(\d+)", url)
         if not match:
             raise ValueError("Invalid URL format, 'publishid' not found")
@@ -194,6 +199,7 @@ class Lecture(BaseModel):
         associated_tutorials: Optional[List[AssociatedTutorial]] = None,
         associated_classes: Optional[List[AssociatedClass]] = None,
     ) -> "Lecture":
+        """Create a Lecture instance from a tuple containing lecture data."""
         title, url, paths = raw
         tree_paths = [TreePath.from_list(p) for p in paths] if paths else None
 
@@ -214,26 +220,17 @@ class Lecture(BaseModel):
         )
 
     def to_dict(self) -> dict:
+        """Convert the Lecture instance to a dictionary representation."""
         return {
             "publish_id": self.publish_id,
             "name": self.title,
-            "tree_paths": (
-                [path.model_dump(mode="json") for path in self.tree_paths]
-                if self.tree_paths
-                else None
-            ),
-            "base_info": (
-                self.base_info.model_dump(mode="json") if self.base_info else None
-            ),
+            "tree_paths": ([path.model_dump(mode="json") for path in self.tree_paths] if self.tree_paths else None),
+            "base_info": (self.base_info.model_dump(mode="json") if self.base_info else None),
             "additional_information": (
-                self.additional_information.model_dump(mode="json")
-                if self.additional_information
-                else None
+                self.additional_information.model_dump(mode="json") if self.additional_information else None
             ),
             "enrollment_deadline": (
-                self.enrollment_deadline.model_dump(mode="json")
-                if self.enrollment_deadline
-                else None
+                self.enrollment_deadline.model_dump(mode="json") if self.enrollment_deadline else None
             ),
             "associated_programs": (
                 [prog.model_dump(mode="json") for prog in self.associated_programs]
@@ -241,24 +238,16 @@ class Lecture(BaseModel):
                 else None
             ),
             "class_materials": (
-                [mat.model_dump(mode="json") for mat in self.class_materials]
-                if self.class_materials
-                else None
+                [mat.model_dump(mode="json") for mat in self.class_materials] if self.class_materials else None
             ),
             "associated_exams": (
-                [exam.model_dump(mode="json") for exam in self.associated_exams]
-                if self.associated_exams
-                else None
+                [exam.model_dump(mode="json") for exam in self.associated_exams] if self.associated_exams else None
             ),
             "exam_informations": (
-                [info.model_dump(mode="json") for info in self.exam_informations]
-                if self.exam_informations
-                else None
+                [info.model_dump(mode="json") for info in self.exam_informations] if self.exam_informations else None
             ),
             "class_sessions": (
-                [session.model_dump(mode="json") for session in self.class_sessions]
-                if self.class_sessions
-                else None
+                [session.model_dump(mode="json") for session in self.class_sessions] if self.class_sessions else None
             ),
             "associated_tutorials": (
                 [tut.model_dump(mode="json") for tut in self.associated_tutorials]
@@ -266,8 +255,6 @@ class Lecture(BaseModel):
                 else None
             ),
             "associated_classes": (
-                [clss.model_dump(mode="json") for clss in self.associated_classes]
-                if self.associated_classes
-                else None
+                [clss.model_dump(mode="json") for clss in self.associated_classes] if self.associated_classes else None
             ),
         }

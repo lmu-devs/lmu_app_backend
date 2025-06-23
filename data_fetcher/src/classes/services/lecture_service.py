@@ -17,14 +17,19 @@ GET_LECTURE_QUERY_NAME = "get_lecture.graphql"
 
 
 class LectureFetcher:
+    """A class to fetch and store lectures from the LSF crawler into a Directus database."""
+
     def __init__(self) -> None:
         self.directus = DirectusService()
         self.lsf_crawler = LSFCrawler()
         self.workers: int = 5
 
-    def store_lectures_if_not_exist_parallel(
-        self, year: int, semester: SemesterTypeEnum
-    ) -> None:
+    def store_lectures_if_not_exist_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
+        """
+        Fetches all lectures for a given year and semester, checks if they exist in the database,
+        and inserts them if they do not exist.
+        This method uses parallel processing to speed up the insertion process.
+        """
         lecture_list = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
 
         def process_lecture(lecture):
@@ -46,12 +51,17 @@ class LectureFetcher:
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = [executor.submit(process_lecture, lec) for lec in lecture_list]
             for future in tqdm.tqdm(
-                as_completed(futures), total=len(futures), desc="Inserting lectures"
+                as_completed(futures),
+                total=len(futures),
+                desc="Inserting lectures",
             ):
                 result = future.result()
                 tqdm.tqdm.write(result)
 
     def store_lectures_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
+        """Fetches all lectures for a given year and semester, checks if they exist in the database,
+        and updates or inserts them as necessary.
+        """
         lecture_list = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
 
         def process_lecture(lecture):
@@ -74,33 +84,37 @@ class LectureFetcher:
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = [executor.submit(process_lecture, lec) for lec in lecture_list]
             for future in tqdm.tqdm(
-                as_completed(futures), total=len(futures), desc="Inserting lectures"
+                as_completed(futures),
+                total=len(futures),
+                desc="Inserting lectures",
             ):
                 result = future.result()
                 tqdm.tqdm.write(result)
 
-    def store_lectures_if_not_exist(
-        self, year: int, semester: SemesterTypeEnum
-    ) -> None:
+    def store_lectures_if_not_exist(self, year: int, semester: SemesterTypeEnum) -> None:
+        """Fetches all lectures for a given year and semester, checks if they exist in the database,
+        and inserts them if they do not exist."""
         self.lsf_crawler.year = year
         self.lsf_crawler.semester_type = semester
-        lecture_urls = self.lsf_crawler.crawl_lecture_urls()
+        lecture_urls = self.lsf_crawler._crawl_all_lecture_urls_sequentially()
         for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
             tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
             publish_id = Lecture.publish_id_from_url(url)
             if self.lecture_exists(publish_id):
                 continue
-            lecture = self.lsf_crawler.build_lecture((name, url))
+            lecture = self.lsf_crawler._build_complete_lecture_object((name, url))
             self.insert_lecture(lecture)
             tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
 
     def store_lectures(self, year: int, semester: SemesterTypeEnum) -> None:
+        """Fetches all lectures for a given year and semester, checks if they exist in the database,
+        and updates or inserts them as necessary."""
         self.lsf_crawler.year = year
         self.lsf_crawler.semester_type = semester
-        lecture_urls = self.lsf_crawler.crawl_lecture_urls()
+        lecture_urls = self.lsf_crawler._crawl_all_lecture_urls_sequentially()
         for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
             tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
-            lecture = self.lsf_crawler.build_lecture((name, url))
+            lecture = self.lsf_crawler._build_complete_lecture_object((name, url))
             if id := self.lecture_exists(lecture.publish_id):
                 self.update_lecture(lecture, id)
             else:
@@ -108,6 +122,7 @@ class LectureFetcher:
             tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
 
     def insert_lecture(self, lecture: Lecture) -> None:
+        """Inserts a lecture into the database using a GraphQL query."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
         query_name = INSERT_LECTURE_QUERY_NAME
@@ -121,6 +136,7 @@ class LectureFetcher:
             raise Exception(f"Error inserting lecture: {response['errors']}")
 
     def lecture_exists(self, publish_id: int) -> str | None:
+        """Checks if a lecture with the given publish_id exists in the database."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
         query_name = GET_LECTURE_QUERY_NAME
@@ -134,6 +150,7 @@ class LectureFetcher:
         return lectures[0].get("id") if lectures else None
 
     def update_lecture(self, lecture: Lecture, id: str) -> None:
+        """Updates an existing lecture in the database using a GraphQL query."""
         if not self.lecture_exists(lecture.publish_id):
             raise Exception(f"No Lecture with publish_id {lecture.publish_id} exist.")
 
