@@ -1,9 +1,0 @@
-query GetRuleIdFromCalendarEvent($id: ID!) {
-  calendar_event(filter: { id: { _eq: $id } }) {
-    id
-#   title
-    rule {
-      id
-    }
-  }
-}

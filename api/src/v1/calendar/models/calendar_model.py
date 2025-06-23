@@ -5,9 +5,8 @@ from datetime import datetime
 from pydantic import BaseModel, RootModel
 from enum import Enum
 from typing import Dict
-from shared.src.core.logging import get_calendar_logger
 
-REPEAT_LIMIT: int = 10  # default limit, used if until_time == None
+from shared.src.core.logging import get_calendar_logger
 
 logger = get_calendar_logger(__name__)
 
@@ -23,6 +22,11 @@ class Frequency(str, Enum):
     MONTHLY = "MONTHLY"
     YEARLY = "YEARLY"
 
+class UpdateType(int, Enum):
+    THIS = 0
+    ALL = 1
+    FUTURE = 2
+
 class CalendarRule(BaseModel):
     frequency: Frequency
     interval: int                  # e.g. every two weeks: repeat_type=WEEKLY, repeat_interval=2
@@ -36,6 +40,46 @@ class CalendarRule(BaseModel):
             until_time=json.get("until_time")
         )
 
+class CalendarException(BaseModel):
+    
+    title: Optional[str]
+    description: Optional[str]
+    address: Optional[str]
+    start_time: Optional[datetime]
+    end_time: Optional[datetime]
+    all_day: Optional[bool]
+    recurrence_id: int
+                                
+    @staticmethod
+    def from_json(json: Dict) -> "CalendarException":
+        return CalendarException(
+            title=json.get("title"),
+            description=json.get("description"),
+            address=json.get("address"),
+            start_time=json.get("start_time"),
+            end_time=json.get("end_time"),
+            all_day=json.get("all_day"),
+            recurrence_id=json["recurrence_id"]
+        )
+    
+    @staticmethod
+    def to_json(create_entry: "CalendarCreate", exception_id: UUID, recurrence_id: int) -> Dict:
+        exception_data = {
+            "title": create_entry.title,
+            "description": create_entry.description,
+            "address": create_entry.address,
+            "start_time": create_entry.start_time.isoformat(),
+            "end_time": create_entry.end_time.isoformat(),
+            "all_day": create_entry.all_day,
+            "recurrence_id": recurrence_id
+        }
+
+        if exception_id is not None:
+            exception_data["id"] = str(exception_id)
+
+        return {
+            "exceptions": [exception_data]
+        }
 
 class CalendarCreate(BaseModel):
     """
@@ -52,7 +96,16 @@ class CalendarCreate(BaseModel):
     all_day: bool
 
     @staticmethod
-    def to_json(create_entry: "CalendarCreate", user_id: uuid.UUID) -> Dict:
+    def to_json(create_entry: "CalendarCreate", user_id: uuid.UUID, rule_id: uuid.UUID) -> Dict:
+        rule_dict = {
+            "frequency": create_entry.rule.frequency,
+            "interval": create_entry.rule.interval,
+            "until_time": create_entry.rule.until_time.isoformat() if create_entry.rule.until_time else None
+        }
+        
+        if rule_id is not None:
+            rule_dict["id"] = str(rule_id)
+     
         return {
                 "title": create_entry.title,
                 "user_id": str(user_id),
@@ -62,11 +115,7 @@ class CalendarCreate(BaseModel):
                 "end_time": create_entry.end_time.isoformat(),
                 "description": create_entry.description,
                 "address": create_entry.address,
-                "rule": {
-                    "frequency": create_entry.rule.frequency,
-                    "interval": create_entry.rule.interval,
-                    "until_time": create_entry.rule.until_time.isoformat() if create_entry.rule.until_time else None
-                }
+                "rule": rule_dict
         }
 
 class CalendarEntry(CalendarCreate):
@@ -76,17 +125,18 @@ class CalendarEntry(CalendarCreate):
 
     id: UUID
     user_id: UUID
+    recurrence_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 
     @staticmethod
-    def from_json(json: Dict) -> "CalendarEntry":    
+    def from_json(json: Dict) -> "CalendarEntry":
             updated_at = json.get("date_updated")
             if updated_at is None:
                 updated_at = json.get("date_created")
 
             rule_data = json.get("rule")
-            rule = CalendarRule.from_json(rule_data[0])
+            rule = CalendarRule.from_json(rule_data)
             
             return CalendarEntry(
                 id=json["id"],
@@ -100,8 +150,12 @@ class CalendarEntry(CalendarCreate):
                 event_type=json["event_type"],
                 start_time=json["start_time"],
                 end_time=json["end_time"],
-                all_day=json["all_day"]
+                all_day=json["all_day"],
+                recurrence_id=json.get("recurrence_id")
             )
+    
+    def copy_with_override(self, **overrides) -> "CalendarEntry":
+        return self.__class__(**{**self.model_dump(), **overrides})
     
 class CalendarEntries(RootModel):
     root: List[CalendarEntry]

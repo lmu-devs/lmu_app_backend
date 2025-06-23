@@ -13,29 +13,31 @@ router = APIRouter()
 @router.post("/calendar-create", response_model=CalendarEntries, description="Create a calendar entry.")
 async def create_calendar_entry(
     calendar_data: CalendarCreate,
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    #user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    entries = CalendarService().create_calendar_entry(user, calendar_data)
+    test_id = uuid.UUID("98bbab65-19c5-4b30-8d6e-ddbabed7697c")
+
+    entries = CalendarService().create_calendar_entry(test_id, calendar_data)
     return CalendarEntries.from_list(entries)
 
-@router.delete("/calendar-delete", response_model=bool, description="Remove a calendar entry.")
+@router.delete("/calendar-delete", response_model=bool, description="Delete a calendar entry.")
 async def delete_calendar_entry(
     entry_id: uuid.UUID
 ):
     return CalendarService().delete_calendar_entry(entry_id)
 
-'''
 @router.put("/calendar-update", response_model=CalendarEntries, description="Update a calendar entry.")
 async def update_calendar_entry(
     calendar_data: CalendarCreate,
-    db: AsyncSession = Depends(get_async_db),
-    entry_id: uuid.UUID = None,
-    user: UserTable = Depends(APIKey.verify_user_api_key),
+    entry_id: uuid.UUID,
+    recurrence_id: Optional[int] = None,
+    update_type: int = 0,
+    #user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    calendar_service = CalendarService(db)
-    entries = await calendar_service.update_calendar_entry(user.id, entry_id, calendar_data.model_dump())
-    return CalendarEntries.from_table(entries)
-'''
+    test_id = uuid.UUID("98bbab65-19c5-4b30-8d6e-ddbabed7697c")
+
+    entries = CalendarService().update_calendar_entry(test_id, entry_id, recurrence_id, calendar_data, update_type)
+    return CalendarEntries.from_list(entries)
 
 @router.get("/calendar-get", response_model=CalendarEntries, description="Get all calendar entries for a user. Optional with a filter.")
 async def get_calendar_entries(
