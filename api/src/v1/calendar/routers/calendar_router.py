@@ -41,10 +41,12 @@ async def update_calendar_entry(
 
 @router.get("/calendar-get", response_model=CalendarEntries, description="Get all calendar entries for a user. Optional with a filter.")
 async def get_calendar_entries(
-    type: Optional[str] = None,
+    event_type: Optional[str] = None,
     frequency: Optional[str] = None,
     all_day: Optional[bool] = None,
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    #user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    entries = CalendarService().get_all(user, type, frequency, all_day)
+    
+    test_id = uuid.UUID("98bbab65-19c5-4b30-8d6e-ddbabed7697c")
+    entries = CalendarService().get_all(test_id, event_type, frequency, all_day)
     return CalendarEntries.from_list(entries)

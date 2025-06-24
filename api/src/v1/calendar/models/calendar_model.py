@@ -41,58 +41,33 @@ class CalendarRule(BaseModel):
         )
 
 class CalendarException(BaseModel):
-    
-    title: Optional[str]
-    description: Optional[str]
-    address: Optional[str]
-    start_time: Optional[datetime]
-    end_time: Optional[datetime]
-    all_day: Optional[bool]
-    recurrence_id: int
-                                
+
     @staticmethod
-    def from_json(json: Dict) -> "CalendarException":
-        return CalendarException(
-            title=json.get("title"),
-            description=json.get("description"),
-            address=json.get("address"),
-            start_time=json.get("start_time"),
-            end_time=json.get("end_time"),
-            all_day=json.get("all_day"),
-            recurrence_id=json["recurrence_id"]
-        )
-    
-    @staticmethod
-    def to_json(create_entry: "CalendarCreate", exception_id: UUID, recurrence_id: int) -> Dict:
-        exception_data = {
+    def to_json(create_entry: "CalendarCreate", calendar_event_id: UUID, recurrence_id: int) -> Dict:
+        data = {
             "title": create_entry.title,
             "description": create_entry.description,
             "address": create_entry.address,
-            "start_time": create_entry.start_time.isoformat(),
-            "end_time": create_entry.end_time.isoformat(),
+            "start_time": create_entry.start_time.isoformat() if create_entry.start_time else None,
+            "end_time": create_entry.end_time.isoformat() if create_entry.end_time else None,
             "all_day": create_entry.all_day,
-            "recurrence_id": recurrence_id
+            "recurrence_id": recurrence_id,
+            "event": { "id": str(calendar_event_id) }
         }
-
-        if exception_id is not None:
-            exception_data["id"] = str(exception_id)
-
-        return {
-            "exceptions": [exception_data]
-        }
+        return data
 
 class CalendarCreate(BaseModel):
     """
     Create a new calendar entry.
     """
 
-    title: str
+    title: Optional[str]
     description: Optional[str]
     address: Optional[str]
     rule: CalendarRule
     event_type: EventType
-    start_time: datetime
-    end_time: datetime
+    start_time: Optional[datetime]
+    end_time: Optional[datetime]
     all_day: bool
 
     @staticmethod
@@ -130,28 +105,43 @@ class CalendarEntry(CalendarCreate):
     updated_at: datetime
 
     @staticmethod
-    def from_json(json: Dict) -> "CalendarEntry":
-            updated_at = json.get("date_updated")
-            if updated_at is None:
-                updated_at = json.get("date_created")
+    def from_json(json: Dict, exception_data: Dict = None) -> "CalendarEntry":
+            updated_at = json.get("date_updated") or json.get("date_created")
 
             rule_data = json.get("rule")
             rule = CalendarRule.from_json(rule_data)
             
+            title = json["title"]
+            description = json.get("description")
+            address = json.get("address")
+            start_time = json["start_time"]
+            end_time = json["end_time"]
+            all_day = json["all_day"]
+            recurrence_id = None
+
+            if exception_data:
+                title = exception_data.get("title", title)
+                description = exception_data.get("description", description)
+                address = exception_data.get("address", address)
+                start_time = exception_data.get("start_time", start_time)
+                end_time = exception_data.get("end_time", end_time)
+                all_day = exception_data.get("all_day", all_day)
+                recurrence_id = exception_data.get("recurrence_id", recurrence_id)
+
             return CalendarEntry(
                 id=json["id"],
                 user_id=json["user_id"],
                 created_at=json["date_created"],
                 updated_at=updated_at,
-                title=json["title"],
-                description=json.get("description"),
-                address=json.get("address"),
+                title=title,
+                description=description,
+                address=address,
                 rule=rule,
                 event_type=json["event_type"],
-                start_time=json["start_time"],
-                end_time=json["end_time"],
-                all_day=json["all_day"],
-                recurrence_id=json.get("recurrence_id")
+                start_time=start_time,
+                end_time=end_time,
+                all_day=all_day,
+                recurrence_id=recurrence_id
             )
     
     def copy_with_override(self, **overrides) -> "CalendarEntry":

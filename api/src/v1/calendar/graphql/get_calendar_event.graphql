@@ -17,5 +17,9 @@ query GetCalendarEvents($filter: calendar_event_filter) {
       interval
       until_time
     }
+    exceptions {
+      id
+      recurrence_id
+    }
   }
 }

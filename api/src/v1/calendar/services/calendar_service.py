@@ -27,9 +27,11 @@ class GraphQLFile(str, Enum):
     kCreate = "create_calendar_event.graphql"
     kDelete = "delete_calendar_event.graphql"
     kUpdate = "update_calendar_event.graphql"
-    kGetAll = "get_calendar_event.graphql"
+    kGetEvent = "get_calendar_event.graphql"
     kGetInformation = "get_calendar_information.graphql"
-    kUpdateRepeat = "update_calendar_repeat_event.graphql"
+    kCreateException = "create_calendar_exception.graphql"
+    kUpdateException = "update_calendar_exception.graphql"
+    kDeleteException = "delete_calendar_exception.graphql"
 
 class CalendarService:
     def __init__(self):
@@ -66,17 +68,14 @@ class CalendarService:
         except (KeyError, IndexError, TypeError):
             return default
 
-    def _get_entry_information(self, entry_id: uuid.UUID, recurrence_id: uuid.UUID) -> dict: 
+    def _get_entry_information(self, entry_id: uuid.UUID, file: GraphQLFile) -> dict: 
             
         filters = {
             "id": {"_eq": str(entry_id)}
         }
-
-        if recurrence_id is not None:
-            filters["exceptions"] = { "recurrence_id": { "_eq": recurrence_id } }
    
         response = self.directus.execute_query_file(
-            query_file_path=self._get_graphql_file(GraphQLFile.kGetInformation),
+            query_file_path=self._get_graphql_file(file),
             variables={"filter": filters}
         )
 
@@ -91,6 +90,9 @@ class CalendarService:
         max_future: int = REPEAT_LIMIT, 
         ) -> list[CalendarEntry]:
             
+        if parent_event is None:
+            return []
+         
         rule = parent_event.rule
         if not rule or rule.frequency == Frequency.ONCE:
             return [parent_event]
@@ -155,25 +157,41 @@ class CalendarService:
             logger.error(f"Failed to remove calendar entry: entry_id is null")
             return False
         
-        rule_response = self._get_entry_information(entry_id, None)
-            
-        rules = self._safe_get(rule_response, ["data", "calendar_event", 0, "rule"], [])
-        rule_id = rules["id"] if rules else None
-
-        if rule_id is None:
+        response = self._get_entry_information(entry_id, GraphQLFile.kGetInformation)      
+        calendar_event = self._safe_get(response, ["data", "calendar_event", 0])
+        if not calendar_event:
+            logger.warning(f"No calendar event found with ID {entry_id}")
+            return False
+        
+        rule_id = self._safe_get(calendar_event, ["rule", "id"])
+        exceptions = calendar_event.get("exceptions", [])
+        if not rule_id:
             logger.warning(f"No rule found for calendar event {entry_id}")
             return False
-
+        
         event_response = self.directus.execute_query_file(
             query_file_path=self._get_graphql_file(GraphQLFile.kDelete),
             variables={
                 "eventId": str(entry_id),
-                    "ruleId": str(rule_id)
+                "ruleId": str(rule_id)
                 },
             )
 
         if (errors := event_response.get("errors")):
             raise DatabaseError(f"Failed to remove calendar entry: {errors}")
+
+        for exc in exceptions:
+            exc_id = exc.get("id")
+            if not exc_id:
+                continue
+
+            delete_exc_response = self.directus.execute_query_file(
+                query_file_path=self._get_graphql_file(GraphQLFile.kDeleteException),
+                variables={ "id": exc_id }
+            )       
+
+            if (errors := delete_exc_response.get("errors")):
+                logger.error(f"Failed to delete exception {exc_id}: {errors}")
 
         #logger.info(f"Deleted calendar entry {entry_id} with rule {rule_id}")
         return True
@@ -182,16 +200,14 @@ class CalendarService:
         user_id: uuid.UUID, 
         entry_id: uuid.UUID,     
         update_data: CalendarCreate,                   
-        ) -> list[CalendarEntry]:
+        ) -> CalendarEntry:
 
-        rule_response = self._get_entry_information(entry_id, None)
-            
-        rule = self._safe_get(rule_response, ["data", "calendar_event", 0, "rule"], [])
-        rule_id = rule["id"] if rule else None
+        rule_response = self._get_entry_information(entry_id, GraphQLFile.kGetInformation)        
+        rule_id = self._safe_get(rule_response, ["data", "calendar_event", 0, "rule", "id"])
 
         if rule_id is None:
             logger.warning(f"No rule found for calendar event {entry_id}")
-            return []
+            return None
 
         update_response = self.directus.execute_query_file(
         query_file_path=self._get_graphql_file(GraphQLFile.kUpdate),
@@ -205,28 +221,44 @@ class CalendarService:
             raise DatabaseError(f"Failed to update calendar entry: {errors}")
 
         item = update_response.get("data", {}).get("update_calendar_event_item", {})
-        entry = CalendarEntry.from_json(item)
 
         logger.info(f"Updated calendar entry {entry_id} for user {user_id}")
-        return [entry]
+        return CalendarEntry.from_json(item)
    
+    def _get_exception_id_from_response(self, response: dict, recurrence_id: int) -> Optional[str]:
+        exceptions = self._safe_get(response, ["data", "calendar_event", 0, "exceptions"], default=[])
+        for entry in exceptions:
+            if entry.get("recurrence_id") == recurrence_id:
+                return entry.get("id")
+        return None
+
     def _update_repeat_entry(self,
         entry_id: uuid.UUID,     
         update_data: CalendarCreate,  
         recurrence_id: int                 
         ) -> list[CalendarEntry]:
 
-        response = self._get_entry_information(entry_id, recurrence_id)  
+        response = self._get_entry_information(entry_id, GraphQLFile.kGetEvent)  
         #logger.info("First Response:\n%s", json.dumps(response, indent=2))
         
-        exception_id = self._safe_get(response, ["data", "calendar_event", 0, "exceptions", 0, "id"])
+        exception_id = self._get_exception_id_from_response(response, recurrence_id)
+
+        if exception_id:
+            logger.info("Update")
+            mutation_path = self._get_graphql_file(GraphQLFile.kUpdateException)
+            variables = {
+                "id": exception_id,
+                "data": CalendarException.to_json(update_data, entry_id, recurrence_id)
+            }
+        else:
+            mutation_path = self._get_graphql_file(GraphQLFile.kCreateException)
+            variables = {
+                "data": CalendarException.to_json(update_data, entry_id, recurrence_id)
+            }
 
         update_response = self.directus.execute_query_file(
-        query_file_path=self._get_graphql_file(GraphQLFile.kUpdateRepeat),
-        variables={
-            "id": str(entry_id),
-            "data": CalendarException.to_json(update_data, exception_id, recurrence_id)
-             },
+            query_file_path=mutation_path,
+            variables=variables
         )
 
         #logger.info("Second Response:\n%s", json.dumps(update_response, indent=2))
@@ -234,7 +266,13 @@ class CalendarService:
         if (errors := update_response.get("errors")):
             raise DatabaseError(f"Failed to update calendar entry: {errors}")
 
-        return []
+        base_event = response.get("data", {}).get("calendar_event", [])
+        exception_data = update_response.get("data", {}).get("update_calendar_exceptions_item") \
+                            or update_response.get("data", {}).get("create_calendar_exceptions_item")
+
+
+        logger.info(f"Updated repeat event {recurrence_id} for calendar entry {entry_id}")
+        return [CalendarEntry.from_json(base_event[0], exception_data)]
 
     def update_calendar_entry(self, 
         user_id: uuid.UUID, 
@@ -244,7 +282,7 @@ class CalendarService:
         update_type: UpdateType
         ) -> list[CalendarEntry]:
         
-        if recurrence_id == None:
+        if recurrence_id is None:
             update_type = UpdateType.ALL
 
         match update_type:
@@ -253,7 +291,7 @@ class CalendarService:
                 return self._update_repeat_entry(entry_id, update_data, recurrence_id)
             case UpdateType.ALL:
                 updated_entry = self._update_entry(user_id, entry_id, update_data)
-                return self.generate_repeat_events(updated_entry)
+                return self._generate_repeat_events(updated_entry)
             case UpdateType.FUTURE: # split 
                 return []
             case _:
@@ -263,7 +301,7 @@ class CalendarService:
     def get_all(
         self,
         user_id: uuid.UUID,
-        type: Optional[str] = None,
+        event_type: Optional[str] = None,
         frequency: Optional[str] = None,
         all_day: Optional[bool] = None
     ) -> list[CalendarEntry]:
@@ -272,15 +310,15 @@ class CalendarService:
             "user_id": {"_eq": str(user_id)}
         }
 
-        if type:
-            filters["event_type"] = {"_eq": type}
+        if event_type:
+            filters["event_type"] = {"_eq": event_type}
         if all_day is not None:
             filters["all_day"] = {"_eq": all_day}
         if frequency:
             filters["rule"] = {"frequency": {"_eq": frequency}}
 
         response = self.directus.execute_query_file(
-            query_file_path=self._get_graphql_file(GraphQLFile.kGetAll),
+            query_file_path=self._get_graphql_file(GraphQLFile.kGetEvent),
             variables={"filter": filters}
         )
         

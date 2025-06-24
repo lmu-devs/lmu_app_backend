@@ -1,0 +1,15 @@
+mutation CreateCalendarException($data: create_calendar_exceptions_input!) {
+  create_calendar_exceptions_item(data: $data) {
+    id
+    title
+    description
+    recurrence_id
+    start_time
+    end_time
+    address
+    all_day
+    event {
+      id
+    }
+  }
+}
