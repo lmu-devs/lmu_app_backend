@@ -38,7 +38,7 @@ class UniversityService:
         faculties_raw: list[dict[str, Any]] = response["data"]["faculties_translations"]
 
         return Faculties(
-            root=[Faculty(id=int(f["faculties_id"]["id"]), title=f["title"]) for f in faculties_raw]
+            root=[Faculty(id=int(f["faculties_id"]["id"]), name=f["title"]) for f in faculties_raw]
         )
 
     async def get_universities(self) -> Universities:
@@ -52,14 +52,14 @@ class UniversityService:
             query_file_path=query_path,
             variables={"languageCode": self.language_code},
         )
-        
+
         universities_raw: list[dict[str, Any]] = response["data"]["universities_translations"]
-        
+
         return Universities(
             root=[
                 University(
                     id=UniversityEnum(u["universities_id"]["abbreviation"]),
-                    title=u["title"],
+                    name=u["title"],
                 )
                 for u in universities_raw
             ]
