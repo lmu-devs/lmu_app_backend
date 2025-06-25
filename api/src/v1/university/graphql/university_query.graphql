@@ -1,0 +1,8 @@
+query University($languageCode: String!) {
+    universities_translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+        universities_id {
+            abbreviation
+        }
+        title
+    }
+}

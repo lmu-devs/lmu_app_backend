@@ -1,0 +1,10 @@
+query Faculty($languageCode: String!){
+  faculties_translations(
+    filter: { languages_code: { code: { _eq: $languageCode} } }
+  ) {
+    faculties_id{
+      id
+    }
+    title
+  }
+}
