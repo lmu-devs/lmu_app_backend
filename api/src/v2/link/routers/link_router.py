@@ -1,10 +1,12 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.src.v2.core.api_key import APIKey
 from api.src.v2.core.language import get_language
 from api.src.v2.link.models.link_benefits_model import LinkBenefitResponse
-from api.src.v2.link.models.link_resources_model import LinkResourceResponse
+from api.src.v2.link.models.link_resources_model import LinkResource
 from api.src.v2.link.services.link_benefit_service import LinkBenefitService
 from shared.src.core.database import get_async_db
 from shared.src.core.logging import get_links_logger
@@ -19,7 +21,7 @@ logger = get_links_logger(__name__)
 
 @router.get(
     "/resources",
-    response_model=LinkResourceResponse,
+    response_model=List[LinkResource],
     description="Get all resources for important LMU services",
 )
 async def get_all_resources(
