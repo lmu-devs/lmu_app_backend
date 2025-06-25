@@ -19,7 +19,13 @@ query GetCalendarEvents($filter: calendar_event_filter) {
     }
     exceptions {
       id
+      title
+      description
       recurrence_id
+      start_time
+      end_time
+      address
+      all_day
     }
   }
 }

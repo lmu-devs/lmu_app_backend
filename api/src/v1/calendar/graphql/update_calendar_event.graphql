@@ -17,5 +17,15 @@ mutation UpdateCalendarEvent($id: ID!, $data: update_calendar_event_input!) {
       interval
       until_time
     }
+    exceptions {
+      id
+      title
+      description
+      recurrence_id
+      start_time
+      end_time
+      address
+      all_day
+    }
   }
 }

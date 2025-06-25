@@ -2,7 +2,7 @@ import uuid
 import json
 from typing import Optional
 from enum import Enum
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from shared.src.core.exceptions import DatabaseError
@@ -57,18 +57,30 @@ class CalendarService:
             case _:
                 return None
             
-    def _safe_get(self, data: dict, path: list, default=None):
+    def _safe_get(self, 
+        data: dict, 
+        path: list, 
+        default=None
+        ):
+
         try:
             for key in path:
                 if isinstance(data, list):
                     data = data[key]
                 else:
                     data = data.get(key)
+
+            if data is None:
+                return default
+            
             return data
         except (KeyError, IndexError, TypeError):
             return default
 
-    def _get_entry_information(self, entry_id: uuid.UUID, file: GraphQLFile) -> dict: 
+    def _get_entry_information(self, 
+        entry_id: uuid.UUID, 
+        file: GraphQLFile
+        ) -> dict: 
             
         filters = {
             "id": {"_eq": str(entry_id)}
@@ -83,45 +95,75 @@ class CalendarService:
             raise DatabaseError(f"Failed to get entry information: {errors}")
             
         return response
+    
+    def _get_exception_id_from_response(self, 
+        response: dict, 
+        recurrence_id: int
+        ) -> Optional[str]:
+
+        exceptions = self._safe_get(response, ["data", "calendar_event", 0, "exceptions"], default=[])
+        for entry in exceptions:
+            if entry.get("recurrence_id") == recurrence_id:
+                return entry.get("id")
+        return None
          
     def _generate_repeat_events(self, 
-        parent_event: CalendarEntry, 
+        parent_event: dict, 
         max_past: int = REPEAT_LIMIT,
         max_future: int = REPEAT_LIMIT, 
         ) -> list[CalendarEntry]:
-            
+        
         if parent_event is None:
             return []
-         
-        rule = parent_event.rule
+        
+        parent_entry = CalendarEntry.from_json(parent_event)
+        rule = parent_entry.rule
         if not rule or rule.frequency == Frequency.ONCE:
-            return [parent_event]
+            return [parent_entry]
         
         delta = self._get_delta(rule.frequency, rule.interval or 1)
         if delta is None:
-            return [parent_event]
+            return [parent_entry]
+    
+        raw_exceptions = self._safe_get(parent_event, ["exceptions"], default=[])
+        exceptions_map = {
+            exc.get("recurrence_id"): exc
+            for exc in raw_exceptions
+            if "recurrence_id" in exc
+        }
 
-        base_start = parent_event.start_time
-        base_end = parent_event.end_time
+        base_start = parent_entry.start_time
+        base_end = parent_entry.end_time
+        result = []
+
+        # helper
+        def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEntry:
+            if offset in exceptions_map:
+                return CalendarEntry.from_json(parent_event, exceptions_map[offset])
+            return parent_entry.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
 
         # past events
-        past = []
         for i in range(max_past, 0, -1):
             start, end = base_start - i * delta, base_end - i * delta
             if not rule.until_time or end >= rule.until_time:
-               past.append(parent_event.copy_with_override(start_time=start, end_time=end, recurrence_id=-i))
+               result.append(generate_entry(-i, start, end))
+
+        # base event
+        if 0 in exceptions_map:
+            entry = CalendarEntry.from_json(parent_event, exceptions_map[0])
+        else:
+            entry = parent_entry
+        entry.recurrence_id = 0
+        result.append(entry)
 
         # future events
-        future = []
         for i in range(1, max_future + 1):
             start, end = base_start + i * delta, base_end + i * delta
             if rule.until_time and start > rule.until_time:
                 break
-
-            future.append(parent_event.copy_with_override(start_time=start, end_time=end, recurrence_id=i))
+            result.append(generate_entry(i, start, end))
         
-        parent_event.recurrence_id = 0
-        return past + [parent_event] + future
+        return result
 
     def create_calendar_entry(self, 
         user_id: uuid.UUID, 
@@ -144,10 +186,8 @@ class CalendarService:
         if not item:
             raise DatabaseError("Failed to create calendar entry! No calendar item returned from GraphQL!")
 
-        entry = CalendarEntry.from_json(item)
-
-        logger.info( f"Created new calendar entry {entry.id} for user {user_id}")
-        return self._generate_repeat_events(entry)
+        logger.info( f"Created new calendar entry {item["id"]} for user {user_id}")
+        return self._generate_repeat_events(item)
 
     def delete_calendar_entry(self, 
         entry_id: uuid.UUID
@@ -175,7 +215,7 @@ class CalendarService:
                 "eventId": str(entry_id),
                 "ruleId": str(rule_id)
                 },
-            )
+        )
 
         if (errors := event_response.get("errors")):
             raise DatabaseError(f"Failed to remove calendar entry: {errors}")
@@ -193,14 +233,14 @@ class CalendarService:
             if (errors := delete_exc_response.get("errors")):
                 logger.error(f"Failed to delete exception {exc_id}: {errors}")
 
-        #logger.info(f"Deleted calendar entry {entry_id} with rule {rule_id}")
+        logger.info(f"Deleted calendar entry {entry_id} with rule {rule_id}")
         return True
      
     def _update_entry(self,
         user_id: uuid.UUID, 
         entry_id: uuid.UUID,     
         update_data: CalendarCreate,                   
-        ) -> CalendarEntry:
+        ) -> list[CalendarEntry]:
 
         rule_response = self._get_entry_information(entry_id, GraphQLFile.kGetInformation)        
         rule_id = self._safe_get(rule_response, ["data", "calendar_event", 0, "rule", "id"])
@@ -210,11 +250,11 @@ class CalendarService:
             return None
 
         update_response = self.directus.execute_query_file(
-        query_file_path=self._get_graphql_file(GraphQLFile.kUpdate),
-        variables={
-            "id": str(entry_id),
-            "data": CalendarCreate.to_json(update_data, user_id, rule_id)
-             },
+            query_file_path=self._get_graphql_file(GraphQLFile.kUpdate),
+            variables={
+                "id": str(entry_id),
+                "data": CalendarCreate.to_json(update_data, user_id, rule_id)
+                },
         )
 
         if (errors := update_response.get("errors")):
@@ -223,14 +263,7 @@ class CalendarService:
         item = update_response.get("data", {}).get("update_calendar_event_item", {})
 
         logger.info(f"Updated calendar entry {entry_id} for user {user_id}")
-        return CalendarEntry.from_json(item)
-   
-    def _get_exception_id_from_response(self, response: dict, recurrence_id: int) -> Optional[str]:
-        exceptions = self._safe_get(response, ["data", "calendar_event", 0, "exceptions"], default=[])
-        for entry in exceptions:
-            if entry.get("recurrence_id") == recurrence_id:
-                return entry.get("id")
-        return None
+        return self._generate_repeat_events(item)
 
     def _update_repeat_entry(self,
         entry_id: uuid.UUID,     
@@ -238,13 +271,10 @@ class CalendarService:
         recurrence_id: int                 
         ) -> list[CalendarEntry]:
 
-        response = self._get_entry_information(entry_id, GraphQLFile.kGetEvent)  
-        #logger.info("First Response:\n%s", json.dumps(response, indent=2))
-        
+        response = self._get_entry_information(entry_id, GraphQLFile.kGetEvent)          
         exception_id = self._get_exception_id_from_response(response, recurrence_id)
 
         if exception_id:
-            logger.info("Update")
             mutation_path = self._get_graphql_file(GraphQLFile.kUpdateException)
             variables = {
                 "id": exception_id,
@@ -261,8 +291,6 @@ class CalendarService:
             variables=variables
         )
 
-        #logger.info("Second Response:\n%s", json.dumps(update_response, indent=2))
-
         if (errors := update_response.get("errors")):
             raise DatabaseError(f"Failed to update calendar entry: {errors}")
 
@@ -270,8 +298,6 @@ class CalendarService:
         exception_data = update_response.get("data", {}).get("update_calendar_exceptions_item") \
                             or update_response.get("data", {}).get("create_calendar_exceptions_item")
 
-
-        logger.info(f"Updated repeat event {recurrence_id} for calendar entry {entry_id}")
         return [CalendarEntry.from_json(base_event[0], exception_data)]
 
     def update_calendar_entry(self, 
@@ -290,8 +316,7 @@ class CalendarService:
                 # generate an overwrite and attach
                 return self._update_repeat_entry(entry_id, update_data, recurrence_id)
             case UpdateType.ALL:
-                updated_entry = self._update_entry(user_id, entry_id, update_data)
-                return self._generate_repeat_events(updated_entry)
+                return self._update_entry(user_id, entry_id, update_data)
             case UpdateType.FUTURE: # split 
                 return []
             case _:
@@ -325,11 +350,15 @@ class CalendarService:
         if (errors := response.get("errors")):
                 raise DatabaseError(f"Failed to get calendar entries: {errors}")
 
-        base_events = response.get("data", {}).get("calendar_event", [])
+        #logger.info("Response0:\n%s", json.dumps(response, indent=2))
+
+        events = self._safe_get(response, ["data", "calendar_event"], default=[])
+        #logger.info(f"Received {len(events)} events")
 
         instances = []
-        for event in base_events:
-            calendar_entry = CalendarEntry.from_json(event)
-            instances.extend(self._generate_repeat_events(calendar_entry))
+        for event in events:
+            if not event:
+                continue
+            instances.extend(self._generate_repeat_events(event))
 
         return instances
