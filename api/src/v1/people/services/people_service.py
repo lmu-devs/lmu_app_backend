@@ -4,7 +4,8 @@ from sqlalchemy import func, distinct
 
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.tables.people.people_table import PeopleTable, PeopleRoleTable, PeopleCoursesTable
-from shared.src.enums import FacultyEnum, AcademicTitle, LSFRole, map_faculty_name_to_enum
+from shared.src.tables.faculty_table import FacultyTable, FacultyTranslationTable
+from shared.src.enums import FacultyEnum, AcademicTitle, LSFRole, map_faculty_name_to_enum, LanguageEnum
 from ..models.people_model import (
     Person, PersonSummary, PeopleResponse, PersonRole, PersonCourse, PersonBasicInfo
 )
@@ -16,9 +17,26 @@ class PeopleService:
     def __init__(self, db: Session):
         self.db = db
 
+    def _get_faculty_name_by_id(self, faculty_id: int) -> Optional[str]:
+        """Get German faculty name by faculty ID from database."""
+        try:
+            # Query the faculty translation table for German name
+            translation = self.db.query(FacultyTranslationTable).join(
+                FacultyTable
+            ).filter(
+                FacultyTable.id == str(faculty_id),  # Convert to string since DB uses String IDs
+                FacultyTranslationTable.language == LanguageEnum.GERMAN.value
+            ).first()
+            
+            return translation.title if translation else None
+        except Exception as e:
+            logger.warning(f"Could not find faculty name for ID {faculty_id}: {e}")
+            return None
+
     async def get_people(
         self,
         faculty_filter: Optional[FacultyEnum] = None,
+        faculty_id_filter: Optional[int] = None,
         limit: int = 50,
         offset: int = 0
     ) -> PeopleResponse:
@@ -29,15 +47,23 @@ class PeopleService:
             joinedload(PeopleTable.courses)
         )
         
-        # Apply faculty filter if provided
+        # Apply faculty filter if provided (either by enum or by ID)
+        applied_faculty_filter = None
         if faculty_filter:
             # Map enum to German faculty name for database query
             from shared.src.enums.faculty_enums import faculty_translations
-            from shared.src.enums import LanguageEnum
             
             german_faculty_name = faculty_translations.get(faculty_filter, {}).get(LanguageEnum.GERMAN)
             if german_faculty_name:
                 query = query.filter(PeopleTable.faculty == german_faculty_name)
+                applied_faculty_filter = faculty_filter
+        elif faculty_id_filter:
+            # Map faculty ID to German faculty name for database query
+            german_faculty_name = self._get_faculty_name_by_id(faculty_id_filter)
+            if german_faculty_name:
+                query = query.filter(PeopleTable.faculty == german_faculty_name)
+                # Map the German name back to enum for response
+                applied_faculty_filter = map_faculty_name_to_enum(german_faculty_name)
         
         # Get total count for pagination
         total_count = query.count()
@@ -53,10 +79,21 @@ class PeopleService:
             if person_db.roles:
                 primary_role = person_db.roles[0].role
             
-            # Map faculty name to enum
+            # Map faculty name to enum and get faculty ID
             faculty_enum = None
+            faculty_id = None
             if person_db.faculty:
                 faculty_enum = map_faculty_name_to_enum(person_db.faculty)
+                # Get faculty ID from database
+                try:
+                    faculty_translation = self.db.query(FacultyTranslationTable).filter(
+                        FacultyTranslationTable.title == person_db.faculty,
+                        FacultyTranslationTable.language == LanguageEnum.GERMAN.value
+                    ).first()
+                    if faculty_translation:
+                        faculty_id = faculty_translation.faculty_id
+                except Exception:
+                    pass
             
             person_summary = PersonSummary(
                 id=person_db.id,
@@ -66,6 +103,7 @@ class PeopleService:
                 primary_role=primary_role,
                 email=person_db.email,
                 faculty=person_db.faculty,
+                faculty_id=faculty_id,
                 faculty_enum=faculty_enum,
                 academic_title=person_db.academic_degree
             )
@@ -74,7 +112,7 @@ class PeopleService:
         return PeopleResponse(
             people=people_summaries,
             total_count=total_count,
-            faculty_filter=faculty_filter
+            faculty_filter=applied_faculty_filter
         )
 
     async def get_person_by_id(self, person_id: str) -> Optional[Person]:
@@ -130,10 +168,21 @@ class PeopleService:
             office_hours=person_db.office_hours
         )
         
-        # Map faculty name to enum
+        # Map faculty name to enum and get faculty ID
         faculty_enum = None
+        faculty_id = None
         if person_db.faculty:
             faculty_enum = map_faculty_name_to_enum(person_db.faculty)
+            # Get faculty ID from database
+            try:
+                faculty_translation = self.db.query(FacultyTranslationTable).filter(
+                    FacultyTranslationTable.title == person_db.faculty,
+                    FacultyTranslationTable.language == LanguageEnum.GERMAN.value
+                ).first()
+                if faculty_translation:
+                    faculty_id = faculty_translation.faculty_id
+            except Exception:
+                pass
         
         # Map academic title
         academic_title_enum = None
@@ -148,6 +197,7 @@ class PeopleService:
             email=person_db.email,
             address=person_db.address,
             faculty=person_db.faculty,
+            faculty_id=faculty_id,
             faculty_enum=faculty_enum,
             academic_title_enum=academic_title_enum,
             roles=roles,
@@ -171,7 +221,20 @@ class PeopleService:
                 PeopleTable.faculty == faculty_name
             ).scalar()
             
+            # Try to get faculty ID from database
+            faculty_id = None
+            try:
+                faculty_translation = self.db.query(FacultyTranslationTable).filter(
+                    FacultyTranslationTable.title == faculty_name,
+                    FacultyTranslationTable.language == LanguageEnum.GERMAN.value
+                ).first()
+                if faculty_translation:
+                    faculty_id = faculty_translation.faculty_id
+            except Exception:
+                pass
+            
             faculty_info = {
+                "id": faculty_id,
                 "name": faculty_name,
                 "enum": faculty_enum.value if faculty_enum else None,
                 "people_count": count

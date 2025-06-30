@@ -50,6 +50,7 @@ class Person(BaseModel):
     
     # Faculty information
     faculty: Optional[str] = None
+    faculty_id: Optional[str] = None
     faculty_enum: Optional[FacultyEnum] = None
     
     # Academic information
@@ -69,6 +70,7 @@ class PersonSummary(BaseModel):
     primary_role: Optional[str] = None
     email: Optional[str] = None
     faculty: Optional[str] = None
+    faculty_id: Optional[str] = None
     faculty_enum: Optional[FacultyEnum] = None
     academic_title: Optional[str] = None
 
