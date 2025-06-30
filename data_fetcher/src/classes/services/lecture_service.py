@@ -94,32 +94,33 @@ class LectureFetcher:
     def store_lectures_if_not_exist(self, year: int, semester: SemesterTypeEnum) -> None:
         """Fetches all lectures for a given year and semester, checks if they exist in the database,
         and inserts them if they do not exist."""
-        self.lsf_crawler.year = year
-        self.lsf_crawler.semester_type = semester
-        lecture_urls = self.lsf_crawler._crawl_all_lecture_urls_sequentially()
+        lecture_urls = self.lsf_crawler.crawl_all_lecture_urls_sequentially(year, semester)
+
         for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
             tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
             publish_id = Lecture.publish_id_from_url(url)
+
             if self.lecture_exists(publish_id):
                 continue
-            lecture = self.lsf_crawler._build_complete_lecture_object((name, url))
+
+            lecture = self.lsf_crawler.build_complete_lecture_object(name, url)
             self.insert_lecture(lecture)
             tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
 
     def store_lectures(self, year: int, semester: SemesterTypeEnum) -> None:
         """Fetches all lectures for a given year and semester, checks if they exist in the database,
         and updates or inserts them as necessary."""
-        self.lsf_crawler.year = year
-        self.lsf_crawler.semester_type = semester
-        lecture_urls = self.lsf_crawler._crawl_all_lecture_urls_sequentially()
-        for name, url in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
-            tqdm.tqdm.write(f"Processing lecture: {name} ({url})")
-            lecture = self.lsf_crawler._build_complete_lecture_object((name, url))
+        lecture_urls = self.lsf_crawler.crawl_all_lectures(year, semester)
+
+        for lecture in tqdm.tqdm(lecture_urls, desc="Crawling and Storing lectures"):
+            tqdm.tqdm.write(f"Processing lecture: {lecture.title} ({lecture.publish_id})")
+
             if id := self.lecture_exists(lecture.publish_id):
                 self.update_lecture(lecture, id)
             else:
                 self.insert_lecture(lecture)
-            tqdm.tqdm.write(f"Succesfully processed lecture: {name} ({url})")
+
+            tqdm.tqdm.write(f"Succesfully processed lecture: {lecture.title} ({lecture.publish_id})")
 
     def insert_lecture(self, lecture: Lecture) -> None:
         """Inserts a lecture into the database using a GraphQL query."""

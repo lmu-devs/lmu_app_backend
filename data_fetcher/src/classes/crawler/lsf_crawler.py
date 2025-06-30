@@ -2,6 +2,7 @@ import codecs
 from collections import defaultdict
 from typing import Any, Optional
 import concurrent.futures
+from requests.sessions import Session
 import tqdm
 import requests
 import re
@@ -9,6 +10,7 @@ import time
 from datetime import time as Time, date as Date, datetime as dt
 from urllib.parse import urlparse, parse_qs, unquote
 from lxml import html
+import random
 
 from shared.src.enums.classes_enum import (
     LectureStartTypeEnum,
@@ -36,8 +38,41 @@ class LSFCrawler:
     """Crawler for the LSF (Lehre, Studium, Forschung) system of LMU Munich."""
 
     def __init__(self) -> None:
-        self.headers = {"User-Agent": "Mozilla/5.0"}
+        self.min_timeout = 0.5
+        self.max_timeout = 2
         self.workers = 16
+        self.user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.207 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 12_6_8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.207 Safari/537.36',
+            'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:127.0) Gecko/20100101 Firefox/127.0',
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Safari/537.36',
+            'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.6422.112 Mobile Safari/537.36',
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
+        ]
+        self.session = self._create_session()
+
+    def _create_session(self) -> requests.Session:
+            """Create session with consistent headers for its lifetime."""
+            session = requests.Session()
+            session.headers.update(self.get_random_header())
+            return session
+
+    def get_random_header(self) -> dict[str, str]:
+        return {
+            'User-Agent': random.choice(self.user_agents),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9,en-GB;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Cache-Control': 'max-age=0',
+        }
+
 
     def crawl_all_lectures(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type sequentially."""
@@ -57,8 +92,20 @@ class LSFCrawler:
         self.semester_type = semester_type
 
     def _crawl_all_lecture_urls_sequentially(self) -> list[tuple[str, str]]:
+        """Crawl all lecture URLs sequentially."""
         lecture_urls = []
         class_type_ids = self._get_all_available_class_type_ids()
+
+        for type_id in tqdm.tqdm(class_type_ids, desc="Getting lecture urls"):
+            lecture_urls += self._get_lecture_urls_for_class_type(type_id)
+
+        return lecture_urls
+
+    def crawl_all_lecture_urls_sequentially(self, year: int, semester_type: SemesterTypeEnum) -> list[tuple[str, str]]:
+        """Crawl all lecture URLs sequentially."""
+        lecture_urls = []
+        class_type_ids = self._get_all_available_class_type_ids()
+        self._set_crawling_parameters(year, semester_type)
 
         for type_id in tqdm.tqdm(class_type_ids, desc="Getting lecture urls"):
             lecture_urls += self._get_lecture_urls_for_class_type(type_id)
@@ -148,6 +195,23 @@ class LSFCrawler:
             self._extract_associated_class_information(response_bytes),
         )
 
+    def build_complete_lecture_object(self, name: str, url: str) -> Lecture:
+        response_bytes = self._make_safe_http_request(url)
+
+        return Lecture.from_tuple(
+            (name, url, self._extract_navigation_tree_paths(response_bytes)),
+            self._extract_class_base_information(response_bytes),
+            self._extract_additional_lecture_information(response_bytes),
+            self._extract_enrollment_deadline_information(response_bytes),
+            self._extract_associated_study_programs(response_bytes),
+            self._extract_class_material_information(response_bytes),
+            self._extract_associated_exam_information(response_bytes),
+            self._extract_detailed_exam_information(response_bytes),
+            self._extract_class_session_schedules(response_bytes),
+            self._extract_associated_tutorial_information(response_bytes),
+            self._extract_associated_class_information(response_bytes),
+        )
+
     def _does_class_type_have_too_many_results(self, class_type: int) -> bool:
         """Check if a class type returns too many results (>1000) requiring splitting."""
         error_message = "Ihre Anfrage lieferte mehr als 1000 Ergebnisse"
@@ -161,8 +225,9 @@ class LSFCrawler:
         """Make HTTP request with retry logic and error handling."""
         for attempt in range(1, retries + 1):
             try:
-                response = requests.get(url, headers=self.headers, timeout=timeout)
+                response = self.session.get(url, headers=self.get_random_header(), timeout=timeout)
                 response.raise_for_status()
+                time.sleep(random.uniform(self.min_timeout, self.max_timeout))
                 return response.content
             except Exception as e:
                 tqdm.tqdm.write(f"[Retry {attempt}/{retries}] Error fetching {url}: {e}")
@@ -766,7 +831,7 @@ class LSFCrawler:
 
 def main() -> None:
     crawler = LSFCrawler()
-    print([l.to_dict() for l in crawler.crawl_all_lectures_parallel(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
+    print([l.to_dict() for l in crawler.crawl_all_lectures(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
 
 
 if __name__ == "__main__":
