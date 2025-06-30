@@ -2,8 +2,12 @@ import logging
 import tqdm
 import requests
 import re
+import time
 from urllib.parse import urlencode
 from lxml import html
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from requests.exceptions import SSLError, ConnectionError, Timeout, RequestException
 from shared.src.enums import AcademicTitle, LSFRole
 from shared.src.core.logging import get_main_fetcher_logger
 
@@ -14,10 +18,64 @@ class LSFPersonCrawler:
     BASE = "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds"
     HEADERS = {"User-Agent": "Mozilla/5.0"}
     RESULTS_PER_PAGE = 50
+    REQUEST_DELAY = 0.5  # Delay between requests to avoid overwhelming server (increase if you get rate limited)
+    MAX_RETRIES = 3
+    TIMEOUT = 30
 
     def __init__(self):
+        self.session = self._create_session()
         self.functions = self._crawl_functions()
         logger.info(f"Found {len(self.functions)} roles to try.")
+    
+    def _create_session(self):
+        """Create a requests session with retry strategy."""
+        session = requests.Session()
+        
+        # Configure retry strategy
+        retry_strategy = Retry(
+            total=self.MAX_RETRIES,
+            status_forcelist=[429, 500, 502, 503, 504],
+            method_whitelist=["HEAD", "GET", "OPTIONS"],
+            backoff_factor=1
+        )
+        
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        
+        return session
+
+    def _make_request(self, url: str, max_attempts: int = None) -> requests.Response:
+        """Make a robust HTTP request with retry logic and error handling."""
+        if max_attempts is None:
+            max_attempts = self.MAX_RETRIES
+            
+        for attempt in range(max_attempts):
+            try:
+                time.sleep(self.REQUEST_DELAY)  # Add delay between requests
+                response = self.session.get(url, headers=self.HEADERS, timeout=self.TIMEOUT)
+                response.raise_for_status()
+                return response
+                
+            except SSLError as e:
+                logger.warning(f"SSL error on attempt {attempt + 1}/{max_attempts}: {e}")
+                if attempt == max_attempts - 1:
+                    raise
+                time.sleep(2 ** attempt)  # Exponential backoff
+                
+            except (ConnectionError, Timeout) as e:
+                logger.warning(f"Connection error on attempt {attempt + 1}/{max_attempts}: {e}")
+                if attempt == max_attempts - 1:
+                    raise
+                time.sleep(2 ** attempt)  # Exponential backoff
+                
+            except RequestException as e:
+                logger.warning(f"Request error on attempt {attempt + 1}/{max_attempts}: {e}")
+                if attempt == max_attempts - 1:
+                    raise
+                time.sleep(2 ** attempt)  # Exponential backoff
+        
+        raise RuntimeError(f"Failed to make request after {max_attempts} attempts")
 
     def _crawl_functions(self) -> dict[int, str]:
         # Pull the Funktion dropdown from the personSearch form
@@ -32,8 +90,7 @@ class LSFPersonCrawler:
             "clean":           "y",
             "category":        "person.search",
         }
-        r = requests.get(f"{self.BASE}?{urlencode(params)}", headers=self.HEADERS)
-        r.raise_for_status()
+        r = self._make_request(f"{self.BASE}?{urlencode(params)}")
         tree = html.fromstring(r.content)
 
         sel = tree.xpath('//select[@id="r_funktion.pfid"]')
@@ -93,6 +150,29 @@ class LSFPersonCrawler:
                 logger.info(f"   – No entries for '{role_name}'")
         
         return all_people
+
+    def crawl_single_role(self, pfid: int) -> list[dict]:
+        """Crawl a single role by its ID."""
+        if pfid not in self.functions:
+            logger.error(f"Role ID {pfid} not found in available functions")
+            return []
+        
+        role_name = self.functions[pfid]
+        logger.info(f"→ Searching role {pfid} ('{role_name}')…")
+        people = self._crawl_role(pfid)
+        
+        if people:
+            # Add role information to each person
+            for person in people:
+                person["role"] = {
+                    "id": pfid,
+                    "name": role_name
+                }
+            logger.info(f"   ✓ Found {len(people)} persons in '{role_name}'")
+        else:
+            logger.info(f"   – No entries for '{role_name}'")
+        
+        return people
 
     def _clean_text(self, text: str) -> str:
         """Clean up text by removing extra whitespace and newlines."""
@@ -280,7 +360,8 @@ class LSFPersonCrawler:
                                 details = self._extract_person_details(detail_doc)
                                 current_person.update(details)
                             except Exception as e:
-                                logger.error(f"Error fetching person details: {e}")
+                                logger.warning(f"Failed to fetch details for person {current_person.get('name', 'Unknown')}: {e}")
+                                # Continue processing other people even if one fails
                                 
                     elif label == "Dienstadresse:":
                         current_person["address"] = self._clean_text(value)
@@ -367,7 +448,8 @@ class LSFPersonCrawler:
                                             details = self._extract_person_details(detail_doc)
                                             current_person.update(details)
                                         except Exception as e:
-                                            logger.error(f"Error fetching person details: {e}")
+                                            logger.warning(f"Failed to fetch details for person {current_person.get('name', 'Unknown')}: {e}")
+                                            # Continue processing other people even if one fails
                                             
                                 elif label == "Dienstadresse:":
                                     current_person["address"] = self._clean_text(value)
@@ -398,9 +480,12 @@ class LSFPersonCrawler:
         else:
             url = href
             
-        r = requests.get(url, headers=self.HEADERS)
-        r.raise_for_status()
-        return html.fromstring(r.content)
+        try:
+            r = self._make_request(url)
+            return html.fromstring(r.content)
+        except Exception as e:
+            logger.error(f"Failed to fetch person details from {url}: {e}")
+            raise
 
     def _too_many(self, letter: str, pfid: int) -> bool:
         doc = self._fetch_search(letter, pfid, 0, per_page=50)
@@ -435,6 +520,10 @@ class LSFPersonCrawler:
         url = f"{self.BASE}?{urlencode(params, safe=',')}"
         logger.debug(f"Fetching page {page + 1} with {per_page} results per page")
         logger.debug(f"→ Effective URL: {url}")
-        r = requests.get(url, headers=self.HEADERS)
-        r.raise_for_status()
-        return html.fromstring(r.content)
+        
+        try:
+            r = self._make_request(url)
+            return html.fromstring(r.content)
+        except Exception as e:
+            logger.error(f"Failed to fetch search results for letter '{letter}', pfid {pfid}: {e}")
+            raise
