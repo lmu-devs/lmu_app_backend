@@ -13,55 +13,46 @@ router = APIRouter(tags=["people"])
 @router.get("/", response_model=PeopleResponse)
 async def get_people(
     faculty_id: Optional[int] = Query(None, description="Filter by faculty ID"),
-    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
-    offset: int = Query(0, ge=0, description="Number of people to skip"),
+    limit: int = Query(50, ge=1, le=500, description="Number of people to return (only when no filters applied)"),
+    offset: int = Query(0, ge=0, description="Number of people to skip (only when no filters applied)"),
     db: Session = Depends(get_db)
 ):
     """
-    Get list of people, optionally filtered by faculty ID
+    Get list of people, optionally filtered by faculty ID.
+    Pagination is only applied when no faculty filter is provided.
     """
     service = PeopleService(db)
-    return await service.get_people(
-        faculty_id_filter=faculty_id,
-        limit=limit,
-        offset=offset
-    )
-
-
-@router.get("/by-faculty/{faculty_id}", response_model=PeopleResponse) 
-async def get_people_by_faculty_id(
-    faculty_id: int,
-    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
-    offset: int = Query(0, ge=0, description="Number of people to skip"),
-    db: Session = Depends(get_db)
-):
-    """
-    Get people from a specific faculty by faculty ID
-    """
-    service = PeopleService(db)
-    return await service.get_people(
-        faculty_id_filter=faculty_id,
-        limit=limit,
-        offset=offset
-    )
+    
+    # Only apply pagination when no faculty filter is provided
+    if faculty_id is None:
+        # No filter - use pagination
+        return await service.get_people(
+            limit=limit,
+            offset=offset,
+            apply_pagination=True
+        )
+    else:
+        # Faculty filter provided - no pagination
+        return await service.get_people(
+            faculty_id_filter=faculty_id,
+            apply_pagination=False
+        )
 
 
 @router.get("/by-faculty-enum/{faculty}", response_model=PeopleResponse) 
 async def get_people_by_faculty_enum(
     faculty: FacultyEnum,
-    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
-    offset: int = Query(0, ge=0, description="Number of people to skip"),
     db: Session = Depends(get_db)
 ):
     """
-    Get people from a specific faculty by faculty enum (legacy endpoint)
+    Get all people from a specific faculty by faculty enum (no pagination)
     """
     service = PeopleService(db)
     return await service.get_people(
         faculty_filter=faculty,
-        limit=limit,
-        offset=offset
+        apply_pagination=False
     )
+
 
 
 @router.get("/{person_id}", response_model=Person)

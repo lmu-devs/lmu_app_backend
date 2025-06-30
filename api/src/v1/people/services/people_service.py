@@ -20,11 +20,9 @@ class PeopleService:
     def _get_faculty_name_by_id(self, faculty_id: int) -> Optional[str]:
         """Get German faculty name by faculty ID from database."""
         try:
-            # Query the faculty translation table for German name
-            translation = self.db.query(FacultyTranslationTable).join(
-                FacultyTable
-            ).filter(
-                FacultyTable.id == str(faculty_id),  # Convert to string since DB uses String IDs
+            # Query the faculty translation table directly for German name
+            translation = self.db.query(FacultyTranslationTable).filter(
+                FacultyTranslationTable.faculty_id == str(faculty_id),  # Convert to string since DB uses String IDs
                 FacultyTranslationTable.language == LanguageEnum.GERMAN.value
             ).first()
             
@@ -33,14 +31,33 @@ class PeopleService:
             logger.warning(f"Could not find faculty name for ID {faculty_id}: {e}")
             return None
 
+    def get_faculty_enum_by_id(self, faculty_id: str) -> Optional[FacultyEnum]:
+        """Get faculty enum from faculty ID."""
+        try:
+            # Query the faculty translation table for German name
+            translation = self.db.query(FacultyTranslationTable).filter(
+                FacultyTranslationTable.faculty_id == faculty_id,  # Use string ID directly
+                FacultyTranslationTable.language == LanguageEnum.GERMAN.value
+            ).first()
+            
+            if translation and translation.title:
+                # Map the German name back to enum
+                return map_faculty_name_to_enum(translation.title)
+            
+            return None
+        except Exception as e:
+            logger.warning(f"Could not find faculty enum for ID {faculty_id}: {e}")
+            return None
+
     async def get_people(
         self,
         faculty_filter: Optional[FacultyEnum] = None,
         faculty_id_filter: Optional[int] = None,
         limit: int = 50,
-        offset: int = 0
+        offset: int = 0,
+        apply_pagination: bool = True
     ) -> PeopleResponse:
-        """Get list of people with optional faculty filter"""
+        """Get list of people with optional faculty filter and conditional pagination"""
         
         query = self.db.query(PeopleTable).options(
             joinedload(PeopleTable.roles),
@@ -68,8 +85,12 @@ class PeopleService:
         # Get total count for pagination
         total_count = query.count()
         
-        # Apply pagination
-        people_data = query.offset(offset).limit(limit).all()
+        # Apply pagination only if requested
+        if apply_pagination:
+            people_data = query.offset(offset).limit(limit).all()
+        else:
+            # No pagination - get all results
+            people_data = query.all()
         
         # Convert to response models
         people_summaries = []
