@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from api.src.v1.release_note.routers import release_notes_router
+from api.src.v1.university.routers import university_router
 from shared.src.core.database import Database
 from shared.src.core.error_handlers import api_error_handler
 from shared.src.core.exceptions import APIException
@@ -94,6 +95,7 @@ def create_app():
     app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
     app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
     app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
+    app.include_router(university_router.router, prefix=f"{prefix_v1}", tags=["university"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

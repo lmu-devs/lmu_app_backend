@@ -14,10 +14,4 @@ query GetLinkResources($languageCode: String!) {
             description
         }
     }
-    faculties {
-        id
-        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
-            title
-        }
-    }
 }
