@@ -12,31 +12,49 @@ router = APIRouter(tags=["people"])
 
 @router.get("/", response_model=PeopleResponse)
 async def get_people(
-    faculty: Optional[FacultyEnum] = Query(None, description="Filter by faculty"),
+    faculty_id: Optional[int] = Query(None, description="Filter by faculty ID"),
     limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
     offset: int = Query(0, ge=0, description="Number of people to skip"),
     db: Session = Depends(get_db)
 ):
     """
-    Get list of people, optionally filtered by faculty
+    Get list of people, optionally filtered by faculty ID
     """
     service = PeopleService(db)
     return await service.get_people(
-        faculty_filter=faculty,
+        faculty_id_filter=faculty_id,
         limit=limit,
         offset=offset
     )
 
 
-@router.get("/by-faculty/{faculty}", response_model=PeopleResponse) 
-async def get_people_by_faculty(
+@router.get("/by-faculty/{faculty_id}", response_model=PeopleResponse) 
+async def get_people_by_faculty_id(
+    faculty_id: int,
+    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
+    offset: int = Query(0, ge=0, description="Number of people to skip"),
+    db: Session = Depends(get_db)
+):
+    """
+    Get people from a specific faculty by faculty ID
+    """
+    service = PeopleService(db)
+    return await service.get_people(
+        faculty_id_filter=faculty_id,
+        limit=limit,
+        offset=offset
+    )
+
+
+@router.get("/by-faculty-enum/{faculty}", response_model=PeopleResponse) 
+async def get_people_by_faculty_enum(
     faculty: FacultyEnum,
     limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
     offset: int = Query(0, ge=0, description="Number of people to skip"),
     db: Session = Depends(get_db)
 ):
     """
-    Get people from a specific faculty
+    Get people from a specific faculty by faculty enum (legacy endpoint)
     """
     service = PeopleService(db)
     return await service.get_people(
