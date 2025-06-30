@@ -6,6 +6,7 @@ from .home_tile_enums import *
 from .image_format_enum import *
 from .language_enums import *
 from .opening_hours_enum import *
+from .people_enums import *
 from .rating_enums import *
 from .university_enums import *
 from .weekday_enum import *
@@ -21,4 +22,9 @@ __all__ = [
     "OpeningHoursEnum",
     "RatingEnum",
     "UniversityEnum",
+    "WeekdayEnum",
+    "AcademicTitle",
+    "LSFRole",
+    "EmploymentStatusEnum",
+    "map_faculty_name_to_enum",
 ]
