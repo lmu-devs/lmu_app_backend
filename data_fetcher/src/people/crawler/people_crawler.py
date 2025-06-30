@@ -18,7 +18,7 @@ class LSFPersonCrawler:
     BASE = "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds"
     HEADERS = {"User-Agent": "Mozilla/5.0"}
     RESULTS_PER_PAGE = 50
-    REQUEST_DELAY = 0.5  # Delay between requests to avoid overwhelming server (increase if you get rate limited)
+    REQUEST_DELAY = 0  # Delay between requests to avoid overwhelming server (increase if you get rate limited)
     MAX_RETRIES = 3
     TIMEOUT = 30
 
@@ -35,7 +35,7 @@ class LSFPersonCrawler:
         retry_strategy = Retry(
             total=self.MAX_RETRIES,
             status_forcelist=[429, 500, 502, 503, 504],
-            method_whitelist=["HEAD", "GET", "OPTIONS"],
+            allowed_methods=["HEAD", "GET", "OPTIONS"],
             backoff_factor=1
         )
         
@@ -270,15 +270,29 @@ class LSFPersonCrawler:
         if faculty_entry:
             details["faculty"] = self._clean_text(faculty_entry[0].text_content())
 
-        # Extract courses
+        # Extract courses with deduplication
         course_rows = doc.xpath('//table[@summary="Übersicht über die Zugehörigkeit zu Veranstaltungen"]//tr[position()>1]')
+        seen_courses = set()  # Track course combinations to avoid duplicates
+        
         for row in course_rows:
             cells = row.xpath('.//td')
             if len(cells) >= 3:
+                course_number = self._clean_text(cells[0].text_content())
+                course_name = self._clean_text(cells[1].xpath('.//a/text()')[0] if cells[1].xpath('.//a/text()') else cells[1].text_content())
+                semester = self._clean_text(cells[2].text_content())
+                
+                # Create a unique identifier for this course to detect duplicates
+                course_key = (course_number, course_name, semester)
+                if course_key in seen_courses:
+                    logger.debug(f"Skipping duplicate course: {course_key}")
+                    continue
+                
+                seen_courses.add(course_key)
+                
                 course = {
-                    "number": self._clean_text(cells[0].text_content()),
-                    "name": self._clean_text(cells[1].xpath('.//a/text()')[0] if cells[1].xpath('.//a/text()') else cells[1].text_content()),
-                    "semester": self._clean_text(cells[2].text_content())
+                    "number": course_number,
+                    "name": course_name,
+                    "semester": semester
                 }
                 if cells[1].xpath('.//a/@href'):
                     course["url"] = cells[1].xpath('.//a/@href')[0]
@@ -289,6 +303,7 @@ class LSFPersonCrawler:
     def _crawl_role(self, pfid: int) -> list[dict]:
         out = []
         too_many_letters = []
+        processed_people = set()  # Track processed people by profile URL to avoid duplicates
         
         # First try single letters
         logger.info(f"Starting to process single letters for role {pfid}")
@@ -350,9 +365,18 @@ class LSFPersonCrawler:
                             # Handle relative URLs correctly
                             href = link[0]
                             if href.startswith('/'):
-                                current_person["profile_url"] = f"https://lsf.verwaltung.uni-muenchen.de{href}"
+                                profile_url = f"https://lsf.verwaltung.uni-muenchen.de{href}"
                             else:
-                                current_person["profile_url"] = href
+                                profile_url = href
+                            
+                            # Check if we've already processed this person
+                            if profile_url in processed_people:
+                                logger.debug(f"Skipping already processed person: {current_person['name']} ({profile_url})")
+                                current_person = {}  # Reset to skip this person
+                                continue
+                            
+                            current_person["profile_url"] = profile_url
+                            processed_people.add(profile_url)
                             
                             # Fetch and parse the person's detail page
                             try:
@@ -438,9 +462,18 @@ class LSFPersonCrawler:
                                         # Handle relative URLs correctly
                                         href = link[0]
                                         if href.startswith('/'):
-                                            current_person["profile_url"] = f"https://lsf.verwaltung.uni-muenchen.de{href}"
+                                            profile_url = f"https://lsf.verwaltung.uni-muenchen.de{href}"
                                         else:
-                                            current_person["profile_url"] = href
+                                            profile_url = href
+                                        
+                                        # Check if we've already processed this person
+                                        if profile_url in processed_people:
+                                            logger.debug(f"Skipping already processed person: {current_person['name']} ({profile_url})")
+                                            current_person = {}  # Reset to skip this person
+                                            continue
+                                        
+                                        current_person["profile_url"] = profile_url
+                                        processed_people.add(profile_url)
                                         
                                         # Fetch and parse the person's detail page
                                         try:
@@ -470,7 +503,11 @@ class LSFPersonCrawler:
                         logger.info(f"Completed combination '{search}': processed {total_processed} people")
                         pbar.update(1)
             
+        # Remove any empty dictionaries that might have been added during duplicate skipping
+        out = [person for person in out if person]
+        
         logger.info(f"Finished processing role {pfid}: collected {len(out)} people in total")
+        logger.info(f"Processed {len(processed_people)} unique people (deduplication applied)")
         return out
 
     def _fetch_person_details(self, href: str) -> html.HtmlElement:
