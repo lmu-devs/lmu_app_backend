@@ -59,8 +59,15 @@ class PeopleService:
                         self._upsert_person(person_data)
                         role_processed += 1
                     except Exception as e:
-                        self.logger.error(f"Error processing person {person_data.get('name', 'Unknown')}: {str(e)}")
-                        continue
+                        # Handle database errors gracefully
+                        error_msg = str(e)
+                        if "duplicate key value violates unique constraint" in error_msg:
+                            self.logger.warning(f"Duplicate entry for person {person_data.get('name', 'Unknown')}: {error_msg}")
+                            # Try to continue processing, the duplicate check should have caught this
+                            continue
+                        else:
+                            self.logger.error(f"Error processing person {person_data.get('name', 'Unknown')}: {error_msg}")
+                            continue
                 
                 # Commit after each role
                 self.db.commit()
@@ -182,38 +189,58 @@ class PeopleService:
         if role_info:
             # Create unique role ID using LSF role ID
             role_id = f"{person_id}_lsf_role_{role_info.get('id')}"
-            existing_role = self.db.query(PeopleRoleTable).filter(PeopleRoleTable.id == role_id).first()
-            
-            if not existing_role:
-                lsf_role = PeopleRoleTable(
-                    id=role_id,
-                    person_id=person_id,
-                    institution="LMU",
-                    role=role_info.get("name", ""),
-                    lsf_role_id=role_info.get("id"),
-                    lsf_role_name=role_info.get("name", "")
-                )
-                self.db.add(lsf_role)
+            try:
+                existing_role = self.db.query(PeopleRoleTable).filter(PeopleRoleTable.id == role_id).first()
+                
+                if not existing_role:
+                    lsf_role = PeopleRoleTable(
+                        id=role_id,
+                        person_id=person_id,
+                        institution="LMU",
+                        role=role_info.get("name", ""),
+                        lsf_role_id=role_info.get("id"),
+                        lsf_role_name=role_info.get("name", "")
+                    )
+                    self.db.add(lsf_role)
+                else:
+                    self.logger.debug(f"LSF role {role_id} already exists, skipping")
+            except Exception as e:
+                self.logger.warning(f"Error inserting LSF role {role_id}: {str(e)}")
+                if "duplicate key value violates unique constraint" in str(e):
+                    self.logger.debug(f"LSF role {role_id} already exists (race condition), continuing")
+                else:
+                    raise
         
         # Add detailed roles from person details
         roles = person_data.get("roles", [])
         for role in roles:
             # Create a unique role ID based on content to avoid duplicates
-            role_content = f"{role.get('institution', '')}_{role.get('role', '')}"
-            role_hash = hashlib.md5(role_content.encode()).hexdigest()[:8]
+            # Include person_id in the content to ensure uniqueness per person
+            role_content = f"{person_id}_{role.get('institution', '')}_{role.get('role', '')}"
+            role_hash = hashlib.md5(role_content.encode()).hexdigest()[:12]  # Use longer hash to reduce collisions
             role_id = f"{person_id}_role_{role_hash}"
             
-            existing_role = self.db.query(PeopleRoleTable).filter(PeopleRoleTable.id == role_id).first()
-            
-            if not existing_role:
-                role_table = PeopleRoleTable(
-                    id=role_id,
-                    person_id=person_id,
-                    institution=role.get("institution", ""),
-                    role=role.get("role", ""),
-                    institution_url=role.get("institution_url", "")
-                )
-                self.db.add(role_table)
+            try:
+                existing_role = self.db.query(PeopleRoleTable).filter(PeopleRoleTable.id == role_id).first()
+                
+                if not existing_role:
+                    role_table = PeopleRoleTable(
+                        id=role_id,
+                        person_id=person_id,
+                        institution=role.get("institution", ""),
+                        role=role.get("role", ""),
+                        institution_url=role.get("institution_url", "")
+                    )
+                    self.db.add(role_table)
+                else:
+                    self.logger.debug(f"Role {role_id} already exists, skipping")
+            except Exception as e:
+                self.logger.warning(f"Error inserting role {role_id}: {str(e)}")
+                if "duplicate key value violates unique constraint" in str(e):
+                    self.logger.debug(f"Role {role_id} already exists (race condition), continuing")
+                    continue
+                else:
+                    raise
 
     def _upsert_person_courses(self, person_id: str, person_data: dict):
         """Add courses for this person without duplicating existing ones"""
@@ -221,22 +248,36 @@ class PeopleService:
         courses = person_data.get("courses", [])
         for course in courses:
             # Create a unique course ID based on content to avoid duplicates
-            course_content = f"{course.get('number', '')}_{course.get('name', '')}_{course.get('semester', '')}"
-            course_hash = hashlib.md5(course_content.encode()).hexdigest()[:8]
+            # Include person_id in the content to ensure uniqueness per person
+            course_content = f"{person_id}_{course.get('number', '')}_{course.get('name', '')}_{course.get('semester', '')}"
+            course_hash = hashlib.md5(course_content.encode()).hexdigest()[:12]  # Use longer hash to reduce collisions
             course_id = f"{person_id}_course_{course_hash}"
             
-            existing_course = self.db.query(PeopleCoursesTable).filter(PeopleCoursesTable.id == course_id).first()
-            
-            if not existing_course:
-                course_table = PeopleCoursesTable(
-                    id=course_id,
-                    person_id=person_id,
-                    course_number=course.get("number", ""),
-                    course_name=course.get("name", ""),
-                    semester=course.get("semester", ""),
-                    course_url=course.get("url", "")
-                )
-                self.db.add(course_table)
+            try:
+                existing_course = self.db.query(PeopleCoursesTable).filter(PeopleCoursesTable.id == course_id).first()
+                
+                if not existing_course:
+                    course_table = PeopleCoursesTable(
+                        id=course_id,
+                        person_id=person_id,
+                        course_number=course.get("number", ""),
+                        course_name=course.get("name", ""),
+                        semester=course.get("semester", ""),
+                        course_url=course.get("url", "")
+                    )
+                    self.db.add(course_table)
+                else:
+                    self.logger.debug(f"Course {course_id} already exists, skipping")
+            except Exception as e:
+                # Handle potential race conditions or other database errors
+                self.logger.warning(f"Error inserting course {course_id}: {str(e)}")
+                # If it's a unique constraint violation, log and continue
+                if "duplicate key value violates unique constraint" in str(e):
+                    self.logger.debug(f"Course {course_id} already exists (race condition), continuing")
+                    continue
+                else:
+                    # Re-raise other types of errors
+                    raise
 
     def _generate_person_id(self, person_data: dict) -> str:
         """Generate a unique ID for a person using personal.pid from URL"""
