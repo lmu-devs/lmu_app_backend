@@ -39,19 +39,39 @@ async def get_people(
         )
 
 
-@router.get("/by-faculty-enum/{faculty}", response_model=PeopleResponse) 
+@router.get("/faculty_code/{faculty_code}", response_model=PeopleResponse)
 async def get_people_by_faculty_enum(
-    faculty: FacultyEnum,
+    faculty_code: str,
     db: Session = Depends(get_db)
 ):
-    """
-    Get all people from a specific faculty by faculty enum (no pagination)
-    """
+    # Map string to enum
+    try:
+        faculty_enum = next(f for f in FacultyEnum if f.code == faculty_code)
+    except StopIteration:
+        raise HTTPException(status_code=400, detail="Invalid faculty code")
     service = PeopleService(db)
     return await service.get_people(
-        faculty_filter=faculty,
+        faculty_filter=faculty_enum,
         apply_pagination=False
     )
+    
+@router.get("/faculty_id/{faculty_id}", response_model=PeopleResponse)
+async def get_people_by_faculty_id(
+    faculty_id: int,
+    db: Session = Depends(get_db)
+):
+    # Map string to enum
+    try:
+        faculty_enum = next(f for f in FacultyEnum if f.id == faculty_id)
+    except StopIteration:
+        raise HTTPException(status_code=400, detail="Invalid faculty code")
+    service = PeopleService(db)
+    return await service.get_people(
+        faculty_filter=faculty_enum,
+        apply_pagination=False
+    )
+
+
 
 
 
@@ -71,11 +91,3 @@ async def get_person_by_id(
     
     return person
 
-
-@router.get("/faculties/", response_model=dict)
-async def get_available_faculties(db: Session = Depends(get_db)):
-    """
-    Get list of faculties that have people data
-    """
-    service = PeopleService(db)
-    return await service.get_available_faculties()

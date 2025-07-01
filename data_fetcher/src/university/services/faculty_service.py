@@ -15,7 +15,7 @@ class FacultyService:
         self.logger.info("⬆️  Adding faculties to database...")
 
         for faculty in FacultyEnum:
-            faculty_table = FacultyTable(id=faculty.value)
+            faculty_table = FacultyTable(id=faculty.code)
             self.db.merge(faculty_table)
             self._add_faculty_translations(faculty)
 
@@ -25,5 +25,5 @@ class FacultyService:
     def _add_faculty_translations(self, faculty):
         translations = faculty_translations[faculty]
         for language, title in translations.items():
-            translation = FacultyTranslationTable(faculty_id=faculty.value, language=language.value, title=title)
+            translation = FacultyTranslationTable(faculty_id=faculty.code, language=language.value, title=title)
             self.db.merge(translation)
