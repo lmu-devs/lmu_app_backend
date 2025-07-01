@@ -18,7 +18,7 @@ async def create_calendar_entry(
     entries = CalendarService().create_calendar_entry(user.id, calendar_data)
     return CalendarEntries.from_list(entries)
 
-@router.delete("/calendar-delete", response_model=bool, description="Delete a calendar entry.")
+@router.delete("/calendar-delete/{entry_id}", response_model=bool, description="Delete a calendar entry.")
 async def delete_calendar_entry(
     entry_id: uuid.UUID
 ):

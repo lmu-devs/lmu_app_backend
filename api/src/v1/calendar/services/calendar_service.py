@@ -196,6 +196,7 @@ class CalendarService:
         entry_id: uuid.UUID
         ) -> bool:
         """Deletes a calendar entry from the database.""" 
+        
         if not entry_id:
             logger.error(f"Failed to remove calendar entry: entry_id is null")
             return False
@@ -208,9 +209,6 @@ class CalendarService:
         
         rule_id = self._safe_get(calendar_event, ["rule", "id"])
         exceptions = calendar_event.get("exceptions", [])
-        if not rule_id:
-            logger.warning(f"No rule found for calendar event {entry_id}")
-            return False
         
         event_response = self.directus.execute_query_file(
             query_file_path=self._get_graphql_file(GraphQLFile.kDelete),
@@ -225,8 +223,6 @@ class CalendarService:
 
         for exc in exceptions:
             exc_id = exc.get("id")
-            if not exc_id:
-                continue
 
             delete_exc_response = self.directus.execute_query_file(
                 query_file_path=self._get_graphql_file(GraphQLFile.kDeleteException),
@@ -234,7 +230,7 @@ class CalendarService:
             )       
 
             if (errors := delete_exc_response.get("errors")):
-                logger.error(f"Failed to delete exception {exc_id}: {errors}")
+                 raise DatabaseError(f"Failed to delete exception {exc_id}: {errors}")
 
         logger.info(f"Deleted calendar entry {entry_id} with rule {rule_id}")
         return True
@@ -247,10 +243,6 @@ class CalendarService:
         """Performs an update to the base event instance. Therefore all events are updated."""
         rule_response = self._get_entry_information(entry_id, GraphQLFile.kGetInformation)        
         rule_id = self._safe_get(rule_response, ["data", "calendar_event", 0, "rule", "id"])
-
-        if rule_id is None:
-            logger.warning(f"No rule found for calendar event {entry_id}")
-            return None
 
         update_response = self.directus.execute_query_file(
             query_file_path=self._get_graphql_file(GraphQLFile.kUpdate),

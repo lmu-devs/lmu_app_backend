@@ -14,6 +14,7 @@ class EventType(str, Enum): # not complete
     MOVIE = "MOVIE"
     SPORT = "SPORT"
     LECTURE = "LECTURE"
+    EXAM = "EXAM"
 
 class Frequency(str, Enum):
     ONCE = "ONCE"
@@ -108,8 +109,7 @@ class CalendarEntry(CalendarCreate):
     def from_json(json: Dict, exception_data: Dict = None) -> "CalendarEntry":
             updated_at = json.get("date_updated") or json.get("date_created")
 
-            rule_data = json.get("rule")
-            rule = CalendarRule.from_json(rule_data)
+            rule = CalendarRule.from_json(json["rule"])
             
             title = json["title"]
             description = json.get("description")
