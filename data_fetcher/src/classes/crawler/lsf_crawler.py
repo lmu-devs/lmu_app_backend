@@ -85,7 +85,7 @@ class LSFCrawler:
     def crawl_all_lectures_parallel(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type in parallel."""
         self._set_crawling_parameters(year, semester_type)
-        lecture_urls = self._crawl_lecture_urls_in_parallel()[:100]
+        lecture_urls = self._crawl_lecture_urls_in_parallel()
         return self._crawl_all_lectures_in_parallel(lecture_urls)
 
     def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
