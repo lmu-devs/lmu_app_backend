@@ -1,6 +1,7 @@
 from data_fetcher.src.core.base_collector import ScheduledCollector
-from services.lecture_service import LectureFetcher
+from data_fetcher.src.classes.services.lecture_service import LectureFetcher
 from shared.src.enums.classes_enum import SemesterTypeEnum
+from shared.src.core.logging import get_classes_logger
 
 import schedule
 import datetime
@@ -11,9 +12,20 @@ class ClassesCollecter(ScheduledCollector):
 
     def __init__(self):
         super().__init__(job_schedule=schedule.every().monday.at("00:00"))
+        self.logger = get_classes_logger(__name__)
         self.lecture_fetcher = LectureFetcher()
 
     async def _collect_data(self, db):
         date = datetime.datetime.now()
+        self.logger.info(f"Collecting summer and winter semester for {date.year}")
+
         self.lecture_fetcher.store_lectures(date.year, SemesterTypeEnum.SUMMER_SEMESTER)
+        self.logger.info(f"Summer semester collected")
+
         self.lecture_fetcher.store_lectures(date.year, SemesterTypeEnum.WINTER_SEMESTER)
+        self.logger.info(f"Winter semester collected")
+
+
+
+if __name__ == "__main__":
+    collector = ClassesCollecter()

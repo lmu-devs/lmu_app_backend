@@ -3,7 +3,6 @@ from collections import defaultdict
 from typing import Any, Optional
 import concurrent.futures
 from requests.sessions import Session
-import tqdm
 import requests
 import re
 import time
@@ -11,7 +10,10 @@ from datetime import time as Time, date as Date, datetime as dt
 from urllib.parse import urlparse, parse_qs, unquote
 from lxml import html
 import random
+import logging
 
+
+from shared.src.core.logging import get_classes_logger
 from shared.src.enums.classes_enum import (
     LectureStartTypeEnum,
     SemesterTypeEnum,
@@ -38,9 +40,8 @@ class LSFCrawler:
     """Crawler for the LSF (Lehre, Studium, Forschung) system of LMU Munich."""
 
     def __init__(self) -> None:
-        self.min_timeout = 0.5
-        self.max_timeout = 2
-        self.workers = 16
+        self.logger = get_classes_logger(__name__)
+        self.workers = 4
         self.user_agents = [
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.6367.207 Safari/537.36',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0',
@@ -60,6 +61,7 @@ class LSFCrawler:
             return session
 
     def get_random_header(self) -> dict[str, str]:
+        """Get a random header for the session."""
         return {
             'User-Agent': random.choice(self.user_agents),
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -94,9 +96,11 @@ class LSFCrawler:
     def _crawl_all_lecture_urls_sequentially(self) -> list[tuple[str, str]]:
         """Crawl all lecture URLs sequentially."""
         lecture_urls = []
+        self.logger.info("Getting class type ids...")
         class_type_ids = self._get_all_available_class_type_ids()
 
-        for type_id in tqdm.tqdm(class_type_ids, desc="Getting lecture urls"):
+        for index, type_id in enumerate(class_type_ids):
+            self.logger.info(f"Fetching class urls: ({index + 1}/{len(class_type_ids)})")
             lecture_urls += self._get_lecture_urls_for_class_type(type_id)
 
         return lecture_urls
@@ -104,10 +108,12 @@ class LSFCrawler:
     def crawl_all_lecture_urls_sequentially(self, year: int, semester_type: SemesterTypeEnum) -> list[tuple[str, str]]:
         """Crawl all lecture URLs sequentially."""
         lecture_urls = []
+        self.logger.info("Getting class type ids...")
         class_type_ids = self._get_all_available_class_type_ids()
         self._set_crawling_parameters(year, semester_type)
 
-        for type_id in tqdm.tqdm(class_type_ids, desc="Getting lecture urls"):
+        for index, type_id in enumerate(class_type_ids):
+            self.logger.info(f"Fetching class urls: ({index + 1}/{len(class_type_ids)})")
             lecture_urls += self._get_lecture_urls_for_class_type(type_id)
 
         return lecture_urls
@@ -122,11 +128,8 @@ class LSFCrawler:
                 executor.submit(self._get_lecture_urls_for_class_type, type_id): type_id
                 for type_id in class_types.keys()
             }
-            for future in tqdm.tqdm(
-                concurrent.futures.as_completed(futures),
-                total=len(futures),
-                desc="Collecting lectures",
-            ):
+            for index, future in enumerate(concurrent.futures.as_completed(futures)):
+                self.logger.info(f"Fetching class urls: ({index + 1}/{len(futures)})")
                 all_lecture_tuples.extend(future.result())
 
         return all_lecture_tuples
@@ -152,8 +155,8 @@ class LSFCrawler:
         """Process all lecture URLs sequentially to build Lecture objects."""
         lectures = []
 
-        for url in tqdm.tqdm(urls, desc="Crawling lecture informations"):
-            tqdm.tqdm.write(f"Processing lecture: {url}")
+        for index, url in enumerate(urls):
+            self.logger.info(f"Processing lecture({index+1}/{len(urls)}): {url}")
             lectures += [self._build_complete_lecture_object(url)]
 
         return lectures
@@ -165,19 +168,18 @@ class LSFCrawler:
             futures = {
                 executor.submit(self._build_complete_lecture_object, name_url): name_url for name_url in lecture_urls
             }
-            for future in tqdm.tqdm(
-                concurrent.futures.as_completed(futures),
-                total=len(futures),
-                desc="Collecting and parsing lecture information",
-            ):
+            for index, future in enumerate(concurrent.futures.as_completed(futures)):
                 try:
-                    lectures.append(future.result())
+                    lecture = future.result()
+                    lectures.append(lecture)
+                    self.logger.info(f"Processed lecture({index+1}/{len(futures)}): {lecture.title} ({lecture.publish_id})")
                 except Exception as e:
-                    raise Exception(f"❌ Error while building lecture: {e}")
+                    self.logger.error(f"❌ Error while building lecture: {e}")
 
         return lectures
 
     def _build_complete_lecture_object(self, name_url: tuple[str, str]) -> Lecture:
+        """Build a complete lecture object from a name and URL."""
         name, url = name_url
         response_bytes = self._make_safe_http_request(url)
 
@@ -196,6 +198,7 @@ class LSFCrawler:
         )
 
     def build_complete_lecture_object(self, name: str, url: str) -> Lecture:
+        """Build a complete lecture object from a name and URL."""
         response_bytes = self._make_safe_http_request(url)
 
         return Lecture.from_tuple(
@@ -227,16 +230,15 @@ class LSFCrawler:
             try:
                 response = self.session.get(url, headers=self.get_random_header(), timeout=timeout)
                 response.raise_for_status()
-                time.sleep(random.uniform(self.min_timeout, self.max_timeout))
                 return response.content
             except Exception as e:
-                tqdm.tqdm.write(f"[Retry {attempt}/{retries}] Error fetching {url}: {e}")
+                self.logger.error(f"[Retry {attempt}/{retries}] Error fetching {url}: {e}")
                 if attempt < retries:
-                    time.sleep(attempt)
+                    time.sleep(2**attempt)
                 else:
-                    tqdm.tqdm.write(f"[FAIL] Giving up on {url}")
+                    self.logger.fatal(f"[FAIL] Giving up on {url}")
 
-        raise RuntimeError(f"Failed to fetch {url} after {retries} retries")
+        self.logger.fatal(f"Failed to fetch {url} after {retries} retries")
 
     def _get_lecture_urls_with_search_filter(self, search_text: str, class_type: int) -> list[tuple[str, str]]:
         """Extract lecture URLs from search results for a given search filter."""
@@ -690,6 +692,7 @@ class LSFCrawler:
         return programs
 
     def _extract_class_session_schedules(self, response_bytes: bytes) -> Optional[list[ClassSession]]:
+        """Extract class session schedules from the response bytes."""
         tree = html.fromstring(response_bytes)
         session_table = tree.xpath("//table[@summary='Übersicht über alle Veranstaltungstermine']")
 
@@ -825,13 +828,15 @@ class LSFCrawler:
 
     @staticmethod
     def _clean_and_normalize_string(raw: str) -> str:
+        """Clean and normalize a string by removing escape characters and extra whitespace."""
         unescaped = codecs.decode(raw, "unicode_escape").encode("latin1").decode("utf-8")
         return re.sub(r"\s+", " ", unescaped).strip()
 
 
 def main() -> None:
+    logger = logging.getLogger(__name__)
     crawler = LSFCrawler()
-    print([l.to_dict() for l in crawler.crawl_all_lectures(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
+    print([l.to_dict() for l in crawler.crawl_all_lectures_parallel(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
 
 
 if __name__ == "__main__":
