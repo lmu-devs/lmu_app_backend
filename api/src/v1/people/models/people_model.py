@@ -49,8 +49,6 @@ class Person(BaseModel):
     address: Optional[str] = None
     
     # Faculty information
-    faculty: Optional[str] = None
-    faculty_id: Optional[str] = None
     faculty_enum: Optional[FacultyEnum] = None
     
     # Academic information
@@ -67,12 +65,9 @@ class PersonSummary(BaseModel):
     name: str
     first_name: Optional[str] = None
     last_name: Optional[str] = None
-    primary_role: Optional[str] = None
-    email: Optional[str] = None
-    faculty: Optional[str] = None
-    faculty_id: Optional[str] = None
-    faculty_enum: Optional[FacultyEnum] = None
     academic_title: Optional[str] = None
+    primary_role: Optional[str] = None
+    faculty_enum: Optional[FacultyEnum] = None
 
 
 class PeopleResponse(BaseModel):
