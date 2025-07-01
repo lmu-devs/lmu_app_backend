@@ -2,9 +2,12 @@ import re
 from datetime import time, date as Date
 from pydantic import BaseModel, Field
 from typing import Any, List, Tuple, Optional
+from pathlib import Path
 
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
+from shared.src.services.directus_service import DirectusService
+
 
 
 class Person(BaseModel):
@@ -61,7 +64,6 @@ class AssociatedProgram(BaseModel):
 
 
 class ClassBaseInfo(BaseModel):
-    persons: Optional[list[Person]]
     institutions: Optional[list[Institution]]
     class_type: Optional[str] = Field(alias="Veranstaltungsart", default=None)
     class_id: Optional[str] = Field(alias="Veranstaltungsnummer", default=None)
@@ -175,6 +177,7 @@ class Lecture(BaseModel):
     class_sessions: Optional[List[ClassSession]]
     associated_tutorials: Optional[List[AssociatedTutorial]]
     associated_classes: Optional[List[AssociatedClass]]
+    persons: Optional[List[Person]]
 
     @staticmethod
     def publish_id_from_url(url: str) -> int:
@@ -198,6 +201,7 @@ class Lecture(BaseModel):
         class_sessions: Optional[List[ClassSession]] = None,
         associated_tutorials: Optional[List[AssociatedTutorial]] = None,
         associated_classes: Optional[List[AssociatedClass]] = None,
+        persons: Optional[List[Person]] = None,
     ) -> "Lecture":
         """Create a Lecture instance from a tuple containing lecture data."""
         title, url, paths = raw
@@ -217,6 +221,7 @@ class Lecture(BaseModel):
             class_sessions=class_sessions,
             associated_tutorials=associated_tutorials,
             associated_classes=associated_classes,
+            persons=persons
         )
 
     def to_dict(self) -> dict:
@@ -257,4 +262,35 @@ class Lecture(BaseModel):
             "associated_classes": (
                 [clss.model_dump(mode="json") for clss in self.associated_classes] if self.associated_classes else None
             ),
+            "persons": {"connect" : self.get_person_ids()}
         }
+
+    def get_person_ids(self):
+        if not self.base_info or not self.persons:
+            return []
+        return [self.get_person_id(person) for person in self.persons]
+
+    @staticmethod
+    def get_person_id(person: Person) -> Optional[str]:
+        GET_PERSON_ID_QUERY_NAME = "get_person_id.graphql"
+        GRAPHQL_FOLDER_NAME = "graphql"
+        directus = DirectusService()
+        base_path = Path(__file__).parent.parent
+        folder = GRAPHQL_FOLDER_NAME
+        query_name = GET_PERSON_ID_QUERY_NAME
+        query_path = base_path / folder / query_name
+
+        response = directus.execute_query_file(
+            query_path,
+            variables={
+                "firstName": person.first_name,
+                "lastName": person.surname
+            },
+        )
+        persons = response.get("data", {}).get("people", [])
+        return persons[0].get("id") if persons else None
+
+
+if __name__ == "__main__":
+    person = Person(first_name="Daniel", surname="Altmann", title=None)
+    print(Lecture.get_person_id(person))

@@ -1,0 +1,12 @@
+query GetPersonID($firstName: String!, $lastName: String!) {
+    people(
+        filter: {
+            basic_info: {
+                first_name: { _eq: $firstName }
+                last_name: { _eq: $lastName }
+            }
+        }
+    ) {
+        id
+    }
+}

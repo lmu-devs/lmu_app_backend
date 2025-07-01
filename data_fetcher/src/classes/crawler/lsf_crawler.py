@@ -85,7 +85,7 @@ class LSFCrawler:
     def crawl_all_lectures_parallel(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type in parallel."""
         self._set_crawling_parameters(year, semester_type)
-        lecture_urls = self._crawl_lecture_urls_in_parallel()
+        lecture_urls = self._crawl_lecture_urls_in_parallel()[:100]
         return self._crawl_all_lectures_in_parallel(lecture_urls)
 
     def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
@@ -195,6 +195,7 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
+            self._extract_responsible_persons_from_lecture_page(response_bytes)
         )
 
     def build_complete_lecture_object(self, name: str, url: str) -> Lecture:
@@ -213,6 +214,7 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
+            self._extract_responsible_persons_from_lecture_page(response_bytes)
         )
 
     def _does_class_type_have_too_many_results(self, class_type: int) -> bool:
@@ -243,6 +245,9 @@ class LSFCrawler:
     def _get_lecture_urls_with_search_filter(self, search_text: str, class_type: int) -> list[tuple[str, str]]:
         """Extract lecture URLs from search results for a given search filter."""
         request_bytes = self._make_safe_http_request(self._build_class_search_url(search_text, class_type))
+        if self._is_invalid_semester(request_bytes):
+            return []
+
         tree = html.fromstring(request_bytes)
 
         classes = tree.xpath('//a[@class="regular" and @title]')
@@ -254,6 +259,9 @@ class LSFCrawler:
         return [
             (self._clean_and_normalize_string(c.text), self._clean_and_normalize_string(c.get("href"))) for c in classes
         ]
+
+    def _is_invalid_semester(self, response_bytes: bytes) -> bool:
+        return "Ungültiges Semester" in response_bytes.decode()
 
     def _extract_result_count_from_info_bar(self, info: Any) -> int:
         """Parse the class count from the info section of the HTML."""
@@ -335,7 +343,6 @@ class LSFCrawler:
     def _extract_class_base_information(self, response_bytes: bytes) -> ClassBaseInfo:
         """Extract basic class information including persons and institutions."""
         base_info_dict: dict[str, Any] = {
-            "persons": self._extract_responsible_persons_from_lecture_page(response_bytes),
             "institutions": self._extract_associated_institutions_from_lecture_page(response_bytes),
         }
         return ClassBaseInfo(**(base_info_dict | self._extract_basic_lecture_data_from_html(response_bytes)))
