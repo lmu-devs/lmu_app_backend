@@ -1,0 +1,15 @@
+mutation UpdateCalendarException($id: ID!, $data: update_calendar_exceptions_input!) {
+  update_calendar_exceptions_item(id: $id, data: $data) {
+    id
+    title
+    description
+    recurrence_id
+    start_time
+    end_time
+    address
+    all_day
+    event {
+      id
+    }
+  }
+}

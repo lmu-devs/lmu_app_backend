@@ -1,0 +1,21 @@
+mutation CreateCalendarEvent($data: create_calendar_event_input!) {
+  create_calendar_event_item(data: $data) {
+    id
+    user_id
+    date_created
+    date_updated
+    title
+    description
+    address
+    all_day
+    event_type
+    start_time
+    end_time
+    rule {
+      id
+      frequency
+      interval
+      until_time
+    }
+  }
+}

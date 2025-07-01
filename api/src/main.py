@@ -11,6 +11,7 @@ from shared.src.core.exceptions import APIException
 from shared.src.core.logging import get_food_logger
 from shared.src.core.settings import get_settings
 
+from .v1.calendar.routers import calendar_router
 from .v1.cinema.routers import cinema_router
 from .v1.feature_flag.routers import feature_flags_router
 from .v1.feedback.routers import feedback_router
@@ -93,6 +94,7 @@ def create_app():
     app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
     app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
     app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
+    app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
     app.include_router(university_router.router, prefix=f"{prefix_v1}", tags=["university"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
