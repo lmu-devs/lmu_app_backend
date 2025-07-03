@@ -6,7 +6,6 @@ mutation CreateCalendarEvent($data: create_calendar_event_input!) {
     date_updated
     title
     description
-    address
     all_day
     event_type
     start_time
@@ -16,6 +15,11 @@ mutation CreateCalendarEvent($data: create_calendar_event_input!) {
       frequency
       interval
       until_time
+    }
+    location {
+      address
+      latitude
+      longitude
     }
   }
 }
