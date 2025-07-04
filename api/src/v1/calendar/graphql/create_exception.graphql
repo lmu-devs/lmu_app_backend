@@ -6,8 +6,12 @@ mutation CreateCalendarException($data: create_calendar_exceptions_input!) {
     recurrence_id
     start_time
     end_time
-    address
     all_day
+    location {
+      address
+      latitude
+      longitude
+    }
     event {
       id
     }

@@ -1,0 +1,7 @@
+mutation DeleteCalendarEventLocation( 
+  $locationId: ID!
+) {
+  delete_calendar_location_item(id: $locationId) {
+    id
+  }
+}

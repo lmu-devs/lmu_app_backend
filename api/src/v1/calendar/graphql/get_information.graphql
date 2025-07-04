@@ -7,6 +7,12 @@ query GetInformationFromCalendarEvent($filter: calendar_event_filter) {
     }
     exceptions {
       id
+      location {
+        id
+      }
+    }
+    location {
+      id
     }
   }
 }

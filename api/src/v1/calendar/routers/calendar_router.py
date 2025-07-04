@@ -15,14 +15,14 @@ async def create_calendar_entry(
     calendar_data: CalendarCreate,
     user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    entries = CalendarService().create_calendar_entry(user.id, calendar_data)
+    entries = CalendarService().create_entry(user.id, calendar_data)
     return CalendarEntries.from_list(entries)
 
 @router.delete("/calendar-delete/{entry_id}", response_model=bool, description="Delete a calendar entry.")
 async def delete_calendar_entry(
     entry_id: uuid.UUID
 ):
-    return CalendarService().delete_calendar_entry(entry_id)
+    return CalendarService().delete_entry(entry_id)
 
 @router.put("/calendar-update", response_model=CalendarEntries, description="Update a calendar entry.")
 async def update_calendar_entry(
@@ -32,7 +32,7 @@ async def update_calendar_entry(
     update_type: int = 0,
     user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
-    entries = CalendarService().update_calendar_entry(user.id, entry_id, recurrence_id, calendar_data, update_type)
+    entries = CalendarService().update_entry(user.id, entry_id, recurrence_id, calendar_data, update_type)
     return CalendarEntries.from_list(entries)
 
 @router.get("/calendar-get", response_model=CalendarEntries, description="Get all calendar entries for a user. Optional with a filter.")
