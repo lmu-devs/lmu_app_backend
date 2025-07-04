@@ -16,3 +16,4 @@ class ReleaseNoteDetail(BaseModel):
 class ReleaseNoteResponse(BaseModel):
     highlights: List[ReleaseNoteHighlight] | None = None
     details: List[ReleaseNoteDetail] | None = None
+    show_privacy_policy: bool | None = None

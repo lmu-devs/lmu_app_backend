@@ -4,5 +4,6 @@ query GetReleaseNotes($languageCode: String!, $version: String!) {
             highlights
             details
         }
+        show_privacy_policy
     }
 }
