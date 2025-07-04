@@ -230,7 +230,7 @@ class CalendarService:
             self._delete_location_entry(exc_location_id)
 
             exc_id = exc.get("id")
-            exc_delete = self._execute_graphql_file(GraphQLFile.kDeleteException, {"exeptionId": exc_id}, [])
+            exc_delete = self._execute_graphql_file(GraphQLFile.kDeleteException, {"exceptionId": exc_id}, [])
             if not exc_delete:
                 raise DatabaseError(f"Failed to delete exception {exc_id}")
 

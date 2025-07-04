@@ -1,5 +1,5 @@
-mutation DeleteCalendarException($exeptionId: ID!) {
-  delete_calendar_exceptions_item(id: $exeptionId) {
+mutation DeleteCalendarException($exceptionId: ID!) {
+  delete_calendar_exceptions_item(id: $exceptionId) {
     id
   }
 }
