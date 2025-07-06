@@ -109,3 +109,7 @@ def get_calendar_logger(module_name: str):
 # Service Logger
 def get_service_logger(module_name: str):
     return setup_logger(module_name, "service", "service")
+
+
+def get_classes_logger(module_name: str):
+    return setup_logger(module_name, "classes", "classes")
