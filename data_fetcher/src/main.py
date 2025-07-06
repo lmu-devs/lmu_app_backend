@@ -3,13 +3,13 @@ import signal
 import sys
 
 from data_fetcher.src.cinema.cinema_collector import CinemaCollector
+from data_fetcher.src.classes.classes_collecter import ClassesCollecter
 from data_fetcher.src.food.food_collector import FoodCollector
 from data_fetcher.src.library.library_collector import LibraryCollector
 from data_fetcher.src.link.link_collector import LinkCollector
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
 from data_fetcher.src.university.university_collector import UniversityCollector
-from data_fetcher.src.classes.classes_collecter import ClassesCollecter
 from shared.src.core.database import Database, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
@@ -22,14 +22,14 @@ class DataCollectorApp:
         self.settings = get_settings()
         self.is_running = True
         self.collectors = [
-            ClassesCollecter(),
             LinkCollector(),
             UniversityCollector(),
             RoomfinderCollector(),
             LibraryCollector(),
-            # FoodCollector(),
+            FoodCollector(),
             SportCollector(),
             CinemaCollector(),
+            ClassesCollecter(),
         ]
 
     async def setup(self):
@@ -55,9 +55,7 @@ class DataCollectorApp:
         try:
             await self.setup()
 
-            tasks = [
-                asyncio.create_task(collector.run()) for collector in self.collectors
-            ]
+            tasks = [asyncio.create_task(collector.run()) for collector in self.collectors]
 
             await asyncio.gather(*tasks, return_exceptions=True)
 
