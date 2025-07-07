@@ -13,7 +13,7 @@ router = APIRouter()
 @router.post("/calendar-create", response_model=CalendarEntries, description="Create a calendar entry.")
 async def create_calendar_entry(
     calendar_data: CalendarCreate,
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    user: UserTable = Depends(APIKey.verify_user_api_key)
 ):
     entries = CalendarService().create_entry(user.id, calendar_data)
     return CalendarEntries.from_list(entries)
@@ -30,7 +30,7 @@ async def update_calendar_entry(
     entry_id: uuid.UUID,
     recurrence_id: Optional[int] = None,
     update_type: int = 0,
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    user: UserTable = Depends(APIKey.verify_user_api_key)
 ):
     entries = CalendarService().update_entry(user.id, entry_id, recurrence_id, calendar_data, update_type)
     return CalendarEntries.from_list(entries)
@@ -40,7 +40,7 @@ async def get_calendar_entries(
     event_type: Optional[str] = None,
     frequency: Optional[str] = None,
     all_day: Optional[bool] = None,
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
+    user: UserTable = Depends(APIKey.verify_user_api_key)
 ):
     entries = CalendarService().get_all(user.id, event_type, frequency, all_day)
     return CalendarEntries.from_list(entries)
