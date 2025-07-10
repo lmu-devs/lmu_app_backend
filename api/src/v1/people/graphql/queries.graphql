@@ -1,0 +1,55 @@
+# Get a person by ID
+query GetPersonById($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        name
+        profile_url
+        basic_info {
+            id
+            first_name
+            last_name
+            gender
+            title
+            academic_degree
+            employment_status
+            name_suffix
+        }
+        email
+        adress
+        faculty_enum
+        academic_title_enum
+        status
+        note
+        office_hours
+    }
+}
+
+# Get all people (with optional filtering, pagination)
+query GetAllPeople($where: people_filter, $limit: Int, $offset: Int) {
+    people(filter: $where, limit: $limit, offset: $offset) {
+        id
+        name
+        profile_url
+        faculty_enum
+    }
+}
+
+# Get roles for a person
+query GetPeopleRoles($person_id: String!) {
+    people_roles(filter: { people: { id: { _eq: $person_id } } }) {
+        id
+        lsf_role_enum
+        institutions
+    }
+}
+
+# Get courses for a person
+query GetPeopleCourses($person_id: String!) {
+    people_courses(filter: { people: { id: { _eq: $person_id } } }) {
+        id
+        course_number
+        course_name
+        semester
+        course_url
+    }
+}
