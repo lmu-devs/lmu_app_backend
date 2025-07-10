@@ -1,0 +1,10 @@
+# Simple people query - testing basic functionality  
+query GetAllPeople($limit: Int, $offset: Int) {
+    people(limit: $limit, offset: $offset) {
+        id
+        name
+        email
+        phone
+        faculty_enum
+    }
+}

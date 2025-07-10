@@ -41,7 +41,7 @@ class Person(BaseModel):
     
     # Names
     name: str  # Full name from crawler
-    basic_info: PersonBasicInfo
+    basic_info: Optional[PersonBasicInfo] = None
     
     # Contact information
     email: Optional[str] = None
@@ -62,5 +62,22 @@ class Person(BaseModel):
     # Related data
     roles: List[PersonRole] = []
     courses: List[PersonCourse] = []
-    
+
+
+class PersonSummary(BaseModel):
+    """Summary person model for list responses"""
+    id: str
+    name: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    primary_role: Optional[str] = None
+    faculty_enum: Optional[FacultyEnum] = None
+    academic_title: Optional[str] = None
+
+
+class PeopleResponse(BaseModel):
+    """Response model for people list endpoints"""
+    people: List[PersonSummary]
+    total_count: int
+    faculty_filter: Optional[FacultyEnum] = None
 
