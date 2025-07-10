@@ -2,14 +2,40 @@ from enum import Enum
 import re
 from typing import Optional
 
-from shared.src.core.logging import get_food_logger
+from shared.src.core.logging import get_main_fetcher_logger
 from .language_enums import LanguageEnum
 from .faculty_enums import FacultyEnum
 
-logger = get_food_logger(__name__)
+logger = get_main_fetcher_logger(__name__)
 
 
-class LSFRole(str, Enum):
+class GenderEnum(str, Enum):
+    """Gender categories"""
+    
+    MALE = "MALE"
+    FEMALE = "FEMALE"
+    DIVERSE = "DIVERSE"
+    UNKNOWN = "UNKNOWN"
+
+    @classmethod
+    def from_string(cls, text: str) -> "GenderEnum":
+        """Extract gender from text string"""
+        if not text:
+            return cls.UNKNOWN
+            
+        text = text.strip().lower()
+        
+        if text in ["männlich", "male", "m"]:
+            return cls.MALE
+        elif text in ["weiblich", "female", "f", "w"]:
+            return cls.FEMALE
+        elif text in ["divers", "diverse", "d"]:
+            return cls.DIVERSE
+        else:
+            return cls.UNKNOWN
+
+
+class LSFRoleEnum(str, Enum):
     """Actual roles from LMU LSF system"""
     
     # Teaching and Academic Staff
@@ -70,14 +96,20 @@ class LSFRole(str, Enum):
     UNKNOWN = "UNKNOWN"
 
     @classmethod
-    def from_string(cls, text: str) -> "LSFRole":
+    def from_string(cls, text: str) -> "LSFRoleEnum":
         """Extract LSF role from text string"""
         if not text:
             return cls.UNKNOWN
             
         text = text.strip()
         
-        # Check translations first
+        # First, try direct enum value match (for cases like "ASSISTENZARZT")
+        try:
+            return cls(text)
+        except ValueError:
+            pass
+        
+        # Check translations second
         for role, translations in lsf_role_translations.items():
             if text == translations.get(LanguageEnum.GERMAN, ""):
                 return role
@@ -86,13 +118,13 @@ class LSFRole(str, Enum):
         return cls.UNKNOWN
 
     @classmethod
-    def from_id(cls, role_id: int, role_name: str) -> "LSFRole":
-        """Create LSFRole from LSF system ID and name"""
-        logger.debug(f"Creating LSFRole from ID {role_id} and name: {role_name}")
+    def from_id(cls, role_id: int, role_name: str) -> "LSFRoleEnum":
+        """Create LSFRoleEnum from LSF system ID and name"""
+        logger.debug(f"Creating LSFRoleEnum from ID {role_id} and name: {role_name}")
         return cls.from_string(role_name)
 
 
-class AcademicTitle(str, Enum):
+class AcademicTitleEnum(str, Enum):
     """Academic titles and degrees from LMU system"""
     
     # Professor titles
@@ -176,7 +208,7 @@ class AcademicTitle(str, Enum):
     UNKNOWN = "UNKNOWN"
 
     @classmethod
-    def from_string(cls, text: str) -> "AcademicTitle":
+    def from_string(cls, text: str) -> "AcademicTitleEnum":
         """Extract academic title from text string"""
         if not text:
             return cls.UNKNOWN
@@ -188,23 +220,87 @@ class AcademicTitle(str, Enum):
             if text == translations.get(LanguageEnum.GERMAN, ""):
                 return title
         
-        # Pattern matching for common variations if not found in translations
-        if text.startswith("Prof."):
-            if "Dr. Dr." in text:
-                return cls.PROF_DR_DR
-            elif "Dr. habil." in text:
-                return cls.PROF_DR_HABIL
-            elif "Dr. h.c." in text:
-                return cls.PROF_DR_HC
-            elif "em." in text:
-                return cls.PROF_EM_DR
-            elif "i.R." in text:
-                return cls.PROF_IR_DR
-            elif "Dr." in text:
-                return cls.PROF_DR
-            else:
-                return cls.PROF_DR
-                
+        # Normalize the text first
+        normalized_text = text.strip()
+        
+        # Fallback: direct mapping for common variations
+        title_mapping = {
+            "Prof. Dr.": cls.PROF_DR,
+            "Prof. Dr. Dr.": cls.PROF_DR_DR,
+            "Prof. Dr. habil.": cls.PROF_DR_HABIL,
+            "Prof. Dr. h.c.": cls.PROF_DR_HC,
+            "Prof. em. Dr.": cls.PROF_EM_DR,
+            "Prof. i.R. Dr.": cls.PROF_IR_DR,
+            "apl. Prof. Dr.": cls.APL_PROF_DR,
+            "PD Dr.": cls.PD_DR,
+            "Dr. med.": cls.DR_MED,
+            "Dr.med.": cls.DR_MED,  # Without space
+            "Dr. med. univ.": cls.DR_MED_UNIV,
+            "Dr.med.univ.": cls.DR_MED_UNIV,  # Without spaces
+            "Dr.med.uni.": cls.DR_MED_UNIV,  # Alternative abbreviation
+            "Dr. phil.": cls.DR_PHIL,
+            "Dr.phil.": cls.DR_PHIL,  # Without space
+            "Dr. rer. nat.": cls.DR_RER_NAT,
+            "Dr.rer.nat.": cls.DR_RER_NAT,  # Without spaces
+            "Dr. rer. pol.": cls.DR_RER_POL,
+            "Dr.rer.pol.": cls.DR_RER_POL,  # Without spaces
+            "Dr. theol.": cls.DR_THEOL,
+            "Dr.theol.": cls.DR_THEOL,  # Without space
+            "Dr. jur.": cls.DR_JUR,
+            "Dr.jur.": cls.DR_JUR,  # Without space
+            "Dr. iur.": cls.DR_IUR,
+            "Dr.iur.": cls.DR_IUR,  # Without space
+            "Dr. rer. biol. hum.": cls.DR_RER_BIOL_HUM,
+            "Dr. habil.": cls.DR_HABIL,
+            "Dr.habil.": cls.DR_HABIL,  # Without space
+            "Dr. Ing.": cls.DR_ING,
+            "Dr.Ing.": cls.DR_ING,  # Without space
+            "Dr. Dr.": cls.DR_DR,
+            "Dr.Dr.": cls.DR_DR,  # Without space
+            "Dr. Dr. med.": cls.DR_DR_MED,
+            "Dr.Dr.med.": cls.DR_DR_MED,  # Without spaces
+            "Ph.D.": cls.PHD,
+            "PhD": cls.PHD,  # Without periods
+            "M.D.": cls.MD,
+            "MD": cls.MD,  # Without periods
+            "M.A.": cls.MA,
+            "MA": cls.MA,  # Without periods
+            "M.Sc.": cls.MSC,
+            "MSc": cls.MSC,  # Without periods
+            "M.B.A.": cls.MBA,
+            "MBA": cls.MBA,  # Without periods
+            "M.P.H.": cls.MPH,
+            "MPH": cls.MPH,  # Without periods
+            "B.A.": cls.BA,
+            "BA": cls.BA,  # Without periods
+            "B.Sc.": cls.BSC,
+            "BSc": cls.BSC,  # Without periods
+            "Dipl.-Psych.": cls.DIPL_PSYCH,
+            "Dipl.-Biol.": cls.DIPL_BIOL,
+            "Dipl.-Ing.": cls.DIPL_ING,
+            "Dipl.-Math.": cls.DIPL_MATH,
+            "Dipl.-Phys.": cls.DIPL_PHYS,
+            "Dipl.-Chem.": cls.DIPL_CHEM,
+            "Dipl.-Inf.": cls.DIPL_INF,
+            "Dipl.-Kfm.": cls.DIPL_KFM,
+        }
+        
+        # Try exact match first
+        if normalized_text in title_mapping:
+            return title_mapping[normalized_text]
+        
+        # Try pattern matching for complex titles
+        if "Dr.med." in normalized_text or "Dr. med." in normalized_text:
+            return cls.DR_MED
+        elif "Dr.phil." in normalized_text or "Dr. phil." in normalized_text:
+            return cls.DR_PHIL
+        elif "Dr.rer.nat." in normalized_text or "Dr. rer. nat." in normalized_text:
+            return cls.DR_RER_NAT
+        elif "Prof." in normalized_text and "Dr." in normalized_text:
+            return cls.PROF_DR
+        elif "Dr." in normalized_text:
+            return cls.DR_MED  # Default fallback for Dr. titles
+        
         logger.warning(f"No matching academic title found for text: {text}")
         return cls.UNKNOWN
 
@@ -232,7 +328,6 @@ class EmploymentStatusEnum(str, Enum):
             return cls.UNKNOWN
 
 
-# Helper function to map CSV faculty names to existing FacultyEnum
 def map_faculty_name_to_enum(german_faculty_name: str) -> FacultyEnum:
     """Map German faculty name from CSV to existing FacultyEnum"""
     if not german_faculty_name:
@@ -263,244 +358,421 @@ def map_faculty_name_to_enum(german_faculty_name: str) -> FacultyEnum:
     return faculty_name_mapping.get(german_faculty_name.strip())
 
 
+def map_academic_title_to_enum(academic_title_text: str) -> AcademicTitleEnum:
+    """Map academic title text to AcademicTitleEnum"""
+    if not academic_title_text:
+        return None
+        
+    # First try to match using the from_string method
+    try:
+        return AcademicTitleEnum.from_string(academic_title_text)
+    except Exception:
+        pass
+    
+    # Normalize the text first
+    normalized_text = academic_title_text.strip()
+    
+    # Fallback: direct mapping for common variations
+    title_mapping = {
+        "Prof. Dr.": AcademicTitleEnum.PROF_DR,
+        "Prof. Dr. Dr.": AcademicTitleEnum.PROF_DR_DR,
+        "Prof. Dr. habil.": AcademicTitleEnum.PROF_DR_HABIL,
+        "Prof. Dr. h.c.": AcademicTitleEnum.PROF_DR_HC,
+        "Prof. em. Dr.": AcademicTitleEnum.PROF_EM_DR,
+        "Prof. i.R. Dr.": AcademicTitleEnum.PROF_IR_DR,
+        "apl. Prof. Dr.": AcademicTitleEnum.APL_PROF_DR,
+        "PD Dr.": AcademicTitleEnum.PD_DR,
+        "Dr. med.": AcademicTitleEnum.DR_MED,
+        "Dr.med.": AcademicTitleEnum.DR_MED,  # Without space
+        "Dr. med. univ.": AcademicTitleEnum.DR_MED_UNIV,
+        "Dr.med.univ.": AcademicTitleEnum.DR_MED_UNIV,  # Without spaces
+        "Dr.med.uni.": AcademicTitleEnum.DR_MED_UNIV,  # Alternative abbreviation
+        "Dr. phil.": AcademicTitleEnum.DR_PHIL,
+        "Dr.phil.": AcademicTitleEnum.DR_PHIL,  # Without space
+        "Dr. rer. nat.": AcademicTitleEnum.DR_RER_NAT,
+        "Dr.rer.nat.": AcademicTitleEnum.DR_RER_NAT,  # Without spaces
+        "Dr. rer. pol.": AcademicTitleEnum.DR_RER_POL,
+        "Dr.rer.pol.": AcademicTitleEnum.DR_RER_POL,  # Without spaces
+        "Dr. theol.": AcademicTitleEnum.DR_THEOL,
+        "Dr.theol.": AcademicTitleEnum.DR_THEOL,  # Without space
+        "Dr. jur.": AcademicTitleEnum.DR_JUR,
+        "Dr.jur.": AcademicTitleEnum.DR_JUR,  # Without space
+        "Dr. iur.": AcademicTitleEnum.DR_IUR,
+        "Dr.iur.": AcademicTitleEnum.DR_IUR,  # Without space
+        "Dr. rer. biol. hum.": AcademicTitleEnum.DR_RER_BIOL_HUM,
+        "Dr. habil.": AcademicTitleEnum.DR_HABIL,
+        "Dr.habil.": AcademicTitleEnum.DR_HABIL,  # Without space
+        "Dr. Ing.": AcademicTitleEnum.DR_ING,
+        "Dr.Ing.": AcademicTitleEnum.DR_ING,  # Without space
+        "Dr. Dr.": AcademicTitleEnum.DR_DR,
+        "Dr.Dr.": AcademicTitleEnum.DR_DR,  # Without space
+        "Dr. Dr. med.": AcademicTitleEnum.DR_DR_MED,
+        "Dr.Dr.med.": AcademicTitleEnum.DR_DR_MED,  # Without spaces
+        "Ph.D.": AcademicTitleEnum.PHD,
+        "PhD": AcademicTitleEnum.PHD,  # Without periods
+        "M.D.": AcademicTitleEnum.MD,
+        "MD": AcademicTitleEnum.MD,  # Without periods
+        "M.A.": AcademicTitleEnum.MA,
+        "MA": AcademicTitleEnum.MA,  # Without periods
+        "M.Sc.": AcademicTitleEnum.MSC,
+        "MSc": AcademicTitleEnum.MSC,  # Without periods
+        "M.B.A.": AcademicTitleEnum.MBA,
+        "MBA": AcademicTitleEnum.MBA,  # Without periods
+        "M.P.H.": AcademicTitleEnum.MPH,
+        "MPH": AcademicTitleEnum.MPH,  # Without periods
+        "B.A.": AcademicTitleEnum.BA,
+        "BA": AcademicTitleEnum.BA,  # Without periods
+        "B.Sc.": AcademicTitleEnum.BSC,
+        "BSc": AcademicTitleEnum.BSC,  # Without periods
+        "Dipl.-Psych.": AcademicTitleEnum.DIPL_PSYCH,
+        "Dipl.-Biol.": AcademicTitleEnum.DIPL_BIOL,
+        "Dipl.-Ing.": AcademicTitleEnum.DIPL_ING,
+        "Dipl.-Math.": AcademicTitleEnum.DIPL_MATH,
+        "Dipl.-Phys.": AcademicTitleEnum.DIPL_PHYS,
+        "Dipl.-Chem.": AcademicTitleEnum.DIPL_CHEM,
+        "Dipl.-Inf.": AcademicTitleEnum.DIPL_INF,
+        "Dipl.-Kfm.": AcademicTitleEnum.DIPL_KFM,
+    }
+    
+    # Try exact match first
+    if normalized_text in title_mapping:
+        return title_mapping[normalized_text]
+    
+    # Try pattern matching for complex titles
+    if "Dr.med." in normalized_text or "Dr. med." in normalized_text:
+        return AcademicTitleEnum.DR_MED
+    elif "Dr.phil." in normalized_text or "Dr. phil." in normalized_text:
+        return AcademicTitleEnum.DR_PHIL
+    elif "Dr.rer.nat." in normalized_text or "Dr. rer. nat." in normalized_text:
+        return AcademicTitleEnum.DR_RER_NAT
+    elif "Prof." in normalized_text and "Dr." in normalized_text:
+        return AcademicTitleEnum.PROF_DR
+    elif "Dr." in normalized_text:
+        return AcademicTitleEnum.DR_MED  # Default fallback for Dr. titles
+    
+    return AcademicTitleEnum.UNKNOWN
+
+
+def map_gender_to_enum(gender_text: str) -> GenderEnum:
+    """Map gender text to GenderEnum"""
+    if not gender_text:
+        return None
+        
+    return GenderEnum.from_string(gender_text)
+
+
+def map_employment_status_to_enum(status_text: str) -> EmploymentStatusEnum:
+    """Map employment status text to EmploymentStatusEnum"""
+    if not status_text:
+        return None
+        
+    # Normalize the text first
+    normalized_text = status_text.strip().lower()
+    
+    # Direct mapping for simple cases
+    if normalized_text == "extern":
+        return EmploymentStatusEnum.EXTERN
+    elif normalized_text == "intern":
+        return EmploymentStatusEnum.INTERN
+    
+    # Smart mapping based on job roles
+    # External roles (typically temporary, guest, or non-university positions)
+    external_indicators = [
+        "gast",  # Guest
+        "externe",  # External
+        "lehrbeauftragte",  # Lecturer (often external)
+        "honorarprofessor",  # Honorary professor (external)
+        "gastprofessor",  # Visiting professor (external)
+        "privatdozent"  # Private lecturer (often external)
+    ]
+    
+    # Internal roles (typically permanent university staff)
+    internal_indicators = [
+        "wissenschaftliche",  # Research staff
+        "professor",  # Professor
+        "akademische",  # Academic staff
+        "mitarbeiter",  # Staff member
+        "direktor",  # Director
+        "oberrat",  # Senior councilor
+        "assistent",  # Assistant
+        "sekretariat",  # Secretariat
+        "verwaltung",  # Administration
+        "vorstand",  # Board
+        "geschäftsführung",  # Management
+        "tutor",  # Tutor
+        "hilfskraft"  # Student assistant
+    ]
+    
+    # Check for external indicators
+    for indicator in external_indicators:
+        if indicator in normalized_text:
+            return EmploymentStatusEnum.EXTERN
+    
+    # Check for internal indicators
+    for indicator in internal_indicators:
+        if indicator in normalized_text:
+            return EmploymentStatusEnum.INTERN
+    
+    # Default fallback
+    return EmploymentStatusEnum.UNKNOWN
+
+
+def map_lsf_role_to_enum(role_text: str) -> LSFRoleEnum:
+    """Map LSF role text to LSFRoleEnum"""
+    if not role_text:
+        return None
+    
+    # Normalize the text
+    normalized_text = role_text.strip()
+    
+    # Try direct enum value first
+    try:
+        return LSFRoleEnum(normalized_text)
+    except ValueError:
+        pass
+    
+    # Try the from_string method (which handles translations)
+    return LSFRoleEnum.from_string(normalized_text)
+
+
 # Translation dictionaries following the pattern from faculty_enums.py
 lsf_role_translations = {
-    LSFRole.ABGEORDNETE_LEHRKRAFT: {
+    LSFRoleEnum.ABGEORDNETE_LEHRKRAFT: {
         LanguageEnum.GERMAN: "Abgeordnete Lehrkraft",
         LanguageEnum.ENGLISH_US: "Delegated Teaching Staff",
     },
-    LSFRole.AKADEMISCHER_DIREKTOR: {
+    LSFRoleEnum.AKADEMISCHER_DIREKTOR: {
         LanguageEnum.GERMAN: "Akademische/r Direktor/in",
         LanguageEnum.ENGLISH_US: "Academic Director",
     },
-    LSFRole.AKADEMISCHER_OBERRAT: {
+    LSFRoleEnum.AKADEMISCHER_OBERRAT: {
         LanguageEnum.GERMAN: "Akademische/r Oberrat/Oberrätin",
         LanguageEnum.ENGLISH_US: "Senior Academic Councilor",
     },
-    LSFRole.AKADEMISCHER_RAT: {
+    LSFRoleEnum.AKADEMISCHER_RAT: {
         LanguageEnum.GERMAN: "Akademische/r Rat/Rätin",
         LanguageEnum.ENGLISH_US: "Academic Councilor",
     },
-    LSFRole.APL_PROFESSOR: {
+    LSFRoleEnum.APL_PROFESSOR: {
         LanguageEnum.GERMAN: "Apl. Professor/in",
         LanguageEnum.ENGLISH_US: "Associate Professor (apl.)",
     },
-    LSFRole.ASSISTENT: {
+    LSFRoleEnum.ASSISTENT: {
         LanguageEnum.GERMAN: "Assistent/in",
         LanguageEnum.ENGLISH_US: "Assistant",
     },
-    LSFRole.EMERITIERTER_PROFESSOR: {
+    LSFRoleEnum.EMERITIERTER_PROFESSOR: {
         LanguageEnum.GERMAN: "Emeritierte/r Professor/in",
         LanguageEnum.ENGLISH_US: "Professor Emeritus",
     },
-    LSFRole.EXTERNER_DOZENT: {
+    LSFRoleEnum.EXTERNER_DOZENT: {
         LanguageEnum.GERMAN: "Externe/r Dozent/in",
         LanguageEnum.ENGLISH_US: "External Lecturer",
     },
-    LSFRole.GASTPROFESSOR: {
+    LSFRoleEnum.GASTPROFESSOR: {
         LanguageEnum.GERMAN: "Gastprofessor/in",
         LanguageEnum.ENGLISH_US: "Visiting Professor",
     },
-    LSFRole.HONORARPROFESSOR: {
+    LSFRoleEnum.HONORARPROFESSOR: {
         LanguageEnum.GERMAN: "Honorarprofessor/in",
         LanguageEnum.ENGLISH_US: "Honorary Professor",
     },
-    LSFRole.JUNIORPROFESSOR: {
+    LSFRoleEnum.JUNIORPROFESSOR: {
         LanguageEnum.GERMAN: "Juniorprofessor/in",
         LanguageEnum.ENGLISH_US: "Junior Professor",
     },
-    LSFRole.LEHRBEAUFTRAGTER: {
+    LSFRoleEnum.LEHRBEAUFTRAGTER: {
         LanguageEnum.GERMAN: "Lehrbeauftragte/r",
         LanguageEnum.ENGLISH_US: "Lecturer",
     },
-    LSFRole.LEHRKRAFT_BESONDERE_AUFGABEN: {
+    LSFRoleEnum.LEHRKRAFT_BESONDERE_AUFGABEN: {
         LanguageEnum.GERMAN: "Lehrkraft für besondere Aufgaben",
         LanguageEnum.ENGLISH_US: "Teaching Staff for Special Tasks",
     },
-    LSFRole.LEHRSTUHLVERTRETER: {
+    LSFRoleEnum.LEHRSTUHLVERTRETER: {
         LanguageEnum.GERMAN: "Lehrstuhlvertreter/in",
         LanguageEnum.ENGLISH_US: "Chair Representative",
     },
-    LSFRole.LEKTOR: {
+    LSFRoleEnum.LEKTOR: {
         LanguageEnum.GERMAN: "Lektor/in",
         LanguageEnum.ENGLISH_US: "Senior Lecturer",
     },
-    LSFRole.LTD_AKADEMISCHER_DIREKTOR: {
+    LSFRoleEnum.LTD_AKADEMISCHER_DIREKTOR: {
         LanguageEnum.GERMAN: "Ltd. Akadmische/r Direktor/in",
         LanguageEnum.ENGLISH_US: "Senior Academic Director",
     },
-    LSFRole.PRIVATDOZENT: {
+    LSFRoleEnum.PRIVATDOZENT: {
         LanguageEnum.GERMAN: "Privatdozent/in",
         LanguageEnum.ENGLISH_US: "Privatdozent",
     },
-    LSFRole.PROFESSOR_IR: {
+    LSFRoleEnum.PROFESSOR_IR: {
         LanguageEnum.GERMAN: "Professor i.R.",
         LanguageEnum.ENGLISH_US: "Professor (Retired)",
     },
-    LSFRole.PROFESSOR: {
+    LSFRoleEnum.PROFESSOR: {
         LanguageEnum.GERMAN: "Professor/in",
         LanguageEnum.ENGLISH_US: "Professor",
     },
-    LSFRole.PROFESSURVERTRETER: {
+    LSFRoleEnum.PROFESSURVERTRETER: {
         LanguageEnum.GERMAN: "Professurvertreter/in",
         LanguageEnum.ENGLISH_US: "Professor Representative",
     },
-    LSFRole.TUTOR: {
+    LSFRoleEnum.TUTOR: {
         LanguageEnum.GERMAN: "Tutor/in",
         LanguageEnum.ENGLISH_US: "Tutor",
     },
-    LSFRole.UNIVERSITAETSDOZENT: {
+    LSFRoleEnum.UNIVERSITAETSDOZENT: {
         LanguageEnum.GERMAN: "Universitätsdozent/in",
         LanguageEnum.ENGLISH_US: "University Lecturer",
     },
-    LSFRole.SONST_DOZENT: {
+    LSFRoleEnum.SONST_DOZENT: {
         LanguageEnum.GERMAN: "sonst. Dozent/in",
         LanguageEnum.ENGLISH_US: "Other Lecturer",
     },
-    LSFRole.ASSISTENZARZT: {
+    LSFRoleEnum.ASSISTENZARZT: {
         LanguageEnum.GERMAN: "Assistenzarzt/Assistenzärztin",
         LanguageEnum.ENGLISH_US: "Resident Physician",
     },
-    LSFRole.CHEFARZT: {
+    LSFRoleEnum.CHEFARZT: {
         LanguageEnum.GERMAN: "Chefarzt/Chefärztin",
         LanguageEnum.ENGLISH_US: "Chief Physician",
     },
-    LSFRole.OBERARZT: {
+    LSFRoleEnum.OBERARZT: {
         LanguageEnum.GERMAN: "Oberarzt/Oberärztin",
         LanguageEnum.ENGLISH_US: "Senior Physician",
     },
-    LSFRole.OBERASSISTENT: {
+    LSFRoleEnum.OBERASSISTENT: {
         LanguageEnum.GERMAN: "Oberassistent/in",
         LanguageEnum.ENGLISH_US: "Senior Assistant",
     },
-    LSFRole.WISSENSCHAFTLICHER_MITARBEITER: {
+    LSFRoleEnum.WISSENSCHAFTLICHER_MITARBEITER: {
         LanguageEnum.GERMAN: "Wissenschaftliche/r Mitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Research Associate",
     },
-    LSFRole.WISSENSCHAFTLICHER_ANGESTELLTER: {
+    LSFRoleEnum.WISSENSCHAFTLICHER_ANGESTELLTER: {
         LanguageEnum.GERMAN: "Wissenschaftliche/r Angestellte/r",
         LanguageEnum.ENGLISH_US: "Scientific Staff",
     },
-    LSFRole.WISSENSCHAFTLICHER_ASSISTENT: {
+    LSFRoleEnum.WISSENSCHAFTLICHER_ASSISTENT: {
         LanguageEnum.GERMAN: "Wissenschaftliche/r Assistent/in",
         LanguageEnum.ENGLISH_US: "Research Assistant",
     },
-    LSFRole.WISSENSCHAFTLICHE_HILFSKRAFT: {
+    LSFRoleEnum.WISSENSCHAFTLICHE_HILFSKRAFT: {
         LanguageEnum.GERMAN: "Wissenschaftliche Hilfskraft",
         LanguageEnum.ENGLISH_US: "Student Research Assistant",
     },
-    LSFRole.PROJEKTMITARBEITER: {
+    LSFRoleEnum.PROJEKTMITARBEITER: {
         LanguageEnum.GERMAN: "Projektmitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Project Staff",
     },
-    LSFRole.GESCHAEFTSFUEHRUNG: {
+    LSFRoleEnum.GESCHAEFTSFUEHRUNG: {
         LanguageEnum.GERMAN: "Geschäftsführung",
         LanguageEnum.ENGLISH_US: "Management",
     },
-    LSFRole.GESCHAEFTSSTELLE: {
+    LSFRoleEnum.GESCHAEFTSSTELLE: {
         LanguageEnum.GERMAN: "Geschäftsstelle",
         LanguageEnum.ENGLISH_US: "Office",
     },
-    LSFRole.MITARBEITER: {
+    LSFRoleEnum.MITARBEITER: {
         LanguageEnum.GERMAN: "Mitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Staff Member",
     },
-    LSFRole.NICHTWISSENSCHAFTLICHER_MITARBEITER: {
+    LSFRoleEnum.NICHTWISSENSCHAFTLICHER_MITARBEITER: {
         LanguageEnum.GERMAN: "Nichtwissenschaftliche/r Mitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Non-Academic Staff",
     },
-    LSFRole.SEKRETARIAT: {
+    LSFRoleEnum.SEKRETARIAT: {
         LanguageEnum.GERMAN: "Sekretariat",
         LanguageEnum.ENGLISH_US: "Secretariat",
     },
-    LSFRole.SONSTIGER_MITARBEITER: {
+    LSFRoleEnum.SONSTIGER_MITARBEITER: {
         LanguageEnum.GERMAN: "Sonstige/r Mitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Other Staff",
     },
-    LSFRole.STUDENTISCHER_MITARBEITER: {
+    LSFRoleEnum.STUDENTISCHER_MITARBEITER: {
         LanguageEnum.GERMAN: "Studentische/r Mitarbeiter/in",
         LanguageEnum.ENGLISH_US: "Student Assistant",
     },
-    LSFRole.STUDIENGANGSKOORDINATOR: {
+    LSFRoleEnum.STUDIENGANGSKOORDINATOR: {
         LanguageEnum.GERMAN: "Studiengangskoordinator/in",
         LanguageEnum.ENGLISH_US: "Program Coordinator",
     },
-    LSFRole.STUDIENREFERENT: {
+    LSFRoleEnum.STUDIENREFERENT: {
         LanguageEnum.GERMAN: "Studienreferent/in",
         LanguageEnum.ENGLISH_US: "Academic Advisor",
     },
-    LSFRole.VERWALTUNGSANGESTELLTER: {
+    LSFRoleEnum.VERWALTUNGSANGESTELLTER: {
         LanguageEnum.GERMAN: "Verwaltungsangestellter/in",
         LanguageEnum.ENGLISH_US: "Administrative Staff",
     },
-    LSFRole.VORSTAND: {
+    LSFRoleEnum.VORSTAND: {
         LanguageEnum.GERMAN: "Vorstand",
         LanguageEnum.ENGLISH_US: "Board",
     },
-    LSFRole.GAST: {
+    LSFRoleEnum.GAST: {
         LanguageEnum.GERMAN: "Gast",
         LanguageEnum.ENGLISH_US: "Guest",
     },
-    LSFRole.HILFSKRAFT: {
+    LSFRoleEnum.HILFSKRAFT: {
         LanguageEnum.GERMAN: "Hilfskraft",
         LanguageEnum.ENGLISH_US: "Assistant",
     },
-    LSFRole.NA: {
+    LSFRoleEnum.NA: {
         LanguageEnum.GERMAN: "n/a",
         LanguageEnum.ENGLISH_US: "n/a",
     },
 }
 
 academic_title_translations = {
-    AcademicTitle.PROF_DR: {
+    AcademicTitleEnum.PROF_DR: {
         LanguageEnum.GERMAN: "Prof. Dr.",
         LanguageEnum.ENGLISH_US: "Prof. Dr.",
     },
-    AcademicTitle.PROF_DR_DR: {
+    AcademicTitleEnum.PROF_DR_DR: {
         LanguageEnum.GERMAN: "Prof. Dr. Dr.",
         LanguageEnum.ENGLISH_US: "Prof. Dr. Dr.",
     },
-    AcademicTitle.PROF_DR_HABIL: {
+    AcademicTitleEnum.PROF_DR_HABIL: {
         LanguageEnum.GERMAN: "Prof. Dr. habil.",
         LanguageEnum.ENGLISH_US: "Prof. Dr. habil.",
     },
-    AcademicTitle.APL_PROF_DR: {
+    AcademicTitleEnum.APL_PROF_DR: {
         LanguageEnum.GERMAN: "apl. Prof. Dr.",
         LanguageEnum.ENGLISH_US: "apl. Prof. Dr.",
     },
-    AcademicTitle.PD_DR: {
+    AcademicTitleEnum.PD_DR: {
         LanguageEnum.GERMAN: "PD Dr.",
         LanguageEnum.ENGLISH_US: "PD Dr.",
     },
-    AcademicTitle.DR_MED: {
+    AcademicTitleEnum.DR_MED: {
         LanguageEnum.GERMAN: "Dr. med.",
         LanguageEnum.ENGLISH_US: "Dr. med.",
     },
-    AcademicTitle.DR_PHIL: {
+    AcademicTitleEnum.DR_PHIL: {
         LanguageEnum.GERMAN: "Dr. phil.",
         LanguageEnum.ENGLISH_US: "Dr. phil.",
     },
-    AcademicTitle.DR_RER_NAT: {
+    AcademicTitleEnum.DR_RER_NAT: {
         LanguageEnum.GERMAN: "Dr. rer. nat.",
         LanguageEnum.ENGLISH_US: "Dr. rer. nat.",
     },
-    AcademicTitle.PHD: {
+    AcademicTitleEnum.PHD: {
         LanguageEnum.GERMAN: "Ph.D.",
         LanguageEnum.ENGLISH_US: "Ph.D.",
     },
-    AcademicTitle.MA: {
+    AcademicTitleEnum.MA: {
         LanguageEnum.GERMAN: "M.A.",
         LanguageEnum.ENGLISH_US: "M.A.",
     },
-    AcademicTitle.MSC: {
+    AcademicTitleEnum.MSC: {
         LanguageEnum.GERMAN: "M.Sc.",
         LanguageEnum.ENGLISH_US: "M.Sc.",
     },
-    AcademicTitle.BA: {
+    AcademicTitleEnum.BA: {
         LanguageEnum.GERMAN: "B.A.",
         LanguageEnum.ENGLISH_US: "B.A.",
     },
-    AcademicTitle.BSC: {
+    AcademicTitleEnum.BSC: {
         LanguageEnum.GERMAN: "B.Sc.",
         LanguageEnum.ENGLISH_US: "B.Sc.",
     },
