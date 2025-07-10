@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import signal
 import sys
 
@@ -6,7 +7,7 @@ from data_fetcher.src.cinema.cinema_collector import CinemaCollector
 from data_fetcher.src.food.food_collector import FoodCollector
 from data_fetcher.src.library.library_collector import LibraryCollector
 from data_fetcher.src.link.link_collector import LinkCollector
-from data_fetcher.src.people.people_collector import PeopleCollector
+from data_fetcher.src.people.people_collector_v2 import PeopleCollectorV2
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
 from data_fetcher.src.university.university_collector import UniversityCollector
@@ -22,14 +23,15 @@ class DataCollectorApp:
         self.settings = get_settings()
         self.is_running = True
         self.collectors = [
-            LinkCollector(),
-            UniversityCollector(),
-            RoomfinderCollector(),
-            LibraryCollector(),
-            PeopleCollector(),
-            FoodCollector(),
-            SportCollector(),
-            CinemaCollector(),
+            # LinkCollector(),
+            # UniversityCollector(),
+            # RoomfinderCollector(),
+            # LibraryCollector(),
+            # PeopleCollector(),
+            PeopleCollectorV2(test_mode=False, batch_size=5),
+            # FoodCollector(),
+            # SportCollector(),
+            # CinemaCollector(),
         ]
 
     async def setup(self):
@@ -49,6 +51,7 @@ class DataCollectorApp:
 
     async def run(self):
         """Main application runner"""
+        logger.setLevel(logging.DEBUG)
         logger.info("=" * 50)
         logger.info("Data Fetcher Starting")
 

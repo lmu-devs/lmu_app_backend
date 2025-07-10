@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Optional, Union
+import logging
 
 import httpx
 
@@ -26,45 +27,19 @@ class DirectusService:
                 },
             )
 
-    def query(self, query: str, variables: dict = None) -> dict:
-        """
-        Execute a GraphQL query against the Directus API.
-
-        Args:
-            query (str): The GraphQL query string
-            variables (dict, optional): Variables for the GraphQL query
-
-        Returns:
-            dict: The JSON response from the API
-        """
-        response = self._client.post("/graphql", json={"query": query, "variables": variables or {}})
+    def query(self, query: str, variables: dict = None, operation_name: str = None) -> dict:
+        payload = {"query": query, "variables": variables or {}}
+        if operation_name:
+            payload["operationName"] = operation_name
+        response = self._client.post("/graphql", json=payload)
         response.raise_for_status()
         return response.json()
 
-    def execute_query_file(self, query_file_path: Union[str, Path], variables: dict = None) -> dict:
-        """
-        Execute a GraphQL query from a file against the Directus API.
-
-        Args:
-            query_file_path (Union[str, Path]): Path to the GraphQL query file
-            variables (dict, optional): Variables for the GraphQL query
-
-        Returns:
-            dict: The JSON response from the API
-
-        Raises:
-            FileNotFoundError: If the query file doesn't exist
-            IOError: If there's an error reading the file
-        """
+    def execute_query_file(self, query_file_path: Union[str, Path], variables: dict = None, operation_name: str = None) -> dict:
         query_path = Path(query_file_path)
-        try:
-            with open(query_path, "r") as file:
-                query_string = file.read()
-            return self.query(query_string, variables)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"GraphQL query file not found: {query_file_path}")
-        except IOError as e:
-            raise IOError(f"Error reading GraphQL query file: {e}")
+        with open(query_path, "r") as file:
+            query_string = file.read()
+        return self.query(query_string, variables, operation_name)
 
     def close(self):
         """Close the HTTP client connection."""

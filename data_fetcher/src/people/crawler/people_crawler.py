@@ -8,8 +8,9 @@ from lxml import html
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from requests.exceptions import SSLError, ConnectionError, Timeout, RequestException
-from shared.src.enums import AcademicTitle, LSFRole
+from shared.src.enums import AcademicTitleEnum, LSFRoleEnum
 from shared.src.core.logging import get_main_fetcher_logger
+# from api.src.v1.people.models.people_model import Institution  # Import Institution model for structure
 
 logger = get_main_fetcher_logger(__name__)
 
@@ -140,10 +141,7 @@ class LSFPersonCrawler:
             if people:
                 # Add role information to each person
                 for person in people:
-                    person["role"] = {
-                        "id": pfid,
-                        "name": role_name
-                    }
+                    person["role"] = self._create_role_info(pfid, role_name)
                 all_people.extend(people)
                 logger.info(f"   ✓ Found {len(people)} persons in '{role_name}'")
             else:
@@ -164,15 +162,27 @@ class LSFPersonCrawler:
         if people:
             # Add role information to each person
             for person in people:
-                person["role"] = {
-                    "id": pfid,
-                    "name": role_name
-                }
+                # Get the dropdown role info
+                dropdown_role = self._create_role_info(pfid, role_name)
+                
+                # Combine dropdown role with detail page roles
+                existing_roles = person.get("roles", [])
+                all_roles = [dropdown_role] + existing_roles
+                person["roles"] = all_roles
             logger.info(f"   ✓ Found {len(people)} persons in '{role_name}'")
         else:
             logger.info(f"   – No entries for '{role_name}'")
         
         return people
+
+    def _create_role_info(self, pfid: int, role_name: str) -> dict:
+        """Create role information with LSFRole enum mapping"""
+        # Map the role name to LSFRole enum
+        lsf_role = LSFRoleEnum.from_string(role_name)
+        return {
+            "lsf_role_enum": lsf_role.value,
+            "institutions": []  # No institution for dropdown role
+        }
 
     def _clean_text(self, text: str) -> str:
         """Clean up text by removing extra whitespace and newlines."""
@@ -201,7 +211,7 @@ class LSFPersonCrawler:
             elif any(f"W{i}" in text for i in range(1, 4)):
                 dept_info["positions"].append({
                     "title": text,
-                    "academic_title": AcademicTitle.from_string(text).name,
+                    "academic_title": AcademicTitleEnum.from_string(text).name,
                     "url": entry.get("href")
                 })
             else:
@@ -233,8 +243,12 @@ class LSFPersonCrawler:
             "basic_10": "status",
         }
 
-        # Loop over all <th> in that Grunddaten table
-        for th in doc.xpath('//table[@summary="Grunddaten zur Veranstaltung"]//th[@id]'):
+        # The table summary sometimes differs ("Grunddaten", "Grunddaten zur Veranstaltung", "Grunddaten zur Person", …)
+        grunddaten_xpath = '//table[contains(@summary, "Grunddaten")]//th[@id]'
+        th_elements = doc.xpath(grunddaten_xpath)
+        logger.debug(f"[Crawler] Found {len(th_elements)} <th> elements in Grunddaten table")
+
+        for th in doc.xpath(grunddaten_xpath):
             field_id = th.get("id")              # e.g. "basic_1"
             key = id_map.get(field_id)
             if not key:
@@ -254,21 +268,66 @@ class LSFPersonCrawler:
         for row in function_rows:
             cells = row.xpath('.//td')
             if len(cells) >= 2:
-                institution = cells[0].xpath('.//a/text()')
-                role = cells[1].xpath('.//text()')
-                if institution and role:
-                    role_info = {
-                        "institution": self._clean_text(institution[0]),
-                        "role": self._clean_text(role[0])
+                institution_name = cells[0].xpath('.//a/text()')
+                role_text = cells[1].xpath('.//text()')
+                institution_url = cells[0].xpath('.//a/@href')
+                institution_id = None  # No id available from LSF, but placeholder for future
+                institution_data = None  # Placeholder for any extra data
+                if institution_name and role_text:
+                    role_enum = LSFRoleEnum.from_string(self._clean_text(role_text[0]))
+                    institution_obj = {
+                        "name": self._clean_text(institution_name[0]),
+                        "url": institution_url[0] if institution_url else None,
+                        "id": institution_id,
+                        "data": institution_data
                     }
-                    if cells[0].xpath('.//a/@href'):
-                        role_info["institution_url"] = cells[0].xpath('.//a/@href')[0]
-                    details["roles"].append(role_info)
+                    details["roles"].append({
+                        "lsf_role_enum": role_enum.value,
+                        "institutions": [institution_obj]
+                    })
 
-        # Extract faculty from the structure tree
-        faculty_entry = doc.xpath('//div[contains(@style, "padding-left: 10px")]//a[contains(text(), "Fakultät")]')
+        # Extract faculty from the structure tree (style depth can vary)
+        faculty_entry = doc.xpath('//div[contains(@style, "padding-left")]//a[contains(text(), "Fakultät")]')
+        logger.debug(f"[Crawler] Faculty entry matches: {len(faculty_entry)}")
         if faculty_entry:
             details["faculty"] = self._clean_text(faculty_entry[0].text_content())
+        else:
+            # Fallback: use department info extraction helper
+            dept_info = self._extract_department_info(doc)
+            if dept_info.get("faculty"):
+                details["faculty"] = self._clean_text(dept_info["faculty"])
+            else:
+                logger.debug("[Crawler] Faculty not found via XPath or department info")
+
+        # Final fallback – try to infer faculty from role institutions or plain text nodes
+        if not details["faculty"]:
+            # 1) Look in the institution names we already captured (roles table)
+            for role in details.get("roles", []):
+                for inst in role.get("institutions", []):
+                    inst_name = inst.get("name", "")
+                    if "Fakultät" in inst_name:
+                        details["faculty"] = self._clean_text(inst_name)
+                        logger.debug(
+                            f"[Crawler] Faculty inferred from institution name: '{details['faculty']}'"
+                        )
+                        break
+                if details["faculty"]:
+                    break
+
+        if not details["faculty"]:
+            # 2) Broad scrape – any anchor that contains the word "Fakultät" irrespective of style
+            generic_fac = doc.xpath('//a[contains(text(), "Fakultät")]')
+            if generic_fac:
+                details["faculty"] = self._clean_text(generic_fac[0].text_content())
+                logger.debug(
+                    f"[Crawler] Faculty inferred from generic anchor search: '{details['faculty']}'"
+                )
+
+        # Log which strategy finally succeeded (or not)
+        if details["faculty"]:
+            logger.debug(f"[Crawler] Final faculty value: '{details['faculty']}'")
+        else:
+            logger.warning("[Crawler] Faculty could not be determined for this person")
 
         # Extract courses with deduplication
         course_rows = doc.xpath('//table[@summary="Übersicht über die Zugehörigkeit zu Veranstaltungen"]//tr[position()>1]')
@@ -297,6 +356,10 @@ class LSFPersonCrawler:
                 if cells[1].xpath('.//a/@href'):
                     course["url"] = cells[1].xpath('.//a/@href')[0]
                 details["courses"].append(course)
+
+        # Log extracted basic_info preview
+        non_empty_basic = {k: v for k, v in details["basic_info"].items() if v}
+        logger.debug(f"[Crawler] Extracted non-empty basic_info fields: {list(non_empty_basic.keys())}")
 
         return details
 
@@ -391,6 +454,8 @@ class LSFPersonCrawler:
                         current_person["address"] = self._clean_text(value)
                     elif label == "E-Mail:":
                         current_person["email"] = self._clean_text(value)
+                    elif label == "Telefon:":
+                        current_person["phone"] = self._clean_text(value)
                 
                 # Don't forget to add the last person
                 if current_person:
@@ -488,6 +553,8 @@ class LSFPersonCrawler:
                                     current_person["address"] = self._clean_text(value)
                                 elif label == "E-Mail:":
                                     current_person["email"] = self._clean_text(value)
+                                elif label == "Telefon:":
+                                    current_person["phone"] = self._clean_text(value)
                             
                             # Don't forget to add the last person
                             if current_person:
