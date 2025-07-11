@@ -8,9 +8,10 @@ COPY requirements.txt ./
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r requirements.txt
 
-# Only copy data_fetcher and shared folders
+# Copy data_fetcher, shared, and api folders (api needed for GraphQL files)
 COPY ./data_fetcher /app/data_fetcher
 COPY ./shared /app/shared
+COPY ./api /app/api
 
 
 # run data_fetcher/main.py

@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from pydantic import ValidationError
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.models.people_model import (
-    Person, PersonBasicInfo, PersonRole, PersonCourse, Institution
+    Person, PersonDetails, PersonRole, PersonCourse
 )
 
 logger = get_main_fetcher_logger(__name__)
@@ -31,32 +31,46 @@ class PeopleModelMapper:
         try:
             # Map basic info
             basic_info_data = mapped_person.get("basic_info", {})
-            basic_info = PersonBasicInfo(
+            
+            # Convert enum objects to string values for PersonDetails model validation
+            gender_enum = basic_info_data.get("gender_enum")
+            gender_value = gender_enum.value if gender_enum else None
+            
+            employment_status_enum = basic_info_data.get("employment_status_enum")
+            employment_status_value = employment_status_enum.value if employment_status_enum else None
+            
+            basic_info = PersonDetails(
+                person_id=mapped_person["person_id"],
                 first_name=basic_info_data.get("first_name"),
                 last_name=basic_info_data.get("last_name"),
-                gender=basic_info_data.get("gender_enum"),  # Use enum object, not string
+                gender=gender_value,  # Convert enum to string for PersonDetails
                 title=basic_info_data.get("title"),
                 academic_degree=basic_info_data.get("academic_degree"),
-                employment_status=basic_info_data.get("employment_status_enum"),  # Use enum object, not string
+                employment_status=employment_status_value,  # Convert enum to string for PersonDetails
                 name_suffix=basic_info_data.get("name_suffix")
             )
             
             # Map roles
             roles = []
             for role_data in mapped_person.get("roles", []):
-                institutions = []
-                for inst_data in role_data.get("institutions", []):
-                    institution = Institution(
-                        name=inst_data.get("name"),
-                        url=inst_data.get("url"),
-                        id=inst_data.get("id"),
-                        data=inst_data.get("data")
-                    )
-                    institutions.append(institution)
+                # Flatten institutions if present (use first institution for legacy fields)
+                institution = None
+                institution_url = None
+                if role_data.get("institutions"):
+                    first_inst = role_data["institutions"][0]
+                    institution = first_inst.get("name")
+                    institution_url = first_inst.get("url")
+                
+                # Convert enum object to string for PersonRole model
+                lsf_role_enum = role_data.get("lsf_role_enum_obj")
+                lsf_role_enum_str = lsf_role_enum.value if lsf_role_enum else None
                 
                 role = PersonRole(
-                    lsf_role_enum=role_data.get("lsf_role_enum_obj"),
-                    institutions=institutions
+                    person_id=mapped_person["person_id"],
+                    role_name=role_data.get("role_name"),
+                    lsf_role_enum=lsf_role_enum_str,  # Convert enum to string for PersonRole
+                    institution=institution,
+                    institution_url=institution_url
                 )
                 roles.append(role)
             
@@ -64,6 +78,7 @@ class PeopleModelMapper:
             courses = []
             for course_data in mapped_person.get("courses", []):
                 course = PersonCourse(
+                    person_id=mapped_person["person_id"],
                     course_number=course_data.get("number"),
                     course_name=course_data.get("name"),
                     semester=course_data.get("semester"),
@@ -73,9 +88,15 @@ class PeopleModelMapper:
             
             # Create Person model
             person = Person(
-                id=mapped_person["id"],
+                id=None,  # Let Directus generate the UUID
+                person_id=mapped_person["person_id"],
                 profile_url=mapped_person.get("profile_url"),
                 name=mapped_person["name"],
+                # Set top-level fields for direct access
+                first_name=basic_info_data.get("first_name"),
+                surname=basic_info_data.get("last_name"),
+                title=basic_info_data.get("title"),
+                academic_degree=basic_info_data.get("academic_degree"),
                 basic_info=basic_info,
                 email=mapped_person.get("email"),
                 phone=mapped_person.get("phone"),
@@ -125,7 +146,7 @@ class PeopleModelMapper:
                 failed_count += 1
                 error_info = {
                     "person_name": person_data.get("name", "Unknown"),
-                    "person_id": person_data.get("id", "Unknown"),
+                    "person_id": person_data.get("person_id", "Unknown"),
                     "errors": str(e)
                 }
                 validation_errors.append(error_info)
@@ -220,9 +241,9 @@ class PeopleModelMapper:
             is_valid = True
             
             # Check required fields
-            if not person.id or not person.name:
+            if not person.person_id or not person.name:
                 integrity_report["issues"]["missing_required_fields"].append({
-                    "id": person.id,
+                    "person_id": person.person_id,
                     "name": person.name
                 })
                 is_valid = False
@@ -230,7 +251,7 @@ class PeopleModelMapper:
             # Check email format (basic)
             if person.email and '@' not in person.email:
                 integrity_report["issues"]["invalid_emails"].append({
-                    "id": person.id,
+                    "person_id": person.person_id,
                     "email": person.email
                 })
                 is_valid = False
@@ -238,7 +259,7 @@ class PeopleModelMapper:
             # Check phone format (basic)
             if person.phone and not person.phone.isdigit():
                 integrity_report["issues"]["invalid_phones"].append({
-                    "id": person.id,
+                    "person_id": person.person_id,
                     "phone": person.phone
                 })
                 is_valid = False
@@ -246,7 +267,7 @@ class PeopleModelMapper:
             # Check for empty names
             if not person.name or person.name.strip() == "":
                 integrity_report["issues"]["empty_names"].append({
-                    "id": person.id,
+                    "person_id": person.person_id,
                     "name": person.name
                 })
                 is_valid = False
@@ -254,7 +275,7 @@ class PeopleModelMapper:
             # Check URL format (basic)
             if person.profile_url and not person.profile_url.startswith(('http://', 'https://')):
                 integrity_report["issues"]["invalid_urls"].append({
-                    "id": person.id,
+                    "person_id": person.person_id,
                     "url": person.profile_url
                 })
                 is_valid = False

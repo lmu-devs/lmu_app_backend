@@ -4,8 +4,9 @@ Orchestrates the complete pipeline from raw data to CMS storage
 """
 import asyncio
 from typing import Dict, List, Optional, Callable
+from tqdm import tqdm
 from shared.src.core.logging import get_main_fetcher_logger
-from shared.src.services.people_cms_service import PeopleCMSService
+from shared.src.services.people_service import PeopleService
 from shared.src.models.people_model import Person
 
 from .people_data_normalizer import PeopleDataNormalizer
@@ -22,12 +23,13 @@ class PeoplePipeline:
         self.logger = logger
         self.test_mode = test_mode
         self.batch_size = batch_size
+        self.logger.setLevel('WARNING')
         
         # Initialize services
         self.normalizer = PeopleDataNormalizer()
         self.enum_mapper = PeopleEnumMapper()
         self.model_mapper = PeopleModelMapper()
-        self.cms_service = PeopleCMSService(test_mode=test_mode)
+        self.cms_service = PeopleService(test_mode=test_mode)
         
         # Pipeline statistics
         self.stats = {
@@ -39,86 +41,6 @@ class PeoplePipeline:
             "processing_errors": 0,
             "batches_processed": 0
         }
-
-    async def process_role_batch(
-        self, 
-        raw_people: List[Dict], 
-        role_id: int, 
-        role_name: str,
-        progress_callback: Optional[Callable] = None
-    ) -> Dict:
-        """
-        Process a batch of people from a specific role through the complete pipeline
-        
-        Args:
-            raw_people: Raw people data from crawler
-            role_id: LSF role ID
-            role_name: LSF role name
-            progress_callback: Optional callback for progress updates
-            
-        Returns:
-            Processing results and statistics
-        """
-        batch_start_time = asyncio.get_event_loop().time()
-        
-        try:
-            self.logger.info(f"🔄 Processing batch for role {role_id} ({role_name}): {len(raw_people)} people")
-            
-            # Step 1: Normalize raw data
-            if progress_callback:
-                await progress_callback("normalizing", 0, len(raw_people))
-            
-            normalized_people = self.normalizer.normalize_batch(raw_people)
-            self.stats["total_normalized"] += len(normalized_people)
-            
-            if not normalized_people:
-                self.logger.warning(f"No people normalized for role {role_id}")
-                return self._create_batch_result(role_id, role_name, 0, 0)
-            
-            # Step 2: Map enums
-            if progress_callback:
-                await progress_callback("mapping_enums", len(normalized_people), len(raw_people))
-            
-            enum_mapped_people = self.enum_mapper.map_batch_enums(normalized_people)
-            self.stats["total_enum_mapped"] += len(enum_mapped_people)
-            
-            # Step 3: Map to models
-            if progress_callback:
-                await progress_callback("mapping_models", len(enum_mapped_people), len(raw_people))
-            
-            person_models = self.model_mapper.map_batch_to_models(enum_mapped_people)
-            self.stats["total_model_mapped"] += len(person_models)
-            
-            if not person_models:
-                self.logger.warning(f"No valid models created for role {role_id}")
-                return self._create_batch_result(role_id, role_name, len(normalized_people), 0)
-            
-            # Step 4: Store in CMS (async)
-            if progress_callback:
-                await progress_callback("storing_cms", len(person_models), len(raw_people))
-            
-            stored_count = await self._store_people_async(person_models)
-            self.stats["total_cms_stored"] += stored_count
-            self.stats["batches_processed"] += 1
-            
-            batch_end_time = asyncio.get_event_loop().time()
-            processing_time = batch_end_time - batch_start_time
-            
-            result = self._create_batch_result(
-                role_id, role_name, len(person_models), stored_count, processing_time
-            )
-            
-            self.logger.info(f"✅ Completed batch for role {role_id}: {stored_count}/{len(raw_people)} stored successfully")
-            
-            if progress_callback:
-                await progress_callback("completed", len(raw_people), len(raw_people))
-            
-            return result
-            
-        except Exception as e:
-            self.stats["processing_errors"] += 1
-            self.logger.error(f"❌ Failed to process batch for role {role_id}: {e}")
-            return self._create_batch_result(role_id, role_name, 0, 0, error=str(e))
 
     async def process_character_batch(
         self,
@@ -141,19 +63,81 @@ class PeoplePipeline:
         Returns:
             Processing results and statistics
         """
-        self.logger.info(f"🔄 Processing character '{character}' for role {role_id} ({role_name}): {len(raw_people)} people")
+        batch_start_time = asyncio.get_event_loop().time()
         
-        result = await self.process_role_batch(raw_people, role_id, role_name, progress_callback)
-        result["character"] = character
-        
-        return result
+        try:
+            if not raw_people:
+                self.logger.warning(f"No people to process for role {role_id}")
+                return self._create_batch_result(role_id, role_name, 0, 0)
+            
+            # tqdm progress bar for normalization
+            with tqdm(total=len(raw_people), desc=f"Char '{character}' {role_name}", leave=False) as pbar:
+                if progress_callback:
+                    await progress_callback("normalizing", 0, len(raw_people))
+                normalized_people = self.normalizer.normalize_batch(raw_people)
+                self.stats["total_normalized"] += len(normalized_people)
+                pbar.update(len(normalized_people))
+            
+            if not normalized_people:
+                self.logger.warning(f"No people normalized for role {role_id}")
+                return self._create_batch_result(role_id, role_name, 0, 0)
+            
+            # tqdm progress bar for enum mapping
+            with tqdm(total=len(normalized_people), desc=f"Enum mapping {role_name}", leave=False) as pbar:
+                if progress_callback:
+                    await progress_callback("mapping_enums", len(normalized_people), len(raw_people))
+                enum_mapped_people = self.enum_mapper.map_batch_enums(normalized_people)
+                self.stats["total_enum_mapped"] += len(enum_mapped_people)
+                pbar.update(len(enum_mapped_people))
+            
+            # tqdm progress bar for model mapping
+            with tqdm(total=len(enum_mapped_people), desc=f"Model mapping {role_name}", leave=False) as pbar:
+                if progress_callback:
+                    await progress_callback("mapping_models", len(enum_mapped_people), len(raw_people))
+                person_models = self.model_mapper.map_batch_to_models(enum_mapped_people)
+                self.stats["total_model_mapped"] += len(person_models)
+                pbar.update(len(person_models))
+            
+            if not person_models:
+                self.logger.warning(f"No valid models created for role {role_id}")
+                return self._create_batch_result(role_id, role_name, len(normalized_people), 0)
+            
+            # tqdm progress bar for CMS storage
+            with tqdm(total=len(person_models), desc=f"Storing to CMS {role_name}", leave=False) as pbar:
+                if progress_callback:
+                    await progress_callback("storing_cms", len(person_models), len(raw_people))
+                stored_count = await self._store_people_async(person_models, enum_mapped_people)
+                self.stats["total_cms_stored"] += stored_count
+                self.stats["batches_processed"] += 1
+                pbar.update(stored_count)
+            
+            batch_end_time = asyncio.get_event_loop().time()
+            processing_time = batch_end_time - batch_start_time
+            
+            result = self._create_batch_result(
+                role_id, role_name, len(person_models), stored_count, processing_time
+            )
+            result["character"] = character
+            
+            self.logger.info(f"✅ Completed batch for role {role_id}: {stored_count}/{len(raw_people)} stored successfully")
+            
+            if progress_callback:
+                await progress_callback("completed", len(raw_people), len(raw_people))
+            
+            return result
+            
+        except Exception as e:
+            self.stats["processing_errors"] += 1
+            self.logger.error(f"❌ Failed to process batch for role {role_id}: {e}")
+            return self._create_batch_result(role_id, role_name, 0, 0, error=str(e))
 
-    async def _store_people_async(self, person_models: List[Person]) -> int:
+    async def _store_people_async(self, person_models: List[Person], enum_mapped_people: List[Dict]) -> int:
         """
         Store people in CMS asynchronously in smaller batches
         
         Args:
             person_models: List of Person models to store
+            enum_mapped_people: List of enum-mapped people data (contains original enum objects)
             
         Returns:
             Number of people successfully stored
@@ -167,40 +151,40 @@ class PeoplePipeline:
             sub_batch = person_models[i:i + sub_batch_size]
             
             try:
-                # Convert models to dicts for CMS service, preserving enum objects
+                # Convert models to dicts for CMS service, using enum objects from enum_mapped_people
                 people_dicts = []
                 for person in sub_batch:
+                    # Find corresponding enum-mapped data for this person
+                    enum_data = next((data for data in enum_mapped_people if data.get("person_id") == person.person_id), None)
+                    
                     person_dict = {
-                        "id": person.id,
+                        # Do not set 'id', let Directus generate it
                         "profile_url": person.profile_url,
                         "name": person.name,
+                        "person_id": person.person_id,
                         "email": person.email,
+                        "phone": person.phone,
                         "address": person.address,
-                        "faculty_enum": person.faculty_enum,  # Keep enum object
-                        "academic_title_enum": person.academic_title_enum,  # Keep enum object
+                        "faculty_enum": person.faculty_enum,  # Keep enum object for CMS service
+                        "academic_title_enum": person.academic_title_enum,  # Keep enum object for CMS service
+                        "primary_role": person.primary_role,
                         "basic_info": {
-                            "first_name": person.basic_info.first_name if person.basic_info else "",
-                            "last_name": person.basic_info.last_name if person.basic_info else "",
-                            "gender_enum": person.basic_info.gender if person.basic_info else None,  # Keep enum object
-                            "title": person.basic_info.title if person.basic_info else "",
-                            "academic_degree": person.basic_info.academic_degree if person.basic_info else "",
-                            "employment_status_enum": person.basic_info.employment_status if person.basic_info else None,  # Keep enum object
-                            "name_suffix": person.basic_info.name_suffix if person.basic_info else "",
+                            "first_name": person.first_name,  # Now accessible directly
+                            "last_name": person.surname,  # Now accessible directly
+                            "gender_enum": enum_data.get("basic_info", {}).get("gender_enum") if enum_data else None,  # Get enum object from enum_mapped_people
+                            "title": person.title,  # Now accessible directly
+                            "academic_degree": person.academic_degree,  # Now accessible directly
+                            "employment_status_enum": enum_data.get("basic_info", {}).get("employment_status_enum") if enum_data else None,  # Get enum object from enum_mapped_people
+                            "name_suffix": None,  # Not available in new model
                             "status": person.status,
                             "note": person.note,
                             "office_hours": person.office_hours,
                         },
                         "roles": [
                             {
-                                "lsf_role_enum_obj": role.lsf_role_enum,  # Keep enum object
-                                "institutions": [
-                                    {
-                                        "name": inst.name,
-                                        "url": inst.url,
-                                        "id": inst.id,
-                                        "data": inst.data
-                                    } for inst in role.institutions
-                                ] if role.institutions else []
+                                "role_name": role.role_name,
+                                "lsf_role_enum_obj": self._get_role_enum_from_mapped_data(enum_data, role.role_name) if enum_data else None,  # Get enum object from enum_mapped_people
+                                "institutions": role.institutions if role.institutions else []
                             } for role in person.roles
                         ] if person.roles else [],
                         "courses": [
@@ -223,9 +207,11 @@ class PeoplePipeline:
                 await asyncio.sleep(0.1)
                 
             except Exception as e:
-                self.logger.error(f"Failed to store sub-batch of {len(sub_batch)} people: {e}")
+                for person in sub_batch:
+                    self.logger.error(f"Failed to store person {getattr(person, 'name', 'UNKNOWN')} ({getattr(person, 'id', 'NO_ID')}): {e}")
                 continue
         
+        self.logger.warning(f"Batch summary: {stored_count}/{len(person_models)} people stored in CMS.")
         return stored_count
 
     def _create_batch_result(
@@ -266,37 +252,19 @@ class PeoplePipeline:
         
         return stats
 
-    def get_detailed_statistics(self, person_models: List[Person]) -> Dict:
-        """Get detailed statistics about the processed data"""
-        pipeline_stats = self.get_pipeline_statistics()
-        model_stats = self.model_mapper.get_model_statistics(person_models)
-        integrity_report = self.model_mapper.validate_models_integrity(person_models)
-        
-        return {
-            "pipeline": pipeline_stats,
-            "models": model_stats,
-            "integrity": integrity_report,
-            "summary": {
-                "total_processed": len(person_models),
-                "pipeline_efficiency": pipeline_stats.get("cms_storage_success_rate", 0),
-                "data_quality": integrity_report.get("validity_percent", 0)
-            }
-        }
-
-    def reset_statistics(self):
-        """Reset pipeline statistics"""
-        self.stats = {
-            "total_raw_people": 0,
-            "total_normalized": 0,
-            "total_enum_mapped": 0,
-            "total_model_mapped": 0,
-            "total_cms_stored": 0,
-            "processing_errors": 0,
-            "batches_processed": 0
-        }
-        
-        self.logger.info("Pipeline statistics reset")
-
     def update_raw_people_count(self, count: int):
         """Update the count of raw people being processed"""
-        self.stats["total_raw_people"] += count 
+        self.stats["total_raw_people"] += count
+
+    def _get_role_enum_from_mapped_data(self, enum_data: Dict, role_name: str):
+        """Get role enum object from enum-mapped data by role name"""
+        if not enum_data or not role_name:
+            return None
+        
+        roles = enum_data.get("roles", [])
+        for role in roles:
+            if role.get("role_name") == role_name:
+                return role.get("lsf_role_enum_obj")
+        
+        return None
+

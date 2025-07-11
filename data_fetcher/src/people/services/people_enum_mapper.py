@@ -54,10 +54,20 @@ class PeopleEnumMapper:
                 normalized_person.get("roles", [])
             )
             
+            # Set primary_role based on first role or employment status
+            mapped_person["primary_role"] = self._determine_primary_role(
+                mapped_person.get("roles", []),
+                normalized_person.get("basic_info", {}).get("employment_status")
+            )
+            
             # Map phone enum
             mapped_person["phone_enum"] = self._map_phone_enum(
                 normalized_person.get("phone")
             )
+            
+            # Propagate person_id if present
+            if 'person_id' in normalized_person:
+                mapped_person['person_id'] = normalized_person['person_id']
             
             return mapped_person
             
@@ -172,6 +182,24 @@ class PeopleEnumMapper:
             mapped_roles.append(mapped_role)
             
         return mapped_roles
+
+    def _determine_primary_role(self, roles: List[Dict], employment_status: Optional[str]) -> Optional[str]:
+        """Determine primary role from roles list or employment status"""
+        # First try to get from roles
+        if roles and len(roles) > 0:
+            first_role = roles[0]
+            # Check for role_name first (set by normalizer)
+            if first_role.get("role_name"):
+                return first_role.get("role_name")
+            # Fallback to lsf_role_enum (raw value)
+            elif first_role.get("lsf_role_enum"):
+                return first_role.get("lsf_role_enum")
+        
+        # Fallback to employment status
+        if employment_status:
+            return employment_status
+        
+        return None
 
     def get_enum_statistics(self, mapped_people: List[Dict]) -> Dict:
         """Get statistics about enum mapping success rates"""

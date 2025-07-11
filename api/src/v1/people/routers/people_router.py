@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from shared.src.enums import FacultyEnum
-from shared.src.models.people_model import Person, PersonSummary, PeopleResponse
+from shared.src.models.people_model import PersonBasic, PersonSummary, PeopleResponse
 from ..services.people_service import PeopleService
 
 router = APIRouter(tags=["people"])
@@ -14,7 +14,7 @@ async def get_people(
     offset: int = Query(0, ge=0, description="Number of people to skip")
 ):
     """
-    Get list of people with optional faculty filter.
+    Get list of people with basic information (refactored schema).
     """
     service = PeopleService()
     return await service.get_all_people(
@@ -24,12 +24,12 @@ async def get_people(
     )
 
 
-@router.get("/{person_id}", response_model=Person)
+@router.get("/{person_id}", response_model=PersonBasic)
 async def get_person_by_id(
     person_id: str
 ):
     """
-    Get detailed information about a specific person
+    Get basic information about a specific person (refactored schema).
     """
     service = PeopleService()
     person = await service.get_person_by_id(person_id)
