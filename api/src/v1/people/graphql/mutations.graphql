@@ -1,86 +1,93 @@
-# Create a new basic info record
-mutation CreateBasicInfo($data: create_people_basic_info_input!) {
-    create_people_basic_info_item(data: $data) {
-        id
-        first_name
-        last_name
-        gender
-        title
-        academic_degree
-        employment_status
-        name_suffix
-    }
-}
-
-# Create a new person, referencing the basic info
+# Create a new person (main table)
 mutation CreatePerson($data: create_people_input!) {
     create_people_item(data: $data) {
-        id
+        person_id
         name
-        profile_url
-        basic_info {
-            id
-            first_name
-            last_name
-            gender
-            title
-            academic_degree
-            employment_status
-            name_suffix
-        }
-        email
-        adress
+        first_name
+        surname
+        title
+        academic_degree
         faculty_enum
-        academic_title_enum
-        status
-        note
-        office_hours
+        primary_role
     }
 }
 
 # Update an existing person
 mutation UpdatePerson($id: ID!, $data: update_people_input!) {
     update_people_item(id: $id, data: $data) {
-        id
+        person_id
         name
-        profile_url
-        basic_info {
-            id
-            first_name
-            last_name
-            gender
-            title
-            academic_degree
-            employment_status
-            name_suffix
-        }
-        email
-        adress
+        first_name
+        surname
+        title
+        academic_degree
         faculty_enum
-        academic_title_enum
-        status
-        note
-        office_hours
+        primary_role
     }
 }
 
-# Create a new role for a person
-mutation CreateRole($data: create_people_roles_input!) {
-    create_people_roles_item(data: $data) {
+# Create person details
+mutation CreatePersonDetails($data: create_person_details_input!) {
+    create_person_details_item(data: $data) {
         id
-        lsf_role_enum
-        institutions
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+    }
+}
+
+# Update person details
+mutation UpdatePersonDetails($id: ID!, $data: update_person_details_input!) {
+    update_person_details_item(id: $id, data: $data) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
     }
 }
 
 # Create a new course for a person
-mutation CreateCourse($data: create_people_courses_input!) {
-    create_people_courses_item(data: $data) {
+mutation CreatePersonCourse($data: create_person_courses_input!) {
+    create_person_courses_item(data: $data) {
         id
-
+        person_id {
+            id
+        }
         course_number
         course_name
         semester
         course_url
+    }
+}
+
+# Create a new role for a person
+mutation CreatePersonRole($data: create_person_roles_input!) {
+    create_person_roles_item(data: $data) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution
+        institution_url
     }
 }

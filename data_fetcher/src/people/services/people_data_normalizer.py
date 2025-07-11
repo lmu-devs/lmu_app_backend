@@ -33,7 +33,7 @@ class PeopleDataNormalizer:
             self.logger.debug(f"  Raw basic_info: {raw_person.get('basic_info', {})}")
             
             normalized = {
-                "id": self._generate_person_id(raw_person),
+                "person_id": self._generate_person_id(raw_person),
                 "name": self._clean_text(raw_person.get("name", "")),
                 "profile_url": self._normalize_url(raw_person.get("profile_url")),
                 "email": self._normalize_email(raw_person.get("email")),
@@ -179,8 +179,11 @@ class PeopleDataNormalizer:
             if not isinstance(role, dict):
                 continue
                 
+            lsf_role_enum = self._clean_text(role.get("lsf_role_enum", ""))
+            
             normalized_role = {
-                "lsf_role_enum": self._clean_text(role.get("lsf_role_enum", "")),
+                "role_name": lsf_role_enum,  # Use lsf_role_enum as role_name
+                "lsf_role_enum": lsf_role_enum,
                 "institutions": self._normalize_institutions(role.get("institutions", []))
             }
             

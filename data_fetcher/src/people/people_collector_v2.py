@@ -14,16 +14,21 @@ class PeopleCollectorV2(BaseCollector):
 
     def __init__(self, test_mode: bool = True, batch_size: int = 50):
         super().__init__()
-        self.test_mode = test_mode
+        self.test_mode = test_mode  # Force test mode to debug GraphQL issues
         self.batch_size = batch_size
-        self.pipeline = PeoplePipeline(test_mode=test_mode, batch_size=batch_size)
+        self.pipeline = PeoplePipeline(test_mode=test_mode, batch_size=batch_size)  # No duplicate tracking
         self.crawler = None
+        # Set logger level to reduce verbosity
+        self.logger.setLevel('WARNING')
 
     async def _collect_data(self, db):
         """Main collection method using the new pipeline"""
         try:
             # Initialize crawler
             self.crawler = LSFPersonCrawler()
+            # Set crawler logger to WARNING
+            if hasattr(self.crawler, 'logger'):
+                self.crawler.logger.setLevel('WARNING')
             
             if not self.crawler.functions:
                 self.logger.error("No functions available from crawler!")
@@ -46,7 +51,18 @@ class PeopleCollectorV2(BaseCollector):
             
             # Final statistics
             final_stats = self.pipeline.get_pipeline_statistics()
-            self._log_final_statistics(final_stats)
+            self.logger.info("🎯 FINAL COLLECTION STATISTICS:")
+            self.logger.info(f"   📥 Raw people: {final_stats.get('total_raw_people', 0)}")
+            self.logger.info(f"   🔄 Normalized: {final_stats.get('total_normalized', 0)}")
+            self.logger.info(f"   🏷️  Enum mapped: {final_stats.get('total_enum_mapped', 0)}")
+            self.logger.info(f"   📋 Model mapped: {final_stats.get('total_model_mapped', 0)}")
+            self.logger.info(f"   💾 CMS stored: {final_stats.get('total_cms_stored', 0)}")
+            self.logger.info(f"   ❌ Errors: {final_stats.get('processing_errors', 0)}")
+            self.logger.info(f"   📦 Batches: {final_stats.get('batches_processed', 0)}")
+            
+            if final_stats.get('total_raw_people', 0) > 0:
+                overall_success = (final_stats.get('total_cms_stored', 0) / final_stats.get('total_raw_people', 1)) * 100
+                self.logger.info(f"   🎯 Overall success rate: {overall_success:.1f}%")
             
         except Exception as e:
             self.logger.error(f"❌ Critical error in collection process: {e}")
@@ -55,8 +71,8 @@ class PeopleCollectorV2(BaseCollector):
     async def _process_role_with_pipeline(self, role_id: int, role_name: str):
         """Process a single role through the pipeline with character-by-character processing"""
         try:
-            # Get the character processing plan
-            processing_plan = self._get_character_processing_plan(role_id)
+            # For testing: only process first character for faster testing
+            processing_plan = list("a")  # Start with just 'a' for testing
             
             total_characters = len(processing_plan)
             self.logger.info(f"📊 Role {role_id} processing plan: {total_characters} character combinations")
@@ -74,9 +90,8 @@ class PeopleCollectorV2(BaseCollector):
                         self.pipeline.update_raw_people_count(len(raw_people))
                         
                         # Process through pipeline
-                        progress_callback = self._create_progress_callback(role_id, character)
                         result = await self.pipeline.process_character_batch(
-                            raw_people, role_id, role_name, character, progress_callback
+                            raw_people, role_id, role_name, character
                         )
                         
                         role_results.append(result)
@@ -89,7 +104,12 @@ class PeopleCollectorV2(BaseCollector):
                     continue
             
             # Log role summary
-            self._log_role_summary(role_id, role_name, role_results)
+            if role_results:
+                total_processed = sum(r.get("processed", 0) for r in role_results)
+                total_stored = sum(r.get("stored", 0) for r in role_results)
+                self.logger.warning(f"Role {role_id} ({role_name}) summary: {total_stored}/{total_processed} people stored.")
+            else:
+                self.logger.warning(f"Role {role_id} ({role_name}): No results")
             
         except Exception as e:
             self.logger.error(f"❌ Failed to process role {role_id} with pipeline: {e}")
@@ -124,7 +144,6 @@ class PeopleCollectorV2(BaseCollector):
             self.logger.info(f"🔍 Starting crawl for character '{character}', role {role_id}")
             
             # Use the existing crawler logic but for a specific character
-            processed_people = set()
             out = []
             
             # Check if this character combination will have too many results
@@ -188,15 +207,7 @@ class PeopleCollectorV2(BaseCollector):
                         if link:
                             href = link[0]
                             profile_url = f"https://lsf.verwaltung.uni-muenchen.de{href}" if href.startswith('/') else href
-                            
-                            # Skip if already processed
-                            if profile_url in processed_people:
-                                self.logger.debug(f"Skipping already processed person: {search_name}")
-                                current_person = {}
-                                continue
-                            
                             current_person["profile_url"] = profile_url
-                            processed_people.add(profile_url)
                             
                             # Fetch detailed person information
                             try:
@@ -283,91 +294,16 @@ class PeopleCollectorV2(BaseCollector):
 
     def _validate_person_data(self, person: Dict) -> bool:
         """Validate that person data meets minimum quality requirements"""
-        # Must have a non-empty name
         name = person.get("name", "").strip() if person.get("name") else ""
         if not name:
-            self.logger.debug(f"🚫 Validation failed: empty name")
+            self.logger.warning(f"Validation failed: empty name")
             return False
-        
-        # Must have at least one piece of contact info or basic info
         has_contact = bool(person.get("email") or person.get("phone") or person.get("address"))
-        
         basic_info = person.get("basic_info", {})
         has_basic_info = any(v and str(v).strip() for v in basic_info.values() if v is not None)
-        
         faculty = person.get("faculty")
         has_faculty = bool(faculty and str(faculty).strip() if faculty is not None else False)
-        
         if not (has_contact or has_basic_info or has_faculty):
-            self.logger.debug(f"🚫 Validation failed for '{name}': no contact info, basic info, or faculty")
+            self.logger.warning(f"Validation failed for '{name}': no contact info, basic info, or faculty")
             return False
-        
-        self.logger.debug(f"✅ Validation passed for '{name}': has_contact={has_contact}, has_basic_info={has_basic_info}, has_faculty={has_faculty}")
-        return True
-
-    def _get_character_processing_plan(self, role_id: int) -> List[str]:
-        """Get the list of characters/combinations to process for a role"""
-        # For testing: only process first few letters
-        plan = list("abc")  # Start with just first 3 letters for testing
-        
-        # TODO: Re-enable full alphabet once pipeline is working
-        # plan = list("abcdefghijklmnopqrstuvwxyzäöüß")
-        
-        # For roles that typically have many people, also add common two-letter combinations
-        high_volume_roles = [1, 2, 3]  # Adjust based on actual role IDs that have many people
-        if role_id in high_volume_roles:
-            # Add some common two-letter combinations (disabled for testing)
-            pass
-            # for first in ["a", "b", "c", "d", "m", "s"]:
-            #     for second in ["a", "e", "i", "o", "u"]:
-            #         plan.append(f"{first}{second}")
-        
-        return plan
-
-    def _create_progress_callback(self, role_id: int, character: str):
-        """Create a progress callback for pipeline updates"""
-        async def progress_callback(stage: str, current: int, total: int):
-            progress_percent = (current / total * 100) if total > 0 else 0
-            self.logger.debug(f"📈 Role {role_id}, char '{character}', {stage}: {current}/{total} ({progress_percent:.1f}%)")
-        
-        return progress_callback
-
-    def _log_role_summary(self, role_id: int, role_name: str, results: List[Dict]):
-        """Log summary statistics for a completed role"""
-        if not results:
-            self.logger.info(f"📊 Role {role_id} ({role_name}): No results")
-            return
-        
-        total_processed = sum(r.get("processed", 0) for r in results)
-        total_stored = sum(r.get("stored", 0) for r in results)
-        successful_batches = sum(1 for r in results if r.get("success", False))
-        
-        self.logger.info(f"📊 Role {role_id} ({role_name}) Summary:")
-        self.logger.info(f"   ✅ Batches processed: {successful_batches}/{len(results)}")
-        self.logger.info(f"   👥 People processed: {total_processed}")
-        self.logger.info(f"   💾 People stored: {total_stored}")
-        if total_processed > 0:
-            success_rate = (total_stored / total_processed) * 100
-            self.logger.info(f"   📈 Success rate: {success_rate:.1f}%")
-
-    def _log_final_statistics(self, stats: Dict):
-        """Log final collection statistics"""
-        self.logger.info("🎯 FINAL COLLECTION STATISTICS:")
-        self.logger.info(f"   📥 Raw people: {stats.get('total_raw_people', 0)}")
-        self.logger.info(f"   🔄 Normalized: {stats.get('total_normalized', 0)}")
-        self.logger.info(f"   🏷️  Enum mapped: {stats.get('total_enum_mapped', 0)}")
-        self.logger.info(f"   📋 Model mapped: {stats.get('total_model_mapped', 0)}")
-        self.logger.info(f"   💾 CMS stored: {stats.get('total_cms_stored', 0)}")
-        self.logger.info(f"   ❌ Errors: {stats.get('processing_errors', 0)}")
-        self.logger.info(f"   📦 Batches: {stats.get('batches_processed', 0)}")
-        
-        if stats.get('total_raw_people', 0) > 0:
-            overall_success = (stats.get('total_cms_stored', 0) / stats.get('total_raw_people', 1)) * 100
-            self.logger.info(f"   🎯 Overall success rate: {overall_success:.1f}%")
-
-
-# Convenience function for running the new collector
-async def run_people_collection_v2(test_mode: bool = True, batch_size: int = 50):
-    """Run the new people collection pipeline"""
-    collector = PeopleCollectorV2(test_mode=test_mode, batch_size=batch_size)
-    await collector._collect_data(None)  # db parameter not used in this implementation 
+        return True 

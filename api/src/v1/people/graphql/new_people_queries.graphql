@@ -1,0 +1,174 @@
+# Simplified GraphQL queries for people schema
+
+# Get all people with basic info (for list views)
+query GetAllPeople($limit: Int, $offset: Int) {
+    people(limit: $limit, offset: $offset) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}
+
+# Get person by ID
+query GetPersonById($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}
+
+# Get person with all details (for detailed views)
+query GetPersonWithDetails($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+        # Get person details
+        person_details {
+            id
+            profile_url
+            email
+            phone
+            address
+            office_hours
+            status
+            note
+            gender
+            employment_status
+        }
+
+        # Get person courses
+        person_courses {
+            id
+            course_number
+            course_name
+            semester
+            course_url
+        }
+
+        # Get person roles
+        person_roles {
+            id
+            role_name
+            lsf_role_enum
+            institution
+            institution_url
+        }
+    }
+}
+
+# Get person details only
+query GetPersonDetails($person_id: ID!) {
+    person_details(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+    }
+}
+
+# Get person courses
+query GetPersonCourses($person_id: ID!) {
+    person_courses(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        course_number
+        course_name
+        semester
+        course_url
+    }
+}
+
+# Get person roles
+query GetPersonRoles($person_id: ID!) {
+    person_roles(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution
+        institution_url
+    }
+}
+
+# Search people by faculty
+query GetPeopleByFaculty($faculty_enum: GraphQLStringOrFloat!, $limit: Int, $offset: Int) {
+    people(filter: { faculty_enum: { _eq: $faculty_enum } }, limit: $limit, offset: $offset) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}
+
+# Search people by name
+query SearchPeopleByName($search: String!, $limit: Int, $offset: Int) {
+    people(
+        filter: {
+            _or: [
+                { name: { _icontains: $search } }
+                { first_name: { _icontains: $search } }
+                { surname: { _icontains: $search } }
+            ]
+        }
+        limit: $limit
+        offset: $offset
+    ) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}
+
+# Get person by person_id (custom string)
+query GetPersonByPersonId($person_id: String!) {
+    people(filter: { person_id: { _eq: $person_id } }) {
+        id
+        person_id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}
