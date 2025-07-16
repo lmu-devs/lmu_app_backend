@@ -1,16 +1,17 @@
-import uuid
-from uuid import UUID
-from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, RootModel
 from enum import Enum
-from typing import Dict
+from typing import List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, RootModel
+
 
 class EventType(str, Enum): # not complete
     MOVIE = "MOVIE"
     SPORT = "SPORT"
     LECTURE = "LECTURE"
     EXAM = "EXAM"
+    OTHER = "OTHER"
 
 class Frequency(str, Enum):
     ONCE = "ONCE"
@@ -21,8 +22,19 @@ class Frequency(str, Enum):
 
 class UpdateType(int, Enum):
     THIS = 0
-    ALL = 1
-    FUTURE = 2
+    DELETE_THIS = 1
+    ALL = 2
+    FUTURE = 3
+
+class AccessScope(int, Enum):
+    """Controls which user is authorized to see which event. 
+    This is also sometimes useful, for example for debugging 
+    and not all users should see an public event directly."""
+
+    PERSONAL = 0 # event created by a user
+    PUBLIC = 10 # event for all users
+    USER = 50
+    ADMIN = 100
 
 class CalendarLocation(BaseModel):
     address: str
@@ -30,7 +42,7 @@ class CalendarLocation(BaseModel):
     longitude: float
 
     @staticmethod
-    def from_json(json: Dict) -> "CalendarLocation":
+    def from_json(json: dict) -> "CalendarLocation":
         if json is None:
             return None
         
@@ -41,7 +53,7 @@ class CalendarLocation(BaseModel):
         )
     
     @staticmethod
-    def to_json(entry: "CalendarLocation") -> Dict:  
+    def to_json(entry: "CalendarLocation") -> dict:  
         data = {
             "address": entry.address,
             "latitude": entry.latitude,
@@ -51,11 +63,11 @@ class CalendarLocation(BaseModel):
         
 class CalendarRule(BaseModel):
     frequency: Frequency
-    interval: int                  # e.g. every two weeks: repeat_type=WEEKLY, repeat_interval=2
-    until_time: Optional[datetime] # end date for repeat, used when available. Otherwise the REPEAT_LIMIT is used
+    interval: int                  # e.g. every two weeks: frequency=WEEKLY, interval=2
+    until_time: Optional[datetime] # end date for repeat, used when available
 
     @staticmethod
-    def from_json(json: Dict) -> "CalendarRule":
+    def from_json(json: dict) -> "CalendarRule":
         return CalendarRule(
             frequency=json["frequency"],
             interval=json["interval"],
@@ -63,13 +75,14 @@ class CalendarRule(BaseModel):
         )
 
 class CalendarException(BaseModel):
+    #deleted: bool
 
     @staticmethod
     def to_json(create_entry: "CalendarCreate", 
         calendar_event_id: UUID, 
         recurrence_id: int, 
         location_id: Optional[UUID] = None
-        ) -> Dict:
+        ) -> dict:
         
         loc_data = None
         if create_entry.location:
@@ -91,7 +104,7 @@ class CalendarException(BaseModel):
 
 class CalendarCreate(BaseModel):
     """
-    Create a new calendar entry.
+    Create a new calendar event.
     """
 
     title: Optional[str]
@@ -102,13 +115,14 @@ class CalendarCreate(BaseModel):
     start_time: Optional[datetime]
     end_time: Optional[datetime]
     all_day: bool
+    access_scope: AccessScope
 
     @staticmethod
     def to_json(create_entry: "CalendarCreate", 
-        user_id: uuid.UUID, 
-        rule_id: uuid.UUID, 
-        location_id: uuid.UUID
-        ) -> Dict:
+        user_id: UUID, 
+        rule_id: UUID, 
+        location_id: UUID
+        ) -> dict:
 
         rule_dict = {
             "frequency": create_entry.rule.frequency,
@@ -138,24 +152,25 @@ class CalendarCreate(BaseModel):
                 "end_time": create_entry.end_time.isoformat(),
                 "description": create_entry.description,
                 "location": loc_dict,
-                "rule": rule_dict
+                "rule": rule_dict,
+                "access_scope": create_entry.access_scope
         }
 
-class CalendarEntry(CalendarCreate):
+class CalendarEvent(CalendarCreate):
     """
-    Calendar entry.
+    Calendar event.
     """
 
     id: UUID
-    user_id: UUID
+    user_id: Optional[UUID]
     recurrence_id: Optional[int]
     created_at: datetime
     updated_at: datetime
 
     @staticmethod
-    def from_json(json: Dict, 
-        exception_data: Dict = None
-        ) -> "CalendarEntry":
+    def from_json(json: dict, 
+        exception_data: dict = None
+        ) -> "CalendarEvent":
             updated_at = json.get("date_updated") or json.get("date_created")
 
             rule = CalendarRule.from_json(json["rule"])
@@ -171,16 +186,13 @@ class CalendarEntry(CalendarCreate):
             if exception_data:
                 title = exception_data.get("title", title)
                 description = exception_data.get("description", description)
-                location_exc = CalendarLocation.from_json(exception_data.get("location"))
-                if location_exc:
-                    location = location_exc
-
+                location = CalendarLocation.from_json(exception_data.get("location"))
                 start_time = exception_data.get("start_time", start_time)
                 end_time = exception_data.get("end_time", end_time)
                 all_day = exception_data.get("all_day", all_day)
                 recurrence_id = exception_data.get("recurrence_id", recurrence_id)
 
-            return CalendarEntry(
+            return CalendarEvent(
                 id=json["id"],
                 user_id=json.get("user_id"),
                 created_at=json["date_created"],
@@ -194,18 +206,19 @@ class CalendarEntry(CalendarCreate):
                 end_time=end_time,
                 all_day=all_day,
                 recurrence_id=recurrence_id,
+                access_scope=json["access_scope"]
             )
     
     def copy_with_override(self, 
         **overrides
-        ) -> "CalendarEntry":
+        ) -> "CalendarEvent":
         return self.__class__(**{**self.model_dump(), **overrides})
     
 class CalendarEntries(RootModel):
-    root: List[CalendarEntry]
+    root: List[CalendarEvent]
 
     @classmethod
     def from_list(cls, 
-        data: List[CalendarEntry]
+        data: List[CalendarEvent]
         ) -> "CalendarEntries":
         return CalendarEntries(root=data)
