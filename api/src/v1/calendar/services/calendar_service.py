@@ -278,53 +278,39 @@ class CalendarService:
         
         return self._generate_repeat_events(item)
 
-    def _update_repeat_event(
-        self,
-        event_id: uuid.UUID,
-        update_data: Optional[CalendarCreate],  # None if delete = True
-        recurrence_id: int,
-        delete: bool = False
+    def _update_repeat_event(self,
+        event_id: uuid.UUID,     
+        update_data: CalendarCreate,  
+        recurrence_id: int                 
         ) -> list[CalendarEvent]:
-        """
-        Performs an update to a generated event instance.
-        If `delete` is True, creates or updates an exception marking the instance as deleted.
-        """
+        """Performs an update to a generated event instance. Therefore a new exception is created or the existing one is updated."""
         event = self._get_event_information(event_id, GraphQLFile.kGetEvent, ["calendar_event", 0]) 
         if not event:
             raise DatabaseError(f"Failed to update {event_id}! No information returned!")
 
         exception = self._get_exception_by_id(event.get("exceptions"), recurrence_id)
 
-        if delete:
-            exc_data = {
-                "recurrence_id": recurrence_id,
-                "event": { "id": str(event_id) },
-                "deleted": True 
+        if exception:
+            file = GraphQLFile.kUpdateException
+            exc_location_id = self._handle_location_update(exception.get("location"), update_data.location) 
+            variables = {
+                "id": exception.get("id"),
+                "data": CalendarException.to_json(update_data, event_id, recurrence_id, exc_location_id)
             }
         else:
-            location_id = self._handle_location_update(
-                exception.get("location") if exception else None,
-                update_data.location
-            ) if update_data.location else None
+            file = GraphQLFile.kCreateException
+            variables = {
+                "data": CalendarException.to_json(update_data, event_id, recurrence_id)  
+            }
 
-            exc_data = CalendarException.to_json(update_data, event_id, recurrence_id, location_id)
+        item = self._execute_graphql_file(file, variables, [])
+        if not item:
+            raise DatabaseError(f"Failed to update {event_id}!")
 
-        file = GraphQLFile.kUpdateException if exception else GraphQLFile.kCreateException
-        variables = {
-            "id": exception.get("id"),
-            "data": exc_data
-        } if exception else {"data": exc_data}
+        exception_data = item.get("update_calendar_exceptions_item") \
+                            or item.get("create_calendar_exceptions_item")
 
-        result = self._execute_graphql_file(file, variables, [])
-        if not result:
-            raise DatabaseError(f"Failed to update/delete recurrence {recurrence_id} of event {event_id}")
-
-        if delete:
-            logger.info(f"Marked recurrence {recurrence_id} of event {event_id} as deleted.")
-            return []
-        
-        item = result.get("update_calendar_exceptions_item") or result.get("create_calendar_exceptions_item")
-        return [CalendarEvent.from_json(event, item)]
+        return [CalendarEvent.from_json(event, exception_data)]
 
     def update_event(self, 
         user_id: uuid.UUID, 
@@ -341,9 +327,6 @@ class CalendarService:
             case UpdateType.THIS: # only use for repeat frequencies, call Update.All for ONCE
                 logger.info(f"Updating single occurrence of calendar event {event_id}.")
                 return self._update_repeat_event(event_id, update_data, recurrence_id)
-            case UpdateType.DELETE_THIS:
-                logger.info(f"Deleting recurrence {recurrence_id} for calendar event {event_id}.")
-                return self._update_repeat_event(event_id, None, recurrence_id, delete=True)
             case UpdateType.ALL:
                 logger.info(f"Updating all occurrences of calendar event {event_id}.")
                 return self._update_event(user_id, event_id, update_data)

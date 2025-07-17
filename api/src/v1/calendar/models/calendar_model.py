@@ -22,7 +22,6 @@ class Frequency(str, Enum):
 
 class UpdateType(int, Enum):
     THIS = 0
-    DELETE_THIS = 1
     ALL = 2
     FUTURE = 3
 
@@ -75,7 +74,6 @@ class CalendarRule(BaseModel):
         )
 
 class CalendarException(BaseModel):
-    #deleted: bool
 
     @staticmethod
     def to_json(create_entry: "CalendarCreate", 
