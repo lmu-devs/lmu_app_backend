@@ -10,6 +10,7 @@ mutation UpdateCalendarEvent($id: ID!, $data: update_calendar_event_input!) {
     event_type
     start_time
     end_time
+    access_scope
     rule {
       id
       frequency
