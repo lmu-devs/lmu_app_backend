@@ -11,3 +11,4 @@ from .time_range_table import *
 from .university_table import *
 from .user_table import *
 from .wishlist import *
+from .lectures import *
