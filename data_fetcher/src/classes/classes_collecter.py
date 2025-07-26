@@ -19,6 +19,8 @@ class ClassesCollecter(ScheduledCollector):
         date = datetime.datetime.now()
         self.logger.info(f"Collecting summer and winter semester for {date.year}")
 
+        self.lecture_fetcher.test_db(db)
+
         self.lecture_fetcher.store_lectures(date.year, SemesterTypeEnum.SUMMER_SEMESTER)
         self.logger.info(f"Summer semester collected")
 

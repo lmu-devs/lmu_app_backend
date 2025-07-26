@@ -3,12 +3,15 @@ from pathlib import Path
 import time
 from typing import List
 import json
+from sqlalchemy.orm.session import Session
 from typing_extensions import Optional
 import datetime
 import logging
 
-from data_fetcher.src.classes.models.lecture import Lecture
+from shared.src.tables.lectures import LectureTable
+from data_fetcher.src.classes.models.lecture import Lecture, TreePath
 from shared.src.enums.classes_enum import SemesterTypeEnum
+from shared.src.tables.lectures.lecture_tables import *
 from ..crawler.lsf_crawler import LSFCrawler
 from shared.src.services.directus_service import DirectusService
 from shared.src.core.logging import get_classes_logger
@@ -27,6 +30,81 @@ class LectureFetcher:
         self.lsf_crawler = LSFCrawler()
         self.workers: int = 5
         self.logger = get_classes_logger(__name__)
+
+    def test_db(self, db: Session):
+        print("Testing database connection...")
+        person1 = PersonTable(first_name="Ada", surname="Lovelace", title="Dr.")
+        institution1 = InstitutionTable(name="LMU München")
+
+        # Or, if they exist already:
+        # person1 = session.query(PersonTable).filter_by(id=1).one()
+        # institution1 = session.query(InstitutionTable).filter_by(id=1).one()
+
+        lecture = LectureTable(
+            publish_id=1,
+            title="Advanced Algorithms",
+
+            # One-to-one
+            base_info=ClassBaseInfoTable(
+                class_type="Vorlesung",
+                class_id="INF123",
+                semester="WS 2025/26",
+                sws=4.0,
+                max_participants=100
+            ),
+            additional_information=AdditionInformationTable(
+                remark="Bring your own laptop.",
+                content="Graph algorithms, dynamic programming",
+                literature="CLRS"
+            ),
+            enrollment_deadline=EnrollmentDeadlineTable(
+                program_associated_deadline="01.10.2025"
+            ),
+
+            # One-to-many
+            tree_paths=[
+                TreePathTable(path=["Fakultät 1", "Informatik"]),
+                TreePathTable(path=["Studiengang", "Bachelor Informatik"])
+            ],
+            associated_programs=[
+                AssociatedProgramTable(program_name="Informatik B.Sc.", ects=6, degree="B.Sc.")
+            ],
+            class_materials=[
+                ClassMaterialTable(valid_from=datetime.date(2025, 10, 15), file_name="script.pdf", description="Vorlesungsskript")
+            ],
+            associated_exams=[
+                AssociatedExamTable(module_name="Algorithmen", ects=6)
+            ],
+            exam_informations=[
+                ExamInformationTable(examiner="Prof. X", ects=6, date=datetime.date(2026, 2, 15))
+            ],
+            class_sessions=[
+                ClassSessionTable(
+                    caption="Vorlesung A",
+                    weekday=WeekdayEnum.MONDAY,
+                    starting_time=datetime.time(10, 0),
+                    ending_time=datetime.time(12, 0),
+                    duration_start=datetime.date(2025, 10, 15),
+                    duration_end=datetime.date(2026, 2, 15),
+                    room="A 101",
+                )
+            ],
+            associated_tutorials=[
+                AssociatedTutorialTable(description="Übung 1", weekly_hours=2.0)
+            ],
+            associated_classes=[
+                AssociatedClassTable(description="Begleitveranstaltung", weekly_hours=2.0)
+            ],
+
+            # Many-to-many — must be list of ORM instances
+            persons=[person1],
+            institutions=[institution1],
+        )
+
+        # Add all to the session
+        db.add(lecture)
+        db.commit()
+
 
     def store_lectures_if_not_exist_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
         """
@@ -102,7 +180,7 @@ class LectureFetcher:
 
         for index, (name, url) in enumerate(lecture_urls):
             self.logger.info(f"Processing lecture({len(lecture_urls)}/{index+1}): {name} ({url})")
-            publish_id = Lecture.publish_id_from_url(url)
+            publish_id = LectureTable.publish_id_from_url(url)
 
             if self.lecture_exists(publish_id):
                 continue
@@ -126,7 +204,7 @@ class LectureFetcher:
 
             self.logger.info(f"Succesfully processed lecture: {lecture.title} ({lecture.publish_id})")
 
-    def insert_lecture(self, lecture: Lecture) -> None:
+    def insert_lecture(self, lecture: LectureTable) -> None:
         """Inserts a lecture into the database using a GraphQL query."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
@@ -154,7 +232,7 @@ class LectureFetcher:
         lectures = response.get("data", {}).get("lecture", [])
         return lectures[0].get("id") if lectures else None
 
-    def update_lecture(self, lecture: Lecture, id: str) -> None:
+    def update_lecture(self, lecture: LectureTable, id: str) -> None:
         """Updates an existing lecture in the database using a GraphQL query."""
         if not self.lecture_exists(lecture.publish_id):
             self.logger.error(f"No Lecture with publish_id {lecture.publish_id} exist.")
