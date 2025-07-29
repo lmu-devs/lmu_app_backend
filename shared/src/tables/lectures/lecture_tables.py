@@ -34,7 +34,7 @@ class TreePathTable(Base):
     __tablename__ = 'tree_paths'
 
     id = Column(Integer, primary_key=True)
-    path = ARRAY(String(100))
+    path = Column(ARRAY(String(255)), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="tree_paths")
@@ -45,7 +45,7 @@ class PersonTable(Base):
     id = Column(Integer, primary_key=True)
     first_name = Column(String(100), nullable=False)
     surname = Column(String(100), nullable=False)
-    title = Column(String(50), nullable=True)
+    title = Column(String(100), nullable=True)
 
     lectures = relationship("LectureTable", secondary=lecture_persons_table, back_populates="persons")
 
@@ -63,9 +63,9 @@ class AssociatedProgramTable(Base):
 
     id = Column(Integer, primary_key=True)
     program_name = Column(String(255), nullable=True)
-    module_classification = Column(String(100), nullable=True)
+    module_classification = Column(String(255), nullable=True)
     ects = Column(Integer, nullable=True)
-    degree = Column(String(100), nullable=True)
+    degree = Column(String(255), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="associated_programs")
@@ -74,17 +74,17 @@ class ClassBaseInfoTable(Base):
     __tablename__ = 'class_base_info'
 
     id = Column(Integer, primary_key=True)
-    class_type = Column(String(100), nullable=True)
-    class_id = Column(String(50), nullable=True)
-    class_cycle = Column(String(100), nullable=True)
-    semester = Column(String(50), nullable=True)
+    class_type = Column(String(255), nullable=True)
+    class_id = Column(String(255), nullable=True)
+    class_cycle = Column(String(255), nullable=True)
+    semester = Column(String(255), nullable=True)
     sws = Column(Float, nullable=True)
     max_participants = Column(Integer, nullable=True)
-    in_person_type = Column(String(100), nullable=True)
-    language = Column(String(50), nullable=True)
-    for_exchange_students = Column(String(10), nullable=True)
+    in_person_type = Column(String(255), nullable=True)
+    language = Column(String(255), nullable=True)
+    for_exchange_students = Column(String(255), nullable=True)
     links = Column(Text, nullable=True)
-    sigel = Column(String(50), nullable=True)
+    sigel = Column(String(255), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="base_info", uselist=False)
@@ -98,10 +98,10 @@ class ClassSessionTable(Base):
     starting_time = Column(Time, nullable=True)
     ending_time = Column(Time, nullable=True)
     timing_type = Column(Enum(LectureStartTypeEnum), nullable=True)
-    rythm = Column(String(100), nullable=True)
+    rythm = Column(String(255), nullable=True)
     duration_start = Column(Date, nullable=True)
     duration_end = Column(Date, nullable=True)
-    room = Column(String(100), nullable=True)
+    room = Column(String(255), nullable=True)
     lecturer = Column(String(255), nullable=True)
     remark = Column(Text, nullable=True)
     cancelled_dates = Column(Text, nullable=True)
@@ -128,11 +128,11 @@ class AssociatedExamTable(Base):
     module_name = Column(String(255), nullable=True)
     program_name = Column(String(255), nullable=True)
     ects = Column(Integer, nullable=True)
-    module_classification = Column(String(100), nullable=True)
+    module_classification = Column(String(255), nullable=True)
     degree = Column(String(100), nullable=True)
-    module_id = Column(String(50), nullable=True)
-    exam_id = Column(String(50), nullable=True)
-    po_version = Column(String(50), nullable=True)
+    module_id = Column(String(100), nullable=True)
+    exam_id = Column(String(100), nullable=True)
+    po_version = Column(String(100), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="associated_exams")
@@ -169,12 +169,12 @@ class ExamInformationTable(Base):
     ects = Column(Integer, nullable=True)
     examiner = Column(String(255), nullable=True)
     degree_program = Column(String(255), nullable=True)
-    kzfa = Column(String(50), nullable=True)
+    kzfa = Column(String(255), nullable=True)
     registration_start = Column(Date, nullable=True)
     registration_end = Column(Date, nullable=True)
-    exam_id = Column(String(50), nullable=True)
-    program_version = Column(String(50), nullable=True)
-    degree_awarded = Column(String(100), nullable=True)
+    exam_id = Column(String(100), nullable=True)
+    program_version = Column(String(100), nullable=True)
+    degree_awarded = Column(String(255), nullable=True)
     date = Column(Date, nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
@@ -186,7 +186,7 @@ class AssociatedClassTable(Base):
     id = Column(Integer, primary_key=True)
     description = Column(Text, nullable=True)
     weekly_hours = Column(Float, nullable=True)
-    number = Column(String(50), nullable=True)
+    number = Column(String(100), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="associated_classes")
@@ -197,7 +197,7 @@ class AssociatedTutorialTable(Base):
     id = Column(Integer, primary_key=True)
     description = Column(Text, nullable=True)
     weekly_hours = Column(Float, nullable=True)
-    number = Column(String(50), nullable=True)
+    number = Column(String(100), nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="associated_tutorials")
@@ -206,7 +206,7 @@ class EnrollmentDeadlineTable(Base):
     __tablename__ = 'enrollment_deadlines'
 
     id = Column(Integer, primary_key=True)
-    program_associated_deadline = Column(String(255), nullable=True)
+    program_associated_deadline = Column(Text, nullable=True)
     other_deadlines = Column(Text, nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 

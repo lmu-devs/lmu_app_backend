@@ -31,80 +31,52 @@ class LectureFetcher:
         self.workers: int = 5
         self.logger = get_classes_logger(__name__)
 
-    def test_db(self, db: Session):
-        print("Testing database connection...")
-        person1 = PersonTable(first_name="Ada", surname="Lovelace", title="Dr.")
-        institution1 = InstitutionTable(name="LMU München")
 
-        # Or, if they exist already:
-        # person1 = session.query(PersonTable).filter_by(id=1).one()
-        # institution1 = session.query(InstitutionTable).filter_by(id=1).one()
+    def store_lectures_db(self, db: Session, year: int, semester: SemesterTypeEnum):
+        """Store all lectures from the LSF crawler into the SQL database."""
+        lectures = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
 
-        lecture = LectureTable(
-            publish_id=1,
-            title="Advanced Algorithms",
+        for index, lecture in enumerate(lectures):
+            if self.lecture_exist_in_db(db, lecture):
+                self.update_lecture_db(db, lecture)
+            else:
+                self.add_lecture_db(db, lecture)
+            self.logger.info(f"Processed Lecture {lecture.title}({index + 1}/{len(lectures)})")
 
-            # One-to-one
-            base_info=ClassBaseInfoTable(
-                class_type="Vorlesung",
-                class_id="INF123",
-                semester="WS 2025/26",
-                sws=4.0,
-                max_participants=100
-            ),
-            additional_information=AdditionInformationTable(
-                remark="Bring your own laptop.",
-                content="Graph algorithms, dynamic programming",
-                literature="CLRS"
-            ),
-            enrollment_deadline=EnrollmentDeadlineTable(
-                program_associated_deadline="01.10.2025"
-            ),
-
-            # One-to-many
-            tree_paths=[
-                TreePathTable(path=["Fakultät 1", "Informatik"]),
-                TreePathTable(path=["Studiengang", "Bachelor Informatik"])
-            ],
-            associated_programs=[
-                AssociatedProgramTable(program_name="Informatik B.Sc.", ects=6, degree="B.Sc.")
-            ],
-            class_materials=[
-                ClassMaterialTable(valid_from=datetime.date(2025, 10, 15), file_name="script.pdf", description="Vorlesungsskript")
-            ],
-            associated_exams=[
-                AssociatedExamTable(module_name="Algorithmen", ects=6)
-            ],
-            exam_informations=[
-                ExamInformationTable(examiner="Prof. X", ects=6, date=datetime.date(2026, 2, 15))
-            ],
-            class_sessions=[
-                ClassSessionTable(
-                    caption="Vorlesung A",
-                    weekday=WeekdayEnum.MONDAY,
-                    starting_time=datetime.time(10, 0),
-                    ending_time=datetime.time(12, 0),
-                    duration_start=datetime.date(2025, 10, 15),
-                    duration_end=datetime.date(2026, 2, 15),
-                    room="A 101",
-                )
-            ],
-            associated_tutorials=[
-                AssociatedTutorialTable(description="Übung 1", weekly_hours=2.0)
-            ],
-            associated_classes=[
-                AssociatedClassTable(description="Begleitveranstaltung", weekly_hours=2.0)
-            ],
-
-            # Many-to-many — must be list of ORM instances
-            persons=[person1],
-            institutions=[institution1],
+    def update_lecture_db(self, session: Session, lecture: Lecture):
+        """Update an existing lecture in the SQL database."""
+        old = (
+            session.query(LectureTable)
+                .filter_by(publish_id=lecture.publish_id)
+                .one_or_none()
         )
+        if old:
+            session.delete(old)
+            session.flush()
 
-        # Add all to the session
-        db.add(lecture)
-        db.commit()
+        self.add_lecture_db(session, lecture)
 
+    def add_lecture_db(self, session: Session, lecture: Lecture):
+        """Add a lecture to the SQL database."""
+        lecture_table, related = lecture.to_table()
+        session.add(lecture_table)
+        for key, entries in related.items():
+            if key in {"persons", "institutions"}:
+                for obj in entries:
+                    session.merge(obj)
+            else:
+                session.add_all(entries)
+
+        session.commit()
+
+
+    def lecture_exist_in_db(self, session: Session, lecture: Lecture) -> bool:
+        """Check if a lecture exists in the SQL database."""
+        return bool(
+            session.query(LectureTable)
+            .filter_by(publish_id=lecture.publish_id)
+            .one_or_none()
+        )
 
     def store_lectures_if_not_exist_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
         """
@@ -204,7 +176,7 @@ class LectureFetcher:
 
             self.logger.info(f"Succesfully processed lecture: {lecture.title} ({lecture.publish_id})")
 
-    def insert_lecture(self, lecture: LectureTable) -> None:
+    def insert_lecture(self, lecture: Lecture) -> None:
         """Inserts a lecture into the database using a GraphQL query."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
@@ -232,7 +204,7 @@ class LectureFetcher:
         lectures = response.get("data", {}).get("lecture", [])
         return lectures[0].get("id") if lectures else None
 
-    def update_lecture(self, lecture: LectureTable, id: str) -> None:
+    def update_lecture(self, lecture: Lecture, id: str) -> None:
         """Updates an existing lecture in the database using a GraphQL query."""
         if not self.lecture_exists(lecture.publish_id):
             self.logger.error(f"No Lecture with publish_id {lecture.publish_id} exist.")
