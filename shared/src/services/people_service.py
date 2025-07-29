@@ -127,7 +127,7 @@ class PeopleService:
                 person_id=person_id,
                 role_name=role_data.get("role_name"),
                 lsf_role_enum=lsf_role_enum,
-                institution=role_data.get("institution"),
+                institution_name=role_data.get("institution_name"),
                 institution_url=role_data.get("institution_url"),
                 institutions=role_data.get("institutions", [])
             )
@@ -595,7 +595,7 @@ class PeopleService:
                     "person_id": {"id": person_uuid},  # Pass as reference object
                     "role_name": role.get("role_name", ""),
                     "lsf_role_enum": get_enum_value(lsf_role_enum),
-                    "institution": institution_name,
+                    "institution_name": institution_name,
                     "institution_url": institution_url
                 }
             }
@@ -649,11 +649,11 @@ class PeopleService:
             # Extract ID from URL if possible
             match = re.search(r'personal\.pid=(\d+)', profile_url)
             if match:
-                return f"lmu_person_{match.group(1)}"
+                return f"{match.group(1)}"
         
         # Fallback: generate hash-based ID
         content = f"{name}_{profile_url}"
-        return f"lmu_person_{hashlib.md5(content.encode()).hexdigest()[:8]}"
+        return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
 
     def test_cms_connection(self) -> Dict:
         """Test CMS connection and validate schema"""

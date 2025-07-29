@@ -34,7 +34,7 @@ class PersonRole(BaseModel):
     person_id: str
     role_name: Optional[str] = None
     lsf_role_enum: Optional[str] = None
-    institution: Optional[str] = None
+    institution_name: Optional[str] = None
     institution_url: Optional[str] = None
     institutions: Optional[List[Dict]] = []
 

@@ -93,11 +93,11 @@ class PeopleDataNormalizer:
             # Extract ID from URL if possible
             match = re.search(r'personal\.pid=(\d+)', profile_url)
             if match:
-                return f"lmu_person_{match.group(1)}"
+                return f"{match.group(1)}"
         
         # Fallback: generate hash-based ID
         content = f"{name}_{profile_url}"
-        return f"lmu_person_{hashlib.md5(content.encode()).hexdigest()[:8]}"
+        return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
 
     def _clean_text(self, text: str) -> str:
         """Clean up text by removing extra whitespace and common prefixes"""

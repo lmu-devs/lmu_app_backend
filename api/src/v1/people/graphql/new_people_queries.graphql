@@ -67,7 +67,7 @@ query GetPersonWithDetails($id: ID!) {
             id
             role_name
             lsf_role_enum
-            institution
+            institution_name
             institution_url
         }
     }
@@ -115,7 +115,7 @@ query GetPersonRoles($person_id: ID!) {
         }
         role_name
         lsf_role_enum
-        institution
+        institution_name
         institution_url
     }
 }
