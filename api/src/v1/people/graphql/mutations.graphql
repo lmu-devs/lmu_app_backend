@@ -87,7 +87,7 @@ mutation CreatePersonRole($data: create_person_roles_input!) {
         }
         role_name
         lsf_role_enum
-        institution
+        institution_name
         institution_url
     }
 }

@@ -2,7 +2,7 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from shared.src.enums import FacultyEnum
 from shared.src.models.people_model import PersonBasic, PersonSummary, PeopleResponse
-from ..services.people_service import PeopleService
+from shared.src.services.people_service import PeopleService
 
 router = APIRouter(tags=["people"])
 

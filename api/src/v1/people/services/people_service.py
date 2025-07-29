@@ -34,7 +34,7 @@ async def get_all_people(
     )
 
 
-async def get_person_by_id(self, person_id: str) -> Optional[Person]:
+async def get_person_by_id(person_id: str) -> Optional[Person]:
     """Get detailed information about a specific person"""
     return await _people_service.get_person_by_id(person_id)
 

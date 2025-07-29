@@ -71,8 +71,7 @@ class PeopleCollectorV2(BaseCollector):
     async def _process_role_with_pipeline(self, role_id: int, role_name: str):
         """Process a single role through the pipeline with character-by-character processing"""
         try:
-            # For testing: only process first character for faster testing
-            processing_plan = list("a")  # Start with just 'a' for testing
+            processing_plan = list("abcdefghijklmnopqrstuvwxyzöäüß")  # Start with just 'a' for testing
             
             total_characters = len(processing_plan)
             self.logger.info(f"📊 Role {role_id} processing plan: {total_characters} character combinations")
