@@ -27,7 +27,6 @@ class PeopleDataNormalizer:
             Normalized person data ready for model mapping
         """
         try:
-            # Debug: Log what raw data we're working with
             self.logger.debug(f"Normalizing person: {raw_person.get('name', 'Unknown')}")
             self.logger.debug(f"  Raw faculty: '{raw_person.get('faculty', 'NOT_FOUND')}'")
             self.logger.debug(f"  Raw basic_info: {raw_person.get('basic_info', {})}")
@@ -45,7 +44,6 @@ class PeopleDataNormalizer:
                 "courses": self._normalize_courses(raw_person.get("courses", [])),
             }
             
-            # Add academic title if found in name or basic_info
             normalized["academic_title"] = self._extract_academic_title(raw_person)
             
             return normalized
@@ -90,12 +88,10 @@ class PeopleDataNormalizer:
         profile_url = person_data.get("profile_url", "")
         
         if profile_url:
-            # Extract ID from URL if possible
             match = re.search(r'personal\.pid=(\d+)', profile_url)
             if match:
                 return f"{match.group(1)}"
         
-        # Fallback: generate hash-based ID
         content = f"{name}_{profile_url}"
         return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
 
@@ -104,9 +100,7 @@ class PeopleDataNormalizer:
         if not text:
             return ""
         
-        # Remove extra whitespace and newlines
         text = re.sub(r'\s+', ' ', text)
-        # Remove common prefixes
         text = re.sub(r'^(Name:|Funktion:|Dienstadresse:|E-Mail:|Dienstzimmer:)', '', text)
         return text.strip()
 
@@ -126,7 +120,6 @@ class PeopleDataNormalizer:
             return None
             
         email = self._clean_text(email)
-        # Basic email validation
         if '@' in email and '.' in email:
             return email.lower()
         return None
@@ -137,11 +130,9 @@ class PeopleDataNormalizer:
             return None
             
         phone = self._clean_text(phone)
-        # Remove common phone number formatting characters
         phone = re.sub(r'[^\d\+\-\s\(\)]', '', phone)
         phone = phone.strip()
         
-        # Return None if empty or too short to be a valid phone number
         if not phone or len(phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '').replace('+', '')) < 5:
             return None
             
@@ -151,7 +142,6 @@ class PeopleDataNormalizer:
         """Normalize basic info fields"""
         normalized = {}
         
-        # Define expected fields and their normalized keys
         field_mapping = {
             "first_name": "first_name",
             "last_name": "last_name", 
@@ -182,12 +172,11 @@ class PeopleDataNormalizer:
             lsf_role_enum = self._clean_text(role.get("lsf_role_enum", ""))
             
             normalized_role = {
-                "role_name": lsf_role_enum,  # Use lsf_role_enum as role_name
+                "role_name": lsf_role_enum,
                 "lsf_role_enum": lsf_role_enum,
                 "institutions": self._normalize_institutions(role.get("institutions", []))
             }
             
-            # Only add if we have meaningful data
             if normalized_role["lsf_role_enum"] or normalized_role["institutions"]:
                 normalized_roles.append(normalized_role)
         
@@ -202,7 +191,6 @@ class PeopleDataNormalizer:
         
         for inst in institutions:
             if isinstance(inst, str):
-                # Simple string institution
                 normalized_institutions.append({
                     "name": self._clean_text(inst),
                     "url": None,
@@ -210,7 +198,6 @@ class PeopleDataNormalizer:
                     "data": None
                 })
             elif isinstance(inst, dict):
-                # Dict institution
                 normalized_institutions.append({
                     "name": self._clean_text(inst.get("name", "")),
                     "url": self._normalize_url(inst.get("url")),
@@ -235,7 +222,6 @@ class PeopleDataNormalizer:
                 "url": self._normalize_url(course.get("url"))
             }
             
-            # Only add if we have meaningful data
             if any(normalized_course.values()):
                 normalized_courses.append(normalized_course)
         
@@ -243,12 +229,10 @@ class PeopleDataNormalizer:
 
     def _extract_academic_title(self, person_data: Dict) -> str:
         """Extract academic title from name or basic_info"""
-        # Try to extract from name first
         name = person_data.get("name", "")
         self.logger.debug(f"Extracting academic title from name: '{name}'")
         
         if name:
-            # Look for common academic title patterns
             title_patterns = [
                 r'(Prof\.?\s*Dr\.?\s*[A-Za-z\.\s]*)',
                 r'(Dr\.?\s*[A-Za-z\.\s]*)',
@@ -263,7 +247,6 @@ class PeopleDataNormalizer:
                     self.logger.debug(f"Extracted academic title: '{extracted_title}' using pattern: {pattern}")
                     return extracted_title
         
-        # Fallback to academic_degree from basic_info
         basic_info = person_data.get("basic_info", {})
         academic_degree = basic_info.get("academic_degree", "")
         

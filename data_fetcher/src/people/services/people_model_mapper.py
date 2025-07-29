@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from pydantic import ValidationError
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.models.people_model import (
-    Person, PersonDetails, PersonRole, PersonCourse
+    Person, PersonDetails, PersonRole
 )
 
 logger = get_main_fetcher_logger(__name__)
@@ -43,10 +43,10 @@ class PeopleModelMapper:
                 person_id=mapped_person["person_id"],
                 first_name=basic_info_data.get("first_name"),
                 last_name=basic_info_data.get("last_name"),
-                gender=gender_value,  # Convert enum to string for PersonDetails
+                gender=gender_value,
                 title=basic_info_data.get("title"),
                 academic_degree=basic_info_data.get("academic_degree"),
-                employment_status=employment_status_value,  # Convert enum to string for PersonDetails
+                employment_status=employment_status_value,
                 name_suffix=basic_info_data.get("name_suffix")
             )
             
@@ -68,31 +68,25 @@ class PeopleModelMapper:
                 role = PersonRole(
                     person_id=mapped_person["person_id"],
                     role_name=role_data.get("role_name"),
-                    lsf_role_enum=lsf_role_enum_str,  # Convert enum to string for PersonRole
+                    lsf_role_enum=lsf_role_enum_str,
                     institution=institution,
                     institution_url=institution_url
                 )
                 roles.append(role)
             
-            # Map courses
+            # Map courses to simple list of course numbers
             courses = []
             for course_data in mapped_person.get("courses", []):
-                course = PersonCourse(
-                    person_id=mapped_person["person_id"],
-                    course_number=course_data.get("number"),
-                    course_name=course_data.get("name"),
-                    semester=course_data.get("semester"),
-                    course_url=course_data.get("url")
-                )
-                courses.append(course)
+                course_number = course_data.get("number")
+                if course_number:
+                    courses.append(course_number)
             
             # Create Person model
             person = Person(
-                id=None,  # Let Directus generate the UUID
+                id=None,
                 person_id=mapped_person["person_id"],
                 profile_url=mapped_person.get("profile_url"),
                 name=mapped_person["name"],
-                # Set top-level fields for direct access
                 first_name=basic_info_data.get("first_name"),
                 surname=basic_info_data.get("last_name"),
                 title=basic_info_data.get("title"),
@@ -161,8 +155,7 @@ class PeopleModelMapper:
         
         if validation_errors:
             self.logger.warning(f"Found {len(validation_errors)} validation errors")
-            # Log sample validation errors for debugging
-            for error in validation_errors[:5]:  # Log first 5 errors
+            for error in validation_errors[:5]:
                 self.logger.debug(f"Validation error sample: {error}")
         
         return person_models

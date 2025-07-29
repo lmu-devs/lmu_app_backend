@@ -51,15 +51,7 @@ query GetPersonWithDetails($id: ID!) {
             note
             gender
             employment_status
-        }
-
-        # Get person courses
-        person_courses {
-            id
-            course_number
-            course_name
-            semester
-            course_url
+            courses
         }
 
         # Get person roles
@@ -89,20 +81,7 @@ query GetPersonDetails($person_id: ID!) {
         note
         gender
         employment_status
-    }
-}
-
-# Get person courses
-query GetPersonCourses($person_id: ID!) {
-    person_courses(filter: { person_id: { id: { _eq: $person_id } } }) {
-        id
-        person_id {
-            id
-        }
-        course_number
-        course_name
-        semester
-        course_url
+        courses
     }
 }
 
