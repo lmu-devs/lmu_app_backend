@@ -172,7 +172,7 @@ class LSFCrawler:
                 try:
                     lecture = future.result()
                     lectures.append(lecture)
-                    self.logger.info(f"Processed lecture({index+1}/{len(futures)}): {lecture.title} ({lecture.publish_id})")
+                    self.logger.info(f"Fetched lecture({index+1}/{len(futures)}): {lecture.title} ({lecture.publish_id})")
                 except Exception as e:
                     self.logger.error(f"❌ Error while building lecture: {e}")
 
