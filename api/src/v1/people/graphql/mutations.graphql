@@ -42,6 +42,7 @@ mutation CreatePersonDetails($data: create_person_details_input!) {
         note
         gender
         employment_status
+        courses
     }
 }
 
@@ -61,20 +62,7 @@ mutation UpdatePersonDetails($id: ID!, $data: update_person_details_input!) {
         note
         gender
         employment_status
-    }
-}
-
-# Create a new course for a person
-mutation CreatePersonCourse($data: create_person_courses_input!) {
-    create_person_courses_item(data: $data) {
-        id
-        person_id {
-            id
-        }
-        course_number
-        course_name
-        semester
-        course_url
+        courses
     }
 }
 

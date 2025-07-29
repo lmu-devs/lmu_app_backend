@@ -19,9 +19,8 @@ logger = get_main_fetcher_logger(__name__)
 class PeoplePipeline:
     """Main pipeline orchestrator for people data processing"""
 
-    def __init__(self, test_mode: bool = True, batch_size: int = 50):
+    def __init__(self, batch_size: int = 50):
         self.logger = logger
-        self.test_mode = test_mode
         self.batch_size = batch_size
         self.logger.setLevel('WARNING')
         
@@ -29,7 +28,7 @@ class PeoplePipeline:
         self.normalizer = PeopleDataNormalizer()
         self.enum_mapper = PeopleEnumMapper()
         self.model_mapper = PeopleModelMapper()
-        self.cms_service = PeopleService(test_mode=test_mode)
+        self.cms_service = PeopleService()
         
         # Pipeline statistics
         self.stats = {
@@ -70,7 +69,6 @@ class PeoplePipeline:
                 self.logger.warning(f"No people to process for role {role_id}")
                 return self._create_batch_result(role_id, role_name, 0, 0)
             
-            # tqdm progress bar for normalization
             with tqdm(total=len(raw_people), desc=f"Char '{character}' {role_name}", leave=False) as pbar:
                 if progress_callback:
                     await progress_callback("normalizing", 0, len(raw_people))
@@ -82,7 +80,6 @@ class PeoplePipeline:
                 self.logger.warning(f"No people normalized for role {role_id}")
                 return self._create_batch_result(role_id, role_name, 0, 0)
             
-            # tqdm progress bar for enum mapping
             with tqdm(total=len(normalized_people), desc=f"Enum mapping {role_name}", leave=False) as pbar:
                 if progress_callback:
                     await progress_callback("mapping_enums", len(normalized_people), len(raw_people))
@@ -90,7 +87,6 @@ class PeoplePipeline:
                 self.stats["total_enum_mapped"] += len(enum_mapped_people)
                 pbar.update(len(enum_mapped_people))
             
-            # tqdm progress bar for model mapping
             with tqdm(total=len(enum_mapped_people), desc=f"Model mapping {role_name}", leave=False) as pbar:
                 if progress_callback:
                     await progress_callback("mapping_models", len(enum_mapped_people), len(raw_people))
@@ -102,7 +98,6 @@ class PeoplePipeline:
                 self.logger.warning(f"No valid models created for role {role_id}")
                 return self._create_batch_result(role_id, role_name, len(normalized_people), 0)
             
-            # tqdm progress bar for CMS storage
             with tqdm(total=len(person_models), desc=f"Storing to CMS {role_name}", leave=False) as pbar:
                 if progress_callback:
                     await progress_callback("storing_cms", len(person_models), len(raw_people))
@@ -144,38 +139,34 @@ class PeoplePipeline:
         """
         stored_count = 0
         
-        # Process in smaller sub-batches for better performance
         sub_batch_size = min(self.batch_size // 2, 25)
         
         for i in range(0, len(person_models), sub_batch_size):
             sub_batch = person_models[i:i + sub_batch_size]
             
             try:
-                # Convert models to dicts for CMS service, using enum objects from enum_mapped_people
                 people_dicts = []
                 for person in sub_batch:
-                    # Find corresponding enum-mapped data for this person
                     enum_data = next((data for data in enum_mapped_people if data.get("person_id") == person.person_id), None)
                     
                     person_dict = {
-                        # Do not set 'id', let Directus generate it
                         "profile_url": person.profile_url,
                         "name": person.name,
                         "person_id": person.person_id,
                         "email": person.email,
                         "phone": person.phone,
                         "address": person.address,
-                        "faculty_enum": person.faculty_enum,  # Keep enum object for CMS service
-                        "academic_title_enum": person.academic_title_enum,  # Keep enum object for CMS service
+                        "faculty_enum": person.faculty_enum,
+                        "academic_title_enum": person.academic_title_enum,
                         "primary_role": person.primary_role,
                         "basic_info": {
-                            "first_name": person.first_name,  # Now accessible directly
-                            "last_name": person.surname,  # Now accessible directly
-                            "gender_enum": enum_data.get("basic_info", {}).get("gender_enum") if enum_data else None,  # Get enum object from enum_mapped_people
-                            "title": person.title,  # Now accessible directly
-                            "academic_degree": person.academic_degree,  # Now accessible directly
-                            "employment_status_enum": enum_data.get("basic_info", {}).get("employment_status_enum") if enum_data else None,  # Get enum object from enum_mapped_people
-                            "name_suffix": None,  # Not available in new model
+                            "first_name": person.first_name,
+                            "last_name": person.surname,
+                            "gender_enum": enum_data.get("basic_info", {}).get("gender_enum") if enum_data else None,
+                            "title": person.title,
+                            "academic_degree": person.academic_degree,
+                            "employment_status_enum": enum_data.get("basic_info", {}).get("employment_status_enum") if enum_data else None,
+                            "name_suffix": None,
                             "status": person.status,
                             "note": person.note,
                             "office_hours": person.office_hours,
@@ -183,27 +174,18 @@ class PeoplePipeline:
                         "roles": [
                             {
                                 "role_name": role.role_name,
-                                "lsf_role_enum_obj": self._get_role_enum_from_mapped_data(enum_data, role.role_name) if enum_data else None,  # Get enum object from enum_mapped_people
+                                "lsf_role_enum_obj": self._get_role_enum_from_mapped_data(enum_data, role.role_name) if enum_data else None,
                                 "institutions": role.institutions if role.institutions else []
                             } for role in person.roles
                         ] if person.roles else [],
-                        "courses": [
-                            {
-                                "number": course.course_number,
-                                "name": course.course_name,
-                                "semester": course.semester,
-                                "url": course.course_url
-                            } for course in person.courses
-                        ] if person.courses else []
+                        "courses": person.courses  # Courses as list of course numbers for person_details
                     }
                     people_dicts.append(person_dict)
                 
-                # Store in CMS
                 self.cms_service.collect_and_store_people(people_dicts)
                 
                 stored_count += len(sub_batch)
                 
-                # Small delay to prevent overwhelming the CMS
                 await asyncio.sleep(0.1)
                 
             except Exception as e:
@@ -243,7 +225,6 @@ class PeoplePipeline:
         """Get comprehensive pipeline statistics"""
         stats = self.stats.copy()
         
-        # Calculate success rates
         if stats["total_raw_people"] > 0:
             stats["normalization_success_rate"] = (stats["total_normalized"] / stats["total_raw_people"]) * 100
             stats["enum_mapping_success_rate"] = (stats["total_enum_mapped"] / stats["total_raw_people"]) * 100

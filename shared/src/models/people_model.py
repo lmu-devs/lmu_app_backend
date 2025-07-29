@@ -16,16 +16,7 @@ class PersonDetails(BaseModel):
     note: Optional[str] = None
     gender: Optional[str] = None
     employment_status: Optional[str] = None
-
-
-class PersonCourse(BaseModel):
-    """Course information for a person (stored in person_courses table)"""
-    id: Optional[str] = None
-    person_id: str
-    course_number: Optional[str] = None
-    course_name: Optional[str] = None
-    semester: Optional[str] = None
-    course_url: Optional[str] = None
+    courses: List[str] = []  # Course numbers stored as JSON array
 
 
 class PersonRole(BaseModel):
@@ -87,8 +78,19 @@ class PersonComplete(BaseModel):
     
     # Related data (from other tables)
     details: Optional[PersonDetails] = None
-    courses: List[PersonCourse] = []
     roles: List[PersonRole] = []
+    
+    @property
+    def courses(self) -> List[str]:
+        """Get courses from person details"""
+        return self.details.courses if self.details else []
+    
+    @courses.setter
+    def courses(self, value: List[str]):
+        """Set courses in person details"""
+        if not self.details:
+            self.details = PersonDetails(person_id=self.person_id)
+        self.details.courses = value
 
 
 class PeopleResponse(BaseModel):
@@ -98,20 +100,15 @@ class PeopleResponse(BaseModel):
     faculty_filter: Optional[FacultyEnum] = None
 
 
-# Legacy Person model for backward compatibility
 class Person(PersonComplete):
     """Legacy Person model - maps to PersonComplete for backward compatibility"""
     
-    # Add person_id field explicitly to ensure it's available
     person_id: str
-    
-    # Add missing fields at top level for direct access
     first_name: Optional[str] = None
     surname: Optional[str] = None
     title: Optional[str] = None
     academic_degree: Optional[str] = None
     
-    # Legacy property that maps to the new structure
     @property
     def basic_info(self) -> Optional[PersonDetails]:
         """Legacy property that maps to details"""

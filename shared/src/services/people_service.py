@@ -21,10 +21,9 @@ logger = get_main_fetcher_logger(__name__)
 class PeopleService:
     """Comprehensive service for people data operations (read/write)"""
     
-    def __init__(self, test_mode: bool = False):
+    def __init__(self):
         self.directus = DirectusService()
         self.logger = logger
-        self.test_mode = test_mode
         
         # Use the same pattern as university_service.py
         base_path = Path(__file__).parent.parent.parent.parent
@@ -259,108 +258,59 @@ class PeopleService:
 
     # ==================== WRITE OPERATIONS ====================
 
-    def collect_and_store_people(self, people_data: List[Dict]):
+    def collect_and_store_people(self, people_data: List[dict]):
         """
-        Collect and store people data in Directus CMS
-        
-        Args:
-            people_data: List of people data dictionaries
+        Main method to collect and store people data in Directus CMS
+        Each person_data should have the structure from PeopleModelMapper
         """
         self.logger.info("⬆️  Collecting and storing people data in Directus CMS...")
-        self.logger.info(f"TEST MODE: {self.test_mode}")
         self.logger.info(f"📋 Found {len(people_data)} people to process")
         
         stored_count = 0
-        skipped_count = 0
+        failed_count = 0
         
         for person_data in people_data:
             try:
                 person_id = person_data.get("person_id")
                 if not person_id:
-                    self.logger.warning(f"❌ Person data missing person_id: {person_data.get('name', 'UNKNOWN')}")
+                    self.logger.error(f"Person data missing person_id: {person_data}")
+                    failed_count += 1
                     continue
                 
-                # Check if person already exists
-                existing_person = self._check_person_exists(person_id)
+                # Check if person already exists by person_id
+                existing_person = self._get_person_by_person_id(person_id)
+                
                 if existing_person:
-                    self.logger.debug(f"⏭️  Person {person_data.get('name', 'UNKNOWN')} already exists, skipping")
-                    skipped_count += 1
-                    continue
-                
-                # Create new person
-                self._create_new_person(person_id, person_data)
+                    self.logger.debug(f"Person {person_id} already exists, updating...")
+                    self._update_existing_person(person_id, person_data)
+                else:
+                    self.logger.debug(f"Creating new person {person_id}...")
+                    self._create_new_person(person_id, person_data)
                 
                 # Add roles if present
                 if person_data.get("roles"):
                     self._upsert_person_roles(person_id, person_data)
                 
-                # Add courses if present
-                if person_data.get("courses"):
-                    self._upsert_person_courses(person_id, person_data)
-                
                 stored_count += 1
                 self.logger.debug(f"✅ Successfully processed person: {person_data.get('name', 'UNKNOWN')}")
                 
             except Exception as e:
-                self.logger.error(f"   ❌ Failed to process person {person_data.get('name', 'UNKNOWN')}: {e}")
+                failed_count += 1
+                self.logger.error(f"❌ Failed to process person {person_data.get('name', 'UNKNOWN')}: {e}")
                 continue
         
-        self.logger.info(f"📊 Processing complete: {stored_count} stored, {skipped_count} skipped, {len(people_data) - stored_count - skipped_count} failed")
-
-    def _check_person_exists(self, person_id: str) -> bool:
-        """Check if a person already exists in the CMS"""
-        try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            variables = {"person_id": person_id}
-            
-            response = self.directus.execute_query_file(
-                query_path,
-                variables,
-                operation_name="GetPersonByPersonId"
-            )
-            people = response.get("data", {}).get("people", [])
-            return len(people) > 0
-            
-        except Exception as e:
-            self.logger.debug(f"Error checking if person {person_id} exists: {e}")
-            return False
+        self.logger.info(f"📊 Storage summary: {stored_count}/{len(people_data)} people stored successfully (failed: {failed_count})")
 
     def _create_new_person(self, person_id: str, person_data: dict):
-        """Create a new person record in CMS using GraphQL mutation"""
+        """Create a new person record along with their details"""
+        
+        # 1. Create main person record
         basic_info = person_data.get("basic_info", {})
         
-        # Helper functions for enum handling
-        def get_enum_value(enum_obj):
-            if enum_obj is None:
-                return None
-            if hasattr(enum_obj, 'value'):
-                return enum_obj.value
-            return str(enum_obj) if enum_obj else None
-        
-        def get_enum_id(enum_obj):
-            if enum_obj is None:
-                return None
-            if hasattr(enum_obj, 'id'):
-                return enum_obj.id
-            if hasattr(enum_obj, 'code'):
-                return enum_obj.code
-            if hasattr(enum_obj, 'value'):
-                return enum_obj.value
-            return str(enum_obj) if enum_obj else None
-
-        # Debug logging for enum values
-        self.logger.debug(f"🔍 DEBUG ENUMS for {person_data.get('name', 'UNKNOWN')}:" )
-        self.logger.debug(f"   faculty_enum: {person_data.get('faculty_enum')} (type: {type(person_data.get('faculty_enum'))})")
-        self.logger.debug(f"   academic_title_enum: {person_data.get('academic_title_enum')} (type: {type(person_data.get('academic_title_enum'))})")
-        self.logger.debug(f"   gender_enum: {basic_info.get('gender_enum')} (type: {type(basic_info.get('gender_enum'))})")
-        self.logger.debug(f"   employment_status_enum: {basic_info.get('employment_status_enum')} (type: {type(basic_info.get('employment_status_enum'))})")
-        self.logger.debug(f"   RAW faculty: {person_data.get('faculty_enum')} (type: {type(person_data.get('faculty_enum'))})")
-        self.logger.debug(f"   RAW academic_title: {person_data.get('academic_title_enum')} (type: {type(person_data.get('academic_title_enum'))})")
-
-        # 1. Create main person record
         person_data_clean = {
             "person_id": person_id,
-            "name": person_data.get("name", "")
+            "name": person_data.get("name", ""),
+            "primary_role": person_data.get("primary_role", "")
         }
         
         # Only add fields with actual values
@@ -373,48 +323,44 @@ class PeopleService:
         if basic_info.get("academic_degree"):
             person_data_clean["academic_degree"] = basic_info.get("academic_degree")
         
-        # Handle faculty_enum properly - convert to integer ID
+        # Handle enums properly by extracting their values
         faculty_enum = person_data.get("faculty_enum")
         if faculty_enum:
-            faculty_id = get_enum_id(faculty_enum)
-            if faculty_id is not None:
-                person_data_clean["faculty_enum"] = faculty_id
-                self.logger.debug(f"Set faculty_enum to {faculty_id} for {person_data.get('name', 'UNKNOWN')}")
+            faculty_value = get_enum_value(faculty_enum)
+            if faculty_value is not None:
+                person_data_clean["faculty_enum"] = faculty_value
+                self.logger.debug(f"Using faculty_enum: {faculty_value} for {person_data.get('name', 'UNKNOWN')}")
             else:
-                self.logger.warning(f"Could not get faculty ID for {faculty_enum} for {person_data.get('name', 'UNKNOWN')}")
+                self.logger.debug(f"Invalid faculty_enum provided for {person_data.get('name', 'UNKNOWN')}")
         else:
             self.logger.debug(f"No faculty_enum provided for {person_data.get('name', 'UNKNOWN')}")
         
         person_variables = {"data": person_data_clean}
         
-        if self.test_mode:
-            self.logger.info(f"🆕 CREATE PERSON: {person_variables}")
-        else:
-            try:
-                query_path = self.graphql_path / self.MUTATIONS_FILE
-                response = self.directus.execute_query_file(
-                    query_path,
-                    person_variables,
-                    operation_name="CreatePerson"
-                )
-                self.logger.info(f"CMS response: {response}")
-            except Exception as e:
-                self.logger.error(f"CMS CreatePerson error: {e}")
-                self.logger.error(f"Failed data: {person_variables}")
-                # Log the exact error details if available
-                if hasattr(e, 'response') and hasattr(e.response, 'text'):
-                    self.logger.error(f"Response text: {e.response.text}")
-                if hasattr(e, 'response') and hasattr(e.response, 'json'):
-                    try:
-                        error_json = e.response.json()
-                        self.logger.error(f"Response JSON: {error_json}")
-                    except:
-                        pass
-                raise
+        try:
+            query_path = self.graphql_path / self.MUTATIONS_FILE
+            response = self.directus.execute_query_file(
+                query_path,
+                person_variables,
+                operation_name="CreatePerson"
+            )
+            self.logger.info(f"CMS response: {response}")
+        except Exception as e:
+            self.logger.error(f"CMS CreatePerson error: {e}")
+            self.logger.error(f"Failed data: {person_variables}")
+            if hasattr(e, 'response') and hasattr(e.response, 'text'):
+                self.logger.error(f"Response text: {e.response.text}")
+            if hasattr(e, 'response') and hasattr(e.response, 'json'):
+                try:
+                    error_json = e.response.json()
+                    self.logger.error(f"Response JSON: {error_json}")
+                except:
+                    pass
+            raise
 
-        # 2. Create person details record
+        # 2. Create person details record (including courses)
         details_data_clean = {
-            "person_id": person_id  # This should be the UUID from the created person, not the string person_id
+            "person_id": person_id
         }
         
         # Only add fields with actual values
@@ -433,6 +379,11 @@ class PeopleService:
         if basic_info.get("note"):
             details_data_clean["note"] = basic_info.get("note")
         
+        # Add courses as JSON array
+        courses = person_data.get("courses", [])
+        if courses:
+            details_data_clean["courses"] = courses
+        
         # Handle enum values properly
         gender_enum = basic_info.get("gender_enum")
         if gender_enum:
@@ -448,58 +399,37 @@ class PeopleService:
             
         details_variables = {"data": details_data_clean}
         
-        if self.test_mode:
-            self.logger.info(f"🆕 CREATE PERSON DETAILS: {details_variables}")
-        else:
-            try:
-                # First, get the person's UUID by person_id
-                person_uuid = self._get_person_uuid_by_person_id(person_id)
-                if person_uuid:
-                    # Update the details_data_clean to use the UUID reference object
-                    details_data_clean["person_id"] = {"id": person_uuid}  # Pass as reference object
-                    details_variables = {"data": details_data_clean}
-                    
-                    query_path = self.graphql_path / self.MUTATIONS_FILE
-                    response = self.directus.execute_query_file(
-                        query_path,
-                        details_variables,
-                        operation_name="CreatePersonDetails"
-                    )
-                    self.logger.info(f"CMS details response: {response}")
-                else:
-                    self.logger.warning(f"Could not find person UUID for person_id: {person_id}")
-            except Exception as e:
-                self.logger.error(f"CMS CreatePersonDetails error: {e}")
-                self.logger.error(f"Failed details data: {details_variables}")
-                # Don't raise here, as the main person was created successfully
+        try:
+            person_uuid = self._get_person_uuid_by_person_id(person_id)
+            if person_uuid:
+                details_data_clean["person_id"] = {"id": person_uuid}
+                details_variables = {"data": details_data_clean}
+                
+                query_path = self.graphql_path / self.MUTATIONS_FILE
+                response = self.directus.execute_query_file(
+                    query_path,
+                    details_variables,
+                    operation_name="CreatePersonDetails"
+                )
+                self.logger.info(f"CMS details response: {response}")
+            else:
+                self.logger.warning(f"Could not find person UUID for person_id: {person_id}")
+        except Exception as e:
+            self.logger.error(f"CMS CreatePersonDetails error: {e}")
+            self.logger.error(f"Failed details data: {details_variables}")
 
     def _update_existing_person(self, person_id: str, person_data: dict):
-        """Update existing person with new data using GraphQL mutation"""
+        """Update an existing person record and their details"""
+        
+        # 1. Update main person record
         basic_info = person_data.get("basic_info", {})
         
-        # Helper functions for enum handling
-        def get_enum_value(enum_obj):
-            if enum_obj is None:
-                return None
-            if hasattr(enum_obj, 'value'):
-                return enum_obj.value
-            return str(enum_obj) if enum_obj else None
+        person_updates = {
+            "name": person_data.get("name", ""),
+            "primary_role": person_data.get("primary_role", "")
+        }
         
-        def get_enum_id(enum_obj):
-            if enum_obj is None:
-                return None
-            if hasattr(enum_obj, 'id'):
-                return enum_obj.id
-            if hasattr(enum_obj, 'code'):
-                return enum_obj.code
-            if hasattr(enum_obj, 'value'):
-                return enum_obj.value
-            return str(enum_obj) if enum_obj else None
-
-        # 1. Update main person record
-        person_updates = {}
-        if person_data.get("name"):
-            person_updates["name"] = person_data.get("name")
+        # Only update fields with actual values
         if basic_info.get("first_name"):
             person_updates["first_name"] = basic_info.get("first_name")
         if basic_info.get("last_name"):
@@ -508,28 +438,45 @@ class PeopleService:
             person_updates["title"] = basic_info.get("title")
         if basic_info.get("academic_degree"):
             person_updates["academic_degree"] = basic_info.get("academic_degree")
-        if get_enum_id(person_data.get("faculty_enum")):
-            person_updates["faculty_enum"] = get_enum_id(person_data.get("faculty_enum"))
-        if person_data.get("primary_role"):
-            person_updates["primary_role"] = person_data.get("primary_role")
-            
-        if person_updates:
+        
+        # Handle faculty enum
+        faculty_enum = person_data.get("faculty_enum")
+        if faculty_enum:
+            faculty_value = get_enum_value(faculty_enum)
+            if faculty_value is not None:
+                person_updates["faculty_enum"] = faculty_value
+        
+        # Get person's UUID for updating
+        person_uuid = self._get_person_uuid_by_person_id(person_id)
+        if person_uuid:
             person_variables = {
-                "id": person_id,
+                "id": person_uuid,
                 "data": person_updates
             }
-            if self.test_mode:
-                self.logger.info(f"🔄 UPDATE PERSON: {person_variables}")
-            else:
+            try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
-                    query_path, 
+                    query_path,
                     person_variables,
                     operation_name="UpdatePerson"
                 )
+            except Exception as e:
+                self.logger.error(f"CMS UpdatePerson error: {e}")
+                self.logger.error(f"Failed data: {person_variables}")
+                if hasattr(e, 'response') and hasattr(e.response, 'text'):
+                    self.logger.error(f"Response text: {e.response.text}")
+                if hasattr(e, 'response') and hasattr(e.response, 'json'):
+                    try:
+                        error_json = e.response.json()
+                        self.logger.error(f"Response JSON: {error_json}")
+                    except:
+                        pass
+                raise
 
-        # 2. Update person details record
+        # 2. Update person details record (including courses)
         details_updates = {}
+        
+        # Only update fields with actual values
         if person_data.get("profile_url"):
             details_updates["profile_url"] = person_data.get("profile_url")
         if person_data.get("email"):
@@ -544,25 +491,50 @@ class PeopleService:
             details_updates["status"] = basic_info.get("status")
         if basic_info.get("note"):
             details_updates["note"] = basic_info.get("note")
-        if get_enum_value(basic_info.get("gender_enum")):
-            details_updates["gender"] = get_enum_value(basic_info.get("gender_enum"))
-        if get_enum_value(basic_info.get("employment_status_enum")):
-            details_updates["employment_status"] = get_enum_value(basic_info.get("employment_status_enum"))
-            
-        if details_updates:
+        
+        # Update courses as JSON array
+        courses = person_data.get("courses", [])
+        details_updates["courses"] = courses
+        
+        # Handle enum values
+        gender_enum = basic_info.get("gender_enum")
+        if gender_enum:
+            gender_value = get_enum_value(gender_enum)
+            if gender_value is not None:
+                details_updates["gender"] = gender_value
+        
+        employment_status_enum = basic_info.get("employment_status_enum")
+        if employment_status_enum:
+            employment_value = get_enum_value(employment_status_enum)
+            if employment_value is not None:
+                details_updates["employment_status"] = employment_value
+        
+        # Get details UUID for updating
+        details_uuid = self._get_person_details_uuid_by_person_id(person_id)
+        if details_uuid and details_updates:
             details_variables = {
-                "person_id": person_id,
+                "id": details_uuid,
                 "data": details_updates
             }
-            if self.test_mode:
-                self.logger.info(f"🔄 UPDATE PERSON DETAILS: {details_variables}")
-            else:
+            try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
-                    query_path, 
+                    query_path,
                     details_variables,
                     operation_name="UpdatePersonDetails"
                 )
+            except Exception as e:
+                self.logger.error(f"CMS UpdatePersonDetails error: {e}")
+                self.logger.error(f"Failed details data: {details_variables}")
+                if hasattr(e, 'response') and hasattr(e.response, 'text'):
+                    self.logger.error(f"Response text: {e.response.text}")
+                if hasattr(e, 'response') and hasattr(e.response, 'json'):
+                    try:
+                        error_json = e.response.json()
+                        self.logger.error(f"Response JSON: {error_json}")
+                    except:
+                        pass
+                raise
 
     def _upsert_person_roles(self, person_id: str, person_data: dict):
         """Add roles for this person using GraphQL mutation"""
@@ -599,46 +571,66 @@ class PeopleService:
                     "institution_url": institution_url
                 }
             }
-            if self.test_mode:
-                self.logger.info(f"🏢 CREATE ROLE: {variables}")
-            else:
+            try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
                     query_path, 
                     variables,
                     operation_name="CreatePersonRole"
                 )
+            except Exception as e:
+                self.logger.error(f"CMS CreatePersonRole error: {e}")
+                self.logger.error(f"Failed data: {variables}")
+                if hasattr(e, 'response') and hasattr(e.response, 'text'):
+                    self.logger.error(f"Response text: {e.response.text}")
+                if hasattr(e, 'response') and hasattr(e.response, 'json'):
+                    try:
+                        error_json = e.response.json()
+                        self.logger.error(f"Response JSON: {error_json}")
+                    except:
+                        pass
+                raise
 
-    def _upsert_person_courses(self, person_id: str, person_data: dict):
-        """Add courses for this person using GraphQL mutation"""
-        courses = person_data.get("courses", [])
-        self.logger.info(f"Upserting courses for {person_id}: {courses}")
-        
-        # Get the person's UUID
-        person_uuid = self._get_person_uuid_by_person_id(person_id)
-        if not person_uuid:
-            self.logger.warning(f"Could not find person UUID for person_id: {person_id}, skipping courses")
-            return
-        
-        for course in courses:
-            variables = {
-                "data": {
-                    "person_id": {"id": person_uuid},  # Pass as reference object
-                    "course_number": course.get("number", ""),
-                    "course_name": course.get("name", ""),
-                    "semester": course.get("semester", ""),
-                    "course_url": course.get("url", "")
-                }
-            }
-            if self.test_mode:
-                self.logger.info(f"📚 CREATE COURSE: {variables}")
-            else:
-                query_path = self.graphql_path / self.MUTATIONS_FILE
-                self.directus.execute_query_file(
-                    query_path, 
-                    variables,
-                    operation_name="CreatePersonCourse"
-                )
+    def _get_person_by_person_id(self, person_id: str) -> Optional[Dict]:
+        """Check if a person exists by person_id and return their data"""
+        try:
+            query_path = self.graphql_path / self.QUERIES_FILE
+            variables = {"person_id": person_id}
+            
+            response = self.directus.execute_query_file(
+                query_path,
+                variables,
+                operation_name="GetPersonByPersonId"
+            )
+            people = response.get("data", {}).get("people", [])
+            return people[0] if people else None
+            
+        except Exception as e:
+            self.logger.debug(f"Error checking if person {person_id} exists: {e}")
+            return None
+
+    def _get_person_details_uuid_by_person_id(self, person_id: str) -> Optional[str]:
+        """Get the UUID of person_details record by person_id"""
+        try:
+            # First get the person's UUID
+            person_uuid = self._get_person_uuid_by_person_id(person_id)
+            if not person_uuid:
+                return None
+                
+            query_path = self.graphql_path / self.QUERIES_FILE
+            variables = {"person_id": person_uuid}
+            
+            response = self.directus.execute_query_file(
+                query_path,
+                variables,
+                operation_name="GetPersonDetails"
+            )
+            details = response.get("data", {}).get("person_details", [])
+            return details[0]["id"] if details else None
+            
+        except Exception as e:
+            self.logger.debug(f"Error getting person details UUID for {person_id}: {e}")
+            return None
 
     def _generate_person_id(self, person_data: dict) -> str:
         """Generate a unique ID for the person"""

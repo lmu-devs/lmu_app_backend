@@ -23,7 +23,7 @@ async def check_duplicate_tracking_status():
     print("🔄 Checking duplicate tracking status...")
     
     # Create collector instance
-    collector = PeopleCollectorV2(test_mode=True, batch_size=50)
+    collector = PeopleCollectorV2(batch_size=50)
     
     print("\n📊 Duplicate tracking status:")
     print("   ✅ Duplicate tracking has been completely removed from the system")
