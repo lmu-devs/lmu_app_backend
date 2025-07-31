@@ -58,12 +58,18 @@ class LectureFetcher:
 
     def add_lecture_db(self, session: Session, lecture: Lecture):
         """Add a lecture to the SQL database."""
+        print(f"Adding lecture {lecture.title} to database, from semester {lecture.base_info.semester if lecture.base_info else 'Unknown'}")
         lecture_table, related = lecture.to_table()
         session.add(lecture_table)
         for key, entries in related.items():
-            if key in {"persons", "institutions"}:
+            if key == "persons":
                 for obj in entries:
-                    session.merge(obj)
+                    merged = session.merge(obj)
+                    lecture_table.persons.append(merged)
+            elif key == "institutions":
+                for obj in entries:
+                    merged = session.merge(obj)
+                    lecture_table.institutions.append(merged)
             else:
                 session.add_all(entries)
 

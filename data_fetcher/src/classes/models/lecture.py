@@ -454,6 +454,7 @@ class Lecture(BaseModel):
                 for tp in self.tree_paths:
                     tpt = tp.to_table()
                     tpt.lecture = lecture
+                    print(f"Adding tree path {tpt.path} to lecture {lecture.id}")
                     related["tree_paths"].append(tpt)
 
             if self.base_info:
