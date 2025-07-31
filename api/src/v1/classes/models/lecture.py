@@ -132,7 +132,7 @@ class EnrollmentDeadline(BaseModel):
     other_deadlines: Optional[str] = Field(None)
 
 
-class Lecture(BaseModel):
+class LectureBasic(BaseModel):
     """Model for a lecture, used to flatten the response from Directus."""
 
     publish_id: int
@@ -142,15 +142,15 @@ class Lecture(BaseModel):
     language: Optional[str]
 
 
-class Lectures(RootModel):
+class LecturesBasic(RootModel):
     """Model for a list of lectures, used to flatten the response from Directus."""
 
-    root: List[Lecture] | List[Lecture] = []
+    root: List[LectureBasic] | List[LectureBasic] = []
 
     @classmethod
-    def from_directus_dict(cls, raw: List[dict[str, Any]]) -> "Lectures":
+    def from_directus_dict(cls, raw: List[dict[str, Any]]) -> "LecturesBasic":
         flatten_raw = cls.flatten_directus_response(raw)
-        return cls(root=[Lecture(**item) for item in flatten_raw])
+        return cls(root=[LectureBasic(**item) for item in flatten_raw])
 
     @staticmethod
     def flatten_directus_response(

@@ -86,7 +86,7 @@ class LSFCrawler:
         """Crawl all lectures for a given year and semester type in parallel."""
         self._set_crawling_parameters(year, semester_type)
         lecture_urls = self._crawl_lecture_urls_in_parallel()
-        return self._crawl_all_lectures_in_parallel(lecture_urls)
+        return self._crawl_all_lectures_in_parallel(lecture_urls[:1000])
 
     def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
         """Set the year and semester type for the crawling session."""
@@ -195,7 +195,8 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
-            self._extract_responsible_persons_from_lecture_page(response_bytes)
+            self._extract_responsible_persons_from_lecture_page(response_bytes),
+            self._extract_associated_institutions_from_lecture_page(response_bytes)
         )
 
     def build_complete_lecture_object(self, name: str, url: str) -> Lecture:
@@ -214,7 +215,8 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
-            self._extract_responsible_persons_from_lecture_page(response_bytes)
+            self._extract_responsible_persons_from_lecture_page(response_bytes),
+            self._extract_associated_institutions_from_lecture_page(response_bytes)
         )
 
     def _does_class_type_have_too_many_results(self, class_type: int) -> bool:
