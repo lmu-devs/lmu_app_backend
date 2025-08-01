@@ -53,6 +53,10 @@ class LSFCrawler:
             'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
         ]
         self.session = self._create_session()
+        x = self._make_safe_http_request("""
+            https://lsf.verwaltung.uni-muenchen.de/qisserver/rds?state=user&type=0&k_semester.semid=20251&idcol=k_semester.semid&idval=20251&purge=n&getglobal=semester&text=Sommersemester+2025
+            """)
+        print(x)
 
     def _create_session(self) -> requests.Session:
             """Create session with consistent headers for its lifetime."""
@@ -86,7 +90,7 @@ class LSFCrawler:
         """Crawl all lectures for a given year and semester type in parallel."""
         self._set_crawling_parameters(year, semester_type)
         lecture_urls = self._crawl_lecture_urls_in_parallel()
-        return self._crawl_all_lectures_in_parallel(lecture_urls[:1000])
+        return self._crawl_all_lectures_in_parallel(lecture_urls[:100])
 
     def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
         """Set the year and semester type for the crawling session."""
@@ -272,7 +276,12 @@ class LSFCrawler:
         return int(class_count.group(1))
 
     def _build_class_search_url(self, search_text: str, class_type: int) -> str:
-        """Build URL for searching classes with specific filters."""
+        """Build URL for searching classes with specific filters.
+            https://lsf.verwaltung.uni-muenchen.de
+            /qisserver/rds?state=verpublish&
+            status=init&vmfile=no&publishid=1078168&moduleCall
+            =webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung
+        """
         semester_type = 1 if self.semester_type.value == "SOSE" else 2
 
         return (

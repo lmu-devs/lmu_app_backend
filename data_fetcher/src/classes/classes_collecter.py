@@ -20,10 +20,10 @@ class ClassesCollecter(ScheduledCollector):
         self.logger.info(f"Collecting summer and winter semester for {date.year}")
 
         self.lecture_fetcher.store_lectures_db(db, date.year, SemesterTypeEnum.SUMMER_SEMESTER)
-        self.logger.info(f"Summer semester collected")
+        self.logger.info("Summer semester collected")
 
-        self.lecture_fetcher.store_lectures_db(db, date.year, SemesterTypeEnum.WINTER_SEMESTER)
-        self.logger.info(f"Winter semester collected")
+        # self.lecture_fetcher.store_lectures_db(db, date.year, SemesterTypeEnum.WINTER_SEMESTER)
+        # self.logger.info(f"Winter semester collected")
 
 
 
