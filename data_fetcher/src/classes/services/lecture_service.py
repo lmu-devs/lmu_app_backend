@@ -36,12 +36,15 @@ class LectureFetcher:
         """Store all lectures from the LSF crawler into the SQL database."""
         lectures = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
 
-        for index, lecture in enumerate(lectures):
-            if self.lecture_exist_in_db(db, lecture):
-                self.update_lecture_db(db, lecture)
-            else:
-                self.add_lecture_db(db, lecture)
-            self.logger.info(f"Processed Lecture {lecture.title}({index + 1}/{len(lectures)})")
+        with db.begin():
+            for index, lecture in enumerate(lectures):
+                print([y.value for x in lecture.tree_paths for y in x.path_elements] if lecture.tree_paths else [])
+                print(lecture.publish_id)
+                if self.lecture_exist_in_db(db, lecture):
+                    self.update_lecture_db(db, lecture)
+                else:
+                    self.add_lecture_db(db, lecture)
+                self.logger.info(f"({index + 1}/{len(lectures)}) Processed Lecture {lecture.title}")
 
     def update_lecture_db(self, session: Session, lecture: Lecture):
         """Update an existing lecture in the SQL database."""
@@ -73,7 +76,6 @@ class LectureFetcher:
             else:
                 session.add_all(entries)
 
-        session.commit()
 
 
     def lecture_exist_in_db(self, session: Session, lecture: Lecture) -> bool:

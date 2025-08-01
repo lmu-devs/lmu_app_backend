@@ -428,6 +428,7 @@ class Lecture(BaseModel):
         persons = response.get("data", {}).get("people", [])
         return persons[0].get("id") if persons else None
 
+
     def to_table(self) -> tuple[LectureTable, dict[str, list[BaseModel]]]:
             lecture = LectureTable(
                 publish_id=self.publish_id,
@@ -454,7 +455,6 @@ class Lecture(BaseModel):
                 for tp in self.tree_paths:
                     tpt = tp.to_table()
                     tpt.lecture = lecture
-                    print(f"Adding tree path {tpt.path} to lecture {lecture.id}")
                     related["tree_paths"].append(tpt)
 
             if self.base_info:
