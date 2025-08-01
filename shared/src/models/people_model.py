@@ -67,14 +67,7 @@ class PersonComplete(BaseModel):
     academic_degree: Optional[str] = None
     faculty_enum: Optional[FacultyEnum] = None
     primary_role: Optional[str] = None
-    profile_url: Optional[str] = None
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    address: Optional[str] = None
     academic_title_enum: Optional[str] = None
-    status: Optional[str] = None
-    note: Optional[str] = None
-    office_hours: Optional[str] = None
     
     # Related data (from other tables)
     details: Optional[PersonDetails] = None
@@ -91,6 +84,41 @@ class PersonComplete(BaseModel):
         if not self.details:
             self.details = PersonDetails(person_id=self.person_id)
         self.details.courses = value
+    
+    @property
+    def email(self) -> Optional[str]:
+        """Get email from person details"""
+        return self.details.email if self.details else None
+    
+    @property
+    def phone(self) -> Optional[str]:
+        """Get phone from person details"""
+        return self.details.phone if self.details else None
+    
+    @property
+    def address(self) -> Optional[str]:
+        """Get address from person details"""
+        return self.details.address if self.details else None
+    
+    @property
+    def profile_url(self) -> Optional[str]:
+        """Get profile_url from person details"""
+        return self.details.profile_url if self.details else None
+    
+    @property
+    def office_hours(self) -> Optional[str]:
+        """Get office_hours from person details"""
+        return self.details.office_hours if self.details else None
+    
+    @property
+    def status(self) -> Optional[str]:
+        """Get status from person details"""
+        return self.details.status if self.details else None
+    
+    @property
+    def note(self) -> Optional[str]:
+        """Get note from person details"""
+        return self.details.note if self.details else None
 
 
 class PeopleResponse(BaseModel):
