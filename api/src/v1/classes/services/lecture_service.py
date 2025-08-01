@@ -42,9 +42,15 @@ class LectureService:
         return LecturesBasic.from_directus_dict(response["data"]["lecture"])
 
 
-    async def get_lectures_from_faculty_db(self, faculty_id: int, db: AsyncSession):
+    async def get_lectures_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
+        """Get all lectures from a specific faculty, semester and year."""
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
-        print(f"Faculty Title: {faculty_title}")
+        year_suffix = year % 2000
+        semester_prefix = "SoSe" if semester_id == 1 else "WiSe"
+        semester_text = (
+            f"{semester_prefix} 20{year_suffix}" if semester_id == 1
+            else f"{semester_prefix} {year_suffix}{year_suffix + 1}"
+        )
         stmt = (
             select(
                 LectureTable.publish_id,
@@ -56,12 +62,13 @@ class LectureService:
             )
             .join(TreePathTable, TreePathTable.lecture_publish_id == LectureTable.publish_id)
             .join(ClassBaseInfoTable, ClassBaseInfoTable.lecture_publish_id == LectureTable.publish_id)
-            .where((TreePathTable.path[2] == faculty_title))
-                #& (ClassBaseInfoTable.semester == "SoSe 25"))
-        )
-        result = await db.execute(stmt)
+            .where(
+                (TreePathTable.path[2] == faculty_title)
+                & (ClassBaseInfoTable.semester == semester_text)
+            )
+        ).distinct()
+        result = await session.execute(stmt)
         rows = result.mappings().all()
-        print(rows)
         lecture_models = [LectureBasic.model_validate(row) for row in rows]
         return LecturesBasic(root=lecture_models)
 
@@ -72,7 +79,6 @@ class LectureService:
         query_name = LECTURE_BY_FACULTY_NAME
         query_path = base_path / folder / query_name
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
-        print(f"Faculty Title: {faculty_title}")
 
         response = self.directus.execute_query_file(
             query_file_path=query_path,

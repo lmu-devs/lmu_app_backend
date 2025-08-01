@@ -430,99 +430,59 @@ class Lecture(BaseModel):
 
 
     def to_table(self) -> tuple[LectureTable, dict[str, list[BaseModel]]]:
-            lecture = LectureTable(
-                publish_id=self.publish_id,
-                title=self.title
-            )
+        """Converts the lecture object to a table object and related tables."""
+        lecture = LectureTable(
+            publish_id=self.publish_id,
+            title=self.title
+        )
 
-            related: dict[str, list[BaseModel]] = {
-                "tree_paths": [],
-                "base_info": [],
-                "additional_information": [],
-                "enrollment_deadline": [],
-                "associated_programs": [],
-                "class_materials": [],
-                "associated_exams": [],
-                "exam_informations": [],
-                "class_sessions": [],
-                "associated_tutorials": [],
-                "associated_classes": [],
-                "persons": [],
-                "institutions": [],
-            }
+        related: dict[str, list[BaseModel]] = {key: [] for key in [
+            "tree_paths", "base_info", "additional_information", "enrollment_deadline",
+            "associated_programs", "class_materials", "associated_exams",
+            "exam_informations", "class_sessions", "associated_tutorials",
+            "associated_classes", "persons", "institutions"
+        ]}
 
-            if self.tree_paths:
-                for tp in self.tree_paths:
-                    tpt = tp.to_table()
-                    tpt.lecture = lecture
-                    related["tree_paths"].append(tpt)
+        self._one_to_one_to_table("base_info", related, lecture)
+        self._one_to_one_to_table("additional_information", related, lecture)
+        self._one_to_one_to_table("enrollment_deadline", related, lecture)
 
-            if self.base_info:
-                base_info = self.base_info.to_table()
-                base_info.lecture = lecture
-                related["base_info"].append(base_info)
+        self._one_to_many_to_table("tree_paths", related, lecture)
+        self._one_to_many_to_table("associated_programs", related, lecture)
+        self._one_to_many_to_table("class_materials", related, lecture)
+        self._one_to_many_to_table("associated_exams", related, lecture)
+        self._one_to_many_to_table("exam_informations", related, lecture)
+        self._one_to_many_to_table("class_sessions", related, lecture)
+        self._one_to_many_to_table("associated_tutorials", related, lecture)
+        self._one_to_many_to_table("associated_classes", related, lecture)
 
-            if self.additional_information:
-                add_info = self.additional_information.to_table()
-                add_info.lecture = lecture
-                related["additional_information"].append(add_info)
+        self._many_to_many_to_table("persons", related)
+        self._many_to_many_to_table("institutions", related)
 
-            if self.enrollment_deadline:
-                deadline = self.enrollment_deadline.to_table()
-                deadline.lecture = lecture
-                related["enrollment_deadline"].append(deadline)
+        return lecture, related
 
-            if self.associated_programs:
-                for ap in self.associated_programs:
-                    apt = ap.to_table()
-                    apt.lecture = lecture
-                    related["associated_programs"].append(apt)
 
-            if self.class_materials:
-                for cm in self.class_materials:
-                    cmt = cm.to_table()
-                    cmt.lecture = lecture
-                    related["class_materials"].append(cmt)
+    def _one_to_one_to_table(self, attr: str, related: dict, lecture: LectureTable):
+        """Convert a one-to-one relationship to a table object."""
+        value = getattr(self, attr, None)
+        if value:
+            table_obj = value.to_table()
+            table_obj.lecture = lecture
+            related[attr].append(table_obj)
 
-            if self.associated_exams:
-                for ae in self.associated_exams:
-                    aet = ae.to_table()
-                    aet.lecture = lecture
-                    related["associated_exams"].append(aet)
+    def _one_to_many_to_table(self, attr: str, related: dict, lecture: LectureTable):
+        """Convert a one-to-many relationship to a list of table objects."""
+        values = getattr(self, attr, [])
+        for item in values:
+            table_obj = item.to_table()
+            table_obj.lecture = lecture
+            related[attr].append(table_obj)
 
-            if self.exam_informations:
-                for ei in self.exam_informations:
-                    eit = ei.to_table()
-                    eit.lecture = lecture
-                    related["exam_informations"].append(eit)
-
-            if self.class_sessions:
-                for cs in self.class_sessions:
-                    cst = cs.to_table()
-                    cst.lecture = lecture
-                    related["class_sessions"].append(cst)
-
-            if self.associated_tutorials:
-                for at in self.associated_tutorials:
-                    att = at.to_table()
-                    att.lecture = lecture
-                    related["associated_tutorials"].append(att)
-
-            if self.associated_classes:
-                for ac in self.associated_classes:
-                    act = ac.to_table()
-                    act.lecture = lecture
-                    related["associated_classes"].append(act)
-
-            if self.persons:
-                for p in self.persons:
-                    related["persons"].append(p.to_table())
-
-            if self.institutions:
-                for i in self.institutions:
-                    related["institutions"].append(i.to_table())
-
-            return lecture, related
+    def _many_to_many_to_table(self, attr: str, related: dict):
+        """Convert a many-to-many relationship to a list of table objects."""
+        values = getattr(self, attr, [])
+        for item in values:
+            related[attr].append(item.to_table())
 
 
 if __name__ == "__main__":

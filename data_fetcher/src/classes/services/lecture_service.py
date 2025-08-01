@@ -38,8 +38,6 @@ class LectureFetcher:
 
         with db.begin():
             for index, lecture in enumerate(lectures):
-                print([y.value for x in lecture.tree_paths for y in x.path_elements] if lecture.tree_paths else [])
-                print(lecture.publish_id)
                 if self.lecture_exist_in_db(db, lecture):
                     self.update_lecture_db(db, lecture)
                 else:
@@ -61,7 +59,6 @@ class LectureFetcher:
 
     def add_lecture_db(self, session: Session, lecture: Lecture):
         """Add a lecture to the SQL database."""
-        print(f"Adding lecture {lecture.title} to database, from semester {lecture.base_info.semester if lecture.base_info else 'Unknown'}")
         lecture_table, related = lecture.to_table()
         session.add(lecture_table)
         for key, entries in related.items():

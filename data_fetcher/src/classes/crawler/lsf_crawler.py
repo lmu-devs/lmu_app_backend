@@ -53,10 +53,6 @@ class LSFCrawler:
             'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1'
         ]
         self.session = self._create_session()
-        x = self._make_safe_http_request("""
-            https://lsf.verwaltung.uni-muenchen.de/qisserver/rds?state=user&type=0&k_semester.semid=20251&idcol=k_semester.semid&idval=20251&purge=n&getglobal=semester&text=Sommersemester+2025
-            """)
-        print(x)
 
     def _create_session(self) -> requests.Session:
             """Create session with consistent headers for its lifetime."""
@@ -79,6 +75,17 @@ class LSFCrawler:
             'Cache-Control': 'max-age=0',
         }
 
+    def build_set_session_semester_url(self, year: int, semester_type: SemesterTypeEnum) -> str:
+        semester_text = "Sommersemester" if semester_type == SemesterTypeEnum.SUMMER_SEMESTER else "Wintersemester"
+        term_id = 1 if semester_type.value == "SOSE" else 2
+        semester_text_year = f"{year}" if term_id == 1 else f"{year}%2F{year+1}"
+        semester_id = f"{year}{term_id}"
+        return (
+            "https://lsf.verwaltung.uni-muenchen.de/qisserver"
+            + f"/rds?state=user&type=0&k_semester.semid={semester_id}"
+            + f"&idcol=k_semester.semid&idval={semester_id}"
+            + f"&purge=n&getglobal=semester&text={semester_text}+{semester_text_year}"
+        )
 
     def crawl_all_lectures(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type sequentially."""
@@ -90,12 +97,18 @@ class LSFCrawler:
         """Crawl all lectures for a given year and semester type in parallel."""
         self._set_crawling_parameters(year, semester_type)
         lecture_urls = self._crawl_lecture_urls_in_parallel()
-        return self._crawl_all_lectures_in_parallel(lecture_urls[:100])
+        return self._crawl_all_lectures_in_parallel(lecture_urls)
 
     def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
         """Set the year and semester type for the crawling session."""
         self.year = year
         self.semester_type = semester_type
+        self._set_semester_in_lsf()
+
+    def _set_semester_in_lsf(self):
+        """Set the semester in the LSF session."""
+        set_session_url = self.build_set_session_semester_url(self.year, self.semester_type)
+        self._make_safe_http_request(set_session_url)
 
     def _crawl_all_lecture_urls_sequentially(self) -> list[tuple[str, str]]:
         """Crawl all lecture URLs sequentially."""
@@ -276,12 +289,7 @@ class LSFCrawler:
         return int(class_count.group(1))
 
     def _build_class_search_url(self, search_text: str, class_type: int) -> str:
-        """Build URL for searching classes with specific filters.
-            https://lsf.verwaltung.uni-muenchen.de
-            /qisserver/rds?state=verpublish&
-            status=init&vmfile=no&publishid=1078168&moduleCall
-            =webInfo&publishConfFile=webInfo&publishSubDir=veranstaltung
-        """
+        """Build URL for searching classes with specific filters."""
         semester_type = 1 if self.semester_type.value == "SOSE" else 2
 
         return (
