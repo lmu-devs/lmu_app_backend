@@ -39,26 +39,18 @@ class PeopleModelMapper:
             employment_status_enum = basic_info_data.get("employment_status_enum")
             employment_status_value = employment_status_enum.value if employment_status_enum else None
             
-            basic_info = PersonDetails(
-                person_id=mapped_person["person_id"],
-                first_name=basic_info_data.get("first_name"),
-                last_name=basic_info_data.get("last_name"),
-                gender=gender_value,
-                title=basic_info_data.get("title"),
-                academic_degree=basic_info_data.get("academic_degree"),
-                employment_status=employment_status_value,
-                name_suffix=basic_info_data.get("name_suffix")
-            )
-            
             # Map roles
             roles = []
             for role_data in mapped_person.get("roles", []):
-                # Flatten institutions if present (use first institution for legacy fields)
-                institution = None
+                # Get all institutions
+                institutions = role_data.get("institutions", [])
+                
+                # Set legacy fields using first institution if available
+                institution_name = None
                 institution_url = None
-                if role_data.get("institutions"):
-                    first_inst = role_data["institutions"][0]
-                    institution = first_inst.get("name")
+                if institutions:
+                    first_inst = institutions[0]
+                    institution_name = first_inst.get("name")
                     institution_url = first_inst.get("url")
                 
                 # Convert enum object to string for PersonRole model
@@ -69,8 +61,9 @@ class PeopleModelMapper:
                     person_id=mapped_person["person_id"],
                     role_name=role_data.get("role_name"),
                     lsf_role_enum=lsf_role_enum_str,
-                    institution=institution,
-                    institution_url=institution_url
+                    institution_name=institution_name,
+                    institution_url=institution_url,
+                    institutions=institutions  # Store all institutions in the list
                 )
                 roles.append(role)
             
@@ -91,7 +84,7 @@ class PeopleModelMapper:
             
             self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Output course numbers: {len(courses)} -> {courses}")
             
-            # Create PersonDetails with courses (this is where courses need to be stored!)
+            # Create a single PersonDetails instance with all fields
             person_details = PersonDetails(
                 person_id=mapped_person["person_id"],
                 profile_url=mapped_person.get("profile_url"),
@@ -101,7 +94,9 @@ class PeopleModelMapper:
                 office_hours=basic_info_data.get("office_hours"),
                 status=basic_info_data.get("status"),
                 note=basic_info_data.get("note"),
-                courses=courses  # This is the key fix!
+                gender=gender_value,
+                employment_status=employment_status_value,
+                courses=courses
             )
             
             # Create Person model
@@ -115,7 +110,7 @@ class PeopleModelMapper:
                 academic_degree=basic_info_data.get("academic_degree"),
                 faculty_enum=mapped_person.get("faculty_enum"),
                 academic_title_enum=mapped_person.get("academic_title_enum"),
-                details=person_details,  # Set details with courses
+                details=person_details,
                 roles=roles
             )
             
