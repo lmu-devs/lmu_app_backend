@@ -172,6 +172,7 @@ class LSFPersonCrawler:
 
         # Extract roles and institutions from the Funktionen table
         function_rows = doc.xpath('//table[@summary="Funktionen"]//tr[position()>1]')
+        logger.debug(f"[Crawler] Found {len(function_rows)} function rows in Funktionen table")
         for row in function_rows:
             cells = row.xpath('.//td')
             if len(cells) >= 2:
@@ -233,19 +234,23 @@ class LSFPersonCrawler:
 
         # Extract courses with deduplication
         course_rows = doc.xpath('//table[@summary="Übersicht über die Zugehörigkeit zu Veranstaltungen"]//tr[position()>1]')
+        logger.debug(f"🎓 [CRAWLER] Found {len(course_rows)} course rows in Veranstaltungen table")
         seen_courses = set()  # Track course combinations to avoid duplicates
         
-        for row in course_rows:
+        for i, row in enumerate(course_rows):
             cells = row.xpath('.//td')
+            logger.debug(f"🎓 [CRAWLER] Row {i+1}: Found {len(cells)} cells")
             if len(cells) >= 3:
                 course_number = self._clean_text(cells[0].text_content())
                 course_name = self._clean_text(cells[1].xpath('.//a/text()')[0] if cells[1].xpath('.//a/text()') else cells[1].text_content())
                 semester = self._clean_text(cells[2].text_content())
                 
+                logger.debug(f"🎓 [CRAWLER] Row {i+1}: number='{course_number}', name='{course_name}', semester='{semester}'")
+                
                 # Create a unique identifier for this course to detect duplicates
                 course_key = (course_number, course_name, semester)
                 if course_key in seen_courses:
-                    logger.debug(f"Skipping duplicate course: {course_key}")
+                    logger.debug(f"🎓 [CRAWLER] Skipping duplicate course: {course_key}")
                     continue
                 
                 seen_courses.add(course_key)
@@ -257,13 +262,105 @@ class LSFPersonCrawler:
                 }
                 if cells[1].xpath('.//a/@href'):
                     course["url"] = cells[1].xpath('.//a/@href')[0]
+                
                 details["courses"].append(course)
+                logger.debug(f"🎓 [CRAWLER] ✅ Added course {i+1}: {course}")
+            else:
+                logger.debug(f"🎓 [CRAWLER] ❌ Row {i+1}: Insufficient cells ({len(cells)} < 3)")
 
         # Log extracted basic_info preview
         non_empty_basic = {k: v for k, v in details["basic_info"].items() if v}
         logger.debug(f"[Crawler] Extracted non-empty basic_info fields: {list(non_empty_basic.keys())}")
 
         return details
+
+    def get_character_list(self) -> list[str]:
+        """Return list of characters to crawl (A-Z)"""
+        return [chr(i) for i in range(ord('a'), ord('z') + 1)]
+    
+    async def crawl_people_by_role_and_character_async(self, role_id: int, character: str) -> list[dict]:
+        """
+        Async method to crawl people for a specific role and character
+        
+        Args:
+            role_id: LSF role ID
+            character: Character to search by (surname starting with this character)
+            
+        Returns:
+            List of people data dictionaries
+        """
+        try:
+            people = []
+            page = 0
+            
+            while True:
+                # Check if there are too many results (>1000 or >100)
+                if page == 0 and self._too_many(character, role_id):
+                    logger.warning(f"Too many results for character '{character}' and role {role_id}, skipping")
+                    break
+                
+                # Fetch a page of results
+                doc = self._fetch_search(character, role_id, page)
+                
+                # Extract people from this page
+                page_people = self._extract_people_from_page(doc)
+                
+                if not page_people:
+                    # No more results on this page
+                    break
+                
+                people.extend(page_people)
+                page += 1
+                
+                # Add delay between requests to be respectful
+                if self.REQUEST_DELAY > 0:
+                    time.sleep(self.REQUEST_DELAY)
+                
+                # Safety limit to prevent infinite loops
+                if page > 100:  # Max 100 pages = 5000 results
+                    logger.warning(f"Hit page limit for character '{character}' and role {role_id}")
+                    break
+            
+            logger.debug(f"Crawled {len(people)} people for character '{character}' and role {role_id}")
+            return people
+            
+        except Exception as e:
+            logger.error(f"Error crawling people for character '{character}' and role {role_id}: {e}")
+            return []
+    
+    def _extract_people_from_page(self, doc: html.HtmlElement) -> list[dict]:
+        """Extract people data from a search results page"""
+        people = []
+        
+        try:
+            # Find all person links in the search results
+            person_links = doc.xpath('//a[contains(@href, "personal.nachname")]')
+            
+            for link in person_links:
+                try:
+                    # Extract basic info from the link
+                    name = link.text_content().strip()
+                    href = link.get('href')
+                    
+                    if name and href:
+                        # Fetch detailed person information
+                        detail_doc = self._fetch_person_details(href)
+                        person_details = self._extract_person_details(detail_doc)
+                        
+                        # Add the name and href to the details
+                        person_details['name'] = name
+                        person_details['href'] = href
+                        
+                        people.append(person_details)
+                        
+                except Exception as e:
+                    logger.warning(f"Failed to extract person from link: {e}")
+                    continue
+                    
+        except Exception as e:
+            logger.error(f"Error extracting people from page: {e}")
+        
+        return people
 
     def _fetch_person_details(self, href: str) -> html.HtmlElement:
         """Fetch and parse a person's detail page."""

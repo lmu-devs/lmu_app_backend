@@ -76,33 +76,52 @@ class PeopleModelMapper:
             
             # Map courses to simple list of course numbers
             courses = []
-            for course_data in mapped_person.get("courses", []):
+            input_courses = mapped_person.get("courses", [])
+            person_name = mapped_person.get("name", "Unknown")
+            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Input courses count: {len(input_courses)}")
+            
+            for i, course_data in enumerate(input_courses):
+                self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Course {i+1}: {course_data}")
                 course_number = course_data.get("number")
                 if course_number:
                     courses.append(course_number)
+                    self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: ✅ Added course number: '{course_number}'")
+                else:
+                    self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: ❌ Skipped course with empty number: {course_data}")
+            
+            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Output course numbers: {len(courses)} -> {courses}")
+            
+            # Create PersonDetails with courses (this is where courses need to be stored!)
+            person_details = PersonDetails(
+                person_id=mapped_person["person_id"],
+                profile_url=mapped_person.get("profile_url"),
+                email=mapped_person.get("email"),
+                phone=mapped_person.get("phone"),
+                address=mapped_person.get("address"),
+                office_hours=basic_info_data.get("office_hours"),
+                status=basic_info_data.get("status"),
+                note=basic_info_data.get("note"),
+                courses=courses  # This is the key fix!
+            )
             
             # Create Person model
             person = Person(
                 id=None,
                 person_id=mapped_person["person_id"],
-                profile_url=mapped_person.get("profile_url"),
                 name=mapped_person["name"],
                 first_name=basic_info_data.get("first_name"),
                 surname=basic_info_data.get("last_name"),
                 title=basic_info_data.get("title"),
                 academic_degree=basic_info_data.get("academic_degree"),
-                basic_info=basic_info,
-                email=mapped_person.get("email"),
-                phone=mapped_person.get("phone"),
-                address=mapped_person.get("address"),
                 faculty_enum=mapped_person.get("faculty_enum"),
                 academic_title_enum=mapped_person.get("academic_title_enum"),
-                status=basic_info_data.get("status"),
-                note=basic_info_data.get("note"),
-                office_hours=basic_info_data.get("office_hours"),
-                roles=roles,
-                courses=courses
+                details=person_details,  # Set details with courses
+                roles=roles
             )
+            
+            # Log final course count after model creation
+            final_courses = person.courses
+            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Final person.courses: {len(final_courses)} -> {final_courses}")
             
             return person
             

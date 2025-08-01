@@ -79,3 +79,24 @@ mutation CreatePersonRole($data: create_person_roles_input!) {
         institution_url
     }
 }
+
+# Update an existing role for a person
+mutation UpdatePersonRole($id: ID!, $data: update_person_roles_input!) {
+    update_person_roles_item(id: $id, data: $data) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution_name
+        institution_url
+    }
+}
+
+# Delete a role for a person
+mutation DeletePersonRole($id: ID!) {
+    delete_person_roles_item(id: $id) {
+        id
+    }
+}
