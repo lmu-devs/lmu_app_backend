@@ -10,7 +10,7 @@ from pathlib import Path
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.services.directus_service import DirectusService
 from shared.src.models.people_model import (
-    Person, PersonSummary, PeopleResponse, PersonRole, PersonCourse, PersonDetails, PersonBasic
+    Person, PersonSummary, PeopleResponse, PersonRole, PersonDetails, PersonBasic
 )
 from shared.src.enums import FacultyEnum
 from shared.src.enums.people_enums import LSFRoleEnum
@@ -200,12 +200,14 @@ class PeopleService:
         except Exception:
             return []
 
-    async def get_people_courses(self, person_id: str) -> List[Dict]:
-        """Get courses for a specific person from CMS"""
+    async def get_people_courses(self, person_id: str) -> List[str]:
+        """Get courses for a specific person from CMS (from person_details.courses)"""
         try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            result = self.directus.execute_query_file(query_path, {"person_id": person_id}, operation_name="GetPersonCourses")
-            return result.get("data", {}).get("person_courses", [])
+            # Get person details which includes courses as a JSON array
+            person_details = await self.get_person_details(person_id)
+            if person_details and person_details.get("courses"):
+                return person_details["courses"]
+            return []
         except Exception:
             return []
 
@@ -326,7 +328,7 @@ class PeopleService:
         # Handle enums properly by extracting their values
         faculty_enum = person_data.get("faculty_enum")
         if faculty_enum:
-            faculty_value = get_enum_value(faculty_enum)
+            faculty_value = self.get_enum_value(faculty_enum)
             if faculty_value is not None:
                 person_data_clean["faculty_enum"] = faculty_value
                 self.logger.debug(f"Using faculty_enum: {faculty_value} for {person_data.get('name', 'UNKNOWN')}")
@@ -381,19 +383,25 @@ class PeopleService:
         
         # Add courses as JSON array
         courses = person_data.get("courses", [])
+        person_name = person_data.get("name", "Unknown")
+        self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: Input courses count: {len(courses)}")
+        self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: Courses data: {courses}")
         if courses:
             details_data_clean["courses"] = courses
+            self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: ✅ Added courses to CMS data")
+        else:
+            self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: ❌ No courses to add to CMS")
         
         # Handle enum values properly
         gender_enum = basic_info.get("gender_enum")
         if gender_enum:
-            gender_value = get_enum_value(gender_enum)
+            gender_value = self.get_enum_value(gender_enum)
             if gender_value is not None:
                 details_data_clean["gender"] = gender_value
         
         employment_status_enum = basic_info.get("employment_status_enum")
         if employment_status_enum:
-            employment_value = get_enum_value(employment_status_enum)
+            employment_value = self.get_enum_value(employment_status_enum)
             if employment_value is not None:
                 details_data_clean["employment_status"] = employment_value
             
@@ -404,6 +412,9 @@ class PeopleService:
             if person_uuid:
                 details_data_clean["person_id"] = {"id": person_uuid}
                 details_variables = {"data": details_data_clean}
+                
+                # Log the final GraphQL variables being sent
+                self.logger.debug(f"🎓 [CMS_GRAPHQL] {person_name}: Final GraphQL variables: {details_variables}")
                 
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 response = self.directus.execute_query_file(
@@ -442,7 +453,7 @@ class PeopleService:
         # Handle faculty enum
         faculty_enum = person_data.get("faculty_enum")
         if faculty_enum:
-            faculty_value = get_enum_value(faculty_enum)
+            faculty_value = self.get_enum_value(faculty_enum)
             if faculty_value is not None:
                 person_updates["faculty_enum"] = faculty_value
         
@@ -494,18 +505,22 @@ class PeopleService:
         
         # Update courses as JSON array
         courses = person_data.get("courses", [])
+        person_name = person_data.get("name", "Unknown")
+        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: Input courses count: {len(courses)}")
+        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: Courses data: {courses}")
         details_updates["courses"] = courses
+        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: ✅ Set courses in update data")
         
         # Handle enum values
         gender_enum = basic_info.get("gender_enum")
         if gender_enum:
-            gender_value = get_enum_value(gender_enum)
+            gender_value = self.get_enum_value(gender_enum)
             if gender_value is not None:
                 details_updates["gender"] = gender_value
         
         employment_status_enum = basic_info.get("employment_status_enum")
         if employment_status_enum:
-            employment_value = get_enum_value(employment_status_enum)
+            employment_value = self.get_enum_value(employment_status_enum)
             if employment_value is not None:
                 details_updates["employment_status"] = employment_value
         
@@ -516,6 +531,10 @@ class PeopleService:
                 "id": details_uuid,
                 "data": details_updates
             }
+            
+            # Log the final GraphQL variables being sent for update
+            self.logger.debug(f"🎓 [CMS_GRAPHQL_UPDATE] {person_name}: Final GraphQL variables: {details_variables}")
+            
             try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
@@ -541,12 +560,7 @@ class PeopleService:
         roles = person_data.get("roles", [])
         self.logger.info(f"Upserting roles for {person_id}: {roles}")
         
-        def get_enum_value(enum_obj):
-            if enum_obj is None:
-                return None
-            if hasattr(enum_obj, 'value'):
-                return enum_obj.value
-            return str(enum_obj) if enum_obj else None
+        # Use the class method instead of nested function
         
         # Get the person's UUID
         person_uuid = self._get_person_uuid_by_person_id(person_id)
@@ -566,7 +580,7 @@ class PeopleService:
                 "data": {
                     "person_id": {"id": person_uuid},  # Pass as reference object
                     "role_name": role.get("role_name", ""),
-                    "lsf_role_enum": get_enum_value(lsf_role_enum),
+                    "lsf_role_enum": self.get_enum_value(lsf_role_enum),
                     "institution_name": institution_name,
                     "institution_url": institution_url
                 }
@@ -718,4 +732,19 @@ class PeopleService:
             
         except Exception as e:
             self.logger.debug(f"Error getting person UUID for person_id {person_id}: {e}")
-            return None 
+            return None
+
+    def get_enum_value(self, enum_obj):
+        """Extract value from enum object safely"""
+        if enum_obj is None:
+            return None
+        
+        # For FacultyEnum and other enums that have an 'id' property, use that
+        if hasattr(enum_obj, 'id'):
+            return enum_obj.id
+        
+        # For simple enums that have a value property
+        if hasattr(enum_obj, 'value'):
+            return enum_obj.value
+            
+        return str(enum_obj) if enum_obj else None 

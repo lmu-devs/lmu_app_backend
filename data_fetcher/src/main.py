@@ -28,7 +28,7 @@ class DataCollectorApp:
             # RoomfinderCollector(),
             # LibraryCollector(),
             # PeopleCollector(),
-            PeopleCollectorV2(test_mode=False, batch_size=5),
+            PeopleCollectorV2(batch_size=5),
             # FoodCollector(),
             # SportCollector(),
             # CinemaCollector(),
