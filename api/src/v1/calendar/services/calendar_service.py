@@ -2,9 +2,9 @@ import uuid
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-
 from dateutil.relativedelta import relativedelta
 from typing import Optional
+from icalendar import Calendar, Event
 
 from api.src.v1.calendar.models.calendar_model import (
     AccessScope,
@@ -337,8 +337,7 @@ class CalendarService:
                 logger.warning(f"Unknown update type: {update_type}")
                 return []
     
-    def get_all(
-        self,
+    def get_all(self,
         user_id: uuid.UUID,
         access_scope: AccessScope,
         event_type: Optional[str] = None,
@@ -381,3 +380,54 @@ class CalendarService:
             instances.extend(self._generate_repeat_events(event))
 
         return instances
+
+    def _calendar_event_to_ical(self,
+        event: CalendarEvent
+    ) -> Event:
+
+        ical_event = Event()
+        ical_event.add("summary", event.title)
+
+        uid = f"{event.id}"
+        if event.recurrence_id is not None:
+            uid += f"-recurrence-{event.recurrence_id}"
+
+        ical_event.add("uid", uid)
+        ical_event.add("dtstamp", event.created_at)
+
+        if event.all_day and event.start_time:
+            # event is all day
+            ical_event.add("dtstart", event.start_time.date())
+            if event.end_time:
+                ical_event.add("dtend", event.end_time.date())
+        else:
+            if event.start_time:
+                ical_event.add("dtstart", event.start_time)
+            if event.end_time:
+                ical_event.add("dtend", event.end_time)
+
+        if event.description:
+            ical_event.add("description", event.description)
+
+        if event.location:
+            ical_event.add("location", event.location.address)
+
+        return ical_event
+
+    def generate_ical(self, 
+        user_id: uuid.UUID
+        ) -> bytes:
+        """Generates an iCal file with all events for a specific user."""
+        if not user_id:
+            raise DatabaseError(f"Got ical request with user_id = None!")
+        
+        cal = Calendar()
+        cal.add("prodid", "-//lmu-devs//LMU Students//EN")
+        cal.add("version", "2.0")
+        cal.add("method", "PUBLISH")
+
+        for event in self.get_all(user_id, AccessScope.USER):
+            ical_event = self._calendar_event_to_ical(event)
+            cal.add_component(ical_event)
+
+        return cal.to_ical()

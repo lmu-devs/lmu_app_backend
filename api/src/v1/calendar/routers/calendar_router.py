@@ -1,8 +1,7 @@
 import uuid
-
 from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 
 from api.src.v1.calendar.models.calendar_model import (
     AccessScope,
@@ -70,3 +69,9 @@ async def get_events(
 ):
     events = CalendarService().get_all(user.id, access_scope, event_type, frequency, all_day)
     return CalendarEntries.from_list(events)
+
+@router.get("/calendar/ical/{user_id}.ics", description="Public iCal feed for a user's events.")
+async def get_user_ical_feed(
+    user_id: uuid.UUID
+):
+    return Response(content=CalendarService().generate_ical(user_id), media_type="text/calendar")
