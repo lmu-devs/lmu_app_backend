@@ -395,16 +395,12 @@ class CalendarService:
         ical_event.add("uid", uid)
         ical_event.add("dtstamp", event.created_at)
 
-        if event.all_day and event.start_time:
-            # event is all day
+        if event.all_day:
             ical_event.add("dtstart", event.start_time.date())
-            if event.end_time:
-                ical_event.add("dtend", event.end_time.date())
+            ical_event.add("dtend", event.end_time.date())
         else:
-            if event.start_time:
-                ical_event.add("dtstart", event.start_time)
-            if event.end_time:
-                ical_event.add("dtend", event.end_time)
+            ical_event.add("dtstart", event.start_time)
+            ical_event.add("dtend", event.end_time)
 
         if event.description:
             ical_event.add("description", event.description)
