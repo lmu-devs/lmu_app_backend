@@ -139,8 +139,8 @@ class PeopleService:
             return None
         
         # Get roles and courses
-        roles_data = await self.get_people_roles(person_id)
-        courses_data = await self.get_people_courses(person_id)
+        roles_data = await self._get_people_roles(person_id)
+        courses_data = await self._get_people_courses(person_id)
         
         # Convert roles
         roles = []
@@ -162,20 +162,11 @@ class PeopleService:
             )
             roles.append(role)
         
-        # Convert courses
-        courses = []
-        for course_data in courses_data:
-            course = PersonCourse(
-                person_id=person_id,
-                course_number=course_data.get("course_number"),
-                course_name=course_data.get("course_name"),
-                semester=course_data.get("semester"),
-                course_url=course_data.get("course_url")
-            )
-            courses.append(course)
+        # Convert courses (simplified - just use the course list)
+        courses = courses_data
         
         # Get person details
-        details_data = await self.get_person_details(person_id)
+        details_data = await self._get_person_details(person_id)
         details = None
         if details_data:
             details = PersonDetails(
@@ -201,7 +192,7 @@ class PeopleService:
         
         return Person(
             id=person_data["id"],
-            profile_url=person_data.get("profile_url"),
+            person_id=person_data.get("person_id", person_id),  # Use provided person_id or fallback to parameter
             name=person_data["name"],
             first_name=person_data.get("first_name"),
             surname=person_data.get("surname"),
@@ -209,19 +200,13 @@ class PeopleService:
             academic_degree=person_data.get("academic_degree"),
             faculty_enum=faculty_enum,
             primary_role=person_data.get("primary_role"),
-            email=details_data.get("email") if details_data else None,
-            phone=details_data.get("phone") if details_data else None,
-            address=details_data.get("address") if details_data else None,
             academic_title_enum=person_data.get("academic_title_enum"),
-            status=details_data.get("status") if details_data else None,
-            note=details_data.get("note") if details_data else None,
-            office_hours=details_data.get("office_hours") if details_data else None,
             details=details,
             roles=roles,
             courses=courses
         )
 
-    async def get_people_roles(self, person_id: str) -> List[Dict]:
+    async def _get_people_roles(self, person_id: str) -> List[Dict]:
         """Get roles for a specific person from CMS"""
         try:
             query_path = self.graphql_path / self.QUERIES_FILE
@@ -230,18 +215,18 @@ class PeopleService:
         except Exception:
             return []
 
-    async def get_people_courses(self, person_id: str) -> List[str]:
+    async def _get_people_courses(self, person_id: str) -> List[str]:
         """Get courses for a specific person from CMS (from person_details.courses)"""
         try:
             # Get person details which includes courses as a JSON array
-            person_details = await self.get_person_details(person_id)
+            person_details = await self._get_person_details(person_id)
             if person_details and person_details.get("courses"):
                 return person_details["courses"]
             return []
         except Exception:
             return []
 
-    async def get_person_details(self, person_id: str) -> Optional[Dict]:
+    async def _get_person_details(self, person_id: str) -> Optional[Dict]:
         """Get details for a specific person from CMS"""
         try:
             query_path = self.graphql_path / self.QUERIES_FILE
