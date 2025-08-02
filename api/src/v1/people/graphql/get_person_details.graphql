@@ -1,0 +1,19 @@
+# Get person details only
+query GetPersonDetails($person_id: ID!) {
+    person_details(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+        courses
+    }
+}

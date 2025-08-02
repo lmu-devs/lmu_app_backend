@@ -1,0 +1,14 @@
+# Get person by ID
+query GetPersonById($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        person_id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}

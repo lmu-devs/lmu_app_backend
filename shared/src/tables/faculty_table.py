@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
@@ -8,7 +8,7 @@ from shared.src.tables.language_table import LanguageTable
 class FacultyTable(Base):
     __tablename__ = "faculties"
 
-    id = Column(String, primary_key=True)
+    id = Column(Integer, primary_key=True)
 
     translations = relationship(
         "FacultyTranslationTable",
@@ -21,7 +21,7 @@ class FacultyTranslationTable(LanguageTable):
     __tablename__ = "faculty_translations"
 
     faculty_id = Column(
-        String,
+        Integer,
         ForeignKey("faculties.id", ondelete="CASCADE"),
         nullable=False,
         primary_key=True,

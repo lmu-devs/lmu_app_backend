@@ -31,6 +31,8 @@ from .v1.university.routers import university_router
 from .v1.classes.routers import lecture_router
 from .v2.link.routers import link_router as link_router_v2
 from .v2.wishlist.routers import wishlist_router as wishlist_router_v2
+from .v1.people.routers import people_router
+
 
 api_logger = get_food_logger(__name__)
 
@@ -104,7 +106,7 @@ def create_app():
     app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
     app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
     app.include_router(university_router.router, prefix=f"{prefix_v1}", tags=["university"])
-    app.include_router(lecture_router.router, prefix=f"{prefix_v1}", tags=["courses"])
+    app.include_router(people_router.router, prefix=f"{prefix_v1}/people", tags=["people"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(
