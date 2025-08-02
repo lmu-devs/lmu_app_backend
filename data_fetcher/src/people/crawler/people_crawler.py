@@ -10,7 +10,6 @@ from urllib3.util.retry import Retry
 from requests.exceptions import SSLError, ConnectionError, Timeout, RequestException
 from shared.src.enums import AcademicTitleEnum, LSFRoleEnum
 from shared.src.core.logging import get_main_fetcher_logger
-# from api.src.v1.people.models.people_model import Institution  # Import Institution model for structure
 
 logger = get_main_fetcher_logger(__name__)
 
@@ -19,7 +18,7 @@ class LSFPersonCrawler:
     BASE = "https://lsf.verwaltung.uni-muenchen.de/qisserver/rds"
     HEADERS = {"User-Agent": "Mozilla/5.0"}
     RESULTS_PER_PAGE = 50
-    REQUEST_DELAY = 0  # Delay between requests to avoid overwhelming server (increase if you get rate limited)
+    REQUEST_DELAY = 0  # Increase if you get rate limited
     MAX_RETRIES = 3
     TIMEOUT = 30
 
@@ -27,59 +26,57 @@ class LSFPersonCrawler:
         self.session = self._create_session()
         self.functions = self._crawl_functions()
         logger.info(f"Found {len(self.functions)} roles to try.")
-    
+
     def _create_session(self):
         """Create a requests session with retry strategy."""
         session = requests.Session()
-        
-        # Configure retry strategy
+
         retry_strategy = Retry(
             total=self.MAX_RETRIES,
             status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=["HEAD", "GET", "OPTIONS"],
             backoff_factor=1
         )
-        
+
         adapter = HTTPAdapter(max_retries=retry_strategy)
         session.mount("http://", adapter)
         session.mount("https://", adapter)
-        
+
         return session
 
     def _make_request(self, url: str, max_attempts: int = None) -> requests.Response:
         """Make a robust HTTP request with retry logic and error handling."""
         if max_attempts is None:
             max_attempts = self.MAX_RETRIES
-            
+
         for attempt in range(max_attempts):
             try:
-                time.sleep(self.REQUEST_DELAY)  # Add delay between requests
+                time.sleep(self.REQUEST_DELAY)
                 response = self.session.get(url, headers=self.HEADERS, timeout=self.TIMEOUT)
                 response.raise_for_status()
                 return response
-                
+
             except SSLError as e:
                 logger.warning(f"SSL error on attempt {attempt + 1}/{max_attempts}: {e}")
                 if attempt == max_attempts - 1:
                     raise
-                time.sleep(2 ** attempt)  # Exponential backoff
-                
+                time.sleep(2 ** attempt)
+
             except (ConnectionError, Timeout) as e:
                 logger.warning(f"Connection error on attempt {attempt + 1}/{max_attempts}: {e}")
                 if attempt == max_attempts - 1:
                     raise
-                time.sleep(2 ** attempt)  # Exponential backoff
-                
+                time.sleep(2 ** attempt)
+
             except RequestException as e:
                 logger.warning(f"Request error on attempt {attempt + 1}/{max_attempts}: {e}")
                 if attempt == max_attempts - 1:
                     raise
-                time.sleep(2 ** attempt)  # Exponential backoff
-        
+                time.sleep(2 ** attempt)
+
         raise RuntimeError(f"Failed to make request after {max_attempts} attempts")
 
     def _crawl_functions(self) -> dict[int, str]:
-        # Pull the Funktion dropdown from the personSearch form
         params = {
             "state":           "change",
             "type":            "5",
@@ -101,29 +98,29 @@ class LSFPersonCrawler:
 
         funcs = {}
         for opt in sel.xpath(".//option"):
-            val = opt.get("value").strip()
+            val = opt.get("value", "").strip()
             txt = opt.text_content().strip()
             if val:
-                funcs[int(val)] = txt
-                logger.debug(f"Role {val}: {txt}")
+                try:
+                    funcs[int(val)] = txt
+                    logger.debug(f"Role {val}: {txt}")
+                except ValueError:
+                    logger.debug(f"Skipping non-int role value: {val}")
         return funcs
 
     def _create_role_info(self, pfid: int, role_name: str) -> dict:
-        """Create role information with LSFRole enum mapping"""
-        # Map the role name to LSFRole enum
+        """Create role information with LSFRole enum mapping."""
         lsf_role = LSFRoleEnum.from_string(role_name)
         return {
             "lsf_role_enum": lsf_role.value,
-            "institutions": []  # No institution for dropdown role
+            "institutions": []
         }
 
     def _clean_text(self, text: str) -> str:
-        """Clean up text by removing extra whitespace and newlines."""
+        """Clean up text by removing extra whitespace and common prefixes."""
         if not text:
             return ""
-        # Remove extra whitespace and newlines
         text = re.sub(r'\s+', ' ', text)
-        # Remove common prefixes
         text = re.sub(r'^(Name:|Funktion:|Dienstadresse:|E-Mail:|Dienstzimmer:)', '', text)
         return text.strip()
 
@@ -135,42 +132,37 @@ class LSFPersonCrawler:
             "roles": [],
             "courses": []
         }
-        
-        # Define a mapping from the th#id → your JSON key
+
         id_map = {
             "basic_1": "last_name",
             "basic_2": "gender",
             "basic_3": "first_name",
-            "basic_4": "office_hours",       # Sprechzeit
+            "basic_4": "office_hours",
             "basic_5": "name_suffix",
-            "basic_6": "employment_status",  # Personalstatus
+            "basic_6": "employment_status",
             "basic_7": "title",
             "basic_8": "note",
-            "basic_9": "academic_degree",    # Akad. Grad
+            "basic_9": "academic_degree",
             "basic_10": "status",
         }
 
-        # The table summary sometimes differs ("Grunddaten", "Grunddaten zur Veranstaltung", "Grunddaten zur Person", …)
         grunddaten_xpath = '//table[contains(@summary, "Grunddaten")]//th[@id]'
         th_elements = doc.xpath(grunddaten_xpath)
         logger.debug(f"[Crawler] Found {len(th_elements)} <th> elements in Grunddaten table")
 
-        for th in doc.xpath(grunddaten_xpath):
-            field_id = th.get("id")              # e.g. "basic_1"
+        for th in th_elements:
+            field_id = th.get("id")
             key = id_map.get(field_id)
             if not key:
-                continue                         # skip columns we don't care about
-
-            # grab the matching <td headers="basic_X">
+                continue
             td = doc.xpath(f'//td[@headers="{field_id}"]')
             value = td[0].text_content().strip() if td else ""
             details["basic_info"][key] = value
 
-        # Ensure all expected keys are present
         for key in id_map.values():
             details["basic_info"].setdefault(key, "")
 
-        # Extract roles and institutions from the Funktionen table
+        # Funktionen table
         function_rows = doc.xpath('//table[@summary="Funktionen"]//tr[position()>1]')
         logger.debug(f"[Crawler] Found {len(function_rows)} function rows in Funktionen table")
         for row in function_rows:
@@ -179,8 +171,8 @@ class LSFPersonCrawler:
                 institution_name = cells[0].xpath('.//a/text()')
                 role_text = cells[1].xpath('.//text()')
                 institution_url = cells[0].xpath('.//a/@href')
-                institution_id = None  # No id available from LSF, but placeholder for future
-                institution_data = None  # Placeholder for any extra data
+                institution_id = None
+                institution_data = None
                 if institution_name and role_text:
                     role_enum = LSFRoleEnum.from_string(self._clean_text(role_text[0]))
                     institution_obj = {
@@ -194,67 +186,56 @@ class LSFPersonCrawler:
                         "institutions": [institution_obj]
                     })
 
-        # Extract faculty from the structure tree (style depth can vary)
+        # Faculty extraction with fallback
         faculty_entry = doc.xpath('//div[contains(@style, "padding-left")]//a[contains(text(), "Fakultät")]')
         logger.debug(f"[Crawler] Faculty entry matches: {len(faculty_entry)}")
         if faculty_entry:
             details["faculty"] = self._clean_text(faculty_entry[0].text_content())
         else:
-            logger.debug("[Crawler] Faculty not found via XPath")
-
-        # Final fallback – try to infer faculty from role institutions or plain text nodes
-        if not details["faculty"]:
-            # 1) Look in the institution names we already captured (roles table)
             for role in details.get("roles", []):
                 for inst in role.get("institutions", []):
                     inst_name = inst.get("name", "")
                     if "Fakultät" in inst_name:
                         details["faculty"] = self._clean_text(inst_name)
-                        logger.debug(
-                            f"[Crawler] Faculty inferred from institution name: '{details['faculty']}'"
-                        )
+                        logger.debug(f"[Crawler] Faculty inferred from institution name: '{details['faculty']}'")
                         break
                 if details["faculty"]:
                     break
 
-        if not details["faculty"]:
-            # 2) Broad scrape – any anchor that contains the word "Fakultät" irrespective of style
-            generic_fac = doc.xpath('//a[contains(text(), "Fakultät")]')
-            if generic_fac:
-                details["faculty"] = self._clean_text(generic_fac[0].text_content())
-                logger.debug(
-                    f"[Crawler] Faculty inferred from generic anchor search: '{details['faculty']}'"
-                )
+            if not details["faculty"]:
+                generic_fac = doc.xpath('//a[contains(text(), "Fakultät")]')
+                if generic_fac:
+                    details["faculty"] = self._clean_text(generic_fac[0].text_content())
+                    logger.debug(f"[Crawler] Faculty inferred from generic anchor: '{details['faculty']}'")
 
-        # Log which strategy finally succeeded (or not)
         if details["faculty"]:
             logger.debug(f"[Crawler] Final faculty value: '{details['faculty']}'")
         else:
             logger.warning("[Crawler] Faculty could not be determined for this person")
 
-        # Extract courses with deduplication
+        # Courses with deduplication
         course_rows = doc.xpath('//table[@summary="Übersicht über die Zugehörigkeit zu Veranstaltungen"]//tr[position()>1]')
-        logger.debug(f"🎓 [CRAWLER] Found {len(course_rows)} course rows in Veranstaltungen table")
-        seen_courses = set()  # Track course combinations to avoid duplicates
-        
+        # logger.debug(f"🎓 [CRAWLER] Found {len(course_rows)} course rows in Veranstaltungen table")
+        seen_courses = set()
+
         for i, row in enumerate(course_rows):
             cells = row.xpath('.//td')
-            logger.debug(f"🎓 [CRAWLER] Row {i+1}: Found {len(cells)} cells")
+            # logger.debug(f"🎓 [CRAWLER] Row {i+1}: Found {len(cells)} cells")
             if len(cells) >= 3:
                 course_number = self._clean_text(cells[0].text_content())
-                course_name = self._clean_text(cells[1].xpath('.//a/text()')[0] if cells[1].xpath('.//a/text()') else cells[1].text_content())
+                course_name = self._clean_text(
+                    cells[1].xpath('.//a/text()')[0] if cells[1].xpath('.//a/text()') else cells[1].text_content()
+                )
                 semester = self._clean_text(cells[2].text_content())
-                
-                logger.debug(f"🎓 [CRAWLER] Row {i+1}: number='{course_number}', name='{course_name}', semester='{semester}'")
-                
-                # Create a unique identifier for this course to detect duplicates
+
+                # logger.debug(f"🎓 [CRAWLER] Row {i+1}: number='{course_number}', name='{course_name}', semester='{semester}'")
+
                 course_key = (course_number, course_name, semester)
                 if course_key in seen_courses:
-                    logger.debug(f"🎓 [CRAWLER] Skipping duplicate course: {course_key}")
+                    # logger.debug(f"🎓 [CRAWLER] Skipping duplicate course: {course_key}")
                     continue
-                
+
                 seen_courses.add(course_key)
-                
                 course = {
                     "number": course_number,
                     "name": course_name,
@@ -262,104 +243,114 @@ class LSFPersonCrawler:
                 }
                 if cells[1].xpath('.//a/@href'):
                     course["url"] = cells[1].xpath('.//a/@href')[0]
-                
-                details["courses"].append(course)
-                logger.debug(f"🎓 [CRAWLER] ✅ Added course {i+1}: {course}")
-            else:
-                logger.debug(f"🎓 [CRAWLER] ❌ Row {i+1}: Insufficient cells ({len(cells)} < 3)")
 
-        # Log extracted basic_info preview
+                details["courses"].append(course)
+                # logger.debug(f"🎓 [CRAWLER] ✅ Added course {i+1}: {course}")
+            else:
+                pass
+
         non_empty_basic = {k: v for k, v in details["basic_info"].items() if v}
         logger.debug(f"[Crawler] Extracted non-empty basic_info fields: {list(non_empty_basic.keys())}")
 
         return details
 
     def get_character_list(self) -> list[str]:
-        """Return list of characters to crawl (A-Z)"""
+        """Return list of characters to crawl (a-z)."""
         return [chr(i) for i in range(ord('a'), ord('z') + 1)]
-    
+
     async def crawl_people_by_role_and_character_async(self, role_id: int, character: str) -> list[dict]:
         """
-        Async method to crawl people for a specific role and character
-        
-        Args:
-            role_id: LSF role ID
-            character: Character to search by (surname starting with this character)
-            
-        Returns:
-            List of people data dictionaries
+        Crawl people for a specific role and character with proper pagination and two-letter fallback.
         """
         try:
             people = []
-            page = 0
-            
-            while True:
-                # Check if there are too many results (>1000 or >100)
-                if page == 0 and self._too_many(character, role_id):
-                    logger.warning(f"Too many results for character '{character}' and role {role_id}, skipping")
-                    break
-                
-                # Fetch a page of results
-                doc = self._fetch_search(character, role_id, page)
-                
-                # Extract people from this page
-                page_people = self._extract_people_from_page(doc)
-                
-                if not page_people:
-                    # No more results on this page
-                    break
-                
-                people.extend(page_people)
-                page += 1
-                
-                # Add delay between requests to be respectful
-                if self.REQUEST_DELAY > 0:
-                    time.sleep(self.REQUEST_DELAY)
-                
-                # Safety limit to prevent infinite loops
-                if page > 100:  # Max 100 pages = 5000 results
-                    logger.warning(f"Hit page limit for character '{character}' and role {role_id}")
-                    break
-            
-            logger.debug(f"Crawled {len(people)} people for character '{character}' and role {role_id}")
+
+            # First attempt single-character exhaustive crawl
+            single_people = self._crawl_by_letter_or_prefix(role_id, character)
+            people.extend(single_people)
+
+            # If too many results on the single character, fallback to two-letter prefixes
+            if self._too_many(character, role_id):
+                logger.info(f"Letter '{character}' had too many results; trying two-letter prefixes")
+                extended_chars = list("abcdefghijklmnopqrstuvwxyzäöüß")
+                for second in extended_chars:
+                    prefix = f"{character}{second}"
+                    prefix_people = self._crawl_by_letter_or_prefix(role_id, prefix)
+                    people.extend(prefix_people)
+
+            logger.debug(f"Crawled total {len(people)} people for role {role_id} and character/prefix '{character}'")
             return people
-            
+
         except Exception as e:
             logger.error(f"Error crawling people for character '{character}' and role {role_id}: {e}")
             return []
-    
+
+    def _crawl_by_letter_or_prefix(self, role_id: int, search: str) -> list[dict]:
+        """Exhaustively crawl all pages for the given search string (letter or prefix)."""
+        out = []
+        page = 0
+        total_processed = 0
+
+        while True:
+            try:
+                doc = self._fetch_search(search, role_id, page)
+            except Exception as e:
+                logger.warning(f"Failed fetching search '{search}' page {page}: {e}")
+                break
+
+            # Parse total count if present
+            count = None
+            info = doc.xpath('//div[contains(@class,"InfoLeiste")]')
+            if info:
+                m = re.search(r"(\d+)\s+Treffer", info[0].text_content())
+                if m:
+                    count = int(m.group(1))
+                    logger.debug(f"Search '{search}': total {count} according to InfoLeiste")
+
+            page_people = self._extract_people_from_page(doc)
+            if not page_people:
+                break
+
+            out.extend(page_people)
+            total_processed += len(page_people)
+
+            if count and total_processed >= count:
+                break
+
+            page += 1
+            if page > 200:  # safety cap
+                logger.warning(f"Hit page cap for search '{search}' after {page} pages")
+                break
+
+        logger.info(f"Completed search '{search}' for role {role_id}: collected {len(out)} people")
+        return out
+
     def _extract_people_from_page(self, doc: html.HtmlElement) -> list[dict]:
-        """Extract people data from a search results page"""
+        """Extract people data from a search results page."""
         people = []
-        
+
         try:
-            # Find all person links in the search results
             person_links = doc.xpath('//a[contains(@href, "personal.nachname")]')
-            
+
             for link in person_links:
                 try:
-                    # Extract basic info from the link
                     name = link.text_content().strip()
                     href = link.get('href')
-                    
+
                     if name and href:
-                        # Fetch detailed person information
                         detail_doc = self._fetch_person_details(href)
                         person_details = self._extract_person_details(detail_doc)
-                        
-                        # Add the name and href to the details
                         person_details['name'] = name
                         person_details['href'] = href
-                        
                         people.append(person_details)
-                        
+
                 except Exception as e:
                     logger.warning(f"Failed to extract person from link: {e}")
                     continue
-                    
+
         except Exception as e:
             logger.error(f"Error extracting people from page: {e}")
-        
+
         return people
 
     def _fetch_person_details(self, href: str) -> html.HtmlElement:
@@ -368,7 +359,7 @@ class LSFPersonCrawler:
             url = f"https://lsf.verwaltung.uni-muenchen.de{href}"
         else:
             url = href
-            
+
         try:
             r = self._make_request(url)
             return html.fromstring(r.content)
@@ -379,7 +370,7 @@ class LSFPersonCrawler:
     def _too_many(self, letter: str, pfid: int) -> bool:
         doc = self._fetch_search(letter, pfid, 0, per_page=50)
         text_blobs = [p.text_content() for p in doc.xpath("//p")]
-        
+
         for t in text_blobs:
             if "mehr als 1000 Ergebnisse" in t:
                 logger.debug(f"Too many (>1000) results for letter '{letter}' and function {pfid}")
@@ -387,17 +378,17 @@ class LSFPersonCrawler:
             elif "mehr als 100 Ergebnisse" in t:
                 logger.debug(f"Too many (>100) results for letter '{letter}' and function {pfid}")
                 return True
-        
+
         return False
 
     def _fetch_search(self, letter: str, pfid: int, page: int = 0, per_page: int = None) -> html.HtmlElement:
         if per_page is None:
             per_page = self.RESULTS_PER_PAGE
-            
+
         params = {
             "state":                     "wsearchv",
             "search":                    "7",
-            "purge":                     "y", 
+            "purge":                     "y",
             "moduleParameter":           "person/person",
             "choice.r_funktion.pfid":    "y",
             "r_funktion.pfid":           str(pfid),
@@ -409,7 +400,7 @@ class LSFPersonCrawler:
         url = f"{self.BASE}?{urlencode(params, safe=',')}"
         logger.debug(f"Fetching page {page + 1} with {per_page} results per page")
         logger.debug(f"→ Effective URL: {url}")
-        
+
         try:
             r = self._make_request(url)
             return html.fromstring(r.content)
