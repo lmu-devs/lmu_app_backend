@@ -11,7 +11,7 @@ router = APIRouter(tags=["people"])
 directus = DirectusService()
 
 # GraphQL queries file path
-graphql_path = FilePath(__file__).parent.parent / "graphql" / "new_people_queries.graphql"
+graphql_path = FilePath(__file__).parent.parent / "graphql" / "people_queries.graphql"
 
 
 @router.get("/faculty/{faculty_id}")

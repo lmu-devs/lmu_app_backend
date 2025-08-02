@@ -26,28 +26,37 @@ class DirectusService:
                 },
             )
 
-    def query(self, query: str, variables: dict = None) -> dict:
+    def query(self, query: str, variables: dict = None, operation_name: str = None) -> dict:
         """
         Execute a GraphQL query against the Directus API.
 
         Args:
             query (str): The GraphQL query string
             variables (dict, optional): Variables for the GraphQL query
+            operation_name (str, optional): Name of the operation to execute
 
         Returns:
             dict: The JSON response from the API
         """
-        response = self._client.post("/graphql", json={"query": query, "variables": variables or {}})
+        payload = {
+            "query": query,
+            "variables": variables or {}
+        }
+        if operation_name:
+            payload["operationName"] = operation_name
+
+        response = self._client.post("/graphql", json=payload)
         response.raise_for_status()
         return response.json()
 
-    def execute_query_file(self, query_file_path: Union[str, Path], variables: dict = None) -> dict:
+    def execute_query_file(self, query_file_path: Union[str, Path], variables: dict = None, operation_name: str = None) -> dict:
         """
         Execute a GraphQL query from a file against the Directus API.
 
         Args:
             query_file_path (Union[str, Path]): Path to the GraphQL query file
             variables (dict, optional): Variables for the GraphQL query
+            operation_name (str, optional): Name of the operation to execute
 
         Returns:
             dict: The JSON response from the API
@@ -60,7 +69,7 @@ class DirectusService:
         try:
             with open(query_path, "r") as file:
                 query_string = file.read()
-            return self.query(query_string, variables)
+            return self.query(query_string, variables, operation_name)
         except FileNotFoundError:
             raise FileNotFoundError(f"GraphQL query file not found: {query_file_path}")
         except IOError as e:

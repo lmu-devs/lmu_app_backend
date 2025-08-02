@@ -30,7 +30,7 @@ class PeopleService:
         self.graphql_path = base_path / "api" / "src" / "v1" / "people" / "graphql"
         
         # Constants
-        self.QUERIES_FILE = "new_people_queries.graphql"
+        self.QUERIES_FILE = "people_queries.graphql"
         self.MUTATIONS_FILE = "mutations.graphql"
 
     # ==================== READ OPERATIONS ====================
