@@ -38,7 +38,6 @@ class PeopleService:
     async def get_all_people(
         self, 
         faculty_filter: Optional[str] = None,
-        limit: Optional[int] = 50, 
         offset: int = 0
     ) -> PeopleResponse:
         """Get all people from CMS with optional faculty filtering"""
@@ -47,7 +46,6 @@ class PeopleService:
         
         # Build variables for the query
         variables = {
-            "limit": limit,
             "offset": offset
         }
         
@@ -225,7 +223,7 @@ class PeopleService:
         """Get list of faculties that have people data from CMS"""
         
         # Get all people to extract faculty information
-        all_people = await self.get_all_people(limit=10000)  # Get all people
+        all_people = await self.get_all_people()  # Get all people
         
         faculty_counts = {}
         faculty_names = {}
@@ -384,13 +382,8 @@ class PeopleService:
         # Add courses as JSON array
         courses = person_data.get("courses", [])
         person_name = person_data.get("name", "Unknown")
-        self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: Input courses count: {len(courses)}")
-        self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: Courses data: {courses}")
         if courses:
             details_data_clean["courses"] = courses
-            self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: ✅ Added courses to CMS data")
-        else:
-            self.logger.debug(f"🎓 [CMS_CREATE] {person_name}: ❌ No courses to add to CMS")
         
         # Handle enum values properly
         gender_enum = basic_info.get("gender_enum")
@@ -414,7 +407,6 @@ class PeopleService:
                 details_variables = {"data": details_data_clean}
                 
                 # Log the final GraphQL variables being sent
-                self.logger.debug(f"🎓 [CMS_GRAPHQL] {person_name}: Final GraphQL variables: {details_variables}")
                 
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 response = self.directus.execute_query_file(
@@ -506,10 +498,8 @@ class PeopleService:
         # Update courses as JSON array
         courses = person_data.get("courses", [])
         person_name = person_data.get("name", "Unknown")
-        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: Input courses count: {len(courses)}")
-        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: Courses data: {courses}")
         details_updates["courses"] = courses
-        self.logger.debug(f"🎓 [CMS_UPDATE] {person_name}: ✅ Set courses in update data")
+        
         
         # Handle enum values
         gender_enum = basic_info.get("gender_enum")
@@ -533,7 +523,6 @@ class PeopleService:
             }
             
             # Log the final GraphQL variables being sent for update
-            self.logger.debug(f"🎓 [CMS_GRAPHQL_UPDATE] {person_name}: Final GraphQL variables: {details_variables}")
             
             try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE

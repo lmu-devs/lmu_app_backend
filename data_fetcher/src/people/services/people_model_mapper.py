@@ -71,18 +71,11 @@ class PeopleModelMapper:
             courses = []
             input_courses = mapped_person.get("courses", [])
             person_name = mapped_person.get("name", "Unknown")
-            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Input courses count: {len(input_courses)}")
             
             for i, course_data in enumerate(input_courses):
-                self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Course {i+1}: {course_data}")
                 course_number = course_data.get("number")
                 if course_number:
                     courses.append(course_number)
-                    self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: ✅ Added course number: '{course_number}'")
-                else:
-                    self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: ❌ Skipped course with empty number: {course_data}")
-            
-            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Output course numbers: {len(courses)} -> {courses}")
             
             # Create a single PersonDetails instance with all fields
             person_details = PersonDetails(
@@ -114,9 +107,8 @@ class PeopleModelMapper:
                 roles=roles
             )
             
-            # Log final course count after model creation
+                        # Log final course count after model creation
             final_courses = person.courses
-            self.logger.debug(f"🎓 [MODEL_MAPPER] {person_name}: Final person.courses: {len(final_courses)} -> {final_courses}")
             
             return person
             

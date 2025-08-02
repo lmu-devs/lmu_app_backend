@@ -37,18 +37,18 @@ class DirectusService:
             payload["operationName"] = operation_name
             
                     # Log request details
-            logger.info("Making GraphQL request:")
-            logger.info(f"URL: {self._client.base_url}/graphql")
-            logger.info(f"Headers: {self._client.headers}")
-            logger.info(f"Payload: {payload}")
+            # logger.info("Making GraphQL request:")
+            # logger.info(f"URL: {self._client.base_url}/graphql")
+            # logger.info(f"Headers: {self._client.headers}")
+            # logger.info(f"Payload: {payload}")
             
             try:
                 response = self._client.post("/graphql", json=payload)
                 
                 # Log response details
-                logger.info(f"Response status: {response.status_code}")
-                logger.info(f"Response headers: {response.headers}")
-                logger.info(f"Response body: {response.text}")
+                # logger.info(f"Response status: {response.status_code}")
+                # logger.info(f"Response headers: {response.headers}")
+                # logger.info(f"Response body: {response.text}")
                 
                 # Check for HTTP errors
                 if response.status_code >= 400:
@@ -71,10 +71,10 @@ class DirectusService:
                 if "errors" in json_response:
                     error_messages = [error.get("message", "Unknown GraphQL error") for error in json_response["errors"]]
                     error_detail = "; ".join(error_messages)
-                    logger.error(f"GraphQL Error: {error_detail}")
-                    logger.error(f"Query: {query[:200]}...")
-                    logger.error(f"Variables: {variables}")
-                    logger.error(f"Operation: {operation_name}")
+                    # logger.error(f"GraphQL Error: {error_detail}")
+                    # logger.error(f"Query: {query[:200]}...")
+                    # logger.error(f"Variables: {variables}")
+                    # logger.error(f"Operation: {operation_name}")
                     raise APIException(
                         status_code=400,
                         detail=f"GraphQL Error: {error_detail}",
@@ -91,11 +91,11 @@ class DirectusService:
             except httpx.HTTPStatusError as e:
                 # Log the detailed error response
                 error_detail = e.response.text if e.response else "No response text"
-                logger.error(f"GraphQL Error: {e}")
-                logger.error(f"Error Response: {error_detail}")
-                logger.error(f"Query: {query[:200]}...")
-                logger.error(f"Variables: {variables}")
-                logger.error(f"Operation: {operation_name}")
+                # logger.error(f"GraphQL Error: {e}")
+                # logger.error(f"Error Response: {error_detail}")
+                # logger.error(f"Query: {query[:200]}...")
+                # logger.error(f"Variables: {variables}")
+                # logger.error(f"Operation: {operation_name}")
                 
                 raise APIException(
                     status_code=e.response.status_code,
@@ -110,13 +110,13 @@ class DirectusService:
 
     def execute_query_file(self, query_file_path: Union[str, Path], variables: dict = None, operation_name: str = None) -> dict:
         query_path = Path(query_file_path)
-        logger.info(f"Reading GraphQL query from: {query_path} (absolute: {query_path.absolute()})")
+        # logger.info(f"Reading GraphQL query from: {query_path} (absolute: {query_path.absolute()})")
         
         try:
             with open(query_path, "r") as file:
                 query_string = file.read()
-                logger.info(f"Successfully read query file. Length: {len(query_string)} chars")
-                logger.info(f"Query content: {query_string[:200]}...")  # Log first 200 chars
+                # logger.info(f"Successfully read query file. Length: {len(query_string)} chars")
+                # logger.info(f"Query content: {query_string[:200]}...")  # Log first 200 chars
         except Exception as e:
             logger.error(f"Failed to read query file: {e}")
             raise

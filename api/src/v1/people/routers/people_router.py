@@ -17,7 +17,6 @@ graphql_path = FilePath(__file__).parent.parent / "graphql" / "new_people_querie
 @router.get("/faculty/{faculty_id}")
 async def get_people_by_faculty(
     faculty_id: int = Path(..., description="Faculty ID to filter by"),
-    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
     offset: int = Query(0, ge=0, description="Number of people to skip")
 ) -> Dict[str, Any]:
     """
@@ -26,7 +25,6 @@ async def get_people_by_faculty(
     try:
         variables = {
             "faculty_enum": faculty_id,
-            "limit": limit,
             "offset": offset
         }
         
@@ -42,7 +40,6 @@ async def get_people_by_faculty(
             "faculty_id": faculty_id,
             "people": people_data,
             "total_count": len(people_data),
-            "limit": limit,
             "offset": offset
         }
         
@@ -85,7 +82,6 @@ async def get_person_with_details(
 @router.get("/", response_model=PeopleResponse)
 async def get_people(
     faculty_filter: Optional[str] = Query(None, description="Filter by faculty code"),
-    limit: int = Query(50, ge=1, le=500, description="Number of people to return"),
     offset: int = Query(0, ge=0, description="Number of people to skip")
 ):
     """
@@ -95,7 +91,6 @@ async def get_people(
     service = PeopleService()
     return await service.get_all_people(
         faculty_filter=faculty_filter,
-        limit=limit,
         offset=offset
     )
 

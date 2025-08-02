@@ -31,9 +31,8 @@ class PeopleDataNormalizer:
             self.logger.debug(f"  Raw faculty: '{raw_person.get('faculty', 'NOT_FOUND')}'")
             self.logger.debug(f"  Raw basic_info: {raw_person.get('basic_info', {})}")
             
-            # Log courses before normalization
+                        # Log courses before normalization
             raw_courses = raw_person.get("courses", [])
-            self.logger.debug(f"🎓 [NORMALIZER] {raw_person.get('name', 'Unknown')}: Raw courses count: {len(raw_courses)}")
             
             normalized = {
                 "person_id": self._generate_person_id(raw_person),
@@ -48,9 +47,8 @@ class PeopleDataNormalizer:
                 "courses": self._normalize_courses(raw_courses),
             }
             
-            # Log courses after normalization
+                        # Log courses after normalization
             normalized_courses = normalized.get("courses", [])
-            self.logger.debug(f"🎓 [NORMALIZER] {raw_person.get('name', 'Unknown')}: Normalized courses count: {len(normalized_courses)}")
             
             normalized["academic_title"] = self._extract_academic_title(raw_person)
             
@@ -219,12 +217,8 @@ class PeopleDataNormalizer:
         """Normalize courses data"""
         normalized_courses = []
         
-        self.logger.debug(f"🎓 [NORMALIZER] Input courses: {len(courses)} courses")
         for i, course in enumerate(courses):
-            self.logger.debug(f"🎓 [NORMALIZER] Course {i+1}: {course}")
-            
             if not isinstance(course, dict):
-                self.logger.debug(f"🎓 [NORMALIZER] Skipping non-dict course: {course}")
                 continue
                 
             normalized_course = {
@@ -234,15 +228,9 @@ class PeopleDataNormalizer:
                 "url": self._normalize_url(course.get("url"))
             }
             
-            self.logger.debug(f"🎓 [NORMALIZER] Normalized course {i+1}: {normalized_course}")
-            
             if any(normalized_course.values()):
                 normalized_courses.append(normalized_course)
-                self.logger.debug(f"🎓 [NORMALIZER] ✅ Added course {i+1}")
-            else:
-                self.logger.debug(f"🎓 [NORMALIZER] ❌ Skipped empty course {i+1}")
         
-        self.logger.debug(f"🎓 [NORMALIZER] Output: {len(normalized_courses)} normalized courses")
         return normalized_courses
 
     def _extract_academic_title(self, person_data: Dict) -> str:

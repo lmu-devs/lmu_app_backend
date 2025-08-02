@@ -1,8 +1,8 @@
 # Simplified GraphQL queries for people schema
 
 # Get all people with basic info (for list views)
-query GetAllPeople($limit: Int, $offset: Int) {
-    people(limit: $limit, offset: $offset) {
+query GetAllPeople($offset: Int) {
+    people(offset: $offset) {
         id
         name
         first_name
@@ -100,8 +100,8 @@ query GetPersonRoles($person_id: ID!) {
 }
 
 # Search people by faculty
-query GetPeopleByFaculty($faculty_enum: GraphQLStringOrFloat!, $limit: Int, $offset: Int) {
-    people(filter: { faculty_enum: { _eq: $faculty_enum } }, limit: $limit, offset: $offset) {
+query GetPeopleByFaculty($faculty_enum: GraphQLStringOrFloat!, $offset: Int) {
+    people(filter: { faculty_enum: { _eq: $faculty_enum } }, offset: $offset) {
         id
         name
         first_name
@@ -114,7 +114,7 @@ query GetPeopleByFaculty($faculty_enum: GraphQLStringOrFloat!, $limit: Int, $off
 }
 
 # Search people by name
-query SearchPeopleByName($search: String!, $limit: Int, $offset: Int) {
+query SearchPeopleByName($search: String!, $offset: Int) {
     people(
         filter: {
             _or: [
@@ -123,7 +123,6 @@ query SearchPeopleByName($search: String!, $limit: Int, $offset: Int) {
                 { surname: { _icontains: $search } }
             ]
         }
-        limit: $limit
         offset: $offset
     ) {
         id

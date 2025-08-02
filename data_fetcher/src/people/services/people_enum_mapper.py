@@ -34,10 +34,9 @@ class PeopleEnumMapper:
         try:
             mapped_person = normalized_person.copy()
             
-            # Log courses before enum mapping
+                        # Log courses before enum mapping
             courses_before = normalized_person.get("courses", [])
             person_name = normalized_person.get("name", "Unknown")
-            self.logger.debug(f"🎓 [ENUM_MAPPER] {person_name}: Input courses count: {len(courses_before)}")
             
             # Map faculty enum
             mapped_person["faculty_enum"] = self._map_faculty_enum(
@@ -74,9 +73,8 @@ class PeopleEnumMapper:
             if 'person_id' in normalized_person:
                 mapped_person['person_id'] = normalized_person['person_id']
             
-            # Log courses after enum mapping (should be same since courses are copied)
+                        # Log courses after enum mapping (should be same since courses are copied)
             courses_after = mapped_person.get("courses", [])
-            self.logger.debug(f"🎓 [ENUM_MAPPER] {person_name}: Output courses count: {len(courses_after)}")
             
             return mapped_person
             

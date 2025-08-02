@@ -29,7 +29,6 @@ async def get_all_people(
     
     return await _people_service.get_all_people(
         faculty_filter=faculty_code,
-        limit=limit if apply_pagination else None,
         offset=offset if apply_pagination else 0
     )
 
