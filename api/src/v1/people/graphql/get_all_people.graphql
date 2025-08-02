@@ -1,0 +1,13 @@
+# Get all people with basic info (for list views)
+query GetAllPeople($offset: Int) {
+    people(offset: $offset) {
+        id
+        name
+        first_name
+        surname
+        title
+        academic_degree
+        faculty_enum
+        primary_role
+    }
+}

@@ -1,5 +1,3 @@
-# Simplified GraphQL queries for people schema
-
 # Get all people with basic info (for list views)
 query GetAllPeople($offset: Int) {
     people(offset: $offset) {

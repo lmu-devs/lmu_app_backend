@@ -29,8 +29,11 @@ class PeopleService:
         base_path = Path(__file__).parent.parent
         self.graphql_path = base_path / "graphql"
         
-        # Constants
-        self.QUERIES_FILE = "people_queries.graphql"
+        # GraphQL query files
+        self.GET_ALL_PEOPLE_FILE = "get_all_people.graphql"
+        self.GET_PERSON_BY_ID_FILE = "get_person_by_id.graphql"
+        self.GET_PERSON_ROLES_FILE = "get_person_roles.graphql"
+        self.GET_PERSON_DETAILS_FILE = "get_person_details.graphql"
         self.MUTATIONS_FILE = "mutations.graphql"
 
     # ==================== READ OPERATIONS ====================
@@ -42,7 +45,7 @@ class PeopleService:
     ) -> PeopleResponse:
         """Get all people from CMS with optional faculty filtering"""
         
-        query_path = self.graphql_path / self.QUERIES_FILE
+        query_path = self.graphql_path / self.GET_ALL_PEOPLE_FILE
         
         # Build variables for the query
         variables = {
@@ -55,8 +58,7 @@ class PeopleService:
         
         response = self.directus.execute_query_file(
             query_file_path=query_path,
-            variables=variables,
-            operation_name="GetAllPeople"
+            variables=variables
         )
         
         # Check if response has expected structure
@@ -116,13 +118,12 @@ class PeopleService:
     async def get_person_by_id(self, person_id: str) -> Optional[Person]:
         """Get detailed information about a specific person from CMS"""
         
-        query_path = self.graphql_path / self.QUERIES_FILE
+        query_path = self.graphql_path / self.GET_PERSON_BY_ID_FILE
         variables = {"id": person_id}
         
         response = self.directus.execute_query_file(
             query_file_path=query_path,
-            variables=variables,
-            operation_name="GetPersonById"
+            variables=variables
         )
         
         # Check if response has expected structure
@@ -209,8 +210,8 @@ class PeopleService:
     async def _get_people_roles(self, person_id: str) -> List[Dict]:
         """Get roles for a specific person from CMS"""
         try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            result = self.directus.execute_query_file(query_path, {"person_id": person_id}, operation_name="GetPersonRoles")
+            query_path = self.graphql_path / self.GET_PERSON_ROLES_FILE
+            result = self.directus.execute_query_file(query_path, {"person_id": person_id})
             return result.get("data", {}).get("person_roles", [])
         except Exception:
             return []
@@ -229,8 +230,8 @@ class PeopleService:
     async def _get_person_details(self, person_id: str) -> Optional[Dict]:
         """Get details for a specific person from CMS"""
         try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            result = self.directus.execute_query_file(query_path, {"person_id": person_id}, operation_name="GetPersonDetails")
+            query_path = self.graphql_path / self.GET_PERSON_DETAILS_FILE
+            result = self.directus.execute_query_file(query_path, {"person_id": person_id})
             details = result.get("data", {}).get("person_details", [])
             return details[0] if details else None
         except Exception:

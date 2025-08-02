@@ -114,8 +114,7 @@ class PeopleService:
             query_path = self.graphql_path / self.MUTATIONS_FILE
             response = self.directus.execute_query_file(
                 query_path,
-                person_variables,
-                operation_name="CreatePerson"
+                person_variables
             )
             self.logger.info(f"CMS response: {response}")
         except Exception as e:
@@ -181,8 +180,7 @@ class PeopleService:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 response = self.directus.execute_query_file(
                     query_path,
-                    details_variables,
-                    operation_name="CreatePersonDetails"
+                    details_variables
                 )
                 self.logger.info(f"CMS details response: {response}")
             else:
@@ -230,8 +228,7 @@ class PeopleService:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
                     query_path,
-                    person_variables,
-                    operation_name="UpdatePerson"
+                    person_variables
                 )
             except Exception as e:
                 self.logger.error(f"CMS UpdatePerson error: {e}")
@@ -286,8 +283,7 @@ class PeopleService:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
                     query_path,
-                    details_variables,
-                    operation_name="UpdatePersonDetails"
+                    details_variables
                 )
             except Exception as e:
                 self.logger.error(f"CMS UpdatePersonDetails error: {e}")
@@ -326,8 +322,7 @@ class PeopleService:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
                     query_path, 
-                    variables,
-                    operation_name="CreatePersonRole"
+                    variables
                 )
             except Exception as e:
                 self.logger.error(f"CMS CreatePersonRole error: {e}")
@@ -342,8 +337,7 @@ class PeopleService:
             
             response = self.directus.execute_query_file(
                 query_path,
-                variables,
-                operation_name="GetPersonByPersonId"
+                variables
             )
             people = response.get("data", {}).get("people", [])
             return people[0] if people else None
@@ -365,8 +359,7 @@ class PeopleService:
             
             response = self.directus.execute_query_file(
                 query_path,
-                variables,
-                operation_name="GetPersonDetails"
+                variables
             )
             details = response.get("data", {}).get("person_details", [])
             return details[0]["id"] if details else None
@@ -383,8 +376,7 @@ class PeopleService:
             
             response = self.directus.execute_query_file(
                 query_path,
-                variables,
-                operation_name="GetPersonByPersonId"
+                variables
             )
             people = response.get("data", {}).get("people", [])
             if people:
