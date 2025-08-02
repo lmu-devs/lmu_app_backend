@@ -20,7 +20,7 @@ class Frequency(str, Enum):
     MONTHLY = "MONTHLY"
     YEARLY = "YEARLY"
 
-class UpdateType(int, Enum):
+class UpdateType(int, Enum): # enum case 1 will be added and used at some point
     THIS = 0
     ALL = 2
     FUTURE = 3

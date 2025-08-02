@@ -1,8 +1,4 @@
-mutation DeleteCalendarEvent(
-  $eventId: ID!, 
-  $ruleId: ID! 
-) {
-  
+mutation DeleteCalendarEvent($eventId: ID!, $ruleId: ID!) {
   delete_calendar_event_item(id: $eventId) {
     id
   }
