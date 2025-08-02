@@ -2,16 +2,12 @@ from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query, Path
 from shared.src.enums import FacultyEnum
 from shared.src.models.people_model import PersonBasic, PersonSummary, PeopleResponse
-from shared.src.services.directus_service import DirectusService
-from pathlib import Path as FilePath
+from shared.src.services.people_service import PeopleService
 
 router = APIRouter(tags=["people"])
 
-# Initialize Directus service
-directus = DirectusService()
-
-# GraphQL queries file path
-graphql_path = FilePath(__file__).parent.parent / "graphql" / "people_queries.graphql"
+# Initialize People service
+people_service = PeopleService()
 
 
 @router.get("/faculty/{faculty_id}")
@@ -20,26 +16,21 @@ async def get_people_by_faculty(
     offset: int = Query(0, ge=0, description="Number of people to skip")
 ) -> Dict[str, Any]:
     """
-    Get people from a specific faculty using GraphQL query.
+    Get people from a specific faculty.
     """
     try:
-        variables = {
-            "faculty_enum": faculty_id,
-            "offset": offset
-        }
+        # Convert faculty_id to string for filtering (assuming faculty codes are strings)
+        faculty_code = str(faculty_id) if faculty_id else None
         
-        response = directus.execute_query_file(
-            query_file_path=graphql_path,
-            variables=variables,
-            operation_name="GetPeopleByFaculty"
+        response = await people_service.get_all_people(
+            faculty_filter=faculty_code,
+            offset=offset
         )
-        
-        people_data = response.get("data", {}).get("people", [])
         
         return {
             "faculty_id": faculty_id,
-            "people": people_data,
-            "total_count": len(people_data),
+            "people": [person.dict() for person in response.people],
+            "total_count": response.total_count,
             "offset": offset
         }
         
@@ -55,21 +46,13 @@ async def get_person_with_details(
     Get detailed information about a specific person including roles and details.
     """
     try:
-        variables = {"id": person_id}
+        person = await people_service.get_person_by_id(person_id)
         
-        response = directus.execute_query_file(
-            query_file_path=graphql_path,
-            variables=variables,
-            operation_name="GetPersonWithDetails"
-        )
-        
-        person_data = response.get("data", {}).get("people_by_id")
-        
-        if not person_data:
+        if not person:
             raise HTTPException(status_code=404, detail="Person not found")
         
         return {
-            "person": person_data
+            "person": person.dict()
         }
         
     except HTTPException:
@@ -87,9 +70,7 @@ async def get_people(
     """
     Get list of people with basic information (refactored schema).
     """
-    from shared.src.services.people_service import PeopleService
-    service = PeopleService()
-    return await service.get_all_people(
+    return await people_service.get_all_people(
         faculty_filter=faculty_filter,
         offset=offset
     )
