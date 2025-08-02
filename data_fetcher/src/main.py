@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import signal
 import sys
 
@@ -51,7 +50,6 @@ class DataCollectorApp:
 
     async def run(self):
         """Main application runner"""
-        logger.setLevel(logging.DEBUG)
         logger.info("=" * 50)
         logger.info("Data Fetcher Starting")
 

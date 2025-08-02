@@ -106,6 +106,7 @@ def create_app():
     app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
     app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
     app.include_router(university_router.router, prefix=f"{prefix_v1}", tags=["university"])
+    app.include_router(lecture_router.router, prefix=f"{prefix_v1}", tags=["courses"])
     app.include_router(people_router.router, prefix=f"{prefix_v1}/people", tags=["people"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
