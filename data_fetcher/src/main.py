@@ -7,7 +7,6 @@ from data_fetcher.src.classes.classes_collecter import ClassesCollecter
 from data_fetcher.src.food.food_collector import FoodCollector
 from data_fetcher.src.library.library_collector import LibraryCollector
 from data_fetcher.src.link.link_collector import LinkCollector
-from data_fetcher.src.people.people_collector_v2 import PeopleCollectorV2
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
 from data_fetcher.src.university.university_collector import UniversityCollector
