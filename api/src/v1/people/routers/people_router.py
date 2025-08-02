@@ -61,17 +61,4 @@ async def get_person_with_details(
         raise HTTPException(status_code=500, detail=f"Failed to fetch person details: {str(e)}")
 
 
-# Legacy endpoints (keeping for backward compatibility)
-@router.get("/", response_model=PeopleResponse)
-async def get_people(
-    faculty_filter: Optional[str] = Query(None, description="Filter by faculty code"),
-    offset: int = Query(0, ge=0, description="Number of people to skip")
-):
-    """
-    Get list of people with basic information (refactored schema).
-    """
-    return await people_service.get_all_people(
-        faculty_filter=faculty_filter,
-        offset=offset
-    )
 
