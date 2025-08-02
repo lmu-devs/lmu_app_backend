@@ -1,6 +1,6 @@
 """
-Comprehensive People Service
-Consolidates all people-related operations (read/write) from CMS
+People Service - Data Collection Layer
+Focused on data collection and CMS write operations
 """
 import hashlib
 import re
@@ -9,252 +9,25 @@ from pathlib import Path
 
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.services.directus_service import DirectusService
-from shared.src.models.people_model import (
-    Person, PersonSummary, PeopleResponse, PersonRole, PersonDetails, PersonBasic
-)
 from shared.src.enums import FacultyEnum
-from shared.src.enums.people_enums import LSFRoleEnum
 
 logger = get_main_fetcher_logger(__name__)
 
 
 class PeopleService:
-    """Comprehensive service for people data operations (read/write)"""
+    """Service focused on people data collection and CMS write operations"""
     
     def __init__(self):
         self.directus = DirectusService()
         self.logger = logger
         
-        # Use the same pattern as university_service.py
-        base_path = Path(__file__).parent.parent.parent.parent
+        # Point to the API GraphQL files from data_fetcher (5 levels up to project root)
+        base_path = Path(__file__).parent.parent.parent.parent.parent
         self.graphql_path = base_path / "api" / "src" / "v1" / "people" / "graphql"
         
         # Constants
-        self.QUERIES_FILE = "new_people_queries.graphql"
+        self.QUERIES_FILE = "people_queries.graphql"
         self.MUTATIONS_FILE = "mutations.graphql"
-
-    # ==================== READ OPERATIONS ====================
-
-    async def get_all_people(
-        self, 
-        faculty_filter: Optional[str] = None,
-        offset: int = 0
-    ) -> PeopleResponse:
-        """Get all people from CMS with optional faculty filtering"""
-        
-        query_path = self.graphql_path / self.QUERIES_FILE
-        
-        # Build variables for the query
-        variables = {
-            "offset": offset
-        }
-        
-        # Note: Faculty filtering is not implemented yet due to CMS schema issues
-        if faculty_filter:
-            self.logger.warning(f"Faculty filtering not implemented yet: {faculty_filter}")
-        
-        response = self.directus.execute_query_file(
-            query_file_path=query_path,
-            variables=variables,
-            operation_name="GetAllPeople"
-        )
-        
-        people_raw: List[dict[str, Any]] = response["data"]["people"]
-        
-        # Convert to PersonSummary objects
-        people_summaries = []
-        for person_data in people_raw:
-            # Map faculty enum if present
-            faculty_enum = None
-            if person_data.get("faculty_enum"):
-                try:
-                    faculty_enum = next(f for f in FacultyEnum if f.id == person_data["faculty_enum"])
-                except StopIteration:
-                    pass
-            
-            person_summary = PersonSummary(
-                id=person_data["id"],
-                name=person_data["name"],
-                first_name=person_data.get("first_name"),
-                surname=person_data.get("surname"),
-                title=person_data.get("title"),
-                academic_degree=person_data.get("academic_degree"),
-                faculty_enum=faculty_enum,
-                primary_role=person_data.get("primary_role")
-            )
-            people_summaries.append(person_summary)
-        
-        return PeopleResponse(
-            people=people_summaries,
-            total_count=len(people_summaries),
-            faculty_filter=faculty_filter
-        )
-
-    async def get_person_by_id(self, person_id: str) -> Optional[Person]:
-        """Get detailed information about a specific person from CMS"""
-        
-        query_path = self.graphql_path / self.QUERIES_FILE
-        variables = {"id": person_id}
-        
-        response = self.directus.execute_query_file(
-            query_file_path=query_path,
-            variables=variables,
-            operation_name="GetPersonById"
-        )
-        
-        person_data = response["data"]["people_by_id"]
-        if not person_data:
-            return None
-        
-        # Get roles and courses
-        roles_data = await self.get_people_roles(person_id)
-        courses_data = await self.get_people_courses(person_id)
-        
-        # Convert roles
-        roles = []
-        for role_data in roles_data:
-            lsf_role_enum = None
-            if role_data.get("lsf_role_enum"):
-                try:
-                    lsf_role_enum = LSFRoleEnum(role_data["lsf_role_enum"])
-                except ValueError:
-                    self.logger.warning(f"Invalid LSFRole enum value: {role_data['lsf_role_enum']}")
-            
-            role = PersonRole(
-                person_id=person_id,
-                role_name=role_data.get("role_name"),
-                lsf_role_enum=lsf_role_enum,
-                institution_name=role_data.get("institution_name"),
-                institution_url=role_data.get("institution_url"),
-                institutions=role_data.get("institutions", [])
-            )
-            roles.append(role)
-        
-        # Convert courses
-        courses = []
-        for course_data in courses_data:
-            course = PersonCourse(
-                person_id=person_id,
-                course_number=course_data.get("course_number"),
-                course_name=course_data.get("course_name"),
-                semester=course_data.get("semester"),
-                course_url=course_data.get("course_url")
-            )
-            courses.append(course)
-        
-        # Get person details
-        details_data = await self.get_person_details(person_id)
-        details = None
-        if details_data:
-            details = PersonDetails(
-                person_id=person_id,
-                profile_url=details_data.get("profile_url"),
-                email=details_data.get("email"),
-                phone=details_data.get("phone"),
-                address=details_data.get("address"),
-                office_hours=details_data.get("office_hours"),
-                status=details_data.get("status"),
-                note=details_data.get("note"),
-                gender=details_data.get("gender"),
-                employment_status=details_data.get("employment_status")
-            )
-        
-        # Map faculty enum
-        faculty_enum = None
-        if person_data.get("faculty_enum"):
-            try:
-                faculty_enum = next(f for f in FacultyEnum if f.id == person_data["faculty_enum"])
-            except StopIteration:
-                pass
-        
-        return Person(
-            id=person_data["id"],
-            profile_url=person_data.get("profile_url"),
-            name=person_data["name"],
-            first_name=person_data.get("first_name"),
-            surname=person_data.get("surname"),
-            title=person_data.get("title"),
-            academic_degree=person_data.get("academic_degree"),
-            faculty_enum=faculty_enum,
-            primary_role=person_data.get("primary_role"),
-            email=details_data.get("email") if details_data else None,
-            phone=details_data.get("phone") if details_data else None,
-            address=details_data.get("address") if details_data else None,
-            academic_title_enum=person_data.get("academic_title_enum"),
-            status=details_data.get("status") if details_data else None,
-            note=details_data.get("note") if details_data else None,
-            office_hours=details_data.get("office_hours") if details_data else None,
-            details=details,
-            roles=roles,
-            courses=courses
-        )
-
-    async def get_people_roles(self, person_id: str) -> List[Dict]:
-        """Get roles for a specific person from CMS"""
-        try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            result = self.directus.execute_query_file(query_path, {"person_id": person_id}, operation_name="GetPersonRoles")
-            return result.get("data", {}).get("person_roles", [])
-        except Exception:
-            return []
-
-    async def get_people_courses(self, person_id: str) -> List[str]:
-        """Get courses for a specific person from CMS (from person_details.courses)"""
-        try:
-            # Get person details which includes courses as a JSON array
-            person_details = await self.get_person_details(person_id)
-            if person_details and person_details.get("courses"):
-                return person_details["courses"]
-            return []
-        except Exception:
-            return []
-
-    async def get_person_details(self, person_id: str) -> Optional[Dict]:
-        """Get details for a specific person from CMS"""
-        try:
-            query_path = self.graphql_path / self.QUERIES_FILE
-            result = self.directus.execute_query_file(query_path, {"person_id": person_id}, operation_name="GetPersonDetails")
-            details = result.get("data", {}).get("person_details", [])
-            return details[0] if details else None
-        except Exception:
-            return None
-
-    async def get_available_faculties(self) -> Dict[str, any]:
-        """Get list of faculties that have people data from CMS"""
-        
-        # Get all people to extract faculty information
-        all_people = await self.get_all_people()  # Get all people
-        
-        faculty_counts = {}
-        faculty_names = {}
-        
-        for person in all_people.people:
-            faculty_enum = person.faculty_enum
-            
-            if faculty_enum:
-                faculty_code = faculty_enum.code
-                if faculty_code not in faculty_counts:
-                    faculty_counts[faculty_code] = 0
-                    faculty_names[faculty_code] = faculty_enum.name
-                faculty_counts[faculty_code] += 1
-        
-        faculties = []
-        for faculty_code, count in faculty_counts.items():
-            faculty_info = {
-                "id": faculty_code,
-                "name": faculty_names.get(faculty_code, faculty_code),
-                "enum": faculty_code,
-                "people_count": count
-            }
-            faculties.append(faculty_info)
-        
-        # Sort by name
-        faculties.sort(key=lambda x: x["name"])
-        
-        return {
-            "faculties": faculties,
-            "total_faculties": len(faculties)
-        }
 
     # ==================== WRITE OPERATIONS ====================
 
@@ -381,7 +154,6 @@ class PeopleService:
         
         # Add courses as JSON array
         courses = person_data.get("courses", [])
-        person_name = person_data.get("name", "Unknown")
         if courses:
             details_data_clean["courses"] = courses
         
@@ -405,8 +177,6 @@ class PeopleService:
             if person_uuid:
                 details_data_clean["person_id"] = {"id": person_uuid}
                 details_variables = {"data": details_data_clean}
-                
-                # Log the final GraphQL variables being sent
                 
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 response = self.directus.execute_query_file(
@@ -466,14 +236,6 @@ class PeopleService:
             except Exception as e:
                 self.logger.error(f"CMS UpdatePerson error: {e}")
                 self.logger.error(f"Failed data: {person_variables}")
-                if hasattr(e, 'response') and hasattr(e.response, 'text'):
-                    self.logger.error(f"Response text: {e.response.text}")
-                if hasattr(e, 'response') and hasattr(e.response, 'json'):
-                    try:
-                        error_json = e.response.json()
-                        self.logger.error(f"Response JSON: {error_json}")
-                    except:
-                        pass
                 raise
 
         # 2. Update person details record (including courses)
@@ -497,9 +259,7 @@ class PeopleService:
         
         # Update courses as JSON array
         courses = person_data.get("courses", [])
-        person_name = person_data.get("name", "Unknown")
         details_updates["courses"] = courses
-        
         
         # Handle enum values
         gender_enum = basic_info.get("gender_enum")
@@ -522,8 +282,6 @@ class PeopleService:
                 "data": details_updates
             }
             
-            # Log the final GraphQL variables being sent for update
-            
             try:
                 query_path = self.graphql_path / self.MUTATIONS_FILE
                 self.directus.execute_query_file(
@@ -534,22 +292,12 @@ class PeopleService:
             except Exception as e:
                 self.logger.error(f"CMS UpdatePersonDetails error: {e}")
                 self.logger.error(f"Failed details data: {details_variables}")
-                if hasattr(e, 'response') and hasattr(e.response, 'text'):
-                    self.logger.error(f"Response text: {e.response.text}")
-                if hasattr(e, 'response') and hasattr(e.response, 'json'):
-                    try:
-                        error_json = e.response.json()
-                        self.logger.error(f"Response JSON: {error_json}")
-                    except:
-                        pass
                 raise
 
     def _upsert_person_roles(self, person_id: str, person_data: dict):
         """Add roles for this person using GraphQL mutation"""
         roles = person_data.get("roles", [])
         self.logger.info(f"Upserting roles for {person_id}: {roles}")
-        
-        # Use the class method instead of nested function
         
         # Get the person's UUID
         person_uuid = self._get_person_uuid_by_person_id(person_id)
@@ -584,14 +332,6 @@ class PeopleService:
             except Exception as e:
                 self.logger.error(f"CMS CreatePersonRole error: {e}")
                 self.logger.error(f"Failed data: {variables}")
-                if hasattr(e, 'response') and hasattr(e.response, 'text'):
-                    self.logger.error(f"Response text: {e.response.text}")
-                if hasattr(e, 'response') and hasattr(e.response, 'json'):
-                    try:
-                        error_json = e.response.json()
-                        self.logger.error(f"Response JSON: {error_json}")
-                    except:
-                        pass
                 raise
 
     def _get_person_by_person_id(self, person_id: str) -> Optional[Dict]:
@@ -635,74 +375,6 @@ class PeopleService:
             self.logger.debug(f"Error getting person details UUID for {person_id}: {e}")
             return None
 
-    def _generate_person_id(self, person_data: dict) -> str:
-        """Generate a unique ID for the person"""
-        name = person_data.get("name", "")
-        profile_url = person_data.get("profile_url", "")
-        
-        if profile_url:
-            # Extract ID from URL if possible
-            match = re.search(r'personal\.pid=(\d+)', profile_url)
-            if match:
-                return f"{match.group(1)}"
-        
-        # Fallback: generate hash-based ID
-        content = f"{name}_{profile_url}"
-        return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
-
-    def test_cms_connection(self) -> Dict:
-        """Test CMS connection and validate schema"""
-        try:
-            # Test basic query - use the same pattern as university service
-            query_path = self.graphql_path / self.QUERIES_FILE
-            variables = {"limit": 1, "offset": 0}
-            
-            response = self.directus.execute_query_file(
-                query_path,
-                variables
-            )
-            
-            return {
-                "success": True,
-                "message": "CMS connection successful",
-                "response": response
-            }
-            
-        except Exception as e:
-            return {
-                "success": False,
-                "message": f"CMS connection failed: {e}",
-                "error": str(e)
-            }
-
-    def validate_person_schema(self, person_data: Dict) -> Dict:
-        """Validate person data against expected schema"""
-        errors = []
-        warnings = []
-        
-        # Check required fields
-        required_fields = ["id", "name"]
-        for field in required_fields:
-            if not person_data.get(field):
-                errors.append(f"Missing required field: {field}")
-        
-        # Check faculty_enum
-        faculty_enum = person_data.get("faculty_enum")
-        if faculty_enum:
-            if hasattr(faculty_enum, 'id'):
-                warnings.append(f"faculty_enum should be integer ID, got: {faculty_enum.id} (type: {type(faculty_enum.id)})")
-            else:
-                warnings.append(f"faculty_enum should be integer ID, got: {faculty_enum} (type: {type(faculty_enum)})")
-        
-        # Check basic_info structure
-        basic_info = person_data.get("basic_info", {})
-        if basic_info:
-            # Check enum fields in basic_info
-            for enum_field in ["gender_enum", "employment_status_enum"]:
-                enum_value = basic_info.get(enum_field)
-                if enum_value and hasattr(enum_value, 'value'):
-                    warnings.append(f"{enum_field} should be string value, got: {enum_value.value} (type: {type(enum_value.value)})") 
-
     def _get_person_uuid_by_person_id(self, person_id: str) -> Optional[str]:
         """Get person's UUID by their person_id string"""
         try:
@@ -736,4 +408,29 @@ class PeopleService:
         if hasattr(enum_obj, 'value'):
             return enum_obj.value
             
-        return str(enum_obj) if enum_obj else None 
+        return str(enum_obj) if enum_obj else None
+
+    def test_cms_connection(self) -> Dict:
+        """Test CMS connection and validate schema"""
+        try:
+            # Test basic query - use the same pattern as university service
+            query_path = self.graphql_path / self.QUERIES_FILE
+            variables = {"limit": 1, "offset": 0}
+            
+            response = self.directus.execute_query_file(
+                query_path,
+                variables
+            )
+            
+            return {
+                "success": True,
+                "message": "CMS connection successful",
+                "response": response
+            }
+            
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"CMS connection failed: {e}",
+                "error": str(e)
+            }

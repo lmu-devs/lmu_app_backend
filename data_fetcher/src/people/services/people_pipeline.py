@@ -6,7 +6,7 @@ import asyncio
 from typing import Dict, List, Optional, Callable
 from tqdm import tqdm
 from shared.src.core.logging import get_main_fetcher_logger
-from shared.src.services.people_service import PeopleService
+from .people_service import PeopleService
 from shared.src.models.people_model import Person
 
 from .people_data_normalizer import PeopleDataNormalizer
