@@ -4,6 +4,16 @@ from pydantic import BaseModel, Field
 from typing import Any, List, Tuple, Optional
 from pathlib import Path
 
+from shared.src.tables.lectures import (
+    LectureTable, PersonTable, InstitutionTable,
+    AssociatedTutorialTable, AssociatedClassTable,
+    AssociatedProgramTable, AssociatedExamTable,
+    ClassBaseInfoTable, ClassSessionTable,
+    TreePathTable, ClassMaterialTable,
+    ExamInformationTable, EnrollmentDeadlineTable,
+    AdditionInformationTable
+)
+
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
 from shared.src.services.directus_service import DirectusService
@@ -32,9 +42,20 @@ class Person(BaseModel):
 
         raise RuntimeError("Invalid string to create person")
 
+    def to_table(self) -> PersonTable:
+        return PersonTable(
+            first_name=self.first_name,
+            surname=self.surname,
+            title=self.title
+        )
+
+
 
 class Institution(BaseModel):
     name: str
+
+    def to_table(self) -> InstitutionTable:
+        return InstitutionTable(name=self.name)
 
 
 class PathElement(BaseModel):
@@ -55,12 +76,23 @@ class TreePath(BaseModel):
 
         return cls(path_elements=path_elements)
 
+    def to_table(self) -> TreePathTable:
+        return TreePathTable(path=[pe.value for pe in self.path_elements])
+
 
 class AssociatedProgram(BaseModel):
     program_name: Optional[str]
     module_classification: Optional[str]
     ects: Optional[int]
     degree: Optional[str]
+
+    def to_table(self) -> AssociatedProgramTable:
+        return AssociatedProgramTable(
+            program_name=self.program_name,
+            module_classification=self.module_classification,
+            ects=self.ects,
+            degree=self.degree
+        )
 
 
 class ClassBaseInfo(BaseModel):
@@ -77,6 +109,21 @@ class ClassBaseInfo(BaseModel):
     links: Optional[str] = Field(alias="Weitere Links", default=None)
     sigel: Optional[str] = Field(alias="Sigel", default=None)
 
+    def to_table(self) -> ClassBaseInfoTable:
+        return ClassBaseInfoTable(
+            class_type=self.class_type,
+            class_id=self.class_id,
+            class_cycle=self.class_cycle,
+            semester=self.semester,
+            sws=self.sws,
+            max_participants=self.max_participants,
+            in_person_type=self.in_person_type,
+            language=self.language,
+            for_exchange_students=self.for_exchange_students,
+            links=self.links,
+            sigel=self.sigel
+        )
+
 
 class ClassSession(BaseModel):
     caption: Optional[str]
@@ -92,12 +139,36 @@ class ClassSession(BaseModel):
     remark: Optional[str]
     cancelled_dates: Optional[str]
 
+    def to_table(self) -> ClassSessionTable:
+        return ClassSessionTable(
+            caption=self.caption,
+            weekday=self.weekday,
+            starting_time=self.starting_time,
+            ending_time=self.ending_time,
+            timing_type=self.timing_type,
+            rythm=self.rythm,
+            duration_start=self.duration_start,
+            duration_end=self.duration_end,
+            room=self.room,
+            lecturer=self.lecturer,
+            remark=self.remark,
+            cancelled_dates=self.cancelled_dates
+        )
+
 
 class ClassMaterial(BaseModel):
     valid_from: Optional[Date]
     valid_to: Optional[Date]
     file_name: Optional[str]
     description: Optional[str]
+
+    def to_table(self) -> ClassMaterialTable:
+        return ClassMaterialTable(
+            valid_from=self.valid_from,
+            valid_to=self.valid_to,
+            file_name=self.file_name,
+            description=self.description
+        )
 
 
 class AssociatedExam(BaseModel):
@@ -110,6 +181,17 @@ class AssociatedExam(BaseModel):
     exam_id: Optional[str]
     po_version: Optional[str]
 
+    def to_table(self) -> AssociatedExamTable:
+        return AssociatedExamTable(
+            module_name=self.module_name,
+            program_name=self.program_name,
+            ects=self.ects,
+            module_classification=self.module_classification,
+            degree=self.degree,
+            module_id=self.module_id,
+            exam_id=self.exam_id,
+            po_version=self.po_version
+        )
 
 class AdditionInformation(BaseModel):
     remark: Optional[str] = Field(default=None, alias="Bemerkung")
@@ -130,6 +212,26 @@ class AdditionInformation(BaseModel):
     number: Optional[str] = Field(default=None, alias="Nr.")
     type: Optional[str] = Field(default=None, alias="Typ")
 
+    def to_table(self) -> AdditionInformationTable:
+        return AdditionInformationTable(
+            remark=self.remark,
+            literature=self.literature,
+            date=self.date,
+            registration=self.registration,
+            format=self.format,
+            content=self.content,
+            learning_content=self.learning_content,
+            target_group=self.target_group,
+            location=self.location,
+            comment=self.comment,
+            assessment=self.assessment,
+            time=self.time,
+            topic=self.topic,
+            short_comment=self.short_comment,
+            prerequisites=self.prerequisites,
+            number=self.number,
+            type=self.type
+        )
 
 class ExamInformation(BaseModel):
     ects: Optional[int] = Field(None, alias="ECTS")
@@ -143,11 +245,31 @@ class ExamInformation(BaseModel):
     degree_awarded: Optional[str] = Field(None, alias="Abschluss")
     date: Optional[Date] = Field(None, alias="Datum")
 
+    def to_table(self) -> ExamInformationTable:
+        return ExamInformationTable(
+            ects=self.ects,
+            examiner=self.examiner,
+            degree_program=self.degree_program,
+            kzfa=self.kzfa,
+            registration_start=self.registration_start,
+            registration_end=self.registration_end,
+            exam_id=self.exam_id,
+            program_version=self.program_version,
+            degree_awarded=self.degree_awarded,
+            date=self.date
+        )
 
 class AssociatedClass(BaseModel):
     description: Optional[str] = Field(None, alias="Beschreibung")
     weekly_hours: Optional[float] = Field(None)
     number: Optional[str] = Field(None)
+
+    def to_table(self) -> AssociatedClassTable:
+        return AssociatedClassTable(
+            description=self.description,
+            weekly_hours=self.weekly_hours,
+            number=self.number
+        )
 
 
 class AssociatedTutorial(BaseModel):
@@ -155,10 +277,23 @@ class AssociatedTutorial(BaseModel):
     weekly_hours: Optional[float] = Field(None)
     number: Optional[str] = Field(None)
 
+    def to_table(self) -> AssociatedTutorialTable:
+        return AssociatedTutorialTable(
+            description=self.description,
+            weekly_hours=self.weekly_hours,
+            number=self.number
+        )
+
 
 class EnrollmentDeadline(BaseModel):
     program_associated_deadline: Optional[str] = Field(None)
     other_deadlines: Optional[str] = Field(None)
+
+    def to_table(self) -> EnrollmentDeadlineTable:
+         return EnrollmentDeadlineTable(
+             program_associated_deadline=self.program_associated_deadline,
+             other_deadlines=self.other_deadlines
+         )
 
 
 class Lecture(BaseModel):
@@ -178,6 +313,7 @@ class Lecture(BaseModel):
     associated_tutorials: Optional[List[AssociatedTutorial]]
     associated_classes: Optional[List[AssociatedClass]]
     persons: Optional[List[Person]]
+    institutions: Optional[List[Institution]]
 
     @staticmethod
     def publish_id_from_url(url: str) -> int:
@@ -202,6 +338,7 @@ class Lecture(BaseModel):
         associated_tutorials: Optional[List[AssociatedTutorial]] = None,
         associated_classes: Optional[List[AssociatedClass]] = None,
         persons: Optional[List[Person]] = None,
+        institutions: Optional[List[Institution]] = None,
     ) -> "Lecture":
         """Create a Lecture instance from a tuple containing lecture data."""
         title, url, paths = raw
@@ -221,7 +358,8 @@ class Lecture(BaseModel):
             class_sessions=class_sessions,
             associated_tutorials=associated_tutorials,
             associated_classes=associated_classes,
-            persons=persons
+            persons=persons,
+            institutions=institutions
         )
 
     def to_dict(self) -> dict:
@@ -289,6 +427,62 @@ class Lecture(BaseModel):
         )
         persons = response.get("data", {}).get("people", [])
         return persons[0].get("id") if persons else None
+
+
+    def to_table(self) -> tuple[LectureTable, dict[str, list[BaseModel]]]:
+        """Converts the lecture object to a table object and related tables."""
+        lecture = LectureTable(
+            publish_id=self.publish_id,
+            title=self.title
+        )
+
+        related: dict[str, list[BaseModel]] = {key: [] for key in [
+            "tree_paths", "base_info", "additional_information", "enrollment_deadline",
+            "associated_programs", "class_materials", "associated_exams",
+            "exam_informations", "class_sessions", "associated_tutorials",
+            "associated_classes", "persons", "institutions"
+        ]}
+
+        self._one_to_one_to_table("base_info", related, lecture)
+        self._one_to_one_to_table("additional_information", related, lecture)
+        self._one_to_one_to_table("enrollment_deadline", related, lecture)
+
+        self._one_to_many_to_table("tree_paths", related, lecture)
+        self._one_to_many_to_table("associated_programs", related, lecture)
+        self._one_to_many_to_table("class_materials", related, lecture)
+        self._one_to_many_to_table("associated_exams", related, lecture)
+        self._one_to_many_to_table("exam_informations", related, lecture)
+        self._one_to_many_to_table("class_sessions", related, lecture)
+        self._one_to_many_to_table("associated_tutorials", related, lecture)
+        self._one_to_many_to_table("associated_classes", related, lecture)
+
+        self._many_to_many_to_table("persons", related)
+        self._many_to_many_to_table("institutions", related)
+
+        return lecture, related
+
+
+    def _one_to_one_to_table(self, attr: str, related: dict, lecture: LectureTable):
+        """Convert a one-to-one relationship to a table object."""
+        value = getattr(self, attr, None)
+        if value:
+            table_obj = value.to_table()
+            table_obj.lecture = lecture
+            related[attr].append(table_obj)
+
+    def _one_to_many_to_table(self, attr: str, related: dict, lecture: LectureTable):
+        """Convert a one-to-many relationship to a list of table objects."""
+        values = getattr(self, attr, [])
+        for item in values:
+            table_obj = item.to_table()
+            table_obj.lecture = lecture
+            related[attr].append(table_obj)
+
+    def _many_to_many_to_table(self, attr: str, related: dict):
+        """Convert a many-to-many relationship to a list of table objects."""
+        values = getattr(self, attr, [])
+        for item in values:
+            related[attr].append(item.to_table())
 
 
 if __name__ == "__main__":

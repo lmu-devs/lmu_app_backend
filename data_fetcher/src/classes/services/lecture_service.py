@@ -3,12 +3,15 @@ from pathlib import Path
 import time
 from typing import List
 import json
+from sqlalchemy.orm.session import Session
 from typing_extensions import Optional
 import datetime
 import logging
 
-from data_fetcher.src.classes.models.lecture import Lecture
+from shared.src.tables.lectures import LectureTable
+from data_fetcher.src.classes.models.lecture import Lecture, TreePath
 from shared.src.enums.classes_enum import SemesterTypeEnum
+from shared.src.tables.lectures.lecture_tables import *
 from ..crawler.lsf_crawler import LSFCrawler
 from shared.src.services.directus_service import DirectusService
 from shared.src.core.logging import get_classes_logger
@@ -27,6 +30,58 @@ class LectureFetcher:
         self.lsf_crawler = LSFCrawler()
         self.workers: int = 5
         self.logger = get_classes_logger(__name__)
+
+
+    def store_lectures_db(self, db: Session, year: int, semester: SemesterTypeEnum):
+        """Store all lectures from the LSF crawler into the SQL database."""
+        lectures = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
+
+        with db.begin():
+            for index, lecture in enumerate(lectures):
+                if self.lecture_exist_in_db(db, lecture):
+                    self.update_lecture_db(db, lecture)
+                else:
+                    self.add_lecture_db(db, lecture)
+                self.logger.info(f"({index + 1}/{len(lectures)}) Processed Lecture {lecture.title}")
+
+    def update_lecture_db(self, session: Session, lecture: Lecture):
+        """Update an existing lecture in the SQL database."""
+        old = (
+            session.query(LectureTable)
+                .filter_by(publish_id=lecture.publish_id)
+                .one_or_none()
+        )
+        if old:
+            session.delete(old)
+            session.flush()
+
+        self.add_lecture_db(session, lecture)
+
+    def add_lecture_db(self, session: Session, lecture: Lecture):
+        """Add a lecture to the SQL database."""
+        lecture_table, related = lecture.to_table()
+        session.add(lecture_table)
+        for key, entries in related.items():
+            if key == "persons":
+                for obj in entries:
+                    merged = session.merge(obj)
+                    lecture_table.persons.append(merged)
+            elif key == "institutions":
+                for obj in entries:
+                    merged = session.merge(obj)
+                    lecture_table.institutions.append(merged)
+            else:
+                session.add_all(entries)
+
+
+
+    def lecture_exist_in_db(self, session: Session, lecture: Lecture) -> bool:
+        """Check if a lecture exists in the SQL database."""
+        return bool(
+            session.query(LectureTable)
+            .filter_by(publish_id=lecture.publish_id)
+            .one_or_none()
+        )
 
     def store_lectures_if_not_exist_parallel(self, year: int, semester: SemesterTypeEnum) -> None:
         """
@@ -102,7 +157,7 @@ class LectureFetcher:
 
         for index, (name, url) in enumerate(lecture_urls):
             self.logger.info(f"Processing lecture({len(lecture_urls)}/{index+1}): {name} ({url})")
-            publish_id = Lecture.publish_id_from_url(url)
+            publish_id = LectureTable.publish_id_from_url(url)
 
             if self.lecture_exists(publish_id):
                 continue

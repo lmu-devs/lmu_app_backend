@@ -75,6 +75,17 @@ class LSFCrawler:
             'Cache-Control': 'max-age=0',
         }
 
+    def build_set_session_semester_url(self, year: int, semester_type: SemesterTypeEnum) -> str:
+        semester_text = "Sommersemester" if semester_type == SemesterTypeEnum.SUMMER_SEMESTER else "Wintersemester"
+        term_id = 1 if semester_type.value == "SOSE" else 2
+        semester_text_year = f"{year}" if term_id == 1 else f"{year}%2F{year+1}"
+        semester_id = f"{year}{term_id}"
+        return (
+            "https://lsf.verwaltung.uni-muenchen.de/qisserver"
+            + f"/rds?state=user&type=0&k_semester.semid={semester_id}"
+            + f"&idcol=k_semester.semid&idval={semester_id}"
+            + f"&purge=n&getglobal=semester&text={semester_text}+{semester_text_year}"
+        )
 
     def crawl_all_lectures(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type sequentially."""
@@ -92,6 +103,12 @@ class LSFCrawler:
         """Set the year and semester type for the crawling session."""
         self.year = year
         self.semester_type = semester_type
+        self._set_semester_in_lsf()
+
+    def _set_semester_in_lsf(self):
+        """Set the semester in the LSF session."""
+        set_session_url = self.build_set_session_semester_url(self.year, self.semester_type)
+        self._make_safe_http_request(set_session_url)
 
     def _crawl_all_lecture_urls_sequentially(self) -> list[tuple[str, str]]:
         """Crawl all lecture URLs sequentially."""
@@ -172,7 +189,7 @@ class LSFCrawler:
                 try:
                     lecture = future.result()
                     lectures.append(lecture)
-                    self.logger.info(f"Processed lecture({index+1}/{len(futures)}): {lecture.title} ({lecture.publish_id})")
+                    self.logger.info(f"Fetched lecture({index+1}/{len(futures)}): {lecture.title} ({lecture.publish_id})")
                 except Exception as e:
                     self.logger.error(f"❌ Error while building lecture: {e}")
 
@@ -195,7 +212,8 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
-            self._extract_responsible_persons_from_lecture_page(response_bytes)
+            self._extract_responsible_persons_from_lecture_page(response_bytes),
+            self._extract_associated_institutions_from_lecture_page(response_bytes)
         )
 
     def build_complete_lecture_object(self, name: str, url: str) -> Lecture:
@@ -214,7 +232,8 @@ class LSFCrawler:
             self._extract_class_session_schedules(response_bytes),
             self._extract_associated_tutorial_information(response_bytes),
             self._extract_associated_class_information(response_bytes),
-            self._extract_responsible_persons_from_lecture_page(response_bytes)
+            self._extract_responsible_persons_from_lecture_page(response_bytes),
+            self._extract_associated_institutions_from_lecture_page(response_bytes)
         )
 
     def _does_class_type_have_too_many_results(self, class_type: int) -> bool:
