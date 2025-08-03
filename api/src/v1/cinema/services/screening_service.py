@@ -63,7 +63,7 @@ class ScreeningService:
             )
             # University and its relationships
             .join(MovieScreeningTable.university)
-            .options(contains_eager(MovieScreeningTable.university).contains_eager(UniversityTable.abbreviation))
+            .options(contains_eager(MovieScreeningTable.university_id).contains_eager(UniversityTable.abbreviation))
             # Cinema and its relationships
             .join(MovieScreeningTable.cinema)
             .outerjoin(CinemaTable.translations)
