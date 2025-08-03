@@ -9,7 +9,6 @@ from data_fetcher.src.library.library_collector import LibraryCollector
 from data_fetcher.src.link.link_collector import LinkCollector
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
-from data_fetcher.src.university.university_collector import UniversityCollector
 from shared.src.core.database import Database, table_creation
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.core.settings import get_settings
@@ -25,10 +24,9 @@ class DataCollectorApp:
         self.collectors = [
             ClassesCollecter(),
             LinkCollector(),
-            UniversityCollector(),
             RoomfinderCollector(),
             LibraryCollector(),
-            # FoodCollector(),
+            FoodCollector(),
             SportCollector(),
             CinemaCollector(),
         ]
