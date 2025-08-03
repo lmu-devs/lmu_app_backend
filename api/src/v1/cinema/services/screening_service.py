@@ -15,7 +15,6 @@ from shared.src.tables import (
     MovieTrailerTranslationTable,
     MovieTranslationTable,
     UniversityTable,
-    UniversityTranslationTable,
 )
 from shared.src.tables.cinema.screening_table import ScreeningLikeTable
 
@@ -84,7 +83,6 @@ class ScreeningService:
         return query.order_by(
             MovieScreeningTable.date,
             create_translation_order_case(MovieTranslationTable, language),
-            create_translation_order_case(UniversityTranslationTable, language),
             create_translation_order_case(MovieTrailerTranslationTable, language),
             create_translation_order_case(CinemaTranslationTable, language),
         )

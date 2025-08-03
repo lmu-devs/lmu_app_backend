@@ -38,7 +38,6 @@ class MovieScreeningTable(Base):
     note = Column(String, nullable=True)
 
     movie = relationship("MovieTable", back_populates="screenings")
-    university = relationship("UniversityTable", back_populates="screenings")
     cinema = relationship("CinemaTable", back_populates="screenings")
     location = relationship("MovieLocationTable", back_populates="screening", uselist=False)
     likes = relationship("ScreeningLikeTable", back_populates="screening")
