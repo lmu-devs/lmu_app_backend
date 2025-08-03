@@ -7,7 +7,6 @@ from pydantic import BaseModel, RootModel
 from shared.src.models.rating_model import Rating
 from shared.src.tables import MovieScreeningTable
 
-from ...university.models.university_model import University
 from .movie_model import Movie
 
 
