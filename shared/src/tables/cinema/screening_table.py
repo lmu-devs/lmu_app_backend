@@ -8,6 +8,7 @@ from sqlalchemy import (
     Enum,
     Float,
     ForeignKey,
+    Integer,
     String,
     UniqueConstraint,
 )
@@ -25,7 +26,7 @@ class MovieScreeningTable(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     date = Column(DateTime)
     movie_id = Column(UUID(as_uuid=True), ForeignKey("movies.id", ondelete="CASCADE"))
-    university_id = Column(Enum(UniversityEnum), ForeignKey("universities.id", ondelete="CASCADE"))
+    university_id = Column(String)
     cinema_id = Column(String, ForeignKey("cinemas.id", ondelete="CASCADE"))
     entry_time = Column(DateTime, nullable=True)
     start_time = Column(DateTime, nullable=True)

@@ -1,9 +1,9 @@
 services:
-    db:
+    db_dev:
         image: postgres:16.4-bookworm
         volumes:
             - postgres_data:/var/lib/postgresql/data/
-        container_name: db
+        container_name: db_dev
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
             POSTGRES_USER: ${POSTGRES_USER}
@@ -20,8 +20,7 @@ services:
             timeout: 2s
             retries: 5
         networks:
-            - backend
-            - frontend
+            - shared
 
 
     api:
@@ -40,14 +39,10 @@ services:
             - .env
         container_name: api
         networks:
-            - backend
-            - frontend
             - shared
         ports:
             - '127.0.0.1:8001:8000'
-        depends_on:
-            db:
-                condition: service_healthy
+
         restart: always
 
     api_dev:
@@ -55,6 +50,9 @@ services:
         container_name: api_dev
         volumes:
             - .:/app
+        depends_on:
+            db_dev:
+                condition: service_healthy
 
     data_fetcher:
         image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
@@ -69,15 +67,11 @@ services:
             - .env
         container_name: data_fetcher
         networks:
-            - frontend
-            - backend
+            - shared
         environment:
             - PYTHONPATH=/app
             - PYTHONUNBUFFERED=1
             - ENVIRONMENT=${ENVIRONMENT:-development}
-        depends_on:
-            db:
-                condition: service_healthy
         restart: on-failure
 
     data_fetcher_dev:
@@ -85,6 +79,9 @@ services:
         container_name: data_fetcher_dev
         volumes:
             - .:/app
+        depends_on:
+            db_dev:
+                condition: service_healthy
 
     nginx:
         container_name: nginx
@@ -100,7 +97,6 @@ services:
         environment:
             TZ: 'Europe/Berlin'
         networks:
-            - frontend
             - shared
 
 volumes:
@@ -108,8 +104,5 @@ volumes:
     postgres_metabase_data:
 
 networks:
-    backend:
-        internal: true
-    frontend:
     shared:
         external: true
