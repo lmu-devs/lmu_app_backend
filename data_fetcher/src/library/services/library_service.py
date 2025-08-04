@@ -73,27 +73,114 @@ class LibraryService:
 
     def _update_library_data(self, library: Library):
         logger.info(f"🔄 Updating library {library.title}")
-        # delete all data for this library
-        self.db.query(LibraryTable).filter(LibraryTable.id == library.id).delete()
-        self.db.flush()
 
-        services = library.services.model_dump() if library.services else None
-        print(services)
-        equipment = library.equipment.model_dump() if library.equipment else None
-        print(equipment)
+        # Get or create the main library record
+        existing_library = self.db.query(LibraryTable).filter(LibraryTable.id == library.id).first()
 
-        translation = LibraryTranslationTable(
-            library_id=library.id,
-            name=library.title,
-            language=LanguageEnum.GERMAN,
-            services=services,
-            equipment=equipment,
-            subject_areas=library.subject_areas,
+        if existing_library:
+            # Update existing library fields
+            existing_library.hash = library.hash
+            existing_library.url = library.url
+            existing_library.reservation_url = library.reservation_url
+
+            # Update contact information
+            if library.contact:
+                existing_library.external_url = library.contact.website.url if library.contact.website else None
+                existing_library.email = library.contact.email[0] if library.contact.email else None
+                existing_library.phone = library.contact.phone.model_dump() if library.contact.phone else None
+            else:
+                existing_library.external_url = None
+                existing_library.email = None
+                existing_library.phone = None
+        else:
+            # Create new library if it doesn't exist
+            external_url = None
+            email = None
+            phone = None
+
+            if library.contact:
+                external_url = library.contact.website.url if library.contact.website else None
+                email = library.contact.email[0] if library.contact.email else None
+                phone = library.contact.phone.model_dump() if library.contact.phone else None
+
+            existing_library = LibraryTable(
+                id=library.id,
+                hash=library.hash,
+                url=library.url,
+                reservation_url=library.reservation_url,
+                external_url=external_url,
+                email=email,
+                phone=phone,
+            )
+            self.db.add(existing_library)
+            self.db.flush()  # Get the ID for foreign keys
+
+        # Update location
+        existing_location = (
+            self.db.query(LibraryLocationTable).filter(LibraryLocationTable.library_id == library.id).first()
         )
 
-        areas = []
+        if library.location:
+            if existing_location:
+                # Update existing location
+                existing_location.address = library.location.address
+                existing_location.latitude = library.location.latitude
+                existing_location.longitude = library.location.longitude
+            else:
+                # Create new location
+                new_location = LibraryLocationTable(
+                    library_id=library.id,
+                    address=library.location.address,
+                    latitude=library.location.latitude,
+                    longitude=library.location.longitude,
+                )
+                self.db.add(new_location)
+        elif existing_location:
+            # Remove location if it no longer exists
+            self.db.delete(existing_location)
+
+        # Update translations
+        services = library.services.model_dump() if library.services else None
+        equipment = library.equipment.model_dump() if library.equipment else None
+
+        existing_translation = (
+            self.db.query(LibraryTranslationTable)
+            .filter(
+                LibraryTranslationTable.library_id == library.id,
+                LibraryTranslationTable.language == LanguageEnum.GERMAN,
+            )
+            .first()
+        )
+
+        if existing_translation:
+            # Update existing translation
+            existing_translation.name = library.title
+            existing_translation.services = services
+            existing_translation.equipment = equipment
+            existing_translation.subject_areas = library.subject_areas
+        else:
+            # Create new translation
+            new_translation = LibraryTranslationTable(
+                library_id=library.id,
+                name=library.title,
+                language=LanguageEnum.GERMAN,
+                services=services,
+                equipment=equipment,
+                subject_areas=library.subject_areas,
+            )
+            self.db.add(new_translation)
+
+        # Update areas - this is more complex due to the relationships
+        # Delete existing areas and their related data
+        existing_areas = self.db.query(LibraryAreaTable).filter(LibraryAreaTable.library_id == library.id).all()
+
+        for existing_area in existing_areas:
+            self.db.delete(existing_area)
+
+        # Create new areas
         if library.areas:
             for area in library.areas:
+                # Create opening hours
                 opening_hours = []
                 if area.opening_hours:
                     for day in area.opening_hours.days:
@@ -104,60 +191,19 @@ class LibraryService:
                             )
                         )
 
+                # Create area translation
                 area_translation = LibraryAreaTranslationTable(
                     name=area.name,
                     language=LanguageEnum.GERMAN,
                 )
-                areas.append(
-                    LibraryAreaTable(
-                        library_id=library.id,
-                        opening_hours=opening_hours,
-                        translations=[area_translation],
-                    )
+
+                # Create the area
+                new_area = LibraryAreaTable(
+                    library_id=library.id,
+                    opening_hours=opening_hours,
+                    translations=[area_translation],
                 )
+                self.db.add(new_area)
 
-        location = None
-        if library.location:
-            location = LibraryLocationTable(
-                library_id=library.id,
-                address=library.location.address,
-                latitude=library.location.latitude,
-                longitude=library.location.longitude,
-            )
-
-        images = None
-        if library.images:
-            images = library.images.model_dump()
-
-        external_url = None
-        if library.contact and library.contact.website:
-            external_url = library.contact.website.url
-
-        email = None
-        if library.contact and library.contact.email:
-            email = library.contact.email[0]
-
-        phone = None
-        if library.contact and library.contact.phone:
-            phone = library.contact.phone.model_dump()
-
-        table = LibraryTable(
-            id=library.id,
-            hash=library.hash,
-            images=images,
-            url=library.url,
-            reservation_url=library.reservation_url,
-            location=location,
-            external_url=external_url,
-            email=email,
-            phone=phone,
-            areas=areas,
-            translations=[translation],
-        )
-
-        self.db.add(table)
-        self.db.flush()
-        # translations = self.translator.create_missing_translations(table)
-        # self.db.add_all(translations)
         self.db.commit()
-        self.db.refresh(table)
+        self.db.refresh(existing_library)

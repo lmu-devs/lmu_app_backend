@@ -1,7 +1,7 @@
 from .cinema import *
-from .faculty_table import *
 from .feedback_table import *
 from .food import *
+from .lectures import *
 from .library import *
 from .link import *
 from .location_table import *
@@ -11,4 +11,3 @@ from .time_range_table import *
 from .university_table import *
 from .user_table import *
 from .wishlist import *
-from .lectures import *

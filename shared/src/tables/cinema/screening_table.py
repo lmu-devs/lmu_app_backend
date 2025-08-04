@@ -5,17 +5,14 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
-    Enum,
     Float,
     ForeignKey,
-    Integer,
     String,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
-from shared.src.enums import UniversityEnum
 from shared.src.tables.like_table import LikeTable
 from shared.src.tables.location_table import LocationTable
 
