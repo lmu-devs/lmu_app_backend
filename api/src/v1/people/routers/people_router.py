@@ -1,7 +1,5 @@
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query, Path
-from shared.src.enums import FacultyEnum
-from ..models.people_model import PersonBasic, PersonSummary, PeopleResponse
 from ..services.people_service import PeopleService
 
 router = APIRouter(tags=["people"])
@@ -18,14 +16,14 @@ async def get_people_by_faculty(
     Get people from a specific faculty.
     """
     try:
-        # Convert faculty_id to string for filtering (assuming faculty codes are strings)
+        # Convert faculty_id to string for filtering
         faculty_code = str(faculty_id) if faculty_id else None
         
-        response = await people_service.get_all_people(
+        people = await people_service.get_all_people(
             faculty_id=faculty_code
         )
         
-        return [person.dict() for person in response.people]
+        return [person.dict() for person in people]
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch people by faculty: {str(e)}")

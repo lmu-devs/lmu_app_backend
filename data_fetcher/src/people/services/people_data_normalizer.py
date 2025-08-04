@@ -98,8 +98,13 @@ class PeopleDataNormalizer:
             if match:
                 return f"{match.group(1)}"
         
-        content = f"{name}_{profile_url}"
-        return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
+        # If no profile_url or no match, generate from name
+        if name:
+            content = f"{name}_{profile_url}"
+            return f"{hashlib.md5(content.encode()).hexdigest()[:8]}"
+        else:
+            # Fallback for completely empty data
+            return f"unknown_{hashlib.md5(str(person_data).encode()).hexdigest()[:8]}"
 
     def _clean_text(self, text: str) -> str:
         """Clean up text by removing extra whitespace and common prefixes"""

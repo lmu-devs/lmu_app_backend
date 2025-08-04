@@ -219,6 +219,7 @@ class AcademicTitleEnum(str, Enum):
         # Handle common variations and abbreviations
         title_mapping = {
             # Professor variations
+            "prof.": cls.UNIV_PROF,  # Add this line for just "Prof."
             "prof. dr.": cls.PROF_DR,
             "prof. dr. dr.": cls.PROF_DR_DR,
             "prof. dr. habil.": cls.PROF_DR_HABIL,
@@ -471,6 +472,7 @@ def map_academic_title_to_enum(academic_title_text: str) -> AcademicTitleEnum:
     
     # Fallback: direct mapping for common variations
     title_mapping = {
+        "Prof.": AcademicTitleEnum.UNIV_PROF,  # Add this line for just "Prof."
         "Prof. Dr.": AcademicTitleEnum.PROF_DR,
         "Prof. Dr. Dr.": AcademicTitleEnum.PROF_DR_DR,
         "Prof. Dr. habil.": AcademicTitleEnum.PROF_DR_HABIL,
@@ -544,6 +546,8 @@ def map_academic_title_to_enum(academic_title_text: str) -> AcademicTitleEnum:
         return AcademicTitleEnum.DR_RER_NAT
     elif "Prof." in normalized_text and "Dr." in normalized_text:
         return AcademicTitleEnum.PROF_DR
+    elif "Prof." in normalized_text:
+        return AcademicTitleEnum.UNIV_PROF  # Add this line for just "Prof."
     elif "Dr." in normalized_text:
         return AcademicTitleEnum.DR_MED  # Default fallback for Dr. titles
     

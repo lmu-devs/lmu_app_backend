@@ -10,10 +10,11 @@ from pathlib import Path
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.services.directus_service import DirectusService
 from ..models.people_model import (
-    Person, PersonSummary, PeopleResponse, PersonRole, PersonDetails, PersonBasic
+    Person, PersonSummary, PersonRole, PersonDetails
 )
-from shared.src.enums import FacultyEnum
+
 from shared.src.enums.people_enums import LSFRoleEnum
+from shared.src.enums.faculty_enums import FacultyEnum
 
 logger = get_main_fetcher_logger(__name__)
 
@@ -39,11 +40,11 @@ class PeopleService:
     # ==================== READ OPERATIONS ====================
 
     async def get_all_people(
-        self, 
-        faculty_id: Optional[str] = None,
-        offset: Optional[int] = None,
-        limit: Optional[int] = None
-    ) -> PeopleResponse:
+    self, 
+    faculty_id: Optional[str] = None,
+    offset: Optional[int] = None,
+    limit: Optional[int] = None
+    ) -> List[PersonSummary]:
         """Get all people from CMS with optional faculty filtering"""
         
         query_path = self.graphql_path / self.GET_ALL_PEOPLE_FILE
@@ -129,11 +130,7 @@ class PeopleService:
             except (StopIteration, ValueError):
                 self.logger.warning(f"Invalid faculty id: {faculty_id}")
         
-        return PeopleResponse(
-            people=people_summaries,
-            total_count=len(people_summaries),
-            faculty_filter=faculty_enum_filter
-        )
+        return people_summaries
 
     async def get_person_by_id(self, person_id: str) -> Optional[Person]:
         """Get detailed information about a specific person from CMS"""

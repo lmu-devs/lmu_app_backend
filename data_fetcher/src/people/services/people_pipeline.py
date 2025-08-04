@@ -150,26 +150,22 @@ class PeoplePipeline:
                     enum_data = next((data for data in enum_mapped_people if data.get("person_id") == person.person_id), None)
                     
                     person_dict = {
-                        "profile_url": person.profile_url,
+                        "profile_url": person.details.profile_url if person.details else None,
                         "name": person.name,
                         "person_id": person.person_id,
-                        "email": person.email,
-                        "phone": person.phone,
-                        "address": person.address,
-                        "faculty_enum": person.faculty_enum,
-                        "academic_title_enum": person.academic_title_enum,
-                        "primary_role": person.primary_role,
+                        "email": person.details.email if person.details else None,
+                        "phone": person.details.phone if person.details else None,
+                        "address": person.details.address if person.details else None,
                         "basic_info": {
                             "first_name": person.first_name,
                             "last_name": person.surname,
                             "gender_enum": enum_data.get("basic_info", {}).get("gender_enum") if enum_data else None,
-                            "title": person.title,
                             "academic_degree": person.academic_degree,
                             "employment_status_enum": enum_data.get("basic_info", {}).get("employment_status_enum") if enum_data else None,
                             "name_suffix": None,
-                            "status": person.status,
-                            "note": person.note,
-                            "office_hours": person.office_hours,
+                            "status": person.details.status if person.details else None,
+                            "note": person.details.note if person.details else None,
+                            "office_hours": person.details.office_hours if person.details else None,
                         },
                         "roles": [
                             {
@@ -178,7 +174,7 @@ class PeoplePipeline:
                                 "institutions": role.institutions if role.institutions else []
                             } for role in person.roles
                         ] if person.roles else [],
-                        "courses": person.courses  # Courses as list of course numbers for person_details
+                        "courses": person.details.courses if person.details else []  # Courses as list of course numbers for person_details
                     }
                     people_dicts.append(person_dict)
                 
