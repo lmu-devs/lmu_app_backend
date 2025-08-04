@@ -37,10 +37,7 @@ class PersonBasic(BaseModel):
     name: str
     first_name: Optional[str] = None
     surname: Optional[str] = None
-    title: Optional[str] = None
     academic_degree: Optional[str] = None
-    faculty_enum: Optional[FacultyEnum] = None
-    primary_role: Optional[str] = None
 
 
 class PersonSummary(BaseModel):
@@ -49,10 +46,7 @@ class PersonSummary(BaseModel):
     name: str
     first_name: Optional[str] = None
     surname: Optional[str] = None
-    title: Optional[str] = None
     academic_degree: Optional[str] = None
-    faculty_enum: Optional[FacultyEnum] = None
-    primary_role: Optional[str] = None
 
 
 class PersonComplete(BaseModel):
@@ -63,10 +57,7 @@ class PersonComplete(BaseModel):
     name: str
     first_name: Optional[str] = None
     surname: Optional[str] = None
-    title: Optional[str] = None
     academic_degree: Optional[str] = None
-    faculty_enum: Optional[FacultyEnum] = None
-    primary_role: Optional[str] = None
     academic_title_enum: Optional[str] = None
     
     # Related data (from other tables)
@@ -134,7 +125,6 @@ class Person(PersonComplete):
     person_id: str
     first_name: Optional[str] = None
     surname: Optional[str] = None
-    title: Optional[str] = None
     academic_degree: Optional[str] = None
     
     @property

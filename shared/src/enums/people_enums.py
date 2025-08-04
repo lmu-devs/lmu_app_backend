@@ -209,98 +209,161 @@ class AcademicTitleEnum(str, Enum):
 
     @classmethod
     def from_string(cls, text: str) -> "AcademicTitleEnum":
-        """Extract academic title from text string"""
+        """Convert string to AcademicTitleEnum with flexible matching"""
         if not text:
             return cls.UNKNOWN
             
-        text = text.strip()
+        # Normalize the text
+        normalized_text = text.strip().lower()
         
-        # Check translations first
-        for title, translations in academic_title_translations.items():
-            if text == translations.get(LanguageEnum.GERMAN, ""):
-                return title
-        
-        # Normalize the text first
-        normalized_text = text.strip()
-        
-        # Fallback: direct mapping for common variations
+        # Handle common variations and abbreviations
         title_mapping = {
-            "Prof. Dr.": cls.PROF_DR,
-            "Prof. Dr. Dr.": cls.PROF_DR_DR,
-            "Prof. Dr. habil.": cls.PROF_DR_HABIL,
-            "Prof. Dr. h.c.": cls.PROF_DR_HC,
-            "Prof. em. Dr.": cls.PROF_EM_DR,
-            "Prof. i.R. Dr.": cls.PROF_IR_DR,
-            "apl. Prof. Dr.": cls.APL_PROF_DR,
-            "PD Dr.": cls.PD_DR,
-            "Dr. med.": cls.DR_MED,
-            "Dr.med.": cls.DR_MED,  # Without space
-            "Dr. med. univ.": cls.DR_MED_UNIV,
-            "Dr.med.univ.": cls.DR_MED_UNIV,  # Without spaces
-            "Dr.med.uni.": cls.DR_MED_UNIV,  # Alternative abbreviation
-            "Dr. phil.": cls.DR_PHIL,
-            "Dr.phil.": cls.DR_PHIL,  # Without space
-            "Dr. rer. nat.": cls.DR_RER_NAT,
-            "Dr.rer.nat.": cls.DR_RER_NAT,  # Without spaces
-            "Dr. rer. pol.": cls.DR_RER_POL,
-            "Dr.rer.pol.": cls.DR_RER_POL,  # Without spaces
-            "Dr. theol.": cls.DR_THEOL,
-            "Dr.theol.": cls.DR_THEOL,  # Without space
-            "Dr. jur.": cls.DR_JUR,
-            "Dr.jur.": cls.DR_JUR,  # Without space
-            "Dr. iur.": cls.DR_IUR,
-            "Dr.iur.": cls.DR_IUR,  # Without space
-            "Dr. rer. biol. hum.": cls.DR_RER_BIOL_HUM,
-            "Dr. habil.": cls.DR_HABIL,
-            "Dr.habil.": cls.DR_HABIL,  # Without space
-            "Dr. Ing.": cls.DR_ING,
-            "Dr.Ing.": cls.DR_ING,  # Without space
-            "Dr. Dr.": cls.DR_DR,
-            "Dr.Dr.": cls.DR_DR,  # Without space
-            "Dr. Dr. med.": cls.DR_DR_MED,
-            "Dr.Dr.med.": cls.DR_DR_MED,  # Without spaces
-            "Ph.D.": cls.PHD,
-            "PhD": cls.PHD,  # Without periods
-            "M.D.": cls.MD,
-            "MD": cls.MD,  # Without periods
-            "M.A.": cls.MA,
-            "MA": cls.MA,  # Without periods
-            "M.Sc.": cls.MSC,
-            "MSc": cls.MSC,  # Without periods
-            "M.B.A.": cls.MBA,
-            "MBA": cls.MBA,  # Without periods
-            "M.P.H.": cls.MPH,
-            "MPH": cls.MPH,  # Without periods
-            "B.A.": cls.BA,
-            "BA": cls.BA,  # Without periods
-            "B.Sc.": cls.BSC,
-            "BSc": cls.BSC,  # Without periods
-            "Dipl.-Psych.": cls.DIPL_PSYCH,
-            "Dipl.-Biol.": cls.DIPL_BIOL,
-            "Dipl.-Ing.": cls.DIPL_ING,
-            "Dipl.-Math.": cls.DIPL_MATH,
-            "Dipl.-Phys.": cls.DIPL_PHYS,
-            "Dipl.-Chem.": cls.DIPL_CHEM,
-            "Dipl.-Inf.": cls.DIPL_INF,
-            "Dipl.-Kfm.": cls.DIPL_KFM,
+            # Professor variations
+            "prof. dr.": cls.PROF_DR,
+            "prof. dr. dr.": cls.PROF_DR_DR,
+            "prof. dr. habil.": cls.PROF_DR_HABIL,
+            "prof. dr. h.c.": cls.PROF_DR_HC,
+            "prof. dr. h.c. mult.": cls.PROF_DR_HC_MULT,
+            "prof. em. dr.": cls.PROF_EM_DR,
+            "prof. em.": cls.PROF_EM,
+            "prof. ir. dr.": cls.PROF_IR_DR,
+            "univ.-prof. dr.": cls.UNIV_PROF_DR,
+            "univ.-prof.": cls.UNIV_PROF,
+            
+            # apl. Professor variations
+            "apl. prof. dr.": cls.APL_PROF_DR,
+            "apl. prof.": cls.APL_PROF,
+            
+            # Privatdozent variations
+            "pd dr.": cls.PD_DR,
+            "priv.-doz. dr.": cls.PRIV_DOZ_DR,
+            "privatdozent dr.": cls.PRIVATDOZENT_DR,
+            
+            # Medical degrees
+            "dr. med.": cls.DR_MED,
+            "dr. med. univ.": cls.DR_MED_UNIV,
+            "dr. med. vet.": cls.DR_MED_VET,
+            "dr. med. dent.": cls.DR_MED_DENT,
+            "dr. med. habil.": cls.DR_MED_HABIL,
+            
+            # Academic doctorates
+            "dr. phil.": cls.DR_PHIL,
+            "dr. rer. nat.": cls.DR_RER_NAT,
+            "dr. rer. pol.": cls.DR_RER_POL,
+            "dr. theol.": cls.DR_THEOL,
+            "dr. jur.": cls.DR_JUR,
+            "dr. iur.": cls.DR_IUR,
+            "dr. rer. biol. hum.": cls.DR_RER_BIOL_HUM,
+            "dr. habil.": cls.DR_HABIL,
+            "dr. ing.": cls.DR_ING,
+            
+            # Double doctorates
+            "dr. dr.": cls.DR_DR,
+            "dr. dr. med.": cls.DR_DR_MED,
+            
+            # International degrees
+            "phd": cls.PHD,
+            "md": cls.MD,
+            
+            # Diplom degrees
+            "dipl. psych.": cls.DIPL_PSYCH,
+            "dipl. biol.": cls.DIPL_BIOL,
+            "dipl. ing.": cls.DIPL_ING,
+            "dipl. math.": cls.DIPL_MATH,
+            "dipl. phys.": cls.DIPL_PHYS,
+            "dipl. chem.": cls.DIPL_CHEM,
+            "dipl. inf.": cls.DIPL_INF,
+            "dipl. kfm.": cls.DIPL_KFM,
+            
+            # Master degrees
+            "ma": cls.MA,
+            "msc": cls.MSC,
+            "mba": cls.MBA,
+            "mph": cls.MPH,
+            "m. sc.": cls.MSC,
+            "m.sc.": cls.MSC,
+            "m. sc. biotech.": cls.MSC,
+            "m.sc. biochem.": cls.MSC,
+            
+            # Bachelor degrees
+            "ba": cls.BA,
+            "bsc": cls.BSC,
+            
+            # Academic positions
+            "akad. rat": cls.AKAD_RAT,
+            "akad. oberrat": cls.AKAD_OBERRAT,
+            "akad. direktor": cls.AKAD_DIREKTOR,
+            
+            # Special cases
+            "cand. med.": cls.CAND_MED,
+            "cand. rer. biol. hum.": cls.CAND_MED,
+            "studienrat": cls.STUDIENRAT,
+            "oberarzt": cls.OBERARZT,
+            "zahnarzt": cls.ZAHNARZT,
+            "dottor": cls.DR_PHIL,  # Italian doctorate
+            
+            # Handle common typos and variations
+            "dra": cls.DR_MED,  # Common typo for "Dr. med."
+            "ärztin": cls.DR_MED,  # Female doctor
+            "arzt": cls.DR_MED,  # Doctor
         }
         
         # Try exact match first
         if normalized_text in title_mapping:
             return title_mapping[normalized_text]
         
-        # Try pattern matching for complex titles
-        if "Dr.med." in normalized_text or "Dr. med." in normalized_text:
-            return cls.DR_MED
-        elif "Dr.phil." in normalized_text or "Dr. phil." in normalized_text:
-            return cls.DR_PHIL
-        elif "Dr.rer.nat." in normalized_text or "Dr. rer. nat." in normalized_text:
-            return cls.DR_RER_NAT
-        elif "Prof." in normalized_text and "Dr." in normalized_text:
-            return cls.PROF_DR
-        elif "Dr." in normalized_text:
-            return cls.DR_MED  # Default fallback for Dr. titles
+        # Handle special cases first
+        if normalized_text.startswith("dra"):
+            return cls.DR_MED  # "dra" is a common typo for "Dr. med."
         
+        # Try partial matches for common patterns
+        if "prof" in normalized_text and "dr" in normalized_text:
+            if "habil" in normalized_text:
+                return cls.PROF_DR_HABIL
+            elif "h.c" in normalized_text:
+                return cls.PROF_DR_HC
+            elif "em" in normalized_text:
+                return cls.PROF_EM_DR
+            else:
+                return cls.PROF_DR
+        elif "dr" in normalized_text:
+            if "med" in normalized_text:
+                return cls.DR_MED
+            elif "phil" in normalized_text:
+                return cls.DR_PHIL
+            elif "jur" in normalized_text:
+                return cls.DR_JUR
+            elif "theol" in normalized_text:
+                return cls.DR_THEOL
+            else:
+                return cls.DR_PHIL  # Default doctorate
+        elif "dipl" in normalized_text:
+            if "biol" in normalized_text:
+                return cls.DIPL_BIOL
+            elif "psych" in normalized_text:
+                return cls.DIPL_PSYCH
+            elif "ing" in normalized_text:
+                return cls.DIPL_ING
+            elif "math" in normalized_text:
+                return cls.DIPL_MATH
+            elif "phys" in normalized_text:
+                return cls.DIPL_PHYS
+            elif "chem" in normalized_text:
+                return cls.DIPL_CHEM
+            elif "inf" in normalized_text:
+                return cls.DIPL_INF
+            else:
+                return cls.DIPL_PSYCH  # Default diploma
+        elif "m.sc" in normalized_text or "msc" in normalized_text:
+            return cls.MSC
+        elif "m. sc" in normalized_text:
+            return cls.MSC
+        elif "cand" in normalized_text:
+            return cls.CAND_MED
+        elif "dottor" in normalized_text:
+            return cls.DR_PHIL
+        
+        # If no match found, log and return UNKNOWN
         logger.warning(f"No matching academic title found for text: {text}")
         return cls.UNKNOWN
 
@@ -333,6 +396,9 @@ def map_faculty_name_to_enum(german_faculty_name: str) -> FacultyEnum:
     if not german_faculty_name:
         return None
         
+    # Normalize the input
+    normalized_name = german_faculty_name.strip()
+    
     faculty_name_mapping = {
         "Evangelisch-Theologische Fakultät": FacultyEnum.PROTESTANT_THEOLOGY,
         "Fakultät für Betriebswirtschaft": FacultyEnum.BUSINESS_ADMIN,
@@ -355,7 +421,38 @@ def map_faculty_name_to_enum(german_faculty_name: str) -> FacultyEnum:
         "Volkswirtschaftliche Fakultät": FacultyEnum.ECONOMICS,
     }
     
-    return faculty_name_mapping.get(german_faculty_name.strip())
+    # Try exact match first
+    if normalized_name in faculty_name_mapping:
+        return faculty_name_mapping[normalized_name]
+    
+    # Try partial matches for common variations
+    partial_mapping = {
+        "Betriebswirtschaft": FacultyEnum.BUSINESS_ADMIN,
+        "Biologie": FacultyEnum.BIOLOGY,
+        "Chemie": FacultyEnum.CHEMISTRY_PHARMACY,
+        "Geowissenschaften": FacultyEnum.GEOSCIENCES,
+        "Geschichts": FacultyEnum.HISTORY_ARTS,
+        "Kulturwissenschaften": FacultyEnum.CULTURE_STUDIES,
+        "Mathematik": FacultyEnum.MATH_INFO_STATS,
+        "Philosophie": FacultyEnum.PHILOSOPHY,
+        "Physik": FacultyEnum.PHYSICS,
+        "Psychologie": FacultyEnum.PSYCHOLOGY_EDUCATION,
+        "Sprach": FacultyEnum.LANGUAGES_LITERATURE,
+        "Sozialwissenschaft": FacultyEnum.SOCIAL_SCIENCES,
+        "Juristische": FacultyEnum.LAW,
+        "Katholisch": FacultyEnum.CATHOLIC_THEOLOGY,
+        "Evangelisch": FacultyEnum.PROTESTANT_THEOLOGY,
+        "Medizinische": FacultyEnum.MEDICINE,
+        "Tierärztliche": FacultyEnum.VETERINARY_MEDICINE,
+        "Volkswirtschaft": FacultyEnum.ECONOMICS,
+    }
+    
+    for partial, enum_value in partial_mapping.items():
+        if partial in normalized_name:
+            return enum_value
+    
+    # If still no match, return None
+    return None
 
 
 def map_academic_title_to_enum(academic_title_text: str) -> AcademicTitleEnum:

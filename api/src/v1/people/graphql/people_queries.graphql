@@ -1,0 +1,150 @@
+# Get all people with basic info (for list views)
+query GetAllPeople($offset: Int) {
+    people(offset: $offset) {
+        id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Get person by ID
+query GetPersonById($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Get person with all details (for detailed views)
+query GetPersonWithDetails($id: ID!) {
+    people_by_id(id: $id) {
+        id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+        # Get person details
+        person_details {
+            id
+            profile_url
+            email
+            phone
+            address
+            office_hours
+            status
+            note
+            gender
+            employment_status
+            courses
+        }
+
+        # Get person roles
+        person_roles {
+            id
+            role_name
+            lsf_role_enum
+            institution_name
+            institution_url
+        }
+    }
+}
+
+# Get person details only
+query GetPersonDetails($person_id: ID!) {
+    person_details(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+        courses
+    }
+}
+
+# Get person roles
+query GetPersonRoles($person_id: ID!) {
+    person_roles(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution_name
+        institution_url
+    }
+}
+
+# Search people by faculty
+query GetPeopleByFaculty($faculty_id: String!, $offset: Int) {
+    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset) {
+        id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Search people by name
+query SearchPeopleByName($search: String!, $offset: Int) {
+    people(
+        filter: {
+            _or: [
+                { name: { _icontains: $search } }
+                { first_name: { _icontains: $search } }
+                { surname: { _icontains: $search } }
+            ]
+        }
+        offset: $offset
+    ) {
+        id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Get person by person_id (custom string)
+query GetPersonByPersonId($person_id: String!) {
+    people(filter: { person_id: { _eq: $person_id } }) {
+        id
+        person_id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}

@@ -1,0 +1,102 @@
+# Create a new person (main table)
+mutation CreatePerson($data: create_people_input!) {
+    create_people_item(data: $data) {
+        person_id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Update an existing person
+mutation UpdatePerson($id: ID!, $data: update_people_input!) {
+    update_people_item(id: $id, data: $data) {
+        person_id
+        name
+        first_name
+        surname
+        academic_degree
+        faculty {
+            id
+        }
+    }
+}
+
+# Create person details
+mutation CreatePersonDetails($data: create_person_details_input!) {
+    create_person_details_item(data: $data) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+        courses
+    }
+}
+
+# Update person details
+mutation UpdatePersonDetails($id: ID!, $data: update_person_details_input!) {
+    update_person_details_item(id: $id, data: $data) {
+        id
+        person_id {
+            id
+        }
+        profile_url
+        email
+        phone
+        address
+        office_hours
+        status
+        note
+        gender
+        employment_status
+        courses
+    }
+}
+
+# Create a new role for a person
+mutation CreatePersonRole($data: create_person_roles_input!) {
+    create_person_roles_item(data: $data) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution_name
+        institution_url
+    }
+}
+
+# Update an existing role for a person
+mutation UpdatePersonRole($id: ID!, $data: update_person_roles_input!) {
+    update_person_roles_item(id: $id, data: $data) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution_name
+        institution_url
+    }
+}
+
+# Delete a role for a person
+mutation DeletePersonRole($id: ID!) {
+    delete_person_roles_item(id: $id) {
+        id
+    }
+}

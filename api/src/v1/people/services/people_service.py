@@ -40,26 +40,45 @@ class PeopleService:
 
     async def get_all_people(
         self, 
-        faculty_filter: Optional[str] = None,
-        offset: int = 0
+        faculty_id: Optional[str] = None,
+        offset: Optional[int] = None
     ) -> PeopleResponse:
         """Get all people from CMS with optional faculty filtering"""
         
         query_path = self.graphql_path / self.GET_ALL_PEOPLE_FILE
         
         # Build variables for the query
-        variables = {
-            "offset": offset
-        }
+        variables = {}
+        if offset is not None:
+            variables["offset"] = offset
         
-        # Note: Faculty filtering is not implemented yet due to CMS schema issues
-        if faculty_filter:
-            self.logger.warning(f"Faculty filtering not implemented yet: {faculty_filter}")
-        
-        response = self.directus.execute_query_file(
-            query_file_path=query_path,
-            variables=variables
-        )
+        # Use faculty filtering if provided
+        if faculty_id:
+            query_path = self.graphql_path / "people_queries.graphql"
+            variables["faculty_id"] = faculty_id
+            # Use the GetPeopleByFaculty query instead
+            response = self.directus.query(
+                """
+                query GetPeopleByFaculty($faculty_id: String!, $offset: Int) {
+                    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset) {
+                        id
+                        name
+                        first_name
+                        surname
+                        academic_degree
+                        faculty {
+                            id
+                        }
+                    }
+                }
+                """,
+                variables
+            )
+        else:
+            response = self.directus.execute_query_file(
+                query_file_path=query_path,
+                variables=variables
+            )
         
         # Check if response has expected structure
         if "data" not in response:
@@ -75,12 +94,15 @@ class PeopleService:
         # Convert to PersonSummary objects
         people_summaries = []
         for person_data in people_raw:
-            # Map faculty enum if present
+            # Map faculty relation if present
             faculty_enum = None
-            if person_data.get("faculty_enum"):
+            if person_data.get("faculty"):
+                faculty_data = person_data["faculty"]
                 try:
-                    faculty_enum = next(f for f in FacultyEnum if f.id == person_data["faculty_enum"])
-                except StopIteration:
+                    # Look up faculty enum by the relation's id (convert string to int)
+                    faculty_id_int = int(faculty_data["id"])
+                    faculty_enum = next(f for f in FacultyEnum if f.id == faculty_id_int)
+                except (StopIteration, ValueError):
                     pass
             
             person_summary = PersonSummary(
@@ -88,26 +110,18 @@ class PeopleService:
                 name=person_data["name"],
                 first_name=person_data.get("first_name"),
                 surname=person_data.get("surname"),
-                title=person_data.get("title"),
-                academic_degree=person_data.get("academic_degree"),
-                faculty_enum=faculty_enum,
-                primary_role=person_data.get("primary_role")
+                academic_degree=person_data.get("academic_degree")
             )
             people_summaries.append(person_summary)
         
-        # Convert faculty_filter string to enum for response
+        # Convert faculty_id to enum for response
         faculty_enum_filter = None
-        if faculty_filter:
+        if faculty_id:
             try:
-                # Try to match by ID first (if faculty_filter is numeric)
-                if faculty_filter.isdigit():
-                    faculty_id = int(faculty_filter)
-                    faculty_enum_filter = next(f for f in FacultyEnum if f.id == faculty_id)
-                else:
-                    # Try to match by code string
-                    faculty_enum_filter = next(f for f in FacultyEnum if f.code == faculty_filter)
+                faculty_id_int = int(faculty_id)
+                faculty_enum_filter = next(f for f in FacultyEnum if f.id == faculty_id_int)
             except (StopIteration, ValueError):
-                self.logger.warning(f"Invalid faculty filter: {faculty_filter}")
+                self.logger.warning(f"Invalid faculty id: {faculty_id}")
         
         return PeopleResponse(
             people=people_summaries,
@@ -183,12 +197,15 @@ class PeopleService:
                 employment_status=details_data.get("employment_status")
             )
         
-        # Map faculty enum
+        # Map faculty relation
         faculty_enum = None
-        if person_data.get("faculty_enum"):
+        if person_data.get("faculty"):
+            faculty_data = person_data["faculty"]
             try:
-                faculty_enum = next(f for f in FacultyEnum if f.id == person_data["faculty_enum"])
-            except StopIteration:
+                # Look up faculty enum by the relation's id (convert string to int)
+                faculty_id_int = int(faculty_data["id"])
+                faculty_enum = next(f for f in FacultyEnum if f.id == faculty_id_int)
+            except (StopIteration, ValueError):
                 pass
         
         return Person(
@@ -197,10 +214,7 @@ class PeopleService:
             name=person_data["name"],
             first_name=person_data.get("first_name"),
             surname=person_data.get("surname"),
-            title=person_data.get("title"),
             academic_degree=person_data.get("academic_degree"),
-            faculty_enum=faculty_enum,
-            primary_role=person_data.get("primary_role"),
             academic_title_enum=person_data.get("academic_title_enum"),
             details=details,
             roles=roles,

@@ -1,8 +1,7 @@
-# Get person by ID
-query GetPersonById($id: ID!) {
-    people_by_id(id: $id) {
+# Get all people with basic info (for list views)
+query GetAllPeople($offset: Int) {
+    people(offset: $offset) {
         id
-        person_id
         name
         first_name
         surname

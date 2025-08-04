@@ -12,9 +12,8 @@ people_service = PeopleService()
 
 @router.get("/faculty/{faculty_id}")
 async def get_people_by_faculty(
-    faculty_id: int = Path(..., description="Faculty ID to filter by"),
-    offset: int = Query(0, ge=0, description="Number of people to skip")
-) -> Dict[str, Any]:
+    faculty_id: int = Path(..., description="Faculty ID to filter by")
+) -> List[Dict[str, Any]]:
     """
     Get people from a specific faculty.
     """
@@ -23,16 +22,10 @@ async def get_people_by_faculty(
         faculty_code = str(faculty_id) if faculty_id else None
         
         response = await people_service.get_all_people(
-            faculty_filter=faculty_code,
-            offset=offset
+            faculty_id=faculty_code
         )
         
-        return {
-            "faculty_id": faculty_id,
-            "people": [person.dict() for person in response.people],
-            "total_count": response.total_count,
-            "offset": offset
-        }
+        return [person.dict() for person in response.people]
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch people by faculty: {str(e)}")
@@ -62,16 +55,15 @@ async def get_person_with_details(
 
 
 # Legacy endpoints (keeping for backward compatibility)
-@router.get("/", response_model=PeopleResponse)
+@router.get("/", response_model=List[PersonSummary])
 async def get_people(
-    faculty_filter: Optional[str] = Query(None, description="Filter by faculty code"),
-    offset: int = Query(0, ge=0, description="Number of people to skip")
+    faculty_id: Optional[str] = Query(None, description="Filter by faculty ID")
 ):
     """
     Get list of people with basic information (refactored schema).
     """
-    return await people_service.get_all_people(
-        faculty_filter=faculty_filter,
-        offset=offset
+    response = await people_service.get_all_people(
+        faculty_id=faculty_id
     )
+    return response.people
 
