@@ -5,7 +5,7 @@ Maps normalized data to Pydantic models with validation
 from typing import Dict, List, Optional
 from pydantic import ValidationError
 from shared.src.core.logging import get_main_fetcher_logger
-from shared.src.models.people_model import (
+from api.src.v1.people.models.people_model import (
     Person, PersonDetails, PersonRole
 )
 

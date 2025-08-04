@@ -98,8 +98,8 @@ query GetPersonRoles($person_id: ID!) {
 }
 
 # Search people by faculty
-query GetPeopleByFaculty($faculty_id: String!, $offset: Int) {
-    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset) {
+query GetPeopleByFaculty($faculty_id: String!, $offset: Int, $limit: Int) {
+    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset, limit: $limit) {
         id
         name
         first_name

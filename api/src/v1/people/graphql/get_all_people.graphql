@@ -1,6 +1,6 @@
 # Get all people with basic info (for list views)
-query GetAllPeople($offset: Int) {
-    people(offset: $offset) {
+query GetAllPeople($offset: Int, $limit: Int) {
+    people(offset: $offset, limit: $limit) {
         id
         name
         first_name

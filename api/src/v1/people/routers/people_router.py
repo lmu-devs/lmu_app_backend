@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any, List
 from fastapi import APIRouter, HTTPException, Query, Path
 from shared.src.enums import FacultyEnum
-from shared.src.models.people_model import PersonBasic, PersonSummary, PeopleResponse
+from ..models.people_model import PersonBasic, PersonSummary, PeopleResponse
 from ..services.people_service import PeopleService
 
 router = APIRouter(tags=["people"])
@@ -53,17 +53,4 @@ async def get_person_with_details(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch person details: {str(e)}")
 
-
-# Legacy endpoints (keeping for backward compatibility)
-@router.get("/", response_model=List[PersonSummary])
-async def get_people(
-    faculty_id: Optional[str] = Query(None, description="Filter by faculty ID")
-):
-    """
-    Get list of people with basic information (refactored schema).
-    """
-    response = await people_service.get_all_people(
-        faculty_id=faculty_id
-    )
-    return response.people
 

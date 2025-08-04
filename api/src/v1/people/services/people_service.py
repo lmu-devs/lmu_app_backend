@@ -9,7 +9,7 @@ from pathlib import Path
 
 from shared.src.core.logging import get_main_fetcher_logger
 from shared.src.services.directus_service import DirectusService
-from shared.src.models.people_model import (
+from ..models.people_model import (
     Person, PersonSummary, PeopleResponse, PersonRole, PersonDetails, PersonBasic
 )
 from shared.src.enums import FacultyEnum
@@ -41,7 +41,8 @@ class PeopleService:
     async def get_all_people(
         self, 
         faculty_id: Optional[str] = None,
-        offset: Optional[int] = None
+        offset: Optional[int] = None,
+        limit: Optional[int] = None
     ) -> PeopleResponse:
         """Get all people from CMS with optional faculty filtering"""
         
@@ -51,6 +52,11 @@ class PeopleService:
         variables = {}
         if offset is not None:
             variables["offset"] = offset
+        if limit is not None:
+            variables["limit"] = limit
+        else:
+            # Set a high limit to get all people (Directus default is 100)
+            variables["limit"] = 10000
         
         # Use faculty filtering if provided
         if faculty_id:
@@ -59,8 +65,8 @@ class PeopleService:
             # Use the GetPeopleByFaculty query instead
             response = self.directus.query(
                 """
-                query GetPeopleByFaculty($faculty_id: String!, $offset: Int) {
-                    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset) {
+                query GetPeopleByFaculty($faculty_id: String!, $offset: Int, $limit: Int) {
+                    people(filter: { faculty: { id: { _eq: $faculty_id } } }, offset: $offset, limit: $limit) {
                         id
                         name
                         first_name
