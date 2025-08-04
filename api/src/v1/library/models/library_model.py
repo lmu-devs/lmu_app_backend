@@ -3,6 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, RootModel
 
+from api.src.v1.core.sql_image_transform_utils import transform_library_files_to_images
 from shared.src.models.image_model import Images
 from shared.src.models.location_model import Location
 from shared.src.models.rating_model import Rating
@@ -169,8 +170,10 @@ class Library(BaseModel):
             if translation.subject_areas:
                 subject_areas = sorted(translation.subject_areas)
 
-        # Create images model
-        images = Images.from_table(library.images)
+        # Create images model from files using the new utility
+        images = Images(root=[])
+        if hasattr(library, "files") and library.files:
+            images = transform_library_files_to_images(library.files)
 
         location = None
         if library.location:

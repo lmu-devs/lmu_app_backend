@@ -1,6 +1,7 @@
 from typing import List
 
-from sqlalchemy import ARRAY, JSON, Column, ForeignKey, String
+from sqlalchemy import ARRAY, JSON, Column, ForeignKey, Integer, String
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, relationship
 
 from shared.src.core.database import Base
@@ -19,7 +20,6 @@ class LibraryTable(Base):
     reservation_url = Column(String, nullable=True)
     email = Column(String, nullable=True)
     phone = Column(JSON, nullable=True)
-    images = Column(JSON, nullable=True)
 
     location: Mapped["LibraryLocationTable"] = relationship(back_populates="library")
     areas: Mapped[List["LibraryAreaTable"]] = relationship(
@@ -31,6 +31,11 @@ class LibraryTable(Base):
         back_populates="library", cascade="all, delete-orphan"
     )
     likes = relationship("LibraryLikeTable", back_populates="library")
+    files: Mapped[List["LibraryFilesTable"]] = relationship(
+        "LibraryFilesTable",
+        back_populates="library",
+        cascade="all, delete-orphan",
+    )
 
     @property
     def like_count(self):
@@ -64,3 +69,13 @@ class LibraryLikeTable(LikeTable):
 
     library = relationship("LibraryTable", back_populates="likes")
     user = relationship("UserTable", back_populates="liked_libraries")
+
+
+class LibraryFilesTable(Base):
+    __tablename__ = "libraries_files"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    libraries_id = Column(String, ForeignKey("libraries.id", ondelete="SET NULL"), nullable=True)
+    directus_files_id = Column(UUID(as_uuid=True), nullable=True)
+
+    library = relationship("LibraryTable", back_populates="files")

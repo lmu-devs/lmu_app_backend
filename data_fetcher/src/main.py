@@ -23,13 +23,13 @@ class DataCollectorApp:
         self.is_running = True
         print("I am initializing the data collector app.")
         self.collectors = [
-            ClassesCollecter(),
-            LinkCollector(),
-            RoomfinderCollector(),
+            # ClassesCollecter(),
+            # LinkCollector(),
+            # RoomfinderCollector(),
             LibraryCollector(),
-            FoodCollector(),
-            SportCollector(),
-            CinemaCollector(),
+            # FoodCollector(),
+            # SportCollector(),
+            # CinemaCollector(),
         ]
 
     async def setup(self):

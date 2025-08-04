@@ -13,6 +13,7 @@ from shared.src.core.logging import get_main_logger
 from shared.src.enums import LanguageEnum
 from shared.src.tables.library.library_area_table import LibraryAreaTable
 from shared.src.tables.library.library_table import (
+    LibraryFilesTable,
     LibraryLikeTable,
     LibraryTable,
     LibraryTranslationTable,
@@ -35,6 +36,7 @@ class LibraryService:
                 .options(
                     selectinload(LibraryTable.location),
                     selectinload(LibraryTable.likes),
+                    selectinload(LibraryTable.files),
                 )
                 .where(LibraryTable.id == library_id)
             )
@@ -74,6 +76,7 @@ class LibraryService:
             stmt = select(LibraryTable).options(
                 selectinload(LibraryTable.location),
                 selectinload(LibraryTable.likes),
+                selectinload(LibraryTable.files),
             )
 
             # Load areas with their translations and opening hours

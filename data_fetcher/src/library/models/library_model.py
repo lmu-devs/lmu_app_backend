@@ -96,7 +96,6 @@ class Library(BaseModel):
     title: str
     hash: str
     areas: List[Area] = []
-    images: Images = Images([])
     url: str | None = None
     reservation_url: str | None = None
     location: Optional[Location] = None
