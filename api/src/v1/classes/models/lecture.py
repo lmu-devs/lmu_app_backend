@@ -1,7 +1,7 @@
 import re
 from pydantic import BaseModel, Field, RootModel
 from typing import Any, List, Tuple, Optional
-from datetime import time, date as Date
+from datetime import datetime, time, date as Date
 
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.classes_enum import LectureStartTypeEnum
@@ -130,6 +130,13 @@ class AssociatedTutorial(BaseModel):
 class EnrollmentDeadline(BaseModel):
     program_associated_deadline: Optional[str] = Field(None)
     other_deadlines: Optional[str] = Field(None)
+
+
+class LectureDetails(BaseModel):
+    sessions: Optional[list[ClassSession]]
+    persons: Optional[list[Person]]
+    addtional_information: Optional[str]
+    last_updated: Optional[datetime]
 
 
 class LectureBasic(BaseModel):

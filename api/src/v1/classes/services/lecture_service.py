@@ -1,18 +1,16 @@
 from pathlib import Path
-from typing import List
-
-from api.src.v1.core.flatten_response_util import flatten_response
+from typing import Optional
 from shared.src.core.settings import get_settings
-from shared.src.tables.lectures import LectureTable, TreePathTable, ClassBaseInfoTable
+from shared.src.tables.lectures import PersonTable, ClassSessionTable, LectureTable, TreePathTable, ClassBaseInfoTable, AdditionInformationTable, lecture_persons_table
 from shared.src.services.directus_service import DirectusService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
-    text,
-    select,
+    select
 )
 
+from lxml import html
 
-from ..models.lecture import LecturesBasic, LectureBasic
+from ..models.lecture import LectureDetails, LecturesBasic, LectureBasic, ClassSession, Person
 from shared.src.enums.faculty_enums import (
     LanguageEnum,
 )
@@ -41,6 +39,100 @@ class LectureService:
         )
         return LecturesBasic.from_directus_dict(response["data"]["lecture"])
 
+    async def get_lecture_details_db(self, session: AsyncSession, publish_id: int) -> LectureDetails:
+        stmt = (
+            select(LectureTable)
+            .where(LectureTable.publish_id == publish_id)
+        ).distinct()
+
+        result = await session.execute(stmt)
+        lecture = result.scalar_one_or_none()
+
+        if not lecture:
+            raise ValueError(f"Lecture with publish_id {publish_id} not found")
+
+        columns = [
+            col for col in AdditionInformationTable.__table__.c
+            if col.name != "id"
+        ]
+
+        base_stmt = (
+            select(*columns)
+            .where(AdditionInformationTable.lecture_publish_id == publish_id)
+        ).distinct()
+        base_result = await session.execute(base_stmt)
+        base_row = base_result.mappings().one_or_none()
+
+        sessions_stmt = (
+            select(ClassSessionTable)
+            .where(ClassSessionTable.lecture_publish_id == publish_id)
+        ).distinct()
+
+        sessions_result = await session.execute(sessions_stmt)
+        sessions = sessions_result.scalars().all()
+
+        persons_stmt = (
+            select(
+                PersonTable.first_name,
+                PersonTable.surname,
+                PersonTable.title
+            )
+            .join(lecture_persons_table, PersonTable.id == lecture_persons_table.c.person_id)
+            .where(lecture_persons_table.c.lecture_publish_id == publish_id)
+            .distinct()
+        )
+
+        result = await session.execute(persons_stmt)
+        persons = result.mappings().all()
+
+        return LectureDetails(
+            last_updated=lecture.last_updated,
+            persons=[Person.model_validate(person) for person in persons],
+            sessions=[ClassSession.model_validate(session.__dict__) for session in sessions],
+            addtional_information=self.convert_additional_info_to_markdown(base_row)
+        )
+
+    def html_to_text(self, html_str: str) -> str:
+        if not html_str:
+            return ""
+        try:
+            tree = html.fromstring(html_str)
+            return tree.text_content().strip()
+        except Exception:
+            return html_str.strip()
+
+    def convert_additional_info_to_markdown(self, add_info: Optional[AdditionInformationTable]) -> str:
+        if not add_info:
+            return ""
+
+        field_translations = {
+            "remark": "Bemerkung",
+            "literature": "Literatur",
+            "date": "Datum",
+            "registration": "Anmeldung",
+            "format": "Format",
+            "content": "Inhalt",
+            "learning_content": "Lerninhalte",
+            "target_group": "Zielgruppe",
+            "location": "Ort",
+            "comment": "Kommentar",
+            "assessment": "Leistungsnachweis",
+            "time": "Zeit",
+            "topic": "Thema",
+            "short_comment": "Kurzkommentar",
+            "prerequisites": "Voraussetzungen",
+            "number": "Nummer",
+            "type": "Typ"
+        }
+
+        markdown_parts = []
+        for field, translation in field_translations.items():
+            value = getattr(add_info, field)
+            text = self.html_to_text(value)
+            if text:
+                markdown_parts.append(f"### {translation.title()}\n\n{text}")
+
+        return "\n\n".join(markdown_parts)
 
     async def get_lectures_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
         """Get all lectures from a specific faculty, semester and year."""
