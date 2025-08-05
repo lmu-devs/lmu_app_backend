@@ -3,6 +3,7 @@ from typing import Optional
 from shared.src.core.settings import get_settings
 from shared.src.tables.lectures import PersonTable, ClassSessionTable, LectureTable, TreePathTable, ClassBaseInfoTable, AdditionInformationTable, lecture_persons_table
 from shared.src.services.directus_service import DirectusService
+from data_fetcher.src.core.html_utils import html_to_markdown
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import (
     select
@@ -92,15 +93,6 @@ class LectureService:
             addtional_information=self.convert_additional_info_to_markdown(base_row)
         )
 
-    def html_to_text(self, html_str: str) -> str:
-        if not html_str:
-            return ""
-        try:
-            tree = html.fromstring(html_str)
-            return tree.text_content().strip()
-        except Exception:
-            return html_str.strip()
-
     def convert_additional_info_to_markdown(self, add_info: Optional[AdditionInformationTable]) -> str:
         if not add_info:
             return ""
@@ -128,7 +120,7 @@ class LectureService:
         markdown_parts = []
         for field, translation in field_translations.items():
             value = getattr(add_info, field)
-            text = self.html_to_text(value)
+            text = html_to_markdown(value)
             if text:
                 markdown_parts.append(f"### {translation.title()}\n\n{text}")
 
