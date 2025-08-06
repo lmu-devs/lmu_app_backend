@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    ARRAY,
+    func, DateTime, ARRAY,
     Column,
     Date,
     Enum,
@@ -20,14 +20,14 @@ from shared.src.enums.classes_enum import LectureStartTypeEnum
 
 lecture_persons_table = Table(
     'lecture_persons', Base.metadata,
-    Column('lecture_publish_id', Integer, ForeignKey('lectures.publish_id')),
-    Column('person_id', Integer, ForeignKey('persons.id'))
+    Column('lecture_publish_id', Integer, ForeignKey('lectures.publish_id', ondelete='CASCADE')),
+    Column('person_id', Integer, ForeignKey('persons.id', ondelete='CASCADE'))
 )
 
 lecture_institutions_table = Table(
     'lecture_institutions', Base.metadata,
-    Column('lecture_publish_id', Integer, ForeignKey('lectures.publish_id')),
-    Column('institution_id', Integer, ForeignKey('institutions.id'))
+    Column('lecture_publish_id', Integer, ForeignKey('lectures.publish_id', ondelete='CASCADE')),
+    Column('institution_id', Integer, ForeignKey('institutions.id', ondelete='CASCADE'))
 )
 
 class TreePathTable(Base):
@@ -74,17 +74,17 @@ class ClassBaseInfoTable(Base):
     __tablename__ = 'class_base_info'
 
     id = Column(Integer, primary_key=True)
-    class_type = Column(String(255), nullable=True)
-    class_id = Column(String(255), nullable=True)
-    class_cycle = Column(String(255), nullable=True)
-    semester = Column(String(255), nullable=True)
+    class_type = Column(String(500), nullable=True)
+    class_id = Column(String(500), nullable=True)
+    class_cycle = Column(String(500), nullable=True)
+    semester = Column(String(500), nullable=True)
     sws = Column(Float, nullable=True)
     max_participants = Column(Integer, nullable=True)
-    in_person_type = Column(String(255), nullable=True)
-    language = Column(String(255), nullable=True)
-    for_exchange_students = Column(String(255), nullable=True)
+    in_person_type = Column(String(500), nullable=True)
+    language = Column(String(500), nullable=True)
+    for_exchange_students = Column(Text, nullable=True)
     links = Column(Text, nullable=True)
-    sigel = Column(String(255), nullable=True)
+    sigel = Column(Text, nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
     lecture = relationship("LectureTable", back_populates="base_info", uselist=False)
@@ -101,8 +101,8 @@ class ClassSessionTable(Base):
     rythm = Column(String(255), nullable=True)
     duration_start = Column(Date, nullable=True)
     duration_end = Column(Date, nullable=True)
-    room = Column(String(255), nullable=True)
-    lecturer = Column(String(255), nullable=True)
+    room = Column(String(500), nullable=True)
+    lecturer = Column(String(500), nullable=True)
     remark = Column(Text, nullable=True)
     cancelled_dates = Column(Text, nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
@@ -115,7 +115,7 @@ class ClassMaterialTable(Base):
     id = Column(Integer, primary_key=True)
     valid_from = Column(Date, nullable=True)
     valid_to = Column(Date, nullable=True)
-    file_name = Column(String(255), nullable=True)
+    file_name = Column(String(500), nullable=True)
     description = Column(Text, nullable=True)
     lecture_publish_id = Column(Integer, ForeignKey('lectures.publish_id'))
 
@@ -217,6 +217,7 @@ class LectureTable(Base):
 
     publish_id = Column(Integer, primary_key=True)
     title = Column(String(500), nullable=False)
+    last_updated = Column(DateTime, default=func.now(), onupdate=func.now())
 
     base_info = relationship("ClassBaseInfoTable", back_populates="lecture", uselist=False, cascade="all, delete-orphan")
     additional_information = relationship("AdditionInformationTable", back_populates="lecture", uselist=False, cascade="all, delete-orphan")

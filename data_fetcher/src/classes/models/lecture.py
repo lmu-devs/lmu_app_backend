@@ -472,7 +472,7 @@ class Lecture(BaseModel):
 
     def _one_to_many_to_table(self, attr: str, related: dict, lecture: LectureTable):
         """Convert a one-to-many relationship to a list of table objects."""
-        values = getattr(self, attr, [])
+        values = getattr(self, attr, []) or []
         for item in values:
             table_obj = item.to_table()
             table_obj.lecture = lecture
@@ -480,7 +480,7 @@ class Lecture(BaseModel):
 
     def _many_to_many_to_table(self, attr: str, related: dict):
         """Convert a many-to-many relationship to a list of table objects."""
-        values = getattr(self, attr, [])
+        values = getattr(self, attr, []) or []
         for item in values:
             related[attr].append(item.to_table())
 
