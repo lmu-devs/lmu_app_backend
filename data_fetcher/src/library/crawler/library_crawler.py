@@ -9,7 +9,6 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel, Field
 
-from data_fetcher.src.core.html_utils import html_to_markdown
 from data_fetcher.src.library.models.library_model import (
     Areas,
     Contact,
@@ -23,6 +22,7 @@ from shared.src.models.location_model import Location
 from shared.src.models.phone_model import Phones
 from shared.src.services.geocoding_service import GeocodingService
 from shared.src.services.llm_service import LLMService
+from shared.utils.html_utils import html_to_markdown
 
 logger = get_library_logger(__name__)
 

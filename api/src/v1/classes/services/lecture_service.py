@@ -1,19 +1,30 @@
 from pathlib import Path
 from typing import Optional
-from shared.src.core.settings import get_settings
-from shared.src.tables.lectures import PersonTable, ClassSessionTable, LectureTable, TreePathTable, ClassBaseInfoTable, AdditionInformationTable, lecture_persons_table
-from shared.src.services.directus_service import DirectusService
-from data_fetcher.src.core.html_utils import html_to_markdown
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import (
-    select
-)
 
 from lxml import html
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models.lecture import LectureDetails, LecturesBasic, LectureBasic, ClassSession, Person
-from shared.src.enums.faculty_enums import (
-    LanguageEnum,
+from shared.src.core.settings import get_settings
+from shared.src.enums.faculty_enums import LanguageEnum
+from shared.src.services.directus_service import DirectusService
+from shared.src.tables.lectures import (
+    AdditionInformationTable,
+    ClassBaseInfoTable,
+    ClassSessionTable,
+    LectureTable,
+    PersonTable,
+    TreePathTable,
+    lecture_persons_table,
+)
+from shared.utils.html_utils import html_to_markdown
+
+from ..models.lecture import (
+    ClassSession,
+    LectureBasic,
+    LectureDetails,
+    LecturesBasic,
+    Person,
 )
 
 GRAPHQL_FOLDER_NAME = "graphql"
@@ -41,10 +52,7 @@ class LectureService:
         return LecturesBasic.from_directus_dict(response["data"]["lecture"])
 
     async def get_lecture_details_db(self, session: AsyncSession, publish_id: int) -> LectureDetails:
-        stmt = (
-            select(LectureTable)
-            .where(LectureTable.publish_id == publish_id)
-        ).distinct()
+        stmt = (select(LectureTable).where(LectureTable.publish_id == publish_id)).distinct()
 
         result = await session.execute(stmt)
         lecture = result.scalar_one_or_none()
@@ -52,32 +60,19 @@ class LectureService:
         if not lecture:
             raise ValueError(f"Lecture with publish_id {publish_id} not found")
 
-        columns = [
-            col for col in AdditionInformationTable.__table__.c
-            if col.name != "id"
-        ]
+        columns = [col for col in AdditionInformationTable.__table__.c if col.name != "id"]
 
-        base_stmt = (
-            select(*columns)
-            .where(AdditionInformationTable.lecture_publish_id == publish_id)
-        ).distinct()
+        base_stmt = (select(*columns).where(AdditionInformationTable.lecture_publish_id == publish_id)).distinct()
         base_result = await session.execute(base_stmt)
         base_row = base_result.mappings().one_or_none()
 
-        sessions_stmt = (
-            select(ClassSessionTable)
-            .where(ClassSessionTable.lecture_publish_id == publish_id)
-        ).distinct()
+        sessions_stmt = (select(ClassSessionTable).where(ClassSessionTable.lecture_publish_id == publish_id)).distinct()
 
         sessions_result = await session.execute(sessions_stmt)
         sessions = sessions_result.scalars().all()
 
         persons_stmt = (
-            select(
-                PersonTable.first_name,
-                PersonTable.surname,
-                PersonTable.title
-            )
+            select(PersonTable.first_name, PersonTable.surname, PersonTable.title)
             .join(lecture_persons_table, PersonTable.id == lecture_persons_table.c.person_id)
             .where(lecture_persons_table.c.lecture_publish_id == publish_id)
             .distinct()
@@ -90,7 +85,7 @@ class LectureService:
             last_updated=lecture.last_updated,
             persons=[Person.model_validate(person) for person in persons],
             sessions=[ClassSession.model_validate(session.__dict__) for session in sessions],
-            addtional_information=self.convert_additional_info_to_markdown(base_row)
+            addtional_information=self.convert_additional_info_to_markdown(base_row),
         )
 
     def convert_additional_info_to_markdown(self, add_info: Optional[AdditionInformationTable]) -> str:
@@ -114,7 +109,7 @@ class LectureService:
             "short_comment": "Kurzkommentar",
             "prerequisites": "Voraussetzungen",
             "number": "Nummer",
-            "type": "Typ"
+            "type": "Typ",
         }
 
         markdown_parts = []
@@ -132,7 +127,8 @@ class LectureService:
         year_suffix = year % 2000
         semester_prefix = "SoSe" if semester_id == 1 else "WiSe"
         semester_text = (
-            f"{semester_prefix} 20{year_suffix}" if semester_id == 1
+            f"{semester_prefix} 20{year_suffix}"
+            if semester_id == 1
             else f"{semester_prefix} {year_suffix}{year_suffix + 1}"
         )
         stmt = (
@@ -142,14 +138,11 @@ class LectureService:
                 ClassBaseInfoTable.sws,
                 ClassBaseInfoTable.class_type,
                 ClassBaseInfoTable.language,
-                ClassBaseInfoTable.semester
+                ClassBaseInfoTable.semester,
             )
             .join(TreePathTable, TreePathTable.lecture_publish_id == LectureTable.publish_id)
             .join(ClassBaseInfoTable, ClassBaseInfoTable.lecture_publish_id == LectureTable.publish_id)
-            .where(
-                (TreePathTable.path[2] == faculty_title)
-                & (ClassBaseInfoTable.semester == semester_text)
-            )
+            .where((TreePathTable.path[2] == faculty_title) & (ClassBaseInfoTable.semester == semester_text))
         ).distinct()
         result = await session.execute(stmt)
         rows = result.mappings().all()
