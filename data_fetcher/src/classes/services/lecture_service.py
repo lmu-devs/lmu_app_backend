@@ -1,9 +1,12 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from operator import le
 from pathlib import Path
 import time
 from typing import List
 import json
+from sqlalchemy.inspection import _self_inspects
 from sqlalchemy.orm.session import Session
+from sqlalchemy.dialects.postgresql import insert
 from typing_extensions import Optional
 import datetime
 import logging
@@ -12,7 +15,7 @@ from shared.src.tables.lectures import LectureTable
 from data_fetcher.src.classes.models.lecture import Lecture, TreePath
 from shared.src.enums.classes_enum import SemesterTypeEnum
 from shared.src.tables.lectures.lecture_tables import *
-from ..crawler.lsf_crawler import LSFCrawler
+from ..crawler.lsf_crawler import LSFCrawler, LSFParallelCrawler
 from shared.src.services.directus_service import DirectusService
 from shared.src.core.logging import get_classes_logger
 
@@ -31,31 +34,55 @@ class LectureFetcher:
         self.workers: int = 5
         self.logger = get_classes_logger(__name__)
 
+    def store_lectures_streaming_upsert(self, db: Session, year: int, semester: SemesterTypeEnum):
+        """Store lectures using streaming + upsert for maximum efficiency."""
+        lecture_crawler = LSFParallelCrawler(year, semester)
+        batch_lectures = []
+        batch_size = 100
+        ids = {
+            id_tuple[0]
+            for id_tuple in db.query(LectureTable.publish_id).all()
+        }
 
-    def store_lectures_db(self, db: Session, year: int, semester: SemesterTypeEnum):
-        """Store all lectures from the LSF crawler into the SQL database."""
-        lectures = self.lsf_crawler.crawl_all_lectures_parallel(year, semester)
+        for index, lecture in enumerate(lecture_crawler):
+            self.logger.info(
+                f"Collecting Batch ({(index + 1) % batch_size}/{batch_size})"
+                + f" from ({index + 1}/{len(lecture_crawler)}) lectures"
+            )
 
-        with db.begin():
-            for index, lecture in enumerate(lectures):
-                if self.lecture_exist_in_db(db, lecture):
-                    self.update_lecture_db(db, lecture)
-                else:
-                    self.add_lecture_db(db, lecture)
-                self.logger.info(f"({index + 1}/{len(lectures)}) Processed Lecture {lecture.title}")
+            batch_lectures.append(lecture)
+            if len(batch_lectures) >= batch_size:
+                self._insert_lecture_batch(db, batch_lectures, ids)
+                db.commit()
+                batch_lectures = []
 
-    def update_lecture_db(self, session: Session, lecture: Lecture):
-        """Update an existing lecture in the SQL database."""
-        old = (
-            session.query(LectureTable)
-                .filter_by(publish_id=lecture.publish_id)
-                .one_or_none()
-        )
-        if old:
-            session.delete(old)
-            session.flush()
+        if batch_lectures:
+            self._insert_lecture_batch(db, batch_lectures, ids)
+            db.commit()
 
-        self.add_lecture_db(session, lecture)
+    def _insert_lecture_batch(self, db: Session, batch: List[Lecture], publish_ids: set[int]):
+        for index, lecture in enumerate(batch):
+            if lecture.publish_id in publish_ids:
+                self.delete_old_lecture_db(db, lecture.publish_id)
+            self.add_lecture_db(db, lecture)
+            self.logger.info(f"Added Lecture in Batch ({index + 1}/{len(batch)}): {lecture.title}")
+
+    def delete_old_lecture_db(self, session: Session, lecture_id: int):
+        lecture = session.get(LectureTable, lecture_id)
+
+        if not lecture:
+            return
+
+        for institution in list(lecture.institutions):
+            lecture.institutions.remove(institution)
+            session.delete(institution)
+
+        for person in list(lecture.persons):
+            lecture.persons.remove(person)
+            session.delete(person)
+
+        session.delete(lecture)
+        session.commit()
 
     def add_lecture_db(self, session: Session, lecture: Lecture):
         """Add a lecture to the SQL database."""
@@ -72,6 +99,32 @@ class LectureFetcher:
                     lecture_table.institutions.append(merged)
             else:
                 session.add_all(entries)
+
+    def store_lectures_db(self, db: Session, year: int, semester: SemesterTypeEnum):
+        """Store all lectures from the LSF crawler into the SQL database."""
+        lecture_crawler = LSFParallelCrawler(year, semester)
+
+        for index, lecture in enumerate(lecture_crawler):
+            if self.lecture_exist_in_db(db, lecture):
+                self.update_lecture_db(db, lecture)
+            else:
+                self.add_lecture_db(db, lecture)
+            db.commit()
+            self.logger.info(f"({index + 1}/{len(lecture_crawler)}) Processed Lecture {lecture.title}")
+
+    def update_lecture_db(self, session: Session, lecture: Lecture):
+        """Update an existing lecture in the SQL database."""
+        old = (
+            session.query(LectureTable)
+                .filter_by(publish_id=lecture.publish_id)
+                .one_or_none()
+        )
+        if old:
+            session.delete(old)
+            session.flush()
+
+        self.add_lecture_db(session, lecture)
+
 
 
 

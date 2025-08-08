@@ -464,7 +464,7 @@ class Lecture(BaseModel):
 
     def _one_to_one_to_table(self, attr: str, related: dict, lecture: LectureTable):
         """Convert a one-to-one relationship to a table object."""
-        value = getattr(self, attr, None)
+        value = getattr(self, attr, None) or None
         if value:
             table_obj = value.to_table()
             table_obj.lecture = lecture
@@ -483,6 +483,27 @@ class Lecture(BaseModel):
         values = getattr(self, attr, []) or []
         for item in values:
             related[attr].append(item.to_table())
+
+    def to_upsert_data(self) -> tuple[dict, dict[str, list[dict]]]:
+        """Convert lecture to upsert-ready dictionaries."""
+        lecture_table, related = self.to_table()
+        lecture_dict = self._table_to_dict(lecture_table)
+        related_dicts = {}
+
+        for relation_type, entities in related.items():
+            related_dicts[relation_type] = [
+                self._table_to_dict(entity) for entity in entities
+            ]
+        return lecture_dict, related_dicts
+
+    def _table_to_dict(self, table_obj) -> dict:
+        """Convert table object to dictionary."""
+        result = {}
+        for column in table_obj.__table__.columns:
+            value = getattr(table_obj, column.name, None)
+            if value is not None:
+                result[column.name] = value
+        return result
 
 
 if __name__ == "__main__":
