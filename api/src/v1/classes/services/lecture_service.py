@@ -115,7 +115,7 @@ class LectureService:
         markdown_parts = []
         for field, translation in field_translations.items():
             value = getattr(add_info, field)
-            text = html_to_markdown(value)
+            text = html_to_markdown(value) if value else ""
             if text:
                 markdown_parts.append(f"### {translation.title()}\n\n{text}")
 
