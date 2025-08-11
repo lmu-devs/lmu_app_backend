@@ -1,6 +1,7 @@
 import codecs
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any, Optional, Iterator
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import concurrent.futures
 from requests.sessions import Session
 import requests
@@ -34,6 +35,7 @@ from ..models.lecture import (
     Lecture,
     Person,
 )
+
 
 
 class LSFCrawler:
@@ -89,17 +91,17 @@ class LSFCrawler:
 
     def crawl_all_lectures(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type sequentially."""
-        self._set_crawling_parameters(year, semester_type)
+        self.set_crawling_parameters(year, semester_type)
         lecture_urls = self._crawl_all_lecture_urls_sequentially()
         return self._crawl_all_lectures_sequentially(lecture_urls)
 
     def crawl_all_lectures_parallel(self, year: int, semester_type: SemesterTypeEnum) -> list[Lecture]:
         """Crawl all lectures for a given year and semester type in parallel."""
-        self._set_crawling_parameters(year, semester_type)
+        self.set_crawling_parameters(year, semester_type)
         lecture_urls = self._crawl_lecture_urls_in_parallel()
         return self._crawl_all_lectures_in_parallel(lecture_urls)
 
-    def _set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
+    def set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
         """Set the year and semester type for the crawling session."""
         self.year = year
         self.semester_type = semester_type
@@ -127,13 +129,14 @@ class LSFCrawler:
         lecture_urls = []
         self.logger.info("Getting class type ids...")
         class_type_ids = self._get_all_available_class_type_ids()
-        self._set_crawling_parameters(year, semester_type)
+        self.set_crawling_parameters(year, semester_type)
 
         for index, type_id in enumerate(class_type_ids):
             self.logger.info(f"Fetching class urls: ({index + 1}/{len(class_type_ids)})")
             lecture_urls += self._get_lecture_urls_for_class_type(type_id)
 
         return lecture_urls
+
 
     def _crawl_lecture_urls_in_parallel(self) -> list[tuple[str, str]]:
         """Collect all lecture URLs in parallel using ThreadPoolExecutor."""
@@ -858,6 +861,49 @@ class LSFCrawler:
         unescaped = codecs.decode(raw, "unicode_escape").encode("latin1").decode("utf-8")
         return re.sub(r"\s+", " ", unescaped).strip()
 
+
+class LSFSequentialCrawler(LSFCrawler):
+    def __init__(self, year: int, semester_type: SemesterTypeEnum):
+        super().__init__()
+        self.set_crawling_parameters(year, semester_type)
+        self._lecture_urls = []
+
+    def __iter__(self) -> Iterator[Lecture]:
+        if self._lecture_urls == []:
+            self._lecture_urls = self._crawl_all_lecture_urls_sequentially()
+
+        for title, url in self._lecture_urls:
+            yield self.build_complete_lecture_object(title, url)
+
+    def __len__(self):
+        return len(self._lecture_urls)
+
+class LSFParallelCrawler(LSFCrawler):
+    def __init__(self, year: int, semester_type: SemesterTypeEnum):
+        super().__init__()
+        self.set_crawling_parameters(year, semester_type)
+        self._lecture_urls = []
+
+    def __iter__(self) -> Iterator[Lecture]:
+        if self._lecture_urls == []:
+            self._lecture_urls = self._crawl_lecture_urls_in_parallel()
+
+        with ThreadPoolExecutor(max_workers=self.workers) as executor:
+            future_to_url = {
+                executor.submit(self.build_complete_lecture_object, title, url): (title, url)
+                for title, url in self._lecture_urls
+            }
+
+            for future in as_completed(future_to_url):
+                try:
+                    lecture = future.result()
+                    yield lecture
+                except Exception as e:
+                    title, _ = future_to_url[future]
+                    self.logger.error(f'Lecture {title} generated an exception: {e}')
+
+    def __len__(self):
+        return len(self._lecture_urls)
 
 def main() -> None:
     logger = logging.getLogger(__name__)
