@@ -167,13 +167,12 @@ class CalendarService:
 
         # past
         # only create past events if the event is not in the future
-        if intervals_since_start > 0:
-            for i in range(min(max_past, intervals_since_start), 0, -1):
-                past_start = current_start - i * delta
-                past_end = past_start + event_duration
-                if past_start >= template.start_time:
-                    recurrence_id = intervals_since_start - i
-                    result.append(generate_entry(recurrence_id, past_start, past_end))
+        for i in range(min(max_past, intervals_since_start), 0, -1):
+            past_start = current_start - i * delta 
+            past_end = past_start + event_duration
+            if past_start >= template.start_time:
+                recurrence_id = intervals_since_start - i
+                result.append(generate_entry(recurrence_id, past_start, past_end))
       
         # "today"
         recurrence_id = intervals_since_start
