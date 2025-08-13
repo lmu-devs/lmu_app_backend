@@ -131,53 +131,63 @@ class CalendarService:
         if parent_event is None:
             return []
         
-        parent_entry = CalendarEvent.from_json(parent_event)
-        rule = parent_entry.rule
+        template = CalendarEvent.from_json(parent_event)
+        rule = template.rule
         if rule.frequency == Frequency.ONCE:
-            return [parent_entry]
+            return [template]
         
         delta = self._get_delta(rule.frequency, rule.interval or 1)
         if delta is None:
-            return [parent_entry]
-    
+            return [template]
+        
         raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
-        exceptions_map = {
-            exc.get("recurrence_id"): exc
-            for exc in raw_exceptions
-            if "recurrence_id" in exc
-        }
+        exceptions_map = { exc.get("recurrence_id"): exc for exc in raw_exceptions if "recurrence_id" in exc }
 
-        base_start = parent_entry.start_time
-        base_end = parent_entry.end_time
-        result = []
+        now = datetime.now()
+        event_duration = template.end_time - template.start_time
+        intervals_since_start = (now - template.start_time) // delta
+        
+        # Prevent the creation of events that shouldn't exist if we create an event in the future
+        if intervals_since_start < 0:
+            intervals_since_start = 0
+            current_start = template.start_time
+            current_end = current_start + event_duration
+        else:
+            current_start = template.start_time + intervals_since_start * delta
+            current_end = current_start + event_duration
 
         # helper
         def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEvent:
-            if offset in exceptions_map:
-                return CalendarEvent.from_json(parent_event, exceptions_map[offset])
-            return parent_entry.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
+            exc = exceptions_map.get(offset)
+            if exc:
+                return CalendarEvent.from_json(parent_event, exc)
+            return template.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
 
-        # past events
-        for i in range(max_past, 0, -1):
-            start, end = base_start - i * delta, base_end - i * delta
-            if not rule.until_time or end >= rule.until_time:
-               result.append(generate_entry(-i, start, end))
+        result = []
 
-        # base event
-        if 0 in exceptions_map:
-            entry = CalendarEvent.from_json(parent_event, exceptions_map[0])
-        else:
-            entry = parent_entry
-        entry.recurrence_id = 0
-        result.append(entry)
+        # past
+        # only create past events if the event is not in the future
+        if intervals_since_start > 0:
+            for i in range(min(max_past, intervals_since_start), 0, -1):
+                past_start = current_start - i * delta
+                past_end = past_start + event_duration
+                if past_start >= template.start_time:
+                    recurrence_id = intervals_since_start - i
+                    result.append(generate_entry(recurrence_id, past_start, past_end))
+      
+        # "today"
+        recurrence_id = intervals_since_start
+        result.append(generate_entry(recurrence_id, current_start, current_end))
 
-        # future events
+        # future
         for i in range(1, max_future + 1):
-            start, end = base_start + i * delta, base_end + i * delta
-            if rule.until_time and start > rule.until_time:
+            future_start = current_start + i * delta
+            future_end = future_start + event_duration
+            if rule.until_time and future_start > rule.until_time: # TODO: fix until_time, invent new exception system :(
                 break
-            result.append(generate_entry(i, start, end))
-        
+            recurrence_id = intervals_since_start + i
+            result.append(generate_entry(recurrence_id, future_start, future_end))
+
         return result
     
     def create_event(self, 
