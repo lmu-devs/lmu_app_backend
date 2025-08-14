@@ -123,7 +123,9 @@ class CalendarService:
          
     def _calc_intervals_since_start(self, 
         start: datetime, 
-        now: datetime, delta) -> int:
+        now: datetime, 
+        delta
+        ) -> int:
         """Calculates the number of intervals happend between now and the start time."""
         if isinstance(delta, timedelta):
             return (now - start) // delta
@@ -159,19 +161,7 @@ class CalendarService:
         
         raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
         exceptions_map = { exc.get("recurrence_id"): exc for exc in raw_exceptions if "recurrence_id" in exc }
-
-        event_duration = template.end_time - template.start_time
-        intervals_since_start = self._calc_intervals_since_start(template.start_time, datetime.now(), delta)
-        
-        # Prevent the creation of events that shouldn't exist if we create an event in the future
-        if intervals_since_start < 0:
-            intervals_since_start = 0
-            current_start = template.start_time
-        else:
-            current_start = template.start_time + intervals_since_start * delta
-
-        current_end = current_start + event_duration
-
+ 
         # helper
         def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEvent:
             exc = exceptions_map.get(offset)
@@ -179,29 +169,34 @@ class CalendarService:
                 return CalendarEvent.from_json(parent_event, exc)
             return template.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
 
+        # calculate the offset from the template.start_time until today. This is our relative "today"
+        # negativ if the event starts in the future
+        base_id = self._calc_intervals_since_start(template.start_time, datetime.now(), delta)
+        event_duration = template.end_time - template.start_time
+
+        # the start_time of the event is in the past, we are in the future
+        if base_id >= 0:
+            start_id = max(0, base_id - max_past)
+            end_id = base_id + max_future
+        # the event is starting in the future
+        else:
+            start_id = 0
+            end_id = max_future
+
         result = []
-
-        # past
-        # only create past events if the event is not in the future
-        for i in range(min(max_past, intervals_since_start), 0, -1):
-            past_start = current_start - i * delta 
-            past_end = past_start + event_duration
-            if past_start >= template.start_time:
-                recurrence_id = intervals_since_start - i
-                result.append(generate_entry(recurrence_id, past_start, past_end))
-      
-        # "today"
-        recurrence_id = intervals_since_start
-        result.append(generate_entry(recurrence_id, current_start, current_end))
-
-        # future
-        for i in range(1, max_future + 1):
-            future_start = current_start + i * delta
-            future_end = future_start + event_duration
-            if rule.until_time and future_start > rule.until_time: # TODO: invent new exception system :(
+    
+        for i in range(start_id, end_id + 1):
+            current_start = template.start_time + i * delta
+        
+            # end loop if end date is reached
+            if rule.until_time and current_start > rule.until_time:
                 break
-            recurrence_id = intervals_since_start + i
-            result.append(generate_entry(recurrence_id, future_start, future_end))
+
+            current_end = current_start + event_duration
+        
+            # i is the offset from template.start_time to the generated instance
+            # this allows the exception system to function
+            result.append(generate_entry(i, current_start, current_end))
 
         return result
     
