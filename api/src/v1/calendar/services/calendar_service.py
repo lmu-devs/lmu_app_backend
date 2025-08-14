@@ -121,7 +121,26 @@ class CalendarService:
                 return entry
         return None
          
-    def _generate_repeat_events(self, 
+    def _calc_intervals_since_start(self, 
+        start: datetime, 
+        now: datetime, 
+        delta
+        ) -> int:
+        """Calculates the number of intervals happend between now and the start time."""
+        if isinstance(delta, timedelta):
+            return (now - start) // delta
+        elif isinstance(delta, relativedelta):
+            # months or years
+            months_diff = (now.year - start.year) * 12 + (now.month - start.month)
+            if delta.years:
+                interval_months = delta.years * 12
+            else:
+                interval_months = delta.months
+            return months_diff // interval_months
+        else:
+            return 0
+
+    def _generate_recurring_events(self, 
         parent_event: dict, 
         max_past: int = REPEAT_LIMIT,
         max_future: int = REPEAT_LIMIT, 
@@ -131,53 +150,53 @@ class CalendarService:
         if parent_event is None:
             return []
         
-        parent_entry = CalendarEvent.from_json(parent_event)
-        rule = parent_entry.rule
+        template = CalendarEvent.from_json(parent_event)
+        rule = template.rule
         if rule.frequency == Frequency.ONCE:
-            return [parent_entry]
+            return [template]
         
         delta = self._get_delta(rule.frequency, rule.interval or 1)
         if delta is None:
-            return [parent_entry]
-    
-        raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
-        exceptions_map = {
-            exc.get("recurrence_id"): exc
-            for exc in raw_exceptions
-            if "recurrence_id" in exc
-        }
-
-        base_start = parent_entry.start_time
-        base_end = parent_entry.end_time
-        result = []
-
-        # helper
-        def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEvent:
-            if offset in exceptions_map:
-                return CalendarEvent.from_json(parent_event, exceptions_map[offset])
-            return parent_entry.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
-
-        # past events
-        for i in range(max_past, 0, -1):
-            start, end = base_start - i * delta, base_end - i * delta
-            if not rule.until_time or end >= rule.until_time:
-               result.append(generate_entry(-i, start, end))
-
-        # base event
-        if 0 in exceptions_map:
-            entry = CalendarEvent.from_json(parent_event, exceptions_map[0])
-        else:
-            entry = parent_entry
-        entry.recurrence_id = 0
-        result.append(entry)
-
-        # future events
-        for i in range(1, max_future + 1):
-            start, end = base_start + i * delta, base_end + i * delta
-            if rule.until_time and start > rule.until_time:
-                break
-            result.append(generate_entry(i, start, end))
+            return [template]
         
+        raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
+        exceptions_map = { exc.get("recurrence_id"): exc for exc in raw_exceptions if "recurrence_id" in exc }
+ 
+        # calculate the offset from the template.start_time until today. This is our relative "today"
+        # negativ if the event starts in the future
+        base_id = self._calc_intervals_since_start(template.start_time, datetime.now(), delta)
+        event_duration = template.end_time - template.start_time
+
+        # the start_time of the event is in the past, we are in the future
+        if base_id >= 0:
+            start_id = max(0, base_id - max_past)
+            end_id = base_id + max_future
+        # the event is starting in the future
+        else:
+            start_id = 0
+            end_id = max_future
+
+        result = []
+    
+        for i in range(start_id, end_id + 1):
+            current_start = template.start_time + i * delta
+        
+            # end loop if end date is reached
+            if rule.until_time and current_start > rule.until_time:
+                break
+
+            current_end = current_start + event_duration
+        
+            # i is the offset from template.start_time to the generated instance
+            # this allows the exception system to function      
+            exc = exceptions_map.get(i)
+            if exc:
+                event = CalendarEvent.from_json(parent_event, exc)
+            else:
+                event = template.copy_with_override(start_time=current_start, end_time=current_end, recurrence_id=i)
+            
+            result.append(event)
+
         return result
     
     def create_event(self, 
@@ -196,7 +215,7 @@ class CalendarService:
             msg = f"for user {user_id}!"
 
         logger.info(f"Created new calendar event {item["id"]} {msg}")
-        return self._generate_repeat_events(item, 0)
+        return self._generate_recurring_events(item, 0)
     
     def _delete_location_event(self,
         location_id: uuid.UUID
@@ -276,7 +295,7 @@ class CalendarService:
         if not item:
             raise DatabaseError(f"Failed to update {event_id}!")
         
-        return self._generate_repeat_events(item)
+        return self._generate_recurring_events(item)
 
     def _update_repeat_event(self,
         event_id: uuid.UUID,     
@@ -377,7 +396,7 @@ class CalendarService:
 
         instances = []
         for event in events:
-            instances.extend(self._generate_repeat_events(event))
+            instances.extend(self._generate_recurring_events(event))
 
         return instances
 
