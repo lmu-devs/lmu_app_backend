@@ -162,13 +162,6 @@ class CalendarService:
         raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
         exceptions_map = { exc.get("recurrence_id"): exc for exc in raw_exceptions if "recurrence_id" in exc }
  
-        # helper
-        def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEvent:
-            exc = exceptions_map.get(offset)
-            if exc:
-                return CalendarEvent.from_json(parent_event, exc)
-            return template.copy_with_override(start_time=start, end_time=end, recurrence_id=offset)
-
         # calculate the offset from the template.start_time until today. This is our relative "today"
         # negativ if the event starts in the future
         base_id = self._calc_intervals_since_start(template.start_time, datetime.now(), delta)
@@ -195,8 +188,14 @@ class CalendarService:
             current_end = current_start + event_duration
         
             # i is the offset from template.start_time to the generated instance
-            # this allows the exception system to function
-            result.append(generate_entry(i, current_start, current_end))
+            # this allows the exception system to function      
+            exc = exceptions_map.get(i)
+            if exc:
+                event = CalendarEvent.from_json(parent_event, exc)
+            else:
+                event = template.copy_with_override(start_time=current_start, end_time=current_end, recurrence_id=i)
+            
+            result.append(event)
 
         return result
     
