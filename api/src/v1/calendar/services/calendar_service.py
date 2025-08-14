@@ -121,7 +121,24 @@ class CalendarService:
                 return entry
         return None
          
-    def _generate_repeat_events(self, 
+    def _calc_intervals_since_start(self, 
+        start: datetime, 
+        now: datetime, delta) -> int:
+        """Calculates the number of intervals happend between now and the start time."""
+        if isinstance(delta, timedelta):
+            return (now - start) // delta
+        elif isinstance(delta, relativedelta):
+            # months or years
+            months_diff = (now.year - start.year) * 12 + (now.month - start.month)
+            if delta.years:
+                interval_months = delta.years * 12
+            else:
+                interval_months = delta.months
+            return months_diff // interval_months
+        else:
+            return 0
+
+    def _generate_recurring_events(self, 
         parent_event: dict, 
         max_past: int = REPEAT_LIMIT,
         max_future: int = REPEAT_LIMIT, 
@@ -143,18 +160,17 @@ class CalendarService:
         raw_exceptions = self._safe_get(parent_event, ["exceptions"]) or []
         exceptions_map = { exc.get("recurrence_id"): exc for exc in raw_exceptions if "recurrence_id" in exc }
 
-        now = datetime.now()
         event_duration = template.end_time - template.start_time
-        intervals_since_start = (now - template.start_time) // delta
+        intervals_since_start = self._calc_intervals_since_start(template.start_time, datetime.now(), delta)
         
         # Prevent the creation of events that shouldn't exist if we create an event in the future
         if intervals_since_start < 0:
             intervals_since_start = 0
             current_start = template.start_time
-            current_end = current_start + event_duration
         else:
             current_start = template.start_time + intervals_since_start * delta
-            current_end = current_start + event_duration
+
+        current_end = current_start + event_duration
 
         # helper
         def generate_entry(offset: int, start: datetime, end: datetime) -> CalendarEvent:
@@ -182,7 +198,7 @@ class CalendarService:
         for i in range(1, max_future + 1):
             future_start = current_start + i * delta
             future_end = future_start + event_duration
-            if rule.until_time and future_start > rule.until_time: # TODO: fix until_time, invent new exception system :(
+            if rule.until_time and future_start > rule.until_time: # TODO: invent new exception system :(
                 break
             recurrence_id = intervals_since_start + i
             result.append(generate_entry(recurrence_id, future_start, future_end))
@@ -205,7 +221,7 @@ class CalendarService:
             msg = f"for user {user_id}!"
 
         logger.info(f"Created new calendar event {item["id"]} {msg}")
-        return self._generate_repeat_events(item, 0)
+        return self._generate_recurring_events(item, 0)
     
     def _delete_location_event(self,
         location_id: uuid.UUID
@@ -285,7 +301,7 @@ class CalendarService:
         if not item:
             raise DatabaseError(f"Failed to update {event_id}!")
         
-        return self._generate_repeat_events(item)
+        return self._generate_recurring_events(item)
 
     def _update_repeat_event(self,
         event_id: uuid.UUID,     
@@ -386,7 +402,7 @@ class CalendarService:
 
         instances = []
         for event in events:
-            instances.extend(self._generate_repeat_events(event))
+            instances.extend(self._generate_recurring_events(event))
 
         return instances
 
