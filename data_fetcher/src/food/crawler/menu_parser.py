@@ -1,11 +1,7 @@
-import csv
 import datetime
-import re
-import tempfile
-import unicodedata
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Dict, List, Optional, Pattern, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 from warnings import warn
 
 import requests  # type: ignore

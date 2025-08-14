@@ -4,7 +4,6 @@ import requests
 import schedule
 
 from data_fetcher.src.core.base_collector import ScheduledCollector
-from data_fetcher.src.food.service.canteen_service import CanteenService
 from data_fetcher.src.food.service.menu_service import MenuFetcher
 from shared.src.core.error_handlers import handle_error
 from shared.src.core.logging import get_food_fetcher_logger
@@ -20,9 +19,6 @@ class FoodCollector(ScheduledCollector):
     async def _collect_data(self, db):
         """Fetches data for the next 28 days for all canteens"""
         try:
-            # Update canteen data
-            CanteenService(db).update_canteen_database()
-
             menu_service = MenuFetcher(db)
 
             # Calculate date range

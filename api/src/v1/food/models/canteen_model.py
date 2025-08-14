@@ -2,7 +2,9 @@ from typing import List
 
 from pydantic import BaseModel, RootModel
 
-from shared.src.models import ActiveOpeningHours, CanteenBase, Images, Rating
+from shared.src.enums.canteen_enums import CanteenEnum, CanteenTypeEnum
+from shared.src.models import ActiveOpeningHours, Images, Rating
+from shared.src.models.location_model import Location
 from shared.src.tables import CanteenStatusTable
 
 
@@ -20,7 +22,11 @@ class CanteenStatus(BaseModel):
         )
 
 
-class CanteenResponse(CanteenBase):
+class CanteenResponse(BaseModel):
+    id: CanteenEnum
+    name: str
+    type: CanteenTypeEnum
+    location: Location
     status: CanteenStatus
     rating: Rating
     images: Images

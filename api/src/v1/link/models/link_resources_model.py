@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 from shared.src.models.rating_model import Rating
-from shared.src.tables.link import LinkType
+from shared.src.tables.link.link_resources_table import LinkType
 
 
 class LinkResource(BaseModel):

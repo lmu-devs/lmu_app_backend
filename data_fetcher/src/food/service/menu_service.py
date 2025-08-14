@@ -28,7 +28,6 @@ logger = get_food_fetcher_logger(__name__)
 
 
 class MenuFetcher:
-
     def __init__(self, db: Session):
         self.db = db
         self.translation_service = TranslationService()

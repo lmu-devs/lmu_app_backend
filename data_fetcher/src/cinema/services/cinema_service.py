@@ -14,13 +14,6 @@ from shared.src.tables import (
     MovieTranslationTable,
 )
 
-from ..constants.cinema_constants import (
-    hm_cinema,
-    lmu_cinema,
-    tum_cinema,
-    tum_garching_cinema,
-)
-
 logger = get_cinema_fetcher_logger(__name__)
 
 
@@ -28,14 +21,6 @@ class CinemaService:
     def __init__(self, db: Session):
         self.settings = get_settings()
         self.db = db
-
-    def add_constant_cinema_data(self):
-        cinemas = [lmu_cinema, hm_cinema, tum_cinema, tum_garching_cinema]
-
-        for cinema in cinemas:
-            self.db.merge(cinema)
-        self.db.commit()
-        logger.info(f"Successfully added {len(cinemas)} cinemas to database")
 
     def clear_cinema_tables(self):
         """Clear all cinema-related tables in the correct order"""
