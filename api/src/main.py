@@ -13,6 +13,7 @@ from shared.src.core.settings import get_settings
 
 from .v1.calendar.routers import calendar_router
 from .v1.cinema.routers import cinema_router
+from .v1.classes.routers import lecture_router
 from .v1.feature_flag.routers import feature_flags_router
 from .v1.feedback.routers import feedback_router
 from .v1.food.routers import canteen_router, dish_router, menu_router, taste_router
@@ -25,11 +26,9 @@ from .v1.places.routers import places_router
 from .v1.roomfinder.routers import roomfinder_router
 from .v1.sport.routers import sport_router
 from .v1.timeline.routers import timeline_router
+from .v1.university.routers import university_router
 from .v1.user.routers import user_router
 from .v1.wishlist.routers import wishlist_router
-from .v1.university.routers import university_router
-from .v1.classes.routers import lecture_router
-from .v2.link.routers import link_router as link_router_v2
 from .v2.wishlist.routers import wishlist_router as wishlist_router_v2
 from .v1.people.routers import people_router
 
@@ -86,22 +85,15 @@ def create_app():
     app.include_router(feedback_router.router, prefix=prefix_v1, tags=["feedback"])
     app.include_router(wishlist_router.router, prefix=prefix_v1, tags=["wishlist"])
     app.include_router(wishlist_router_v2.router, prefix=prefix_v2, tags=["wishlist"])
-    app.include_router(
-        cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"]
-    )
+    app.include_router(cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"])
     app.include_router(home_router.router, prefix=prefix_v1, tags=["home"])
     app.include_router(places_router.router, prefix=prefix_v1, tags=["place"])
     app.include_router(sport_router.router, prefix=prefix_v1, tags=["sport"])
-    app.include_router(
-        roomfinder_router.router, prefix=f"{prefix_v1}/roomfinder", tags=["roomfinder"]
-    )
+    app.include_router(roomfinder_router.router, prefix=f"{prefix_v1}/roomfinder", tags=["roomfinder"])
     app.include_router(timeline_router.router, prefix=prefix_v1, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix_v1}/link", tags=["link"])
-    app.include_router(link_router_v2.router, prefix=f"{prefix_v2}/link", tags=["link"])
-    app.include_router(
-        library_router.router, prefix=f"{prefix_v1}/library", tags=["library"]
-    )
-    app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])  
+    app.include_router(library_router.router, prefix=f"{prefix_v1}/library", tags=["library"])
+    app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
     app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
     app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
     app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
