@@ -34,7 +34,7 @@ async def get_all_resources(
     return links
 
 
-@router.get(
+@router.post(
     "/resources/toggle-like",
     description="Toggle like for a link resource",
     response_model=bool,
