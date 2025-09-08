@@ -1,0 +1,28 @@
+query GetBenefits($languageCode: String!) {
+    benefit_types(sort: ["translations.title"]) {
+        id
+        emoji
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+            description
+        }
+        benefits {
+            benefits_id {
+                id
+            }
+        }
+    }
+    benefits(sort: ["translations.title"]) {
+        id
+        image {
+            title
+            id
+        }
+        url
+        favicon_url
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+            description
+        }
+    }
+}
