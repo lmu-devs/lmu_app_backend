@@ -32,7 +32,7 @@ jobs:
               with:
                   context: .
                   file: ./docker/Dockerfile-api
-                  platforms: linux/amd64,linux/arm64
+                  platforms: linux/amd64
                   push: true
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-api:staging
@@ -47,7 +47,7 @@ jobs:
               with:
                   context: .
                   file: ./docker/Dockerfile-data_fetcher
-                  platforms: linux/amd64,linux/arm64
+                  platforms: linux/amd64
                   push: true
                   tags: |
                       ${{ secrets.DOCKER_USERNAME }}/lmu-app-backend-data:staging
