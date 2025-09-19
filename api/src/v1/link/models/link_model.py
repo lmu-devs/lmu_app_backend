@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from shared.src.models.rating_model import Rating
 
 
-class LinkResource(BaseModel):
+class Link(BaseModel):
     id: str
     title: str
     description: str
