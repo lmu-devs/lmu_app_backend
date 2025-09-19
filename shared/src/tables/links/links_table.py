@@ -21,7 +21,7 @@ class LinkLikeTable(Base):
     __tablename__ = "links_likes"
 
     id = Column(Integer, primary_key=True)
-    link_id = Column(Integer, ForeignKey("links.id", ondelete="CASCADE"), nullable=False)
+    links_id = Column(Integer, ForeignKey("links.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     link = relationship("LinkTable", back_populates="likes")

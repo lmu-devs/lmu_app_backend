@@ -12,10 +12,10 @@ from shared.src.models.rating_model import Rating
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.links.links_table import LinkLikeTable
 
-from ..models.link_resources_model import LinkResource
+from ..models.link_model import Link
 
 
-class LinkResourceService:
+class LinkService:
     def __init__(self, db: AsyncSession):
         self.db = db
         self.like_service = LikeService(db)
@@ -26,10 +26,10 @@ class LinkResourceService:
         self,
         language: LanguageEnum = LanguageEnum.GERMAN,
         user_id: Optional[uuid.UUID] = None,
-    ) -> List[LinkResource]:
+    ) -> List[Link]:
         try:
             # Execute GraphQL query
-            query_path = Path(__file__).parent.parent / "graphql" / "link_recources_query.graphql"
+            query_path = Path(__file__).parent.parent / "graphql" / "link_query.graphql"
             response = self.directus.execute_query_file(
                 query_file_path=query_path,
                 variables={"languageCode": language.value},
@@ -42,7 +42,7 @@ class LinkResourceService:
             print(links)
 
             # Get like counts for all links
-            like_counts = await self.like_service.get_like_counts(LinkLikeTable, [link["id"] for link in links])
+            like_counts = await self.like_service.get_like_counts(LinkLikeTable, [int(link["id"]) for link in links])
 
             # Get user's liked links if user_id is provided
             liked_link_ids = []
@@ -52,8 +52,9 @@ class LinkResourceService:
             # Add rating information and process each link
             processed_links = []
             for link in links:
-                like_count = like_counts.get(link["id"], 0)
-                is_liked = link["id"] in liked_link_ids if user_id else None
+                link_id = int(link["id"])
+                like_count = like_counts.get(link_id, 0)
+                is_liked = link_id in liked_link_ids if user_id else None
 
                 # Add rating information
                 link["rating"] = Rating.from_params(like_count=like_count, is_liked=is_liked)
@@ -68,7 +69,7 @@ class LinkResourceService:
                 link["aliases"] = []
 
                 # Create validated link object
-                processed_links.append(LinkResource(**link))
+                processed_links.append(Link(**link))
 
             # Return the complete response
             return processed_links
@@ -77,4 +78,4 @@ class LinkResourceService:
             raise e
 
     async def toggle_like(self, id: str, user_id: str):
-        return await self.like_service.toggle_like(LinkLikeTable, id, user_id)
+        return await self.like_service.toggle_like(LinkLikeTable, int(id), user_id)
