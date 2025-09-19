@@ -27,7 +27,6 @@ from .v1.sport.routers import sport_router
 from .v1.timeline.routers import timeline_router
 from .v1.university.routers import university_router
 from .v1.user.routers import user_router
-from .v1.wishlist.routers import wishlist_router
 from .v2.benefit.routers import benefit_router
 from .v2.wishlist.routers import wishlist_router as wishlist_router_v2
 from .v1.people.routers import people_router
@@ -83,7 +82,6 @@ def create_app():
     app.include_router(user_router.router, prefix=prefix_v1, tags=["user"])
     app.include_router(log_router.router, prefix=prefix_v1, tags=["log"])
     app.include_router(feedback_router.router, prefix=prefix_v1, tags=["feedback"])
-    app.include_router(wishlist_router.router, prefix=prefix_v1, tags=["wishlist"])
     app.include_router(wishlist_router_v2.router, prefix=prefix_v2, tags=["wishlist"])
     app.include_router(cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"])
     app.include_router(home_router.router, prefix=prefix_v1, tags=["home"])

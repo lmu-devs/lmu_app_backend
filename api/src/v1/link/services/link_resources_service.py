@@ -10,7 +10,7 @@ from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.models.rating_model import Rating
 from shared.src.services.directus_service import DirectusService
-from shared.src.tables.link.link_resources_table import LinkResourceLikeTable
+from shared.src.tables.links.links_table import LinkLikeTable
 
 from ..models.link_resources_model import LinkResource
 
@@ -42,12 +42,12 @@ class LinkResourceService:
             print(links)
 
             # Get like counts for all links
-            like_counts = await self.like_service.get_like_counts(LinkResourceLikeTable, [link["id"] for link in links])
+            like_counts = await self.like_service.get_like_counts(LinkLikeTable, [link["id"] for link in links])
 
             # Get user's liked links if user_id is provided
             liked_link_ids = []
             if user_id:
-                liked_link_ids = await self.like_service.get_user_likes(LinkResourceLikeTable, user_id)
+                liked_link_ids = await self.like_service.get_user_likes(LinkLikeTable, user_id)
 
             # Add rating information and process each link
             processed_links = []
@@ -77,4 +77,4 @@ class LinkResourceService:
             raise e
 
     async def toggle_like(self, id: str, user_id: str):
-        return await self.like_service.toggle_like(LinkResourceLikeTable, id, user_id)
+        return await self.like_service.toggle_like(LinkLikeTable, id, user_id)
