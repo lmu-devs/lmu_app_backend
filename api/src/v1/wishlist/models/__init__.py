@@ -1,1 +1,0 @@
-from .wishlist_scheme import *
