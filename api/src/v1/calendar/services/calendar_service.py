@@ -436,6 +436,8 @@ class CalendarService:
             filters["_and"].append({"rule": {"frequency": {"_eq": frequency}}})
 
         events = self._execute_graphql_file(GraphQLFile.kGetEvent, {"filter": filters}, ["calendar_event"])
+        if not events:
+            logger.error("No events found!")
 
         instances = []
         for event in events:
