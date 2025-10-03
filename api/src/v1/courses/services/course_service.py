@@ -5,43 +5,44 @@ from lxml import html
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from data_fetcher.src.courses.models.course import Course
 from shared.src.core.settings import get_settings
 from shared.src.enums.faculty_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
-from shared.src.tables.lectures import (
-    AdditionInformationTable,
-    ClassBaseInfoTable,
-    ClassSessionTable,
-    LectureTable,
-    PersonTable,
-    TreePathTable,
-    lecture_persons_table,
+from shared.src.tables.courses.course_tables import (
+    CourseAdditionInformationTable,
+    CourseBaseInfoTable,
+    CourseSessionTable,
+    CourseTable,
+    CoursePersonTable,
+    CourseTreePathTable,
+    course_persons_association,
 )
 from shared.utils.html_utils import html_to_markdown
 
-from ..models.lecture import (
-    ClassSession,
-    LectureBasic,
-    LectureDetails,
-    LecturesBasic,
+from ..models.course import (
+    Session,
+    CourseBasic,
+    CoursesBasic,
+    CourseDetails,
     Person,
 )
 
 GRAPHQL_FOLDER_NAME = "graphql"
 ALL_LECTURE_QERRY_NAME = "all_lectures.graphql"
-LECTURE_BY_FACULTY_NAME = "faculty_lectures.graphql"
+COURSES_BY_FACULTY_NAME = "faculty_lectures.graphql"
 FACULTY_BY_ID_QUERY_NAME = "faculty_title_by_id.graphql"
 
 
-class LectureService:
-    """Service to interact with lectures in the Directus database."""
+class CourseService:
+    """Service to interact with courses in the Directus database."""
 
     def __init__(self):
         self.settings = get_settings()
         self.directus = DirectusService()
 
-    async def get_all_lectures(self) -> LecturesBasic:
-        """Get all lectures."""
+    async def get_all_courses(self) -> CoursesBasic:
+        """Get all courses."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
         query_name = ALL_LECTURE_QERRY_NAME
@@ -49,46 +50,71 @@ class LectureService:
         response = self.directus.execute_query_file(
             query_file_path=query_path,
         )
-        return LecturesBasic.from_directus_dict(response["data"]["lecture"])
+        return CoursesBasic.from_directus_dict(response["data"]["lecture"])
 
-    async def get_lecture_details_db(self, session: AsyncSession, publish_id: int) -> LectureDetails:
-        stmt = (select(LectureTable).where(LectureTable.publish_id == publish_id)).distinct()
+    async def getcourse_details_db(
+        self, session: AsyncSession, publish_id: int
+    ) -> CourseDetails:
+        stmt = (
+            select(CourseTable).where(CourseTable.publish_id == publish_id)
+        ).distinct()
 
         result = await session.execute(stmt)
-        lecture = result.scalar_one_or_none()
+        course = result.scalar_one_or_none()
 
-        if not lecture:
-            raise ValueError(f"Lecture with publish_id {publish_id} not found")
+        if not course:
+            raise ValueError(f"Course with publish_id {publish_id} not found")
 
-        columns = [col for col in AdditionInformationTable.__table__.c if col.name != "id"]
+        columns = [
+            col
+            for col in CourseAdditionInformationTable.__table__.c
+            if col.name != "id"
+        ]
 
-        base_stmt = (select(*columns).where(AdditionInformationTable.lecture_publish_id == publish_id)).distinct()
+        base_stmt = (
+            select(*columns).where(
+                CourseAdditionInformationTable.course_publish_id == publish_id
+            )
+        ).distinct()
         base_result = await session.execute(base_stmt)
         base_row = base_result.mappings().one_or_none()
 
-        sessions_stmt = (select(ClassSessionTable).where(ClassSessionTable.lecture_publish_id == publish_id)).distinct()
+        sessions_stmt = (
+            select(CourseSessionTable).where(
+                CourseSessionTable.course_publish_id == publish_id
+            )
+        ).distinct()
 
         sessions_result = await session.execute(sessions_stmt)
         sessions = sessions_result.scalars().all()
 
         persons_stmt = (
-            select(PersonTable.first_name, PersonTable.surname, PersonTable.title)
-            .join(lecture_persons_table, PersonTable.id == lecture_persons_table.c.person_id)
-            .where(lecture_persons_table.c.lecture_publish_id == publish_id)
+            select(
+                CoursePersonTable.first_name,
+                CoursePersonTable.surname,
+                CoursePersonTable.title,
+            )
+            .join(
+                course_persons_association,
+                CoursePersonTable.id == course_persons_association.c.person_id,
+            )
+            .where(course_persons_association.c.course_publish_id == publish_id)
             .distinct()
         )
 
         result = await session.execute(persons_stmt)
         persons = result.mappings().all()
 
-        return LectureDetails(
-            last_updated=lecture.last_updated,
+        return CourseDetails(
+            last_updated=course.last_updated,
             persons=[Person.model_validate(person) for person in persons],
-            sessions=[ClassSession.model_validate(session.__dict__) for session in sessions],
+            sessions=[Session.model_validate(session.__dict__) for session in sessions],
             addtional_information=self.convert_additional_info_to_markdown(base_row),
         )
 
-    def convert_additional_info_to_markdown(self, add_info: Optional[AdditionInformationTable]) -> str:
+    def convert_additional_info_to_markdown(
+        self, add_info: Optional[CourseAdditionInformationTable]
+    ) -> str:
         if not add_info:
             return ""
 
@@ -121,8 +147,10 @@ class LectureService:
 
         return "\n\n".join(markdown_parts)
 
-    async def get_lectures_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
-        """Get all lectures from a specific faculty, semester and year."""
+    async def get_coursess_from_faculty_db(
+        self, session: AsyncSession, faculty_id: int, year: int, semester_id: int
+    ):
+        """Get all classes from a specific faculty, semester and year."""
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
         year_suffix = year % 2000
         semester_prefix = "SoSe" if semester_id == 1 else "WiSe"
@@ -133,27 +161,36 @@ class LectureService:
         )
         stmt = (
             select(
-                LectureTable.publish_id,
-                LectureTable.title.label("name"),
-                ClassBaseInfoTable.sws,
-                ClassBaseInfoTable.class_type,
-                ClassBaseInfoTable.language,
-                ClassBaseInfoTable.semester,
+                CourseTable.publish_id,
+                CourseTable.title.label("name"),
+                CourseBaseInfoTable.sws,
+                CourseBaseInfoTable.type,
+                CourseBaseInfoTable.language,
+                CourseBaseInfoTable.semester,
             )
-            .join(TreePathTable, TreePathTable.lecture_publish_id == LectureTable.publish_id)
-            .join(ClassBaseInfoTable, ClassBaseInfoTable.lecture_publish_id == LectureTable.publish_id)
-            .where((TreePathTable.path[2] == faculty_title) & (ClassBaseInfoTable.semester == semester_text))
+            .join(
+                CourseTreePathTable,
+                CourseTreePathTable.course_publish_id == CourseTable.publish_id,
+            )
+            .join(
+                CourseBaseInfoTable,
+                CourseBaseInfoTable.course_publish_id == CourseTable.publish_id,
+            )
+            .where(
+                (CourseTreePathTable.path[2] == faculty_title)
+                & (CourseBaseInfoTable.semester == semester_text)
+            )
         ).distinct()
         result = await session.execute(stmt)
         rows = result.mappings().all()
-        lecture_models = [LectureBasic.model_validate(row) for row in rows]
-        return LecturesBasic(root=lecture_models)
+        course_models = [CourseBasic.model_validate(row) for row in rows]
+        return CoursesBasic(root=course_models)
 
-    async def get_lectures_from_faculty(self, faculty_id: int) -> LecturesBasic:
-        """Get all lectures from a specified faculty."""
+    async def get_courses_from_faculty(self, faculty_id: int) -> CoursesBasic:
+        """Get all courses from a specified faculty."""
         base_path = Path(__file__).parent.parent
         folder = GRAPHQL_FOLDER_NAME
-        query_name = LECTURE_BY_FACULTY_NAME
+        query_name = COURSES_BY_FACULTY_NAME
         query_path = base_path / folder / query_name
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
 
@@ -162,7 +199,7 @@ class LectureService:
             variables={"facultyString": faculty_title},
         )
 
-        return LecturesBasic.from_directus_dict(response["data"]["lecture"])
+        return CoursesBasic.from_directus_dict(response["data"]["lecture"])
 
     async def get_faculty_from_id(self, faculty_id: int, language: LanguageEnum) -> str:
         """Get the faculty title from its ID using directus."""
@@ -177,6 +214,8 @@ class LectureService:
             variables=variables,
         )
         if not (faculties := response["data"]["faculties_translations"]):
-            raise ValueError(f"No faculty found with ID {faculty_id} in language {language.value}")
+            raise ValueError(
+                f"No faculty found with ID {faculty_id} in language {language.value}"
+            )
 
         return faculties[0]["title"]
