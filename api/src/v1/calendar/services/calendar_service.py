@@ -408,14 +408,17 @@ class CalendarService:
         frequency: Optional[str] = None,
         all_day: Optional[bool] = None
     ) -> list[CalendarEvent]:
-        """Returns a list of all calendar events for a user. Several filters are optionally available. Includes global events included in access_scope."""
+        """Returns a list of calendar events. Several filters are optionally available."""
         
-        user_filter = {
-            "_or": [
-                {"user_id": {"_eq": str(user_id)}},
-                {"user_id": {"_null": True}}
-            ]
-        }
+        user_filter = {"user_id": {"_null": True}}
+
+        if user_id is not None:
+            user_filter = {
+                "_or": [
+                    {"user_id": {"_eq": str(user_id)}},
+                    {"user_id": {"_null": True}}
+                ]
+            }
 
         access_scope_filter = {
             "access_scope": {"_in": access_scope}
