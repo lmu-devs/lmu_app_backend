@@ -81,7 +81,7 @@ async def delete_event(
         event_id=event_id, 
         recurrence_id=recurrence_id)
 
-@router.get("/calendar-get", response_model=CalendarEntries, description="Retrieve all calendar events for a user. Pass None as user to get all public events. Optionally with multiple filters.")
+@router.get("/calendar-get", response_model=CalendarEntries, description="Retrieve all calendar events for a user. Pass None as user to just get all public events. Optionally with multiple filters.")
 async def get_events(
     event_type: Optional[EventType] = None,
     frequency: Optional[str] = None,
