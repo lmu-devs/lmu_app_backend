@@ -1,7 +1,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Response, Query
+from fastapi import APIRouter, Depends, Query, Response
 
 from api.src.v1.calendar.models.calendar_model import (
     AccessScope,
@@ -13,104 +13,109 @@ from api.src.v1.calendar.models.calendar_model import (
 )
 from api.src.v1.calendar.services.calendar_service import CalendarService
 from api.src.v1.core.api_key import APIKey
-
 from shared.src.tables import UserTable
 
 router = APIRouter()
 
-@router.post("/calendar-create-user", response_model=CalendarEntries, description="Create a calendar event for a user.")
-async def create_event_user(
-    calendar_data: CalendarCreate,
-    user: UserTable = Depends(APIKey.verify_user_api_key)
-):
-    events = CalendarService().create_event(
-        user_id=user.id, 
-        calendar_data=calendar_data)
+
+@router.post("/user-event", response_model=CalendarEntries, description="Create a calendar event for a user.")
+async def create_event_user(calendar_data: CalendarCreate, user: UserTable = Depends(APIKey.verify_user_api_key)):
+    events = CalendarService().create_event(user_id=user.id, calendar_data=calendar_data)
 
     return CalendarEntries.from_list(events)
 
-@router.put("/calendar-update-user", response_model=CalendarEntries, description="Update a calendar event for a user.")
+
+@router.put("/user-event", response_model=CalendarEntries, description="Update a calendar event for a user.")
 async def update_event_user(
     event_id: uuid.UUID,
     calendar_exception: CalendarException,
     update_type: UpdateType = UpdateType.ALL,
     recurrence_id: Optional[int] = None,
-    user: UserTable = Depends(APIKey.verify_user_api_key)
+    user: UserTable = Depends(APIKey.verify_user_api_key),
 ):
     events = CalendarService().update_event(
-        user_id=user.id, 
-        event_id=event_id, 
-        recurrence_id=recurrence_id, 
-        update_exception=calendar_exception, 
-        update_type=update_type)
-    
+        user_id=user.id,
+        event_id=event_id,
+        recurrence_id=recurrence_id,
+        update_exception=calendar_exception,
+        update_type=update_type,
+    )
+
     return CalendarEntries.from_list(events)
 
-@router.post("/calendar-create-public", response_model=CalendarEntries, description="Create a calendar event for all users.")
+
+@router.post("/public-event", response_model=CalendarEntries, description="Create a calendar event for all users.")
 async def create_event_public(
     calendar_data: CalendarCreate,
 ):
-    events = CalendarService().create_event(
-        user_id=None, 
-        calendar_data=calendar_data)
+    events = CalendarService().create_event(user_id=None, calendar_data=calendar_data)
 
     return CalendarEntries.from_list(events)
 
-@router.put("/calendar-update-public", response_model=CalendarEntries, description="Update a calendar event that is available to all users.")
+
+@router.put(
+    "/public-event",
+    response_model=CalendarEntries,
+    description="Update a calendar event that is available to all users.",
+)
 async def update_event_public(
     event_id: uuid.UUID,
     calendar_exception: CalendarException,
     update_type: UpdateType = UpdateType.ALL,
-    recurrence_id: Optional[int] = None
+    recurrence_id: Optional[int] = None,
 ):
     events = CalendarService().update_event(
-        user_id=None, 
-        event_id=event_id, 
-        recurrence_id=recurrence_id, 
-        update_exception=calendar_exception, 
-        update_type=update_type)
-    
+        user_id=None,
+        event_id=event_id,
+        recurrence_id=recurrence_id,
+        update_exception=calendar_exception,
+        update_type=update_type,
+    )
+
     return CalendarEntries.from_list(events)
 
-@router.delete("/calendar-delete", response_model=bool, description="Delete a calendar event.")
-async def delete_event(
-    event_id: uuid.UUID,
-    recurrence_id: Optional[int] = None
-):
-    return CalendarService().delete_event(
-        event_id=event_id, 
-        recurrence_id=recurrence_id)
 
-@router.get("/calendar-get", response_model=CalendarEntries, description="Retrieve all calendar events for a user. Pass None as user to just get all public events. Optionally with multiple filters.")
+@router.delete("/delete", response_model=bool, description="Delete a calendar event.")
+async def delete_event(event_id: uuid.UUID, recurrence_id: Optional[int] = None):
+    return CalendarService().delete_event(event_id=event_id, recurrence_id=recurrence_id)
+
+
+@router.get(
+    "/get",
+    response_model=CalendarEntries,
+    description="Retrieve all calendar events for a user. Pass None as user to just get all public events. Optionally with multiple filters.",
+)
 async def get_events(
     event_type: Optional[EventType] = None,
     frequency: Optional[str] = None,
     all_day: Optional[bool] = None,
     access_scope: list[AccessScope] = Query([AccessScope.PERSONAL, AccessScope.PUBLIC]),
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
-): 
+    user: UserTable = Depends(APIKey.verify_user_api_key_soft),
+):
     user_id = user.id if user else None
     access_scope = access_scope if user else [AccessScope.PUBLIC]
 
     events = CalendarService().get_all(
-        user_id=user_id, 
-        access_scope=access_scope, 
-        generate_recurrence=True, 
-        event_type=event_type, 
-        frequency=frequency, 
-        all_day=all_day)
-    
+        user_id=user_id,
+        access_scope=access_scope,
+        generate_recurrence=True,
+        event_type=event_type,
+        frequency=frequency,
+        all_day=all_day,
+    )
+
     return CalendarEntries.from_list(events)
+
 
 @router.get("/calendar/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
 async def get_user_ical_feed(
-    access_scope_str: str = "0,10", # AccessScope.PERSONAL, AccessScope.PUBLIC -- If there's a better option than a string, please change
-    user_id: uuid.UUID = None
+    access_scopes: list[AccessScope] = [
+        AccessScope.PERSONAL,
+        AccessScope.PUBLIC,
+    ],  # AccessScope.PERSONAL, AccessScope.PUBLIC -- If there's a better option than a string, please change
+    user_id: uuid.UUID = None,
 ):
-    access_scopes = [AccessScope(int(x)) for x in access_scope_str.split(",")]
 
-    events = CalendarService().generate_ical(
-        user_id=user_id, 
-        access_scope=access_scopes)
+    events = CalendarService().generate_ical(user_id=user_id, access_scope=access_scopes)
 
     return Response(content=events, media_type="text/calendar")
