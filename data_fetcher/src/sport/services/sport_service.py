@@ -104,6 +104,8 @@ class SportService:
                         student_price=course.price.student,
                         employee_price=course.price.employee,
                         external_price=course.price.external,
+                        total_availability=course.total_availability,
+                        today_availability=course.today_availability,
                     )
                     self.db.add(course_entry)
 

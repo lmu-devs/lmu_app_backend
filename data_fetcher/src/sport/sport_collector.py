@@ -6,7 +6,7 @@ from data_fetcher.src.sport.services.sport_service import SportService
 
 class SportCollector(ScheduledCollector):
     def __init__(self):
-        super().__init__(job_schedule=schedule.every().hour.at(":55"))
+        super().__init__(job_schedule=schedule.every().day.at("02:13"))
 
     async def _collect_data(self, db):
         service = SportService(db)
