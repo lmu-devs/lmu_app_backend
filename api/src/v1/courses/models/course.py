@@ -152,27 +152,3 @@ class CoursesBasic(RootModel):
     """Model for a list of courses, used to flatten the response from Directus."""
 
     root: List[CourseBasic] | List[CourseBasic] = []
-
-    @classmethod
-    def from_directus_dict(cls, raw: List[dict[str, Any]]) -> "CoursesBasic":
-        flatten_raw = cls.flatten_directus_response(raw)
-        return cls(root=[CourseBasic(**item) for item in flatten_raw])
-
-    @staticmethod
-    def flatten_directus_response(
-        raw: List[dict[str, Any]],
-    ) -> List[dict[str, Any]]:
-        return [
-            {
-                "name": l["name"],
-                "publish_id": l["publish_id"],
-                "sws": l["base_info"]["sws"] if l["base_info"] else None,
-                "class_type": (
-                    l["base_info"]["class_type"]
-                    if (l["base_info"] and l["base_info"]["class_type"] != "n/a")
-                    else None
-                ),
-                "language": l["base_info"]["language"] if l["base_info"] else None,
-            }
-            for l in raw
-        ]

@@ -23,7 +23,6 @@ from shared.src.tables.courses.course_tables import (
 
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.courses_enums import CourseStartTypeEnum
-from shared.src.services.directus_service import DirectusService
 
 
 class Person(BaseModel):
@@ -433,28 +432,6 @@ class Course(BaseModel):
             "persons": {"connect": self.get_person_ids()},
         }
 
-    def get_person_ids(self):
-        if not self.base_info or not self.persons:
-            return []
-        return [self.get_person_id(person) for person in self.persons]
-
-    @staticmethod
-    def get_person_id(person: Person) -> Optional[str]:
-        GET_PERSON_ID_QUERY_NAME = "get_person_id.graphql"
-        GRAPHQL_FOLDER_NAME = "graphql"
-        directus = DirectusService()
-        base_path = Path(__file__).parent.parent
-        folder = GRAPHQL_FOLDER_NAME
-        query_name = GET_PERSON_ID_QUERY_NAME
-        query_path = base_path / folder / query_name
-
-        response = directus.execute_query_file(
-            query_path,
-            variables={"firstName": person.first_name, "lastName": person.surname},
-        )
-        persons = response.get("data", {}).get("people", [])
-        return persons[0].get("id") if persons else None
-
     def to_table(self) -> tuple[CourseTable, dict[str, list[BaseModel]]]:
         """Converts the course object to a table object and related tables."""
         course_table = CourseTable(publish_id=self.publish_id, title=self.title)
@@ -526,8 +503,3 @@ class Course(BaseModel):
             if value is not None:
                 result[column.name] = value
         return result
-
-
-if __name__ == "__main__":
-    person = Person(first_name="Daniel", surname="Altmann", title=None)
-    print(Course.get_person_id(person))

@@ -28,10 +28,8 @@ from ..models.course import (
     Person,
 )
 
-GRAPHQL_FOLDER_NAME = "graphql"
-ALL_LECTURE_QERRY_NAME = "all_lectures.graphql"
-COURSES_BY_FACULTY_NAME = "faculty_lectures.graphql"
 FACULTY_BY_ID_QUERY_NAME = "faculty_title_by_id.graphql"
+GRAPHQL_FOLDER_NAME = "graphql"
 
 
 class CourseService:
@@ -40,17 +38,6 @@ class CourseService:
     def __init__(self):
         self.settings = get_settings()
         self.directus = DirectusService()
-
-    async def get_all_courses(self) -> CoursesBasic:
-        """Get all courses."""
-        base_path = Path(__file__).parent.parent
-        folder = GRAPHQL_FOLDER_NAME
-        query_name = ALL_LECTURE_QERRY_NAME
-        query_path = base_path / folder / query_name
-        response = self.directus.execute_query_file(
-            query_file_path=query_path,
-        )
-        return CoursesBasic.from_directus_dict(response["data"]["lecture"])
 
     async def getcourse_details_db(
         self, session: AsyncSession, publish_id: int
@@ -185,21 +172,6 @@ class CourseService:
         rows = result.mappings().all()
         course_models = [CourseBasic.model_validate(row) for row in rows]
         return CoursesBasic(root=course_models)
-
-    async def get_courses_from_faculty(self, faculty_id: int) -> CoursesBasic:
-        """Get all courses from a specified faculty."""
-        base_path = Path(__file__).parent.parent
-        folder = GRAPHQL_FOLDER_NAME
-        query_name = COURSES_BY_FACULTY_NAME
-        query_path = base_path / folder / query_name
-        faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
-
-        response = self.directus.execute_query_file(
-            query_file_path=query_path,
-            variables={"facultyString": faculty_title},
-        )
-
-        return CoursesBasic.from_directus_dict(response["data"]["lecture"])
 
     async def get_faculty_from_id(self, faculty_id: int, language: LanguageEnum) -> str:
         """Get the faculty title from its ID using directus."""
