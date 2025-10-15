@@ -6,7 +6,6 @@ from data_fetcher.src.cinema.cinema_collector import CinemaCollector
 from data_fetcher.src.courses.courses_collector import CoursesCollector
 from data_fetcher.src.food.food_collector import FoodCollector
 from data_fetcher.src.library.library_collector import LibraryCollector
-from data_fetcher.src.link.link_collector import LinkCollector
 from data_fetcher.src.roomfinder.explore_collector import RoomfinderCollector
 from data_fetcher.src.sport.sport_collector import SportCollector
 from shared.src.core.database import Database, table_creation

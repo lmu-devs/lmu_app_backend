@@ -1,28 +1,4 @@
 services:
-    db_dev:
-        image: postgres:16.4-bookworm
-        volumes:
-            - postgres_data:/var/lib/postgresql/data/
-        container_name: db_dev
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_PORT: ${POSTGRES_PORT}
-            POSTGRES_HOST: ${POSTGRES_HOST}
-            PGDATABASE: ${POSTGRES_DB}
-        ports:
-            - '127.0.0.1:5432:5432'
-        restart: always
-        healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
-            interval: 2s
-            timeout: 2s
-            retries: 5
-        networks:
-            - shared
-
-
     api:
         image: ${DOCKER_USERNAME}/lmu-app-backend-api:${ENVIRONMENT}
         build:
@@ -50,9 +26,6 @@ services:
         container_name: api_dev
         volumes:
             - .:/app
-        depends_on:
-            db_dev:
-                condition: service_healthy
 
     data_fetcher:
         image: ${DOCKER_USERNAME}/lmu-app-backend-data:${ENVIRONMENT}
@@ -79,9 +52,6 @@ services:
         container_name: data_fetcher_dev
         volumes:
             - .:/app
-        depends_on:
-            db_dev:
-                condition: service_healthy
 
     nginx:
         container_name: nginx
