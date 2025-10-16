@@ -118,18 +118,8 @@ async def get_events(
 
 @router.get("/calendar/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
 async def get_user_ical_feed(
-    access_scope_str: str, # Comma-separated string, e.g. "0,10"  -- if there's a better option than this please fix
+    access_scope_str: str, # Hyphen-separated string, e.g. "0-10"  -- if there's a better option than this please fix
     user_id: uuid.UUID
 ):
-    default_scopes = [AccessScope.PERSONAL, AccessScope.PUBLIC]
-
-    valid_access_scopes = [ 
-        AccessScope(int(x))
-        for x in access_scope_str.split(",")
-        if x.isdigit() and int(x) in AccessScope._value2member_map_
-    ]
-    if not valid_access_scopes:
-        valid_access_scopes = default_scopes
-
-    events = CalendarService().generate_ical(user_id=user_id, access_scope=valid_access_scopes)
+    events = CalendarService().generate_ical(user_id=user_id, access_scope_str=access_scope_str)
     return Response(content=events, media_type="text/calendar")

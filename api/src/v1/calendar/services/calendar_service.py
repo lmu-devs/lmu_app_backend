@@ -494,18 +494,31 @@ class CalendarService:
 
     def generate_ical(self, # TODO: for someone who wants to have fun -> add exception system into ical
         user_id: uuid.UUID,
-        access_scope: list[AccessScope]
+        access_scope_str: str
         ) -> bytes:
-        """Generates an iCal file with all events for a specific user."""
-        if not user_id:
-            raise DatabaseError(f"Got ical request with user_id = None!")
-        
+        """Generates an iCal file with all events for a specific user."""    
+        default_scopes = [AccessScope.PERSONAL, AccessScope.PUBLIC]
+        forbidden_scopes = {AccessScope.ADMIN.value}
+
+        valid_access_scopes = [
+            AccessScope(int(x))
+            for x in access_scope_str.split("-")
+            if (
+                x.isdigit()
+                and int(x) in AccessScope._value2member_map_
+                and int(x) not in forbidden_scopes
+            )
+        ]
+
+        if not valid_access_scopes:
+            valid_access_scopes = default_scopes
+
         cal = Calendar()
         cal.add("prodid", "-//lmu-devs//LMU Students//EN")
         cal.add("version", "2.0")
         cal.add("method", "PUBLISH")
 
-        for event in self.get_all(user_id, access_scope, False):
+        for event in self.get_all(user_id, valid_access_scopes, False):
             ical_event = self._calendar_event_to_ical(event)
             cal.add_component(ical_event)
 
