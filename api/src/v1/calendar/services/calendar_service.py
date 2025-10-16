@@ -230,6 +230,7 @@ class CalendarService:
                 raise DatabaseError(f"Failed to delete location {location_id}!")
 
     def _delete_event(self,
+        user_id: uuid.UUID,
         event_id: uuid.UUID
         ) -> bool:
         """Deletes a calendar event from the database. The exception entry is deleted automatically (through a setting in directus)"""    
@@ -237,6 +238,11 @@ class CalendarService:
         if not information:
             raise DatabaseError(f"No calendar event found with ID {event_id}")
         
+        event_user_id = information.get("user_id")
+        if event_user_id != user_id:
+            logger.critical(f"User {user_id} tried to delete {event_id} of user {event_user_id})")
+            return False
+
         exceptions = information.get("exceptions", [])
         for exc in exceptions:
             exc_location_id = self._safe_get(exc, ["location", "id"])
@@ -289,14 +295,15 @@ class CalendarService:
         return True
 
     def delete_event(self, 
+        user_id: uuid.UUID,
         event_id: uuid.UUID,
         recurrence_id: Optional[int]
         ) -> bool:
         """Deletes a calendar event from the database. Or flags an recurring event as deleted."""    
         if recurrence_id is None:
-            return self._delete_event(event_id)
+            return self._delete_event(user_id, event_id)
         else:
-            return self._delete_recurring_event(event_id, recurrence_id)
+            return self._delete_recurring_event(user_id, event_id, recurrence_id)
      
     def _handle_location_update(
         self,

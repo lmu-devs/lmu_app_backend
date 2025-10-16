@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional
+from typing import Optional, Annotated
 
 from fastapi import APIRouter, Depends, Query, Response
 
@@ -17,13 +17,11 @@ from shared.src.tables import UserTable
 
 router = APIRouter()
 
-
 @router.post("/user-event", response_model=CalendarEntries, description="Create a calendar event for a user.")
 async def create_event_user(calendar_data: CalendarCreate, user: UserTable = Depends(APIKey.verify_user_api_key)):
     events = CalendarService().create_event(user_id=user.id, calendar_data=calendar_data)
 
     return CalendarEntries.from_list(events)
-
 
 @router.put("/user-event", response_model=CalendarEntries, description="Update a calendar event for a user.")
 async def update_event_user(
@@ -43,15 +41,23 @@ async def update_event_user(
 
     return CalendarEntries.from_list(events)
 
+@router.delete("/user-delete", response_model=bool, description="Delete a user calendar event.")
+async def delete_event_user(
+    event_id: uuid.UUID, 
+    recurrence_id: Optional[int] = None,
+    user: UserTable = Depends(APIKey.verify_user_api_key)
+):
+    return CalendarService().delete_event(user_id=user.id,event_id=event_id, recurrence_id=recurrence_id)
+
 
 @router.post("/public-event", response_model=CalendarEntries, description="Create a calendar event for all users.")
 async def create_event_public(
     calendar_data: CalendarCreate,
+    authorized: bool = Depends(APIKey.verify_admin_api_key)
 ):
     events = CalendarService().create_event(user_id=None, calendar_data=calendar_data)
 
     return CalendarEntries.from_list(events)
-
 
 @router.put(
     "/public-event",
@@ -63,6 +69,7 @@ async def update_event_public(
     calendar_exception: CalendarException,
     update_type: UpdateType = UpdateType.ALL,
     recurrence_id: Optional[int] = None,
+    authorized: bool = Depends(APIKey.verify_admin_api_key)
 ):
     events = CalendarService().update_event(
         user_id=None,
@@ -74,16 +81,19 @@ async def update_event_public(
 
     return CalendarEntries.from_list(events)
 
-
-@router.delete("/delete", response_model=bool, description="Delete a calendar event.")
-async def delete_event(event_id: uuid.UUID, recurrence_id: Optional[int] = None):
-    return CalendarService().delete_event(event_id=event_id, recurrence_id=recurrence_id)
+@router.delete("/public-delete", response_model=bool, description="Delete a public calendar event.")
+async def delete_event_public(
+    event_id: uuid.UUID, 
+    recurrence_id: Optional[int] = None,
+    authorized: bool = Depends(APIKey.verify_admin_api_key)
+):
+    return CalendarService().delete_event(user_id=None, event_id=event_id, recurrence_id=recurrence_id)
 
 
 @router.get(
     "/get",
     response_model=CalendarEntries,
-    description="Retrieve all calendar events for a user. Pass None as user to just get all public events. Optionally with multiple filters.",
+    description="Retrieve all calendar events for a user. Pass None as user to only get all the public events. Optionally with multiple filters.",
 )
 async def get_events(
     event_type: Optional[EventType] = None,
@@ -105,7 +115,6 @@ async def get_events(
     )
 
     return CalendarEntries.from_list(events)
-
 
 @router.get("/calendar/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
 async def get_user_ical_feed(
