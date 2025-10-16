@@ -29,7 +29,7 @@ async def update_event_user(
     calendar_exception: CalendarException,
     update_type: UpdateType = UpdateType.ALL,
     recurrence_id: Optional[int] = None,
-    user: UserTable = Depends(APIKey.verify_user_api_key),
+    user: UserTable = Depends(APIKey.verify_user_api_key)
 ):
     events = CalendarService().update_event(
         user_id=user.id,
@@ -100,7 +100,7 @@ async def get_events(
     frequency: Optional[str] = None,
     all_day: Optional[bool] = None,
     access_scope: list[AccessScope] = Query([AccessScope.PERSONAL, AccessScope.PUBLIC]),
-    user: UserTable = Depends(APIKey.verify_user_api_key_soft),
+    user: UserTable = Depends(APIKey.verify_user_api_key_soft)
 ):
     user_id = user.id if user else None
     access_scope = access_scope if user else [AccessScope.PUBLIC]
@@ -118,13 +118,21 @@ async def get_events(
 
 @router.get("/calendar/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
 async def get_user_ical_feed(
-    access_scopes: list[AccessScope] = [
-        AccessScope.PERSONAL,
-        AccessScope.PUBLIC,
-    ],  # AccessScope.PERSONAL, AccessScope.PUBLIC -- If there's a better option than a string, please change
-    user_id: uuid.UUID = None,
+    access_scope_str: str, # Comma-separated string, e.g. "0,10"  -- if there's a better option than this please fix
+    user_id: uuid.UUID
 ):
+    default_scopes = [AccessScope.PERSONAL, AccessScope.PUBLIC]
 
-    events = CalendarService().generate_ical(user_id=user_id, access_scope=access_scopes)
+    if not access_scope_str.strip():
+        valid_access_scopes = default_scopes
+    else:
+        valid_access_scopes = [ 
+            AccessScope(int(x))
+            for x in access_scope_str.split(",")
+            if x.isdigit() and int(x) in AccessScope._value2member_map_
+        ]
+        if not valid_access_scopes:
+            valid_access_scopes = default_scopes
 
+    events = CalendarService().generate_ical(user_id=user_id, access_scope=valid_access_scopes)
     return Response(content=events, media_type="text/calendar")
