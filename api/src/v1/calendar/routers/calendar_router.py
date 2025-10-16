@@ -123,16 +123,13 @@ async def get_user_ical_feed(
 ):
     default_scopes = [AccessScope.PERSONAL, AccessScope.PUBLIC]
 
-    if not access_scope_str.strip():
+    valid_access_scopes = [ 
+        AccessScope(int(x))
+        for x in access_scope_str.split(",")
+        if x.isdigit() and int(x) in AccessScope._value2member_map_
+    ]
+    if not valid_access_scopes:
         valid_access_scopes = default_scopes
-    else:
-        valid_access_scopes = [ 
-            AccessScope(int(x))
-            for x in access_scope_str.split(",")
-            if x.isdigit() and int(x) in AccessScope._value2member_map_
-        ]
-        if not valid_access_scopes:
-            valid_access_scopes = default_scopes
 
     events = CalendarService().generate_ical(user_id=user_id, access_scope=valid_access_scopes)
     return Response(content=events, media_type="text/calendar")
