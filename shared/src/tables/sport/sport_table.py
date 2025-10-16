@@ -56,7 +56,7 @@ class SportCourseTable(Base):
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
     instructor = Column(String)
-    category_id = Column(Integer)
+    category_id = Column(String)  # Now using offer_id as category_id
     status_code = Column(Integer)
     is_available = Column(Boolean, default=False)
 
@@ -64,6 +64,10 @@ class SportCourseTable(Base):
     student_price = Column(Float)
     employee_price = Column(Float)
     external_price = Column(Float)
+
+    # Availability
+    total_availability = Column(Integer, nullable=True)
+    today_availability = Column(Boolean, nullable=True)
 
     # Relationships
     sport_type = relationship("SportTypeTable", back_populates="sport_courses")

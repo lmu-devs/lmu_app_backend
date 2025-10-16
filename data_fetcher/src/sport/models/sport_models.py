@@ -1,7 +1,7 @@
 from datetime import datetime, time
 from typing import Dict, List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from shared.src.core.logging import get_sport_fetcher_logger
 from shared.src.enums.weekday_enum import WeekdayEnum
@@ -16,65 +16,53 @@ class TimeSlot(BaseModel):
     end_time: time
 
     @classmethod
-    def from_pattern(
-        cls,
-        day_patterns: List[int],
-        time_patterns: List[str],
-        tage_data: List[List[int]],
-    ) -> List["TimeSlot"]:
-        """Create TimeSlots from the ZHS day and time patterns
+    def from_interval(cls, interval: Dict) -> List["TimeSlot"]:
+        """Create TimeSlots from ZHS interval data
 
         Args:
-            day_patterns: List where numbers reference indices in tage_data
-            time_patterns: List of time strings in format "HH:MM-HH:MM" or "HH.MM-HH.MM"
-            tage_data: List of day patterns from ZHS data where each pattern is [Mo,Di,Mi,Do,Fr,Sa,So]
+            interval: Interval dict containing weekdays array and time strings
+                weekdays: [0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday]
+                start_time: ISO datetime string (e.g., "1970-01-01T18:30:00Z")
+                end_time: ISO datetime string (e.g., "1970-01-01T20:00:00Z")
         """
         slots = []
 
-        for pattern_idx in day_patterns:
-            if pattern_idx <= 0 or pattern_idx >= len(tage_data):
-                continue
+        try:
+            weekdays = interval.get("weekdays", [])
+            start_time_str = interval.get("start_time", "")
+            end_time_str = interval.get("end_time", "")
 
-            # Get the weekday pattern (array of 7 integers where 1 indicates active day)
-            weekday_pattern = tage_data[pattern_idx][1:]  # Skip first element (name)
+            if not weekdays or not start_time_str or not end_time_str:
+                return slots
 
-            # Get the corresponding time pattern
-            time_str = time_patterns[0].strip()  # Default to first time pattern
-            if not time_str or time_str == "--":
-                continue
+            # Parse time from ISO datetime string
+            start_time = datetime.fromisoformat(start_time_str.replace("Z", "+00:00")).time()
+            end_time = datetime.fromisoformat(end_time_str.replace("Z", "+00:00")).time()
 
-            try:
-                # Parse the time string
-                start, end = time_str.split("-")
+            # Map weekday numbers to WeekdayEnum
+            # 0=Sunday, 1=Monday, 2=Tuesday, 3=Wednesday, 4=Thursday, 5=Friday, 6=Saturday
+            weekday_map = {
+                0: WeekdayEnum.SUNDAY,
+                1: WeekdayEnum.MONDAY,
+                2: WeekdayEnum.TUESDAY,
+                3: WeekdayEnum.WEDNESDAY,
+                4: WeekdayEnum.THURSDAY,
+                5: WeekdayEnum.FRIDAY,
+                6: WeekdayEnum.SATURDAY,
+            }
 
-                # Parse start time
-                start = start.strip()
-                if ":" in start:
-                    start_time = datetime.strptime(start, "%H:%M").time()
-                else:
-                    start_time = datetime.strptime(start, "%H.%M").time()
-
-                # Parse end time
-                end = end.strip()
-                if ":" in end:
-                    end_time = datetime.strptime(end, "%H:%M").time()
-                else:
-                    end_time = datetime.strptime(end, "%H.%M").time()
-
-                # Create a TimeSlot for each active day in the pattern
-                for day_idx, is_active in enumerate(weekday_pattern):
-                    if is_active:
-                        slots.append(
-                            cls(
-                                day=WeekdayEnum[list(WeekdayEnum)[day_idx].name],
-                                start_time=start_time,
-                                end_time=end_time,
-                            )
+            for weekday_num in weekdays:
+                if weekday_num in weekday_map:
+                    slots.append(
+                        cls(
+                            day=weekday_map[weekday_num],
+                            start_time=start_time,
+                            end_time=end_time,
                         )
+                    )
 
-            except (ValueError, IndexError) as e:
-                logger.warning(f"Could not parse time slot for pattern {pattern_idx}: {time_patterns} - {str(e)}")
-                continue
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Could not parse time slot from interval: {interval} - {str(e)}")
 
         return slots
 
@@ -85,34 +73,36 @@ class Price(BaseModel):
     external: float
 
     @classmethod
-    def from_price_string(cls, price: str) -> "Price":
-        """Create Price from ZHS price string"""
-        # Handle special cases
-        if not price or "nur mit" in price or "entgeltfrei" in price:
-            return cls(student=0.0, employee=0.0, external=0.0)
+    def from_price_options(cls, price_options: List[Dict]) -> "Price":
+        """Create Price from ZHS price_options array
+
+        Args:
+            price_options: List of price dicts with 'role' and 'price' (in cents)
+        """
+        student_price = 0.0
+        employee_price = 0.0
+        external_price = 0.0
 
         try:
-            # Remove HTML and euro symbol
-            price = price.replace("€", "").strip()
-            if price == "--":
-                return cls(student=0.0, employee=0.0, external=0.0)
+            for option in price_options:
+                roles = option.get("role", [])
+                price_cents = option.get("price", 0)
+                price_euros = price_cents / 100.0  # Convert cents to euros
 
-            # Split and parse prices
-            prices = price.split("/")
+                if "Studierende" in roles:
+                    student_price = price_euros
+                elif "Mitarbeitende" in roles:
+                    employee_price = price_euros
+                elif "Kursleitung" in roles:
+                    # Use Kursleitung price as external if we don't have Mitarbeitende
+                    if employee_price == 0.0:
+                        employee_price = price_euros
+                    external_price = price_euros
 
-            # Convert prices, handling both . and , as decimal separator
-            # and handling '--' as 0.0
-            def parse_price(p: str) -> float:
-                p = p.strip()
-                return 0.0 if p == "--" else float(p.replace(",", "."))
+            return cls(student=student_price, employee=employee_price, external=external_price)
 
-            return cls(
-                student=parse_price(prices[0]),
-                employee=parse_price(prices[1]) if len(prices) > 1 else 0.0,
-                external=parse_price(prices[2]) if len(prices) > 2 else 0.0,
-            )
-        except (ValueError, IndexError) as e:
-            logger.warning(f"Could not parse price: {price} - {str(e)}")
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Could not parse price options: {price_options} - {str(e)}")
             return cls(student=0.0, employee=0.0, external=0.0)
 
 
@@ -121,111 +111,64 @@ class TimeFrame(BaseModel):
     end_date: datetime
 
     @classmethod
-    def from_duration_string(cls, duration: str) -> "TimeFrame":
-        """Create TimeFrame from ZHS duration string
+    def from_interval(cls, interval: Dict) -> "TimeFrame":
+        """Create TimeFrame from ZHS interval data
 
-        Handles various formats:
-        - Single date with year: '30.05.25'
-        - Single date without year: '30.05.'
-        - Date range with year: '31.05.-01.06.25'
-        - Multiple dates: '23.04., 28.04., 30.04., 05.05.'
-        - Multiple date ranges: '17.05.-18.05./24.05.-25.05.25'
+        Args:
+            interval: Interval dict containing first_date and last_date ISO strings
         """
         try:
-            if not duration or duration == "--" or duration == "???":
+            first_date_str = interval.get("first_date", "")
+            last_date_str = interval.get("last_date", "")
+
+            if not first_date_str or not last_date_str:
                 return cls(start_date=datetime.now(), end_date=datetime.now())
 
-            # Clean up the input string
-            duration = duration.strip()
+            # Parse ISO datetime strings
+            start_date = datetime.fromisoformat(first_date_str.replace("Z", "+00:00"))
+            end_date = datetime.fromisoformat(last_date_str.replace("Z", "+00:00"))
 
-            # Helper function to parse date with flexible year
-            def parse_date(date_str: str, year: str = None) -> datetime:
-                date_str = date_str.strip()
-                if date_str.endswith("."):
-                    date_str = date_str[:-1]  # Remove trailing dot
+            return cls(start_date=start_date, end_date=end_date)
 
-                # Split into components
-                parts = date_str.split(".")
-                if len(parts) < 2:
-                    raise ValueError(f"Invalid date format: {date_str}")
-
-                day = int(parts[0])
-                month = int(parts[1])
-
-                # Handle year
-                if len(parts) > 2:
-                    year = parts[2]
-                if year:
-                    if len(year) == 2:
-                        year = f"20{year}"  # Assume 20xx for 2-digit years
-                else:
-                    year = str(datetime.now().year)
-
-                return datetime(int(year), month, day)
-
-            # Case 1: Multiple date ranges with slashes
-            if "/" in duration:
-                ranges = duration.split("/")
-                dates = []
-                year = None
-                # Extract year from the last range if present
-                if ranges[-1].strip().split(".")[-1].isdigit():
-                    year = ranges[-1].strip().split(".")[-1]
-
-                for date_range in ranges:
-                    if "-" in date_range:
-                        start, end = date_range.split("-")
-                        dates.extend([parse_date(start, year), parse_date(end, year)])
-                    else:
-                        dates.append(parse_date(date_range, year))
-
-                return cls(start_date=min(dates), end_date=max(dates))
-
-            # Case 2: Multiple dates with commas
-            if "," in duration:
-                dates = []
-                parts = duration.split(",")
-                year = None
-                # Extract year from the last part if present
-                if parts[-1].strip().split(".")[-1].isdigit():
-                    year = parts[-1].strip().split(".")[-1]
-
-                for part in parts:
-                    dates.append(parse_date(part, year))
-
-                return cls(start_date=min(dates), end_date=max(dates))
-
-            # Case 3: Single date range
-            if "-" in duration:
-                start, end = duration.split("-")
-                year = None
-                # Extract year from end date if present
-                if end.strip().split(".")[-1].isdigit():
-                    year = end.strip().split(".")[-1]
-
-                return cls(start_date=parse_date(start, year), end_date=parse_date(end, year))
-
-            # Case 4: Single date
-            return cls(start_date=parse_date(duration), end_date=parse_date(duration))
-
-        except (ValueError, IndexError) as e:
-            logger.warning(f"Could not parse duration: {duration} - {str(e)}")
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Could not parse interval dates: {interval} - {str(e)}")
             return cls(start_date=datetime.now(), end_date=datetime.now())
 
 
 class SportCourseLocation(Location):
     @classmethod
-    def from_pattern(cls, location_data: list[str, float, float]) -> "SportCourseLocation":
-        if not location_data or len(location_data) < 3:
+    def from_interval(cls, interval: Dict) -> "SportCourseLocation":
+        """Create SportCourseLocation from ZHS interval data
+
+        Args:
+            interval: Interval dict containing locations array
+        """
+        try:
+            locations = interval.get("locations", [])
+            if not locations:
+                return None
+
+            location = locations[0]  # Use first location
+            building_name = (location.get("building_name") or "").strip()
+            room_name = (location.get("name") or "").strip()
+
+            # Combine building and room name
+            address = f"{building_name} - {room_name}" if building_name and room_name else (room_name or building_name)
+
+            if not address:
+                return None
+
+            # Note: The API doesn't provide lat/long, so we set them to 0
+            # These could be geocoded later if needed
+            return cls(
+                address=address,
+                latitude=0.0,
+                longitude=0.0,
+            )
+
+        except (ValueError, KeyError) as e:
+            logger.warning(f"Could not parse location from interval: {interval} - {str(e)}")
             return None
-        # Skip if any required field is empty or invalid
-        if not location_data[0] or not location_data[1] or not location_data[2]:
-            return None
-        return cls(
-            address=location_data[0],
-            latitude=location_data[1],
-            longitude=location_data[2],
-        )
 
 
 class Course(BaseModel):
@@ -236,9 +179,74 @@ class Course(BaseModel):
     instructor: str
     price: Price
     location: SportCourseLocation | None = None
-    category_id: int
-    status_code: int = Field(..., description="Usually 5, meaning might be related to course status")
+    category_id: str  # Now using offer_id as category_id
+    status_code: int = 0  # No longer provided by new API
     is_available: bool = False
+    total_availability: int | None = None
+    today_availability: bool | None = None
+
+    @classmethod
+    def from_course_data(
+        cls,
+        course_data: Dict,
+        offer_id: str,
+        total_availability: int,
+        today_availability: bool,
+    ) -> "Course":
+        """Create Course from ZHS course data
+
+        Args:
+            course_data: Course dict from API
+            offer_id: The offer ID to use as category_id
+            total_availability: Total availability from offer
+            today_availability: Today availability from offer
+        """
+        try:
+            # Extract basic info
+            course_id = course_data.get("id", "")
+            name = course_data.get("name", "")
+
+            # Extract tutors/instructors
+            tutors = course_data.get("tutors", [])
+            instructor = ", ".join([tutor.get("name", "") for tutor in tutors])
+
+            # Parse price
+            price_options = course_data.get("price_options", [])
+            price = Price.from_price_options(price_options)
+
+            # Parse intervals (time slots, duration, location)
+            intervals = course_data.get("intervals", [])
+            time_slots = []
+            duration = TimeFrame(start_date=datetime.now(), end_date=datetime.now())
+            location = None
+
+            if intervals:
+                first_interval = intervals[0]
+                time_slots = TimeSlot.from_interval(first_interval)
+                duration = TimeFrame.from_interval(first_interval)
+                location = SportCourseLocation.from_interval(first_interval)
+
+            # Determine availability
+            is_available = total_availability > 0 if total_availability is not None else False
+
+            return cls(
+                id=course_id,
+                name=name,
+                time_slots=time_slots,
+                duration=duration,
+                instructor=instructor,
+                price=price,
+                location=location,
+                category_id=offer_id,
+                status_code=0,
+                is_available=is_available,
+                total_availability=total_availability,
+                today_availability=today_availability,
+            )
+
+        except Exception as e:
+            logger.error(f"Error creating Course from data: {str(e)}")
+            raise
 
 
 class SportCourse(BaseModel):
@@ -246,13 +254,25 @@ class SportCourse(BaseModel):
     courses: List[Course]
 
     @classmethod
-    def from_course_list(cls, courses: List[Course]) -> List["SportCourse"]:
-        """Group courses by their title"""
-        course_dict: Dict[str, List[Course]] = {}
+    def from_offer_data(cls, offer_data: Dict, courses_data: List[Dict]) -> "SportCourse":
+        """Create SportCourse from ZHS offer and courses data
 
-        for course in courses:
-            if course.title not in course_dict:
-                course_dict[course.title] = []
-            course_dict[course.title].append(course)
+        Args:
+            offer_data: The offer dict containing name and availability
+            courses_data: List of course dicts for this offer
+        """
+        title = offer_data.get("name", "Unknown Sport")
+        offer_id = offer_data.get("id", "")
+        total_availability = offer_data.get("total_availability")
+        today_availability = offer_data.get("today_availability")
 
-        return [cls(title=title, courses=course_list) for title, course_list in course_dict.items()]
+        courses = []
+        for course_data in courses_data:
+            try:
+                course = Course.from_course_data(course_data, offer_id, total_availability, today_availability)
+                courses.append(course)
+            except Exception as e:
+                logger.error(f"Failed to parse course {course_data.get('id')}: {str(e)}")
+                continue
+
+        return cls(title=title, courses=courses)
