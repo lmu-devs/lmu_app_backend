@@ -41,7 +41,7 @@ async def update_event_user(
 
     return CalendarEntries.from_list(events)
 
-@router.delete("/user-delete", response_model=bool, description="Delete a user calendar event.")
+@router.delete("/user-event", response_model=bool, description="Delete a user calendar event.")
 async def delete_event_user(
     event_id: uuid.UUID, 
     recurrence_id: Optional[int] = None,
@@ -81,7 +81,7 @@ async def update_event_public(
 
     return CalendarEntries.from_list(events)
 
-@router.delete("/public-delete", response_model=bool, description="Delete a public calendar event.")
+@router.delete("/public-event", response_model=bool, description="Delete a public calendar event.")
 async def delete_event_public(
     event_id: uuid.UUID, 
     recurrence_id: Optional[int] = None,
