@@ -35,7 +35,7 @@ class AccessScope(int, Enum):
     ADMIN = 100 # debug scope
 
 class RepresentationType(int, Enum):
-    """Used in the exception system to determine which variable should be overwrited."""
+    """Used in the exception system to determine which variable should be overwritten."""
     TITLE = 0
     DESCRIPTION = 1
     ALL_DAY = 2
