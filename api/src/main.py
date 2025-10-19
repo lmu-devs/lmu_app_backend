@@ -59,16 +59,6 @@ def create_app():
         name="canteen_images",
     )
     app.mount(
-        path="/images/dishes",
-        app=StaticFiles(directory="/app/shared/src/assets/dishes"),
-        name="dish_images",
-    )
-    app.mount(
-        path="/images/wishlist",
-        app=StaticFiles(directory="/app/shared/src/assets/wishlists"),
-        name="wishlist_images",
-    )
-    app.mount(
         path="/images/cinemas",
         app=StaticFiles(directory="/app/shared/src/assets/cinemas"),
         name="cinema_images",
@@ -105,7 +95,7 @@ def create_app():
     app.include_router(
         release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"]
     )
-    app.include_router(calendar_router.router, prefix=prefix_v1, tags=["calendar"])
+    app.include_router(calendar_router.router, prefix=f"{prefix_v1}/calendar", tags=["calendar"])
     app.include_router(
         university_router.router, prefix=f"{prefix_v1}", tags=["university"]
     )
