@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class LectureStartTypeEnum(str, Enum):
+class CourseStartTypeEnum(str, Enum):
     SINE_TEMPORE = "SINE_TEMPORE"
     CUM_TEMPORE = "CUM_TEMPORE"
 

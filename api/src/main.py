@@ -11,7 +11,7 @@ from shared.src.core.settings import get_settings
 
 from .v1.calendar.routers import calendar_router
 from .v1.cinema.routers import cinema_router
-from .v1.classes.routers import lecture_router
+from .v1.courses.routers import course_router
 from .v1.feature_flag.routers import feature_flags_router
 from .v1.feedback.routers import feedback_router
 from .v1.food.routers import canteen_router, dish_router, menu_router, taste_router
@@ -71,21 +71,33 @@ def create_app():
     app.include_router(log_router.router, prefix=prefix_v1, tags=["log"])
     app.include_router(feedback_router.router, prefix=prefix_v1, tags=["feedback"])
     app.include_router(wishlist_router_v2.router, prefix=prefix_v2, tags=["wishlist"])
-    app.include_router(cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"])
+    app.include_router(
+        cinema_router.router, prefix=f"{prefix_v1}/cinema", tags=["cinema"]
+    )
     app.include_router(home_router.router, prefix=prefix_v1, tags=["home"])
     app.include_router(places_router.router, prefix=prefix_v1, tags=["place"])
     app.include_router(sport_router.router, prefix=prefix_v1, tags=["sport"])
-    app.include_router(roomfinder_router.router, prefix=f"{prefix_v1}/roomfinder", tags=["roomfinder"])
+    app.include_router(
+        roomfinder_router.router, prefix=f"{prefix_v1}/roomfinder", tags=["roomfinder"]
+    )
     app.include_router(timeline_router.router, prefix=prefix_v1, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix_v1}/link", tags=["link"])
     app.include_router(benefit_router.router, prefix=f"{prefix_v2}/link", tags=["link"])
-    app.include_router(library_router.router, prefix=f"{prefix_v1}/library", tags=["library"])
+    app.include_router(
+        library_router.router, prefix=f"{prefix_v1}/library", tags=["library"]
+    )
     app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
-    app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
-    app.include_router(release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"])
+    app.include_router(
+        feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"]
+    )
+    app.include_router(
+        release_notes_router.router, prefix=f"{prefix_v1}", tags=["release-note"]
+    )
     app.include_router(calendar_router.router, prefix=f"{prefix_v1}/calendar", tags=["calendar"])
-    app.include_router(university_router.router, prefix=f"{prefix_v1}", tags=["university"])
-    app.include_router(lecture_router.router, prefix=f"{prefix_v1}", tags=["courses"])
+    app.include_router(
+        university_router.router, prefix=f"{prefix_v1}", tags=["university"]
+    )
+    app.include_router(course_router.router, prefix=f"{prefix_v1}", tags=["courses"])
 
     # Add middleware to allow CORS (Cross-Origin Resource Sharing)
     app.add_middleware(

@@ -1,10 +1,9 @@
-import re
 from pydantic import BaseModel, Field, RootModel
 from typing import Any, List, Tuple, Optional
 from datetime import datetime, time, date as Date
 
 from shared.src.enums.weekday_enum import WeekdayEnum
-from shared.src.enums.classes_enum import LectureStartTypeEnum
+from shared.src.enums.courses_enums import CourseStartTypeEnum
 
 
 class Person(BaseModel):
@@ -33,7 +32,7 @@ class AssociatedProgram(BaseModel):
     degree: Optional[str]
 
 
-class ClassBaseInfo(BaseModel):
+class CourseBaseInfo(BaseModel):
     persons: Optional[list[Person]]
     institutions: Optional[list[Institution]]
     class_type: Optional[str]
@@ -49,12 +48,12 @@ class ClassBaseInfo(BaseModel):
     sigel: Optional[str]
 
 
-class ClassSession(BaseModel):
+class Session(BaseModel):
     caption: Optional[str]
     weekday: Optional[WeekdayEnum]
     starting_time: Optional[time]
     ending_time: Optional[time]
-    timing_type: Optional[LectureStartTypeEnum]
+    timing_type: Optional[CourseStartTypeEnum]
     rythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
@@ -64,7 +63,7 @@ class ClassSession(BaseModel):
     cancelled_dates: Optional[str]
 
 
-class ClassMaterial(BaseModel):
+class Material(BaseModel):
     valid_from: Optional[Date]
     valid_to: Optional[Date]
     file_name: Optional[str]
@@ -132,48 +131,24 @@ class EnrollmentDeadline(BaseModel):
     other_deadlines: Optional[str] = Field(None)
 
 
-class LectureDetails(BaseModel):
-    sessions: Optional[list[ClassSession]]
+class CourseDetails(BaseModel):
+    sessions: Optional[list[Session]]
     persons: Optional[list[Person]]
     addtional_information: Optional[str]
     last_updated: Optional[datetime]
 
 
-class LectureBasic(BaseModel):
-    """Model for a lecture, used to flatten the response from Directus."""
+class CourseBasic(BaseModel):
+    """Model for a course, used to flatten the response from Directus."""
 
     publish_id: int
     title: str = Field(alias="name")
     sws: Optional[float]
-    class_type: Optional[str]
+    type: Optional[str]
     language: Optional[str]
 
 
-class LecturesBasic(RootModel):
-    """Model for a list of lectures, used to flatten the response from Directus."""
+class CoursesBasic(RootModel):
+    """Model for a list of courses, used to flatten the response from Directus."""
 
-    root: List[LectureBasic] | List[LectureBasic] = []
-
-    @classmethod
-    def from_directus_dict(cls, raw: List[dict[str, Any]]) -> "LecturesBasic":
-        flatten_raw = cls.flatten_directus_response(raw)
-        return cls(root=[LectureBasic(**item) for item in flatten_raw])
-
-    @staticmethod
-    def flatten_directus_response(
-        raw: List[dict[str, Any]],
-    ) -> List[dict[str, Any]]:
-        return [
-            {
-                "name": l["name"],
-                "publish_id": l["publish_id"],
-                "sws": l["base_info"]["sws"] if l["base_info"] else None,
-                "class_type": (
-                    l["base_info"]["class_type"]
-                    if (l["base_info"] and l["base_info"]["class_type"] != "n/a")
-                    else None
-                ),
-                "language": l["base_info"]["language"] if l["base_info"] else None,
-            }
-            for l in raw
-        ]
+    root: List[CourseBasic] | List[CourseBasic] = []
