@@ -1,9 +1,0 @@
-query GetAllLectures {
-    lecture(limit: 1000) {
-        name
-        publish_id
-        base_info {
-            sws
-        }
-    }
-}
