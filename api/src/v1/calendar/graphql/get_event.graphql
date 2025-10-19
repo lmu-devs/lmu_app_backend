@@ -30,6 +30,8 @@ query GetCalendarEvents($filter: calendar_event_filter) {
       start_time
       end_time
       all_day
+      is_deleted
+      overwrite
       location {
         id
         address

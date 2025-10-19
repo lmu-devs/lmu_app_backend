@@ -7,6 +7,7 @@ mutation UpdateCalendarException($id: ID!, $data: update_calendar_exceptions_inp
     start_time
     end_time
     all_day
+    overwrite
     location {
       id
       address

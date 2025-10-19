@@ -31,6 +31,7 @@ mutation UpdateCalendarEvent($id: ID!, $data: update_calendar_event_input!) {
       start_time
       end_time
       all_day
+      is_deleted
       location {
         id
         address
