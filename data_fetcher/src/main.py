@@ -19,7 +19,7 @@ class DataCollectorApp:
     def __init__(self):
         self.settings = get_settings()
         self.is_running = True
-        print("I am initializing the data collector app.")
+        print("Initializing the data collector.")
         self.collectors = [
             FoodCollector(),
             RoomfinderCollector(),
@@ -52,9 +52,7 @@ class DataCollectorApp:
         try:
             await self.setup()
 
-            tasks = [
-                asyncio.create_task(collector.run()) for collector in self.collectors
-            ]
+            tasks = [asyncio.create_task(collector.run()) for collector in self.collectors]
 
             await asyncio.gather(*tasks, return_exceptions=True)
 

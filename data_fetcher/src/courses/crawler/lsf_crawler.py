@@ -1,37 +1,36 @@
 import codecs
-from collections import defaultdict
-from typing import Any, Optional, Iterator
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import concurrent.futures
-import requests
+import logging
+import random
 import re
 import time
-from datetime import time as Time, date as Date, datetime as dt
-from urllib.parse import urlparse, parse_qs, unquote
-from lxml import html
-import random
-import logging
+from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date as Date
+from datetime import datetime as dt
+from datetime import time as Time
+from typing import Any, Iterator, Optional
+from urllib.parse import parse_qs, unquote, urlparse
 
+import requests
+from lxml import html
 
 from shared.src.core.logging import get_course_logger
-from shared.src.enums.courses_enums import (
-    CourseStartTypeEnum,
-    SemesterTypeEnum,
-)
+from shared.src.enums.courses_enums import CourseStartTypeEnum, SemesterTypeEnum
 from shared.src.enums.weekday_enum import WeekdayEnum
-from ..models.course import (
+from shared.src.models.course import (
     AdditionInformation,
     AssociatedClass,
     AssociatedExam,
     AssociatedProgram,
     AssociatedTutorial,
+    Course,
     CourseBaseInfo,
     CourseMaterial,
     CourseSession,
     EnrollmentDeadline,
     ExamInformation,
     Institution,
-    Course,
     Person,
 )
 
@@ -75,14 +74,8 @@ class LSFCrawler:
             "Cache-Control": "max-age=0",
         }
 
-    def build_set_session_semester_url(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> str:
-        semester_text = (
-            "Sommersemester"
-            if semester_type == SemesterTypeEnum.SUMMER_SEMESTER
-            else "Wintersemester"
-        )
+    def build_set_session_semester_url(self, year: int, semester_type: SemesterTypeEnum) -> str:
+        semester_text = "Sommersemester" if semester_type == SemesterTypeEnum.SUMMER_SEMESTER else "Wintersemester"
         term_id = 1 if semester_type.value == "SOSE" else 2
         semester_text_year = f"{year}" if term_id == 1 else f"{year}%2F{year + 1}"
         semester_id = f"{year}{term_id}"
@@ -93,25 +86,19 @@ class LSFCrawler:
             + f"&purge=n&getglobal=semester&text={semester_text}+{semester_text_year}"
         )
 
-    def crawl_all_courses(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> list[Course]:
+    def crawl_all_courses(self, year: int, semester_type: SemesterTypeEnum) -> list[Course]:
         """Crawl all courses for a given year and semester type sequentially."""
         self.set_crawling_parameters(year, semester_type)
         course_urls = self._crawl_all_course_urls_sequentially()
         return self._crawl_all_courses_sequentially(course_urls)
 
-    def crawl_all_courses_parallel(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> list[Course]:
+    def crawl_all_courses_parallel(self, year: int, semester_type: SemesterTypeEnum) -> list[Course]:
         """Crawl all courses for a given year and semester type in parallel."""
         self.set_crawling_parameters(year, semester_type)
         course_urls = self._crawl_course_urls_in_parallel()
         return self._crawl_all_courses_in_parallel(course_urls)
 
-    def set_crawling_parameters(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> None:
+    def set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
         """Set the year and semester type for the crawling session."""
         self.year = year
         self.semester_type = semester_type
@@ -119,9 +106,7 @@ class LSFCrawler:
 
     def _set_semester_in_lsf(self):
         """Set the semester in the LSF session."""
-        set_session_url = self.build_set_session_semester_url(
-            self.year, self.semester_type
-        )
+        set_session_url = self.build_set_session_semester_url(self.year, self.semester_type)
         _ = self._make_safe_http_request(set_session_url)
 
     def _crawl_all_course_urls_sequentially(self) -> list[tuple[str, str]]:
@@ -131,16 +116,12 @@ class LSFCrawler:
         course_type_ids = self._get_all_available_course_type_ids()
 
         for index, type_id in enumerate(course_type_ids):
-            self.logger.info(
-                f"Fetching course urls: ({index + 1}/{len(course_type_ids)})"
-            )
+            self.logger.info(f"Fetching course urls: ({index + 1}/{len(course_type_ids)})")
             course_urls += self._get_course_urls_for_course_type(type_id)
 
         return course_urls
 
-    def crawl_all_course_urls_sequentially(
-        self, year: int, semester_type: SemesterTypeEnum
-    ) -> list[tuple[str, str]]:
+    def crawl_all_course_urls_sequentially(self, year: int, semester_type: SemesterTypeEnum) -> list[tuple[str, str]]:
         """Crawl all course URLs sequentially."""
         course_urls = []
         self.logger.info("Getting course type ids...")
@@ -148,9 +129,7 @@ class LSFCrawler:
         self.set_crawling_parameters(year, semester_type)
 
         for index, type_id in enumerate(course_type_ids):
-            self.logger.info(
-                f"Fetching course urls: ({index + 1}/{len(course_type_ids)})"
-            )
+            self.logger.info(f"Fetching course urls: ({index + 1}/{len(course_type_ids)})")
             course_urls += self._get_course_urls_for_course_type(type_id)
 
         return course_urls
@@ -160,9 +139,7 @@ class LSFCrawler:
         course_types = self._get_all_available_course_types_with_names()
         all_course_tuples: list[tuple[str, str]] = []
 
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self.workers
-        ) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = {
                 executor.submit(self._get_course_urls_for_course_type, type_id): type_id
                 for type_id in course_types.keys()
@@ -180,9 +157,7 @@ class LSFCrawler:
         else:
             return self._get_course_urls_with_search_filter("", type_id)
 
-    def _get_course_urls_with_alphabetical_splitting(
-        self, type_id: int
-    ) -> list[tuple[str, str]]:
+    def _get_course_urls_with_alphabetical_splitting(self, type_id: int) -> list[tuple[str, str]]:
         """Split large course type results by searching with each letter of the alphabet."""
         courses: list[tuple[str, str]] = []
         german_chars = list("abcdefghijklmnopqrstuvwxyzäöüß")
@@ -192,9 +167,7 @@ class LSFCrawler:
 
         return courses
 
-    def _crawl_all_courses_sequentially(
-        self, urls: list[tuple[str, str]]
-    ) -> list[Course]:
+    def _crawl_all_courses_sequentially(self, urls: list[tuple[str, str]]) -> list[Course]:
         """Process all course URLs sequentially to build Course objects."""
         courses = []
 
@@ -204,17 +177,12 @@ class LSFCrawler:
 
         return courses
 
-    def _crawl_all_courses_in_parallel(
-        self, course_urls: list[tuple[str, str]]
-    ) -> list[Course]:
+    def _crawl_all_courses_in_parallel(self, course_urls: list[tuple[str, str]]) -> list[Course]:
         """Process all course URLs in parallel to build Course objects."""
         courses = []
-        with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self.workers
-        ) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=self.workers) as executor:
             futures = {
-                executor.submit(self._build_complete_course_object, name_url): name_url
-                for name_url in course_urls
+                executor.submit(self._build_complete_course_object, name_url): name_url for name_url in course_urls
             }
             for index, future in enumerate(concurrent.futures.as_completed(futures)):
                 try:
@@ -272,29 +240,21 @@ class LSFCrawler:
     def _does_course_type_have_too_many_results(self, course_type: int) -> bool:
         """Check if a course type returns too many results (>1000) requiring splitting."""
         error_message = "Ihre Anfrage lieferte mehr als 1000 Ergebnisse"
-        response_bytes = self._make_safe_http_request(
-            self._build_course_search_url("", course_type)
-        )
+        response_bytes = self._make_safe_http_request(self._build_course_search_url("", course_type))
         tree = html.fromstring(response_bytes)
         p_tags = tree.xpath("//p")
 
         return any(error_message in p.text_content() for p in p_tags)
 
-    def _make_safe_http_request(
-        self, url: str, timeout: float = 10, retries: int = 10
-    ) -> bytes:
+    def _make_safe_http_request(self, url: str, timeout: float = 10, retries: int = 10) -> bytes:
         """Make HTTP request with retry logic and error handling."""
         for attempt in range(1, retries + 1):
             try:
-                response = self.session.get(
-                    url, headers=self.get_random_header(), timeout=timeout
-                )
+                response = self.session.get(url, headers=self.get_random_header(), timeout=timeout)
                 response.raise_for_status()
                 return response.content
             except Exception as e:
-                self.logger.error(
-                    f"[Retry {attempt}/{retries}] Error fetching {url}: {e}"
-                )
+                self.logger.error(f"[Retry {attempt}/{retries}] Error fetching {url}: {e}")
                 if attempt < retries:
                     time.sleep(2**attempt)
                 else:
@@ -302,13 +262,9 @@ class LSFCrawler:
 
         self.logger.fatal(f"Failed to fetch {url} after {retries} retries")
 
-    def _get_course_urls_with_search_filter(
-        self, search_text: str, course_type: int
-    ) -> list[tuple[str, str]]:
+    def _get_course_urls_with_search_filter(self, search_text: str, course_type: int) -> list[tuple[str, str]]:
         """Extract course URLs from search results for a given search filter."""
-        request_bytes = self._make_safe_http_request(
-            self._build_course_search_url(search_text, course_type)
-        )
+        request_bytes = self._make_safe_http_request(self._build_course_search_url(search_text, course_type))
         if self._is_invalid_semester(request_bytes):
             return []
 
@@ -381,9 +337,7 @@ class LSFCrawler:
             + "function=search&clean=y&category=veranstaltung.search"
         )
 
-    def _extract_navigation_tree_paths(
-        self, response_bytes: bytes
-    ) -> Optional[list[list[str]]]:
+    def _extract_navigation_tree_paths(self, response_bytes: bytes) -> Optional[list[list[str]]]:
         """Extract hierarchical navigation paths from the course page."""
         tree = html.fromstring(response_bytes)
         navigation_nodes = tree.xpath("//div[contains(@style, 'padding-left')]/a")
@@ -396,9 +350,7 @@ class LSFCrawler:
             text_content = self._clean_and_normalize_string(node.text_content().strip())
 
             try:
-                indentation_level = int(
-                    style_attribute.split("padding-left:")[1].split("px")[0].strip()
-                )
+                indentation_level = int(style_attribute.split("padding-left:")[1].split("px")[0].strip())
             except Exception:
                 continue
 
@@ -415,20 +367,11 @@ class LSFCrawler:
     def _extract_course_base_information(self, response_bytes: bytes) -> CourseBaseInfo:
         """Extract basic course information including persons and institutions."""
         base_info_dict: dict[str, Any] = {
-            "institutions": self._extract_associated_institutions_from_course_page(
-                response_bytes
-            ),
+            "institutions": self._extract_associated_institutions_from_course_page(response_bytes),
         }
-        return CourseBaseInfo(
-            **(
-                base_info_dict
-                | self._extract_basic_course_data_from_html(response_bytes)
-            )
-        )
+        return CourseBaseInfo(**(base_info_dict | self._extract_basic_course_data_from_html(response_bytes)))
 
-    def _extract_responsible_persons_from_course_page(
-        self, html_text: Any
-    ) -> Optional[list[Person]]:
+    def _extract_responsible_persons_from_course_page(self, html_text: Any) -> Optional[list[Person]]:
         """Extract responsible persons/lecturers from the course page."""
         tree = html.fromstring(html_text)
         persons_table = tree.xpath('//table[@summary="Verantwortliche Dozenten"]')
@@ -443,9 +386,7 @@ class LSFCrawler:
 
             if person_raw == "keine öffentliche Person":
                 continue
-            persons.append(
-                Person.from_str(self._clean_and_normalize_string(person_raw))
-            )
+            persons.append(Person.from_str(self._clean_and_normalize_string(person_raw)))
 
         return persons if len(persons) > 0 else None
 
@@ -455,9 +396,7 @@ class LSFCrawler:
     ) -> Optional[list[Institution]]:
         """Extract associated institutions from the course page."""
         tree = html.fromstring(html_content)
-        rows = tree.xpath(
-            "//table[@summary='Übersicht über die zugehörigen Einrichtungen']//tr"
-        )
+        rows = tree.xpath("//table[@summary='Übersicht über die zugehörigen Einrichtungen']//tr")
 
         institutions = []
         for row in rows:
@@ -468,9 +407,7 @@ class LSFCrawler:
 
         return institutions
 
-    def _extract_basic_course_data_from_html(
-        self, html_text: Any
-    ) -> dict[str, Optional[Any]]:
+    def _extract_basic_course_data_from_html(self, html_text: Any) -> dict[str, Optional[Any]]:
         """Extract basic data from the course's 'Grunddaten' table."""
         base_info_dict: dict[str, Optional[Any]] = {
             "Weitere Links": "",
@@ -501,13 +438,9 @@ class LSFCrawler:
 
         return base_info_dict
 
-    def _extract_associated_tutorial_information(
-        self, response_bytes: bytes
-    ) -> Optional[list[AssociatedTutorial]]:
+    def _extract_associated_tutorial_information(self, response_bytes: bytes) -> Optional[list[AssociatedTutorial]]:
         """Extract information about associated tutorials."""
-        tutorial_data = self._extract_data_from_table_with_summary(
-            response_bytes, "Zugehörige Übungen"
-        )
+        tutorial_data = self._extract_data_from_table_with_summary(response_bytes, "Zugehörige Übungen")
 
         if not tutorial_data:
             return None
@@ -520,13 +453,9 @@ class LSFCrawler:
 
         return [AssociatedTutorial(**table) for table in tutorial_data]
 
-    def _extract_associated_course_information(
-        self, response_bytes: bytes
-    ) -> Optional[list[AssociatedClass]]:
+    def _extract_associated_course_information(self, response_bytes: bytes) -> Optional[list[AssociatedClass]]:
         """Extract information about associated courses."""
-        course_data = self._extract_data_from_table_with_summary(
-            response_bytes, "Zugehörige Veranstaltungen"
-        )
+        course_data = self._extract_data_from_table_with_summary(response_bytes, "Zugehörige Veranstaltungen")
 
         if not course_data:
             return None
@@ -539,14 +468,11 @@ class LSFCrawler:
 
         return [AssociatedClass(**table) for table in course_data]
 
-    def _extract_enrollment_deadline_information(
-        self, response_bytes: bytes
-    ) -> Optional[EnrollmentDeadline]:
+    def _extract_enrollment_deadline_information(self, response_bytes: bytes) -> Optional[EnrollmentDeadline]:
         """Extract enrollment deadline information with program-specific and general deadlines."""
         tree = html.fromstring(response_bytes)
         deadline_tables = tree.xpath(
-            "//table[@summary='Übersicht über die zugehörigen Belegfristen'"
-            + "and not(ancestor::table)]"
+            "//table[@summary='Übersicht über die zugehörigen Belegfristen'" + "and not(ancestor::table)]"
         )
 
         if len(deadline_tables) != 1:
@@ -568,9 +494,7 @@ class LSFCrawler:
                     current_section = None
                 continue
 
-            row_html = self._clean_and_normalize_string(
-                str(html.tostring(row, encoding="unicode"))
-            )
+            row_html = self._clean_and_normalize_string(str(html.tostring(row, encoding="unicode")))
 
             if current_section == "program":
                 program_specific_rows.append(row_html)
@@ -578,9 +502,7 @@ class LSFCrawler:
                 general_deadline_rows.append(row_html)
 
         return EnrollmentDeadline(
-            program_associated_deadline=self._wrap_rows_in_table_tags(
-                program_specific_rows
-            ),
+            program_associated_deadline=self._wrap_rows_in_table_tags(program_specific_rows),
             other_deadlines=self._wrap_rows_in_table_tags(general_deadline_rows),
         )
 
@@ -592,13 +514,9 @@ class LSFCrawler:
         rows_content = "\n".join(rows)
         return f"<table>{rows_content}</table>"
 
-    def _extract_detailed_exam_information(
-        self, response_bytes: bytes
-    ) -> Optional[list[ExamInformation]]:
+    def _extract_detailed_exam_information(self, response_bytes: bytes) -> Optional[list[ExamInformation]]:
         """Extract detailed exam information including registration periods."""
-        exam_data = self._extract_data_from_table_with_summary(
-            response_bytes, "Übersicht über die zugehörigen PORG"
-        )
+        exam_data = self._extract_data_from_table_with_summary(response_bytes, "Übersicht über die zugehörigen PORG")
 
         if not exam_data:
             return None
@@ -606,32 +524,21 @@ class LSFCrawler:
         for exam in exam_data:
             registration_duration = exam["Anmeldungszeitraum"]
             exam["registration_start"] = (
-                self._parse_duration_start(registration_duration)
-                if registration_duration
-                else None
+                self._parse_duration_start(registration_duration) if registration_duration else None
             )
             exam["registration_end"] = (
-                self._parse_duration_end(registration_duration)
-                if registration_duration
-                else None
+                self._parse_duration_end(registration_duration) if registration_duration else None
             )
-            exam["ECTS"] = (
-                self._parse_ects_from_text(exam["ECTS"]) if exam["ECTS"] else None
-            )
-            exam["Datum"] = (
-                dt.strptime(exam["Datum"], "%d.%m.%Y") if exam["Datum"] else None
-            )
+            exam["ECTS"] = self._parse_ects_from_text(exam["ECTS"]) if exam["ECTS"] else None
+            exam["Datum"] = dt.strptime(exam["Datum"], "%d.%m.%Y") if exam["Datum"] else None
 
         return [ExamInformation(**data) for data in exam_data]
 
-    def _extract_additional_course_information(
-        self, response_bytes: bytes
-    ) -> Optional[AdditionInformation]:
+    def _extract_additional_course_information(self, response_bytes: bytes) -> Optional[AdditionInformation]:
         """Extract additional information from the 'Weitere Angaben' table."""
         tree = html.fromstring(response_bytes)
         additional_info_tables = tree.xpath(
-            "//table[@summary='Weitere Angaben zur Veranstaltung'"
-            + "and not(ancestor::table)]"
+            "//table[@summary='Weitere Angaben zur Veranstaltung'" + "and not(ancestor::table)]"
         )
 
         additional_data: defaultdict = defaultdict(lambda: None)
@@ -649,23 +556,17 @@ class LSFCrawler:
                 key = str(header_cells[0].text_content().strip())
                 if len(data_cells[0]):
                     inner_html = "".join(
-                        self._clean_and_normalize_string(
-                            str(html.tostring(child, encoding="unicode"))
-                        )
+                        self._clean_and_normalize_string(str(html.tostring(child, encoding="unicode")))
                         for child in data_cells[0]
                     )
                 else:
-                    inner_html = self._clean_and_normalize_string(
-                        str(data_cells[0].text_content().strip())
-                    )
+                    inner_html = self._clean_and_normalize_string(str(data_cells[0].text_content().strip()))
 
                 additional_data[key] = inner_html
 
         return AdditionInformation(**additional_data)
 
-    def _extract_data_from_table_with_summary(
-        self, response_bytes: bytes, summary: str
-    ) -> Optional[list[dict]]:
+    def _extract_data_from_table_with_summary(self, response_bytes: bytes, summary: str) -> Optional[list[dict]]:
         """Generic method to extract tabular data based on table summary attribute."""
         tree = html.fromstring(response_bytes)
         matching_tables = tree.xpath(f"//table[@summary='{summary}']")
@@ -675,20 +576,13 @@ class LSFCrawler:
             return None
 
         for table in matching_tables:
-            column_headers = [
-                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
-            ]
+            column_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             for table_row in table.xpath(".//tr[position()>1]"):
                 cell_values = [
                     (
                         cleaned_data
                         if (
-                            (
-                                cleaned_data := self._clean_and_normalize_string(
-                                    td.text_content()
-                                )
-                            )
-                            != ""
+                            (cleaned_data := self._clean_and_normalize_string(td.text_content())) != ""
                             and cleaned_data != "-"
                         )
                         else None
@@ -699,39 +593,22 @@ class LSFCrawler:
 
         return table_content
 
-    def _extract_associated_exam_information(
-        self, response_bytes: bytes
-    ) -> Optional[list[AssociatedExam]]:
+    def _extract_associated_exam_information(self, response_bytes: bytes) -> Optional[list[AssociatedExam]]:
         """Extract information about exams associated with the course."""
         tree = html.fromstring(response_bytes)
-        exam_tables = tree.xpath(
-            "//table[@summary=" + "'Übersicht über die zugehörigen Prüfungen']"
-        )
+        exam_tables = tree.xpath("//table[@summary=" + "'Übersicht über die zugehörigen Prüfungen']")
 
         if len(exam_tables) == 0:
             return None
 
         exams = []
         for table in exam_tables:
-            column_headers = [
-                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
-            ]
+            column_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             table_rows = []
 
             for table_row in table.xpath(".//tr[position()>1]"):
                 cell_values = [
-                    (
-                        data
-                        if (
-                            (
-                                data := self._clean_and_normalize_string(
-                                    td.text_content()
-                                )
-                            )
-                            != ""
-                        )
-                        else None
-                    )
+                    (data if ((data := self._clean_and_normalize_string(td.text_content())) != "") else None)
                     for td in table_row.xpath("td")
                 ]
                 row_data = dict(zip(column_headers, cell_values))
@@ -741,9 +618,7 @@ class LSFCrawler:
                 AssociatedExam(
                     module_name=self._remove_ects_from_text(row["Modul"]),
                     program_name=row["Stg"],
-                    ects=self._parse_ects_from_text(
-                        row["ECTS"] or "" + row["Modul"] or ""
-                    ),
+                    ects=self._parse_ects_from_text(row["ECTS"] or "" + row["Modul"] or ""),
                     module_classification=row["KzFa"],
                     degree=row["Abschl"],
                     module_id=row["Modulnr"],
@@ -784,40 +659,22 @@ class LSFCrawler:
             return int(match.group(1))
         return None
 
-    def _extract_course_material_information(
-        self, response_bytes: bytes
-    ) -> Optional[list[CourseMaterial]]:
+    def _extract_course_material_information(self, response_bytes: bytes) -> Optional[list[CourseMaterial]]:
         """Extract information about course materials and their validity periods."""
         tree = html.fromstring(response_bytes)
-        material_tables = tree.xpath(
-            "//table[@summary="
-            + "'Übersicht über die zugehörigen Medien oder so ähnlich']"
-        )
+        material_tables = tree.xpath("//table[@summary=" + "'Übersicht über die zugehörigen Medien oder so ähnlich']")
 
         if len(material_tables) == 0:
             return None
 
         material = []
         for table in material_tables:
-            columns_headers = [
-                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
-            ]
+            columns_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             table_rows = []
 
             for table_row in table.xpath(".//tr[position()>1]"):
                 cells = [
-                    (
-                        data
-                        if (
-                            (
-                                data := self._clean_and_normalize_string(
-                                    td.text_content()
-                                )
-                            )
-                            != ""
-                        )
-                        else None
-                    )
+                    (data if ((data := self._clean_and_normalize_string(td.text_content())) != "") else None)
                     for td in table_row.xpath("td")
                 ]
                 row_data = dict(zip(columns_headers, cells))
@@ -825,16 +682,8 @@ class LSFCrawler:
 
             material += [
                 CourseMaterial(
-                    valid_from=(
-                        dt.strptime(row["gültig von"], "%d.%m.%Y").date()
-                        if row["gültig von"]
-                        else None
-                    ),
-                    valid_to=(
-                        dt.strptime(row["gültig bis"], "%d.%m.%Y").date()
-                        if row["gültig bis"]
-                        else None
-                    ),
+                    valid_from=(dt.strptime(row["gültig von"], "%d.%m.%Y").date() if row["gültig von"] else None),
+                    valid_to=(dt.strptime(row["gültig bis"], "%d.%m.%Y").date() if row["gültig bis"] else None),
                     file_name=row["Dateiname"],
                     description=row["Beschreibung"],
                 )
@@ -843,30 +692,21 @@ class LSFCrawler:
 
         return material
 
-    def _extract_associated_study_programs(
-        self, response_bytes: bytes
-    ) -> Optional[list[AssociatedProgram]]:
+    def _extract_associated_study_programs(self, response_bytes: bytes) -> Optional[list[AssociatedProgram]]:
         """Extract information about study programs associated with the course."""
         tree = html.fromstring(response_bytes)
-        program_tables = tree.xpath(
-            "//table[@summary='Übersicht über die zugehörigen Studiengänge']"
-        )
+        program_tables = tree.xpath("//table[@summary='Übersicht über die zugehörigen Studiengänge']")
 
         if len(program_tables) == 0:
             return None
 
         programs = []
         for table in program_tables:
-            column_headers = [
-                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
-            ]
+            column_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             table_rows = []
 
             for table_row in table.xpath(".//tr[position()>1]"):
-                cell_values = [
-                    self._clean_and_normalize_string(td.text_content())
-                    for td in table_row.xpath("td")
-                ]
+                cell_values = [self._clean_and_normalize_string(td.text_content()) for td in table_row.xpath("td")]
                 row_data = dict(zip(column_headers, cell_values))
                 table_rows.append(row_data)
 
@@ -882,31 +722,22 @@ class LSFCrawler:
 
         return programs
 
-    def _extract_course_session_schedules(
-        self, response_bytes: bytes
-    ) -> Optional[list[CourseSession]]:
+    def _extract_course_session_schedules(self, response_bytes: bytes) -> Optional[list[CourseSession]]:
         """Extract course session schedules from the response bytes."""
         tree = html.fromstring(response_bytes)
-        session_table = tree.xpath(
-            "//table[@summary='Übersicht über alle Veranstaltungstermine']"
-        )
+        session_table = tree.xpath("//table[@summary='Übersicht über alle Veranstaltungstermine']")
 
         if len(session_table) == 0:
             return None
 
         sessions = []
         for table in session_table:
-            column_headers = [
-                th.text_content().strip() for th in table.xpath(".//tr[1]/th")
-            ]
+            column_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             table_caption = c[0] if (c := table.xpath(".//caption/text()")) else None
             table_rows = []
 
             for table_row in table.xpath(".//tr[position()>1]"):
-                cells = [
-                    self._clean_and_normalize_string(td.text_content())
-                    for td in table_row.xpath("td")
-                ]
+                cells = [self._clean_and_normalize_string(td.text_content()) for td in table_row.xpath("td")]
                 row_data = dict(zip(column_headers, cells))
                 table_rows.append(row_data)
 
@@ -1029,9 +860,7 @@ class LSFCrawler:
     @staticmethod
     def _clean_and_normalize_string(raw: str) -> str:
         """Clean and normalize a string by removing escape characters and extra whitespace."""
-        unescaped = (
-            codecs.decode(raw, "unicode_escape").encode("latin1").decode("utf-8")
-        )
+        unescaped = codecs.decode(raw, "unicode_escape").encode("latin1").decode("utf-8")
         return re.sub(r"\s+", " ", unescaped).strip()
 
 
@@ -1084,16 +913,8 @@ class LSFParallelCrawler(LSFCrawler):
 
 
 def main() -> None:
-    logger = logging.getLogger(__name__)
     crawler = LSFCrawler()
-    print(
-        [
-            l.to_dict()
-            for l in crawler.crawl_all_courses_parallel(
-                2025, SemesterTypeEnum.SUMMER_SEMESTER
-            )
-        ]
-    )
+    print([l.to_dict() for l in crawler.crawl_all_courses_parallel(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
 
 
 if __name__ == "__main__":

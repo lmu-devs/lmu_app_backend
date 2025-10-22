@@ -1,32 +1,24 @@
 from pathlib import Path
 from typing import Optional
 
-from lxml import html
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from data_fetcher.src.courses.models.course import Course
 from shared.src.core.settings import get_settings
 from shared.src.enums.faculty_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.courses.course_tables import (
     CourseAdditionInformationTable,
     CourseBaseInfoTable,
+    CoursePersonTable,
     CourseSessionTable,
     CourseTable,
-    CoursePersonTable,
     CourseTreePathTable,
     course_persons_association,
 )
 from shared.utils.html_utils import html_to_markdown
 
-from ..models.course import (
-    Session,
-    CourseBasic,
-    CoursesBasic,
-    CourseDetails,
-    Person,
-)
+from ..models.course import CourseBasic, CourseDetails, CoursesBasic, Person, Session
 
 FACULTY_BY_ID_QUERY_NAME = "faculty_title_by_id.graphql"
 GRAPHQL_FOLDER_NAME = "graphql"
@@ -39,12 +31,8 @@ class CourseService:
         self.settings = get_settings()
         self.directus = DirectusService()
 
-    async def getcourse_details_db(
-        self, session: AsyncSession, publish_id: int
-    ) -> CourseDetails:
-        stmt = (
-            select(CourseTable).where(CourseTable.publish_id == publish_id)
-        ).distinct()
+    async def getcourse_details_db(self, session: AsyncSession, publish_id: int) -> CourseDetails:
+        stmt = (select(CourseTable).where(CourseTable.publish_id == publish_id)).distinct()
 
         result = await session.execute(stmt)
         course = result.scalar_one_or_none()
@@ -52,24 +40,14 @@ class CourseService:
         if not course:
             raise ValueError(f"Course with publish_id {publish_id} not found")
 
-        columns = [
-            col
-            for col in CourseAdditionInformationTable.__table__.c
-            if col.name != "id"
-        ]
+        columns = [col for col in CourseAdditionInformationTable.__table__.c if col.name != "id"]
 
-        base_stmt = (
-            select(*columns).where(
-                CourseAdditionInformationTable.course_publish_id == publish_id
-            )
-        ).distinct()
+        base_stmt = (select(*columns).where(CourseAdditionInformationTable.course_publish_id == publish_id)).distinct()
         base_result = await session.execute(base_stmt)
         base_row = base_result.mappings().one_or_none()
 
         sessions_stmt = (
-            select(CourseSessionTable).where(
-                CourseSessionTable.course_publish_id == publish_id
-            )
+            select(CourseSessionTable).where(CourseSessionTable.course_publish_id == publish_id)
         ).distinct()
 
         sessions_result = await session.execute(sessions_stmt)
@@ -99,9 +77,7 @@ class CourseService:
             addtional_information=self.convert_additional_info_to_markdown(base_row),
         )
 
-    def convert_additional_info_to_markdown(
-        self, add_info: Optional[CourseAdditionInformationTable]
-    ) -> str:
+    def convert_additional_info_to_markdown(self, add_info: Optional[CourseAdditionInformationTable]) -> str:
         if not add_info:
             return ""
 
@@ -134,9 +110,7 @@ class CourseService:
 
         return "\n\n".join(markdown_parts)
 
-    async def get_coursess_from_faculty_db(
-        self, session: AsyncSession, faculty_id: int, year: int, semester_id: int
-    ):
+    async def get_coursess_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
         """Get all classes from a specific faculty, semester and year."""
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
         year_suffix = year % 2000
@@ -163,10 +137,7 @@ class CourseService:
                 CourseBaseInfoTable,
                 CourseBaseInfoTable.course_publish_id == CourseTable.publish_id,
             )
-            .where(
-                (CourseTreePathTable.path[2] == faculty_title)
-                & (CourseBaseInfoTable.semester == semester_text)
-            )
+            .where((CourseTreePathTable.path[2] == faculty_title) & (CourseBaseInfoTable.semester == semester_text))
         ).distinct()
         result = await session.execute(stmt)
         rows = result.mappings().all()
@@ -186,8 +157,6 @@ class CourseService:
             variables=variables,
         )
         if not (faculties := response["data"]["faculties_translations"]):
-            raise ValueError(
-                f"No faculty found with ID {faculty_id} in language {language.value}"
-            )
+            raise ValueError(f"No faculty found with ID {faculty_id} in language {language.value}")
 
         return faculties[0]["title"]

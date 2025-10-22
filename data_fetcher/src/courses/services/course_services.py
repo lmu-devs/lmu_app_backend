@@ -1,14 +1,14 @@
 from typing import List
-from sqlalchemy.orm.session import Session
-from typing_extensions import Optional
-import datetime
 
-from data_fetcher.src.courses.models.course import Course
-from shared.src.enums.courses_enums import SemesterTypeEnum
-from shared.src.tables.courses.course_tables import CourseTable
-from ..crawler.lsf_crawler import LSFCrawler, LSFParallelCrawler
-from shared.src.services.directus_service import DirectusService
+from sqlalchemy.orm.session import Session
+
 from shared.src.core.logging import get_course_logger
+from shared.src.enums.courses_enums import SemesterTypeEnum
+from shared.src.models.course import Course
+from shared.src.services.directus_service import DirectusService
+from shared.src.tables.courses.course_tables import CourseTable
+
+from ..crawler.lsf_crawler import LSFCrawler, LSFParallelCrawler
 
 
 class CourseFetcher:
@@ -20,9 +20,7 @@ class CourseFetcher:
         self.workers: int = 5
         self.logger = get_course_logger(__name__)
 
-    def store_courses_streaming_upsert(
-        self, db: Session, year: int, semester: SemesterTypeEnum
-    ):
+    def store_courses_streaming_upsert(self, db: Session, year: int, semester: SemesterTypeEnum):
         """Store courses using streaming + upsert for maximum efficiency."""
         courses_crawler = LSFParallelCrawler(year, semester)
         batch_courses: list[Course] = []
@@ -45,16 +43,12 @@ class CourseFetcher:
             self._insert_course_batch(db, batch_courses, ids)
             db.commit()
 
-    def _insert_course_batch(
-        self, db: Session, batch: List[Course], publish_ids: set[int]
-    ):
+    def _insert_course_batch(self, db: Session, batch: List[Course], publish_ids: set[int]):
         for index, course in enumerate(batch):
             if course.publish_id in publish_ids:
                 self.delete_old_course_db(db, course.publish_id)
             self.add_course_db(db, course)
-            self.logger.info(
-                f"Added Course in Batch ({index + 1}/{len(batch)}): {course.title}"
-            )
+            self.logger.info(f"Added Course in Batch ({index + 1}/{len(batch)}): {course.title}")
 
     def delete_old_course_db(self, session: Session, course_id: int):
         course = session.get(CourseTable, course_id)
