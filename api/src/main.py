@@ -29,6 +29,8 @@ from .v1.university.routers import university_router
 from .v1.user.routers import user_router
 from .v2.benefit.routers import benefit_router
 from .v2.wishlist.routers import wishlist_router as wishlist_router_v2
+from .v1.people.routers import people_router
+
 
 api_logger = get_food_logger(__name__)
 

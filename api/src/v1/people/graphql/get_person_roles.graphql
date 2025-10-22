@@ -1,0 +1,13 @@
+# Get person roles
+query GetPersonRoles($person_id: ID!) {
+    person_roles(filter: { person_id: { id: { _eq: $person_id } } }) {
+        id
+        person_id {
+            id
+        }
+        role_name
+        lsf_role_enum
+        institution_name
+        institution_url
+    }
+}
