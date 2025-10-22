@@ -1,28 +1,29 @@
 import re
-from datetime import time, date as Date
-from pydantic import BaseModel, Field
-from typing import Any, List, Tuple, Optional
+from datetime import date as Date
+from datetime import time
 from pathlib import Path
+from typing import Any, List, Optional, Tuple
 
-from shared.src.tables.courses.course_tables import (
-    CourseTable,
-    CoursePersonTable,
-    CourseInstitutionTable,
-    CourseAssociatedTutorialTable,
-    CourseAssociatedClassTable,
-    CourseAssociatedProgramTable,
-    CourseAssociatedExamTable,
-    CourseBaseInfoTable,
-    CourseSessionTable,
-    CourseTreePathTable,
-    CourseMaterialTable,
-    CourseExamInformationTable,
-    CourseEnrollmentDeadlineTable,
-    CourseAdditionInformationTable,
-)
+from pydantic import BaseModel, Field
 
-from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.enums.courses_enums import CourseStartTypeEnum
+from shared.src.enums.weekday_enum import WeekdayEnum
+from shared.src.tables.courses.course_tables import (
+    CourseAdditionInformationTable,
+    CourseAssociatedClassTable,
+    CourseAssociatedExamTable,
+    CourseAssociatedProgramTable,
+    CourseAssociatedTutorialTable,
+    CourseBaseInfoTable,
+    CourseEnrollmentDeadlineTable,
+    CourseExamInformationTable,
+    CourseInstitutionTable,
+    CourseMaterialTable,
+    CoursePersonTable,
+    CourseSessionTable,
+    CourseTable,
+    CourseTreePathTable,
+)
 
 
 class Person(BaseModel):
@@ -48,9 +49,7 @@ class Person(BaseModel):
         raise RuntimeError("Invalid string to create person")
 
     def to_table(self) -> CoursePersonTable:
-        return CoursePersonTable(
-            first_name=self.first_name, surname=self.surname, title=self.title
-        )
+        return CoursePersonTable(first_name=self.first_name, surname=self.surname, title=self.title)
 
 
 class Institution(BaseModel):
@@ -104,14 +103,10 @@ class CourseBaseInfo(BaseModel):
     cycle: Optional[str] = Field(alias="Rhythmus", default=None)
     semester: Optional[str] = Field(alias="Semester", default=None)
     sws: Optional[float] = Field(alias="SWS", default=None)
-    max_participants: Optional[int] = Field(
-        alias="Max. Teilnehmer/-innen", default=None
-    )
+    max_participants: Optional[int] = Field(alias="Max. Teilnehmer/-innen", default=None)
     in_person_type: Optional[str] = Field(alias="Veranstaltungstyp", default=None)
     language: Optional[str] = Field(alias="Sprache", default=None)
-    for_exchange_students: Optional[str] = Field(
-        alias="für Austauschstudierende", default=None
-    )
+    for_exchange_students: Optional[str] = Field(alias="für Austauschstudierende", default=None)
     links: Optional[str] = Field(alias="Weitere Links", default=None)
     sigel: Optional[str] = Field(alias="Sigel", default=None)
 
@@ -376,58 +371,34 @@ class Course(BaseModel):
         return {
             "publish_id": self.publish_id,
             "name": self.title,
-            "tree_paths": (
-                [path.model_dump(mode="json") for path in self.tree_paths]
-                if self.tree_paths
-                else None
-            ),
-            "base_info": (
-                self.base_info.model_dump(mode="json") if self.base_info else None
-            ),
+            "tree_paths": ([path.model_dump(mode="json") for path in self.tree_paths] if self.tree_paths else None),
+            "base_info": (self.base_info.model_dump(mode="json") if self.base_info else None),
             "additional_information": (
-                self.additional_information.model_dump(mode="json")
-                if self.additional_information
-                else None
+                self.additional_information.model_dump(mode="json") if self.additional_information else None
             ),
             "enrollment_deadline": (
-                self.enrollment_deadline.model_dump(mode="json")
-                if self.enrollment_deadline
-                else None
+                self.enrollment_deadline.model_dump(mode="json") if self.enrollment_deadline else None
             ),
             "associated_programs": (
                 [prog.model_dump(mode="json") for prog in self.associated_programs]
                 if self.associated_programs
                 else None
             ),
-            "materials": (
-                [mat.model_dump(mode="json") for mat in self.materials]
-                if self.materials
-                else None
-            ),
+            "materials": ([mat.model_dump(mode="json") for mat in self.materials] if self.materials else None),
             "associated_exams": (
-                [exam.model_dump(mode="json") for exam in self.associated_exams]
-                if self.associated_exams
-                else None
+                [exam.model_dump(mode="json") for exam in self.associated_exams] if self.associated_exams else None
             ),
             "exam_informations": (
-                [info.model_dump(mode="json") for info in self.exam_informations]
-                if self.exam_informations
-                else None
+                [info.model_dump(mode="json") for info in self.exam_informations] if self.exam_informations else None
             ),
-            "sessions": (
-                [session.model_dump(mode="json") for session in self.sessions]
-                if self.sessions
-                else None
-            ),
+            "sessions": ([session.model_dump(mode="json") for session in self.sessions] if self.sessions else None),
             "associated_tutorials": (
                 [tut.model_dump(mode="json") for tut in self.associated_tutorials]
                 if self.associated_tutorials
                 else None
             ),
             "associated_classes": (
-                [clss.model_dump(mode="json") for clss in self.associated_classes]
-                if self.associated_classes
-                else None
+                [clss.model_dump(mode="json") for clss in self.associated_classes] if self.associated_classes else None
             ),
             "persons": {"connect": self.get_person_ids()},
         }
