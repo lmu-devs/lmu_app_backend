@@ -106,6 +106,7 @@ class SportService:
                         external_price=course.price.external,
                         total_availability=course.total_availability,
                         today_availability=course.today_availability,
+                        url=course.url,
                     )
                     self.db.add(course_entry)
 
@@ -125,7 +126,7 @@ class SportService:
                             latitude=course.location.latitude,
                             longitude=course.location.longitude,
                         )
-                    self.db.add(location)
+                        self.db.add(location)
 
                     # Add time slots
                     for slot in course.time_slots:

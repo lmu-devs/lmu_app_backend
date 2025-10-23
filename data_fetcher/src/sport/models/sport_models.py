@@ -181,6 +181,7 @@ class Course(BaseModel):
     location: SportCourseLocation | None = None
     category_id: str  # Now using offer_id as category_id
     status_code: int = 0  # No longer provided by new API
+    url: str
     is_available: bool = False
     total_availability: int | None = None
     today_availability: bool | None = None
@@ -190,6 +191,7 @@ class Course(BaseModel):
         cls,
         course_data: Dict,
         offer_id: str,
+        offer_slug: str,
         total_availability: int,
         today_availability: bool,
     ) -> "Course":
@@ -198,6 +200,7 @@ class Course(BaseModel):
         Args:
             course_data: Course dict from API
             offer_id: The offer ID to use as category_id
+            offer_slug: The offer slug to construct the URL
             total_availability: Total availability from offer
             today_availability: Today availability from offer
         """
@@ -229,6 +232,13 @@ class Course(BaseModel):
             # Determine availability
             is_available = total_availability > 0 if total_availability is not None else False
 
+            # Construct URL from offer slug
+            base_url = "https://kurse.zhs-muenchen.de"
+            group_slug = (
+                "Sports%20courses%20in%20Munich%20as%20well%20as%20external%20locations%20and%20outdoor%20destinations"
+            )
+            url = f"{base_url}/de/courses/{group_slug}/offers/{offer_slug}"
+
             return cls(
                 id=course_id,
                 name=name,
@@ -236,6 +246,7 @@ class Course(BaseModel):
                 duration=duration,
                 instructor=instructor,
                 price=price,
+                url=url,
                 location=location,
                 category_id=offer_id,
                 status_code=0,
@@ -263,13 +274,20 @@ class SportCourse(BaseModel):
         """
         title = offer_data.get("name", "Unknown Sport")
         offer_id = offer_data.get("id", "")
+        offer_slug = offer_data.get("slug", "")
         total_availability = offer_data.get("total_availability")
         today_availability = offer_data.get("today_availability")
 
         courses = []
         for course_data in courses_data:
             try:
-                course = Course.from_course_data(course_data, offer_id, total_availability, today_availability)
+                course = Course.from_course_data(
+                    course_data,
+                    offer_id,
+                    offer_slug,
+                    total_availability,
+                    today_availability,
+                )
                 courses.append(course)
             except Exception as e:
                 logger.error(f"Failed to parse course {course_data.get('id')}: {str(e)}")

@@ -59,6 +59,7 @@ class SportCourseTable(Base):
     category_id = Column(String)  # Now using offer_id as category_id
     status_code = Column(Integer)
     is_available = Column(Boolean, default=False)
+    url = Column(String)
 
     # Prices
     student_price = Column(Float)
