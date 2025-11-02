@@ -72,7 +72,7 @@ class CalendarLocation(BaseModel):
 class CalendarRule(BaseModel):
     frequency: Frequency
     interval: int                  # e.g. every two weeks: frequency=WEEKLY, interval=2
-    until_time: Optional[datetime] # end date for repeat, used when available
+    until_time: Optional[datetime] # end date for recurring events, used when available
 
     @staticmethod
     def from_json(json: dict) -> "CalendarRule":
