@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, Annotated
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, Response
 
@@ -116,7 +116,7 @@ async def get_events(
 
     return CalendarEntries.from_list(events)
 
-@router.get("/calendar/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
+@router.get("/ical/{access_scope_str}--{user_id}.ics", description="Public iCal feed for a user's events.")
 async def get_user_ical_feed(
     access_scope_str: str, # Hyphen-separated string, e.g. "0-10"  -- if there's a better option than this please fix
     user_id: uuid.UUID

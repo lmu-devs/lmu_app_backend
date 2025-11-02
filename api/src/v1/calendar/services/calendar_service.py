@@ -238,7 +238,11 @@ class CalendarService:
         if not information:
             raise DatabaseError(f"No calendar event found with ID {event_id}")
         
-        event_user_id = information.get("user_id")
+        if (event_user_str := information.get("user_id")):
+            event_user_id = uuid.UUID(event_user_str)
+        else:
+            event_user_id = None
+        
         if event_user_id != user_id:
             logger.critical(f"User {user_id} tried to delete {event_id} of user {event_user_id})")
             return False
@@ -479,6 +483,9 @@ class CalendarService:
 
         if event.location:
             ical_event.add("location", event.location.address)
+
+        if event.online_link:
+            ical_event.add("url", event.online_link)
 
         if event.rule.frequency != Frequency.ONCE:
             rrule = {

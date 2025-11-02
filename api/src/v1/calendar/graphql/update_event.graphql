@@ -23,6 +23,7 @@ mutation UpdateCalendarEvent($id: ID!, $data: update_calendar_event_input!) {
       latitude
       longitude
     }
+    online_link
     exceptions {
       id
       title
@@ -38,6 +39,7 @@ mutation UpdateCalendarEvent($id: ID!, $data: update_calendar_event_input!) {
         latitude
         longitude
       }
+      online_link
     }
   }
 }

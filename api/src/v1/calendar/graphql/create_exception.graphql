@@ -13,6 +13,7 @@ mutation CreateCalendarException($data: create_calendar_exceptions_input!) {
       latitude
       longitude
     }
+    online_link
     event {
       id
     }

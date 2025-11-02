@@ -1,6 +1,7 @@
 query GetInformationFromCalendarEvent($filter: calendar_event_filter) {
   calendar_event(filter: $filter) {
     id
+    user_id
 #   title
     rule {
       id
