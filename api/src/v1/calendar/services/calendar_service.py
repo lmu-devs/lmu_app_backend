@@ -423,10 +423,10 @@ class CalendarService:
         user_id: uuid.UUID,
         access_scope: list[AccessScope],
         generate_recurrence: bool,
-        current_date: Optional[datetime],                
-        event_type: Optional[str],
-        frequency: Optional[str],
-        all_day: Optional[bool]
+        current_date: Optional[datetime] = None,                
+        event_type: Optional[str] = None,
+        frequency: Optional[str] = None,
+        all_day: Optional[bool] = None
     ) -> list[CalendarEvent]:
         """Returns a list of calendar events. Several filters are optionally available."""
         
