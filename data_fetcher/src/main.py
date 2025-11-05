@@ -21,9 +21,9 @@ class DataCollectorApp:
         self.is_running = True
         print("Initializing the data collector.")
         self.collectors = [
-            # FoodCollector(),
+            FoodCollector(),
             # RoomfinderCollector(),
-            # LibraryCollector(),
+            LibraryCollector(),
             SportCollector(),
             # CinemaCollector(),
             # CoursesCollector(),
