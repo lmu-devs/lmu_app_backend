@@ -1,9 +1,11 @@
-from pydantic import BaseModel, Field, RootModel
-from typing import Any, List, Tuple, Optional
-from datetime import datetime, time, date as Date
+from datetime import date as Date
+from datetime import datetime, time
+from typing import List, Optional
 
-from shared.src.enums.weekday_enum import WeekdayEnum
+from pydantic import BaseModel, Field, RootModel
+
 from shared.src.enums.courses_enums import CourseStartTypeEnum
+from shared.src.enums.weekday_enum import WeekdayEnum
 
 
 class Person(BaseModel):
@@ -54,7 +56,7 @@ class Session(BaseModel):
     starting_time: Optional[time]
     ending_time: Optional[time]
     timing_type: Optional[CourseStartTypeEnum]
-    rythm: Optional[str]
+    rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
     room: Optional[str]
@@ -81,7 +83,7 @@ class AssociatedExam(BaseModel):
     po_version: Optional[str]
 
 
-class AdditionInformation(BaseModel):
+class AdditionalInformation(BaseModel):
     remark: Optional[str]
     literature: Optional[str]
     date: Optional[str]
@@ -134,7 +136,7 @@ class EnrollmentDeadline(BaseModel):
 class CourseDetails(BaseModel):
     sessions: Optional[list[Session]]
     persons: Optional[list[Person]]
-    addtional_information: Optional[str]
+    additional_information: Optional[str]
     last_updated: Optional[datetime]
 
 
@@ -146,9 +148,10 @@ class CourseBasic(BaseModel):
     sws: Optional[float]
     type: Optional[str]
     language: Optional[str]
+    degree: Optional[str]
 
 
 class CoursesBasic(RootModel):
     """Model for a list of courses, used to flatten the response from Directus."""
 
-    root: List[CourseBasic] | List[CourseBasic] = []
+    root: List[CourseBasic] = []

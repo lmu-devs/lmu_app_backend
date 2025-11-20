@@ -132,7 +132,7 @@ class CourseSession(BaseModel):
     starting_time: Optional[time]
     ending_time: Optional[time]
     timing_type: Optional[CourseStartTypeEnum]
-    rythm: Optional[str]
+    rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
     room: Optional[str]
@@ -147,7 +147,7 @@ class CourseSession(BaseModel):
             starting_time=self.starting_time,
             ending_time=self.ending_time,
             timing_type=self.timing_type,
-            rythm=self.rythm,
+            rhythm=self.rhythm,
             duration_start=self.duration_start,
             duration_end=self.duration_end,
             room=self.room,

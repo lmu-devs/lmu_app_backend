@@ -33,6 +33,7 @@ from shared.src.models.course import (
     Institution,
     Person,
 )
+from shared.utils.html_utils import html_to_markdown
 
 
 class LSFCrawler:
@@ -562,7 +563,7 @@ class LSFCrawler:
                 else:
                     inner_html = self._clean_and_normalize_string(str(data_cells[0].text_content().strip()))
 
-                additional_data[key] = inner_html
+                additional_data[key] = html_to_markdown(inner_html)
 
         return AdditionInformation(**additional_data)
 
@@ -748,7 +749,7 @@ class LSFCrawler:
                     starting_time=self._extract_start_time(row["Zeit"]),
                     ending_time=self._extract_end_time(row["Zeit"]),
                     timing_type=self._extract_time_type(row["Zeit"]),
-                    rythm=row["Rhythmus"] or None,
+                    rhythm=row["Rhythmus"] or None,
                     duration_start=self._parse_duration_start(row["Dauer"]),
                     duration_end=self._parse_duration_end(row["Dauer"]),
                     room=self._clean_room_name(row["Raum"]),

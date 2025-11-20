@@ -1,19 +1,19 @@
 from sqlalchemy import (
-    func,
-    DateTime,
     ARRAY,
     Column,
     Date,
+    DateTime,
     Enum,
     Float,
     ForeignKey,
     Integer,
     String,
-    Time,
+    Table,
     Text,
+    Time,
+    func,
 )
 from sqlalchemy.orm import relationship
-from sqlalchemy import Table
 
 from shared.src.core.database import Base
 from shared.src.enums import WeekdayEnum
@@ -127,7 +127,7 @@ class CourseSessionTable(Base, BaseTable):
     starting_time = Column(Time, nullable=True)
     ending_time = Column(Time, nullable=True)
     timing_type = Column(Enum(CourseStartTypeEnum, native_enum=False), nullable=True)
-    rythm = Column(String(255), nullable=True)
+    rhythm = Column(String(255), nullable=True)
     duration_start = Column(Date, nullable=True)
     duration_end = Column(Date, nullable=True)
     room = Column(String(500), nullable=True)
@@ -189,9 +189,7 @@ class CourseAdditionInformationTable(Base, BaseTable):
     type = Column(Text, nullable=True)
     course_publish_id = Column(Integer, ForeignKey("courses.publish_id"))
 
-    course = relationship(
-        "CourseTable", back_populates="additional_information", uselist=False
-    )
+    course = relationship("CourseTable", back_populates="additional_information", uselist=False)
 
 
 class CourseExamInformationTable(Base, BaseTable):
@@ -241,9 +239,7 @@ class CourseEnrollmentDeadlineTable(Base, BaseTable):
     other_deadlines = Column(Text, nullable=True)
     course_publish_id = Column(Integer, ForeignKey("courses.publish_id"))
 
-    course = relationship(
-        "CourseTable", back_populates="enrollment_deadline", uselist=False
-    )
+    course = relationship("CourseTable", back_populates="enrollment_deadline", uselist=False)
 
 
 class CourseTable(Base):
@@ -272,9 +268,7 @@ class CourseTable(Base):
         cascade=CASCADE_OPTION,
     )
 
-    tree_paths = relationship(
-        "CourseTreePathTable", back_populates="course", cascade=CASCADE_OPTION
-    )
+    tree_paths = relationship("CourseTreePathTable", back_populates="course", cascade=CASCADE_OPTION)
     associated_programs = relationship(
         "CourseAssociatedProgramTable",
         back_populates="course",
@@ -295,9 +289,7 @@ class CourseTable(Base):
         back_populates="course",
         cascade=CASCADE_OPTION,
     )
-    sessions = relationship(
-        "CourseSessionTable", back_populates="course", cascade=CASCADE_OPTION
-    )
+    sessions = relationship("CourseSessionTable", back_populates="course", cascade=CASCADE_OPTION)
     associated_tutorials = relationship(
         "CourseAssociatedTutorialTable",
         back_populates="course",

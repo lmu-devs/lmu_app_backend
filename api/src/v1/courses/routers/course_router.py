@@ -1,13 +1,12 @@
 import datetime
 
 from fastapi import APIRouter, Depends
-
-from ..services.course_service import CourseService
-from ..models.course import CoursesBasic, CourseDetails
-from shared.src.core.database import get_async_db
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared.src.core.database import get_async_db
+
+from ..models.course import CourseDetails, CoursesBasic
+from ..services.course_service import CourseService
 
 router = APIRouter()
 
@@ -25,9 +24,7 @@ async def get_courses_from_faculty(
 ) -> CoursesBasic:
     """Endpoint to get course from a specific faculty."""
     course_service = CourseService()
-    result = await course_service.get_coursess_from_faculty_db(
-        session, faculty_id, year, term_id
-    )
+    result = await course_service.get_courses_from_faculty_db(session, faculty_id, year, term_id)
     return result
 
 

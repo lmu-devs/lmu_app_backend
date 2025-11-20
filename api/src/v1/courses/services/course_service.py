@@ -9,6 +9,7 @@ from shared.src.enums.faculty_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.courses.course_tables import (
     CourseAdditionInformationTable,
+    CourseAssociatedProgramTable,
     CourseBaseInfoTable,
     CoursePersonTable,
     CourseSessionTable,
@@ -16,7 +17,6 @@ from shared.src.tables.courses.course_tables import (
     CourseTreePathTable,
     course_persons_association,
 )
-from shared.utils.html_utils import html_to_markdown
 
 from ..models.course import CourseBasic, CourseDetails, CoursesBasic, Person, Session
 
@@ -74,7 +74,7 @@ class CourseService:
             last_updated=course.last_updated,
             persons=[Person.model_validate(person) for person in persons],
             sessions=[Session.model_validate(session.__dict__) for session in sessions],
-            addtional_information=self.convert_additional_info_to_markdown(base_row),
+            additional_information=self.convert_additional_info_to_markdown(base_row),
         )
 
     def convert_additional_info_to_markdown(self, add_info: Optional[CourseAdditionInformationTable]) -> str:
@@ -104,13 +104,13 @@ class CourseService:
         markdown_parts = []
         for field, translation in field_translations.items():
             value = getattr(add_info, field)
-            text = html_to_markdown(value) if value else ""
+            text = value if value else ""
             if text:
                 markdown_parts.append(f"### {translation.title()}\n\n{text}")
 
         return "\n\n".join(markdown_parts)
 
-    async def get_coursess_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
+    async def get_courses_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
         """Get all classes from a specific faculty, semester and year."""
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
         year_suffix = year % 2000
@@ -128,10 +128,15 @@ class CourseService:
                 CourseBaseInfoTable.type,
                 CourseBaseInfoTable.language,
                 CourseBaseInfoTable.semester,
+                CourseAssociatedProgramTable.degree,
             )
             .join(
                 CourseTreePathTable,
                 CourseTreePathTable.course_publish_id == CourseTable.publish_id,
+            )
+            .join(
+                CourseAssociatedProgramTable,
+                CourseAssociatedProgramTable.course_publish_id == CourseTable.publish_id,
             )
             .join(
                 CourseBaseInfoTable,
