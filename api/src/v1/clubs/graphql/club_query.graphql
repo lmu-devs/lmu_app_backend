@@ -1,0 +1,23 @@
+query clubs($languageCode: String!) {
+    student_clubs(sort: ["translations.title"]) {
+        id
+        univerities {
+            id
+        }
+        type
+        logo {
+            filename_download
+        }
+        url
+        email
+        instagram_url
+        linkedin_url
+        is_shown 
+        translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
+            title
+            description
+            content
+        }
+    }
+
+}
