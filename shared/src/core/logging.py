@@ -65,6 +65,8 @@ def get_places_logger(module_name: str):
 def get_links_logger(module_name: str):
     return setup_logger(module_name, "links", "links_api")
 
+def get_clubs_logger(module_name: str):
+    return setup_logger(module_name, "clubs", "clubs_api")
 
 def get_user_logger(module_name: str):
     return setup_logger(module_name, "user", "user_api")
