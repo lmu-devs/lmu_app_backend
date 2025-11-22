@@ -26,7 +26,7 @@ class DataCollectorApp:
             # LibraryCollector(),
             # SportCollector(),
             # CinemaCollector(),
-            CoursesCollector(),
+            # CoursesCollector(),
         ]
 
     async def setup(self):
