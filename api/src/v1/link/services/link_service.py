@@ -39,8 +39,6 @@ class LinkService:
             flattened_response = flatten_response(response)
             links = flattened_response["links"]
 
-            print(links)
-
             # Get like counts for all links
             like_counts = await self.like_service.get_like_counts(LinkLikeTable, [int(link["id"]) for link in links])
 

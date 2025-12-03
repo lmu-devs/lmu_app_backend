@@ -1,5 +1,5 @@
 query clubs($languageCode: String!) {
-    student_clubs(sort: ["translations.title"]) {
+    student_clubs(sort: ["translations.title"], filter: { is_shown: { _eq: true } }) {
         id
         univerities {
             id
@@ -12,7 +12,7 @@ query clubs($languageCode: String!) {
         email
         instagram_url
         linkedin_url
-        is_shown 
+        category
         translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
             title
             description
