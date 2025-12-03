@@ -11,6 +11,7 @@ from shared.src.core.settings import get_settings
 
 from .v1.calendar.routers import calendar_router
 from .v1.cinema.routers import cinema_router
+from .v1.clubs.routers import clubs_router
 from .v1.courses.routers import course_router
 from .v1.feature_flag.routers import feature_flags_router
 from .v1.feedback.routers import feedback_router
@@ -81,6 +82,7 @@ def create_app():
     app.include_router(timeline_router.router, prefix=prefix_v1, tags=["timeline"])
     app.include_router(link_router.router, prefix=f"{prefix_v1}/link", tags=["link"])
     app.include_router(benefit_router.router, prefix=f"{prefix_v2}/link", tags=["link"])
+    app.include_router(clubs_router.router, prefix=f"{prefix_v1}", tags=["clubs"])
     app.include_router(library_router.router, prefix=f"{prefix_v1}/library", tags=["library"])
     app.include_router(map_router.router, prefix=f"{prefix_v1}/map", tags=["map"])
     app.include_router(feature_flags_router.router, prefix=f"{prefix_v1}", tags=["feature-flag"])
