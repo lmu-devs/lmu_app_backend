@@ -22,5 +22,6 @@ mutation CreateCalendarEvent($data: create_calendar_event_input!) {
       latitude
       longitude
     }
+    online_link
   }
 }

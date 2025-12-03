@@ -42,6 +42,7 @@ class RepresentationType(int, Enum):
     START_TIME = 3
     END_TIME = 4
     LOCATION = 5
+    ONLINE_LINK = 6
 
 class CalendarLocation(BaseModel):
     address: str
@@ -71,7 +72,7 @@ class CalendarLocation(BaseModel):
 class CalendarRule(BaseModel):
     frequency: Frequency
     interval: int                  # e.g. every two weeks: frequency=WEEKLY, interval=2
-    until_time: Optional[datetime] # end date for repeat, used when available
+    until_time: Optional[datetime] # end date for recurring events, used when available
 
     @staticmethod
     def from_json(json: dict) -> "CalendarRule":
@@ -89,6 +90,7 @@ class CalendarCreate(BaseModel):
     title: Optional[str]
     description: Optional[str]
     location: Optional[CalendarLocation]
+    online_link: Optional[str]
     rule: CalendarRule
     event_type: EventType
     start_time: Optional[datetime]
@@ -131,6 +133,7 @@ class CalendarCreate(BaseModel):
                 "end_time": create_entry.end_time.isoformat(),
                 "description": create_entry.description,
                 "location": loc_dict,
+                "online_link": create_entry.online_link,
                 "rule": rule_dict,
                 "access_scope": create_entry.access_scope
         }
@@ -197,7 +200,7 @@ class CalendarException(BaseModel):
         elif original_exception and original_exception.get("location"):
             loc_data = original_exception.get("location")
 
-        fields = ["title", "description", "start_time", "end_time", "all_day"]
+        fields = ["title", "description", "start_time", "end_time", "all_day", "online_link"]
         merged_fields = {
             field: CalendarException._merge_field(field, overwrite, update_exception, original_exception)
             for field in fields
@@ -237,13 +240,14 @@ class CalendarEvent(CalendarCreate):
             "end_time": json["end_time"],
             "all_day": json["all_day"],
             "location": location,
+            "online_link": json.get("online_link"),
             "recurrence_id": None,
         }
 
         if exception_data:
             overwrite = {RepresentationType(int(x)) for x in exception_data.get("overwrite", []) or []}
 
-            for field in ["title", "description", "start_time", "end_time", "all_day"]:
+            for field in ["title", "description", "start_time", "end_time", "all_day", "online_link"]:
                 field_type = RepresentationType[field.upper()]
                 if field_type in overwrite:
                     event_data[field] = exception_data.get(field, event_data[field])

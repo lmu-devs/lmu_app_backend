@@ -128,23 +128,27 @@ class CalendarService:
         delta
         ) -> int:
         """Calculates the number of intervals happend between now and the start time."""
-        if isinstance(delta, timedelta):
-            return (now - start) // delta
-        elif isinstance(delta, relativedelta):
-            # months or years
-            months_diff = (now.year - start.year) * 12 + (now.month - start.month)
-            if delta.years:
-                interval_months = delta.years * 12
+        try:        
+            if isinstance(delta, timedelta):
+                return (now - start) // delta
+            elif isinstance(delta, relativedelta):
+                # months or years
+                months_diff = (now.year - start.year) * 12 + (now.month - start.month)
+                if delta.years:
+                    interval_months = delta.years * 12
+                else:
+                    interval_months = delta.months
+                return months_diff // interval_months
             else:
-                interval_months = delta.months
-            return months_diff // interval_months
-        else:
-            return 0
+                return 0
+        except Exception as e:
+            raise DatabaseError(f"Exception while calculating time intervals: {e}") from e
 
     def _generate_recurring_events(self, 
         parent_event: dict, 
+        current_date: Optional[datetime],
         max_past: int = REPEAT_LIMIT,
-        max_future: int = REPEAT_LIMIT, 
+        max_future: int = REPEAT_LIMIT
         ) -> list[CalendarEvent]:
         """Generates all recurring event instances based on a parent event and its recurrence rule. 
         If there are exceptions, they will overwrite the corresponding event."""
@@ -165,7 +169,8 @@ class CalendarService:
  
         # calculate the offset from the template.start_time until today. This is our relative "today"
         # negativ if the event starts in the future
-        base_id = self._get_intervals_elapsed(template.start_time, datetime.now(), delta)
+        generate_date = current_date or datetime.now()
+        base_id = self._get_intervals_elapsed(template.start_time, generate_date, delta)
         event_duration = template.end_time - template.start_time
 
         # the start_time of the event is in the past, we are in the future
@@ -205,7 +210,8 @@ class CalendarService:
     
     def create_event(self, 
         user_id: uuid.UUID, 
-        calendar_data: CalendarCreate
+        calendar_data: CalendarCreate,
+        current_date: Optional[datetime]
         ) -> list[CalendarEvent]:
         """Creates a calendar event in the database. Returns a list of several recurring events based on the event rule."""  
         create_event = CalendarCreate.to_json(calendar_data, user_id, None, None)   
@@ -219,7 +225,7 @@ class CalendarService:
             msg = f"for user {user_id}!"
 
         logger.info(f"Created new calendar event {item["id"]} {msg}")
-        return self._generate_recurring_events(item, 0)
+        return self._generate_recurring_events(item, current_date)
  
     def _delete_location_event(self,
         location_id: uuid.UUID
@@ -238,7 +244,11 @@ class CalendarService:
         if not information:
             raise DatabaseError(f"No calendar event found with ID {event_id}")
         
-        event_user_id = information.get("user_id")
+        if (event_user_str := information.get("user_id")):
+            event_user_id = uuid.UUID(event_user_str)
+        else:
+            event_user_id = None
+        
         if event_user_id != user_id:
             logger.critical(f"User {user_id} tried to delete {event_id} of user {event_user_id})")
             return False
@@ -327,7 +337,8 @@ class CalendarService:
     def _update_event(self,
         user_id: uuid.UUID, 
         event_id: uuid.UUID,     
-        update_data: CalendarCreate,                   
+        update_data: CalendarCreate,   
+        current_date: Optional[datetime]                
         ) -> list[CalendarEvent]:
         """Performs an update to the base event instance. Therefore all events are updated."""
         event = self._get_event_information(event_id, GraphQLFile.kGetInformation, ["calendar_event", 0])        
@@ -343,7 +354,7 @@ class CalendarService:
         if not item:
             raise DatabaseError(f"Failed to update {event_id}!")
         
-        return self._generate_recurring_events(item)
+        return self._generate_recurring_events(item, current_date)
 
     def _update_recurring_event(self,
         event_id: uuid.UUID,     
@@ -390,7 +401,8 @@ class CalendarService:
         event_id: uuid.UUID, 
         recurrence_id: int,
         update_exception: CalendarException, 
-        update_type: UpdateType
+        update_type: UpdateType,
+        current_date: Optional[datetime]
         ) -> list[CalendarEvent]:
         """Updates calendar entries in the database."""
         match update_type:
@@ -399,7 +411,7 @@ class CalendarService:
                 return self._update_recurring_event(event_id, update_exception, recurrence_id)
             case UpdateType.ALL:
                 logger.info(f"Updating all occurrences of calendar event {event_id}.")
-                return self._update_event(user_id, event_id, update_exception.data)
+                return self._update_event(user_id, event_id, update_exception.data, current_date)
             case UpdateType.FUTURE: # split 
                 logger.info("Not implemented yet!")
                 return []
@@ -411,6 +423,7 @@ class CalendarService:
         user_id: uuid.UUID,
         access_scope: list[AccessScope],
         generate_recurrence: bool,
+        current_date: Optional[datetime] = None,                
         event_type: Optional[str] = None,
         frequency: Optional[str] = None,
         all_day: Optional[bool] = None
@@ -452,7 +465,7 @@ class CalendarService:
         instances = []
         for event in events:
             if generate_recurrence:
-                instances.extend(self._generate_recurring_events(event))
+                instances.extend(self._generate_recurring_events(event, current_date))
             else:
                 instances.append(CalendarEvent.from_json(event))
 
@@ -479,6 +492,9 @@ class CalendarService:
 
         if event.location:
             ical_event.add("location", event.location.address)
+
+        if event.online_link:
+            ical_event.add("url", event.online_link)
 
         if event.rule.frequency != Frequency.ONCE:
             rrule = {
