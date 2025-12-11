@@ -135,7 +135,8 @@ class CourseSession(BaseModel):
     rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
-    room: Optional[str]
+    room_id: Optional[str]
+    building_id: Optional[str]
     lecturer: Optional[str]
     remark: Optional[str]
     cancelled_dates: Optional[str]
@@ -150,7 +151,8 @@ class CourseSession(BaseModel):
             rhythm=self.rhythm,
             duration_start=self.duration_start,
             duration_end=self.duration_end,
-            room=self.room,
+            room_id=self.room_id,
+            building_id=self.building_id,
             lecturer=self.lecturer,
             remark=self.remark,
             cancelled_dates=self.cancelled_dates,

@@ -5,7 +5,7 @@ from shared.src.core.database import Base
 
 
 class StreetTable(Base):
-    __tablename__ = "streets"
+    __tablename__ = "roomfinder_streets"
 
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)

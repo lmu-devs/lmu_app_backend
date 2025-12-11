@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared.src.core.settings import get_settings
 from shared.src.enums.faculty_enums import LanguageEnum
+from shared.src.models.location_model import Location
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.courses.course_tables import (
     CourseAdditionInformationTable,
@@ -17,6 +18,8 @@ from shared.src.tables.courses.course_tables import (
     CourseTreePathTable,
     course_persons_association,
 )
+from shared.src.tables.roomfinder.building_table import BuildingLocationTable
+from shared.src.tables.roomfinder.room_table import RoomTable
 
 from ..models.course import CourseBasic, CourseDetails, CoursesBasic, Person, Session
 
@@ -46,12 +49,25 @@ class CourseService:
         base_result = await session.execute(base_stmt)
         base_row = base_result.mappings().one_or_none()
 
+        # Select session columns + room name + building location via LEFT JOINs
         sessions_stmt = (
-            select(CourseSessionTable).where(CourseSessionTable.course_publish_id == publish_id)
+            select(
+                *CourseSessionTable.__table__.c,
+                RoomTable.name.label("room_name"),
+                BuildingLocationTable.address,
+                BuildingLocationTable.latitude,
+                BuildingLocationTable.longitude,
+            )
+            .outerjoin(RoomTable, CourseSessionTable.room_id == RoomTable.id)
+            .outerjoin(
+                BuildingLocationTable,
+                CourseSessionTable.building_id == BuildingLocationTable.building_id,
+            )
+            .where(CourseSessionTable.course_publish_id == publish_id)
         ).distinct()
 
         sessions_result = await session.execute(sessions_stmt)
-        sessions = sessions_result.scalars().all()
+        sessions_rows = sessions_result.mappings().all()
 
         persons_stmt = (
             select(
@@ -73,9 +89,20 @@ class CourseService:
         return CourseDetails(
             last_updated=course.last_updated,
             persons=[Person.model_validate(person) for person in persons],
-            sessions=[Session.model_validate(session.__dict__) for session in sessions],
+            sessions=[self._create_session_from_row(dict(row)) for row in sessions_rows],
             additional_information=self.convert_additional_info_to_markdown(base_row),
         )
+
+    def _create_session_from_row(self, row: dict) -> Session:
+        """Create a Session API model from a database row dict."""
+        address = row.pop("address", None)
+        latitude = row.pop("latitude", None)
+        longitude = row.pop("longitude", None)
+        room_name = row.pop("room_name", None)
+
+        location = Location(address=address, latitude=latitude, longitude=longitude) if address else None
+
+        return Session.from_table(row, room_name=room_name, location=location)
 
     def convert_additional_info_to_markdown(self, add_info: Optional[CourseAdditionInformationTable]) -> str:
         if not add_info:

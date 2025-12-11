@@ -1,0 +1,19 @@
+---
+description: general python3 infos
+globs: 
+alwaysApply: true
+---
+
+## Python3 Stack
+- python3
+- black
+- isort
+- pre-commit
+- pre-push
+
+## Sty
+- printWidth: 120
+- tabWidth: 4
+- singleQuote: true
+- trailingComma: "all"
+- semi: false

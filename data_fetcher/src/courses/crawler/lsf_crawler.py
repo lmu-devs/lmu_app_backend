@@ -247,21 +247,49 @@ class LSFCrawler:
 
         return any(error_message in p.text_content() for p in p_tags)
 
-    def _make_safe_http_request(self, url: str, timeout: float = 10, retries: int = 10) -> bytes:
-        """Make HTTP request with retry logic and error handling."""
+    def _make_safe_http_request(
+        self,
+        url: str,
+        timeout: tuple[float, float] = (10, 30),
+        retries: int = 5,
+        max_backoff: float = 30,
+    ) -> bytes:
+        """Make HTTP request with retry logic and error handling.
+
+        Args:
+            url: The URL to fetch
+            timeout: Tuple of (connect_timeout, read_timeout) in seconds
+            retries: Maximum number of retry attempts
+            max_backoff: Maximum sleep time between retries in seconds
+        """
         for attempt in range(1, retries + 1):
             try:
                 response = self.session.get(url, headers=self.get_random_header(), timeout=timeout)
                 response.raise_for_status()
                 return response.content
-            except Exception as e:
-                self.logger.error(f"[Retry {attempt}/{retries}] Error fetching {url}: {e}")
+            except requests.exceptions.Timeout:
+                sleep_time = min(2**attempt, max_backoff)
+                self.logger.warning(
+                    f"[Timeout {attempt}/{retries}] Request timed out (connect={timeout[0]}s, read={timeout[1]}s). "
+                    f"Retrying in {sleep_time}s..."
+                )
                 if attempt < retries:
-                    time.sleep(2**attempt)
-                else:
-                    self.logger.fatal(f"[FAIL] Giving up on {url}")
+                    time.sleep(sleep_time)
+            except requests.exceptions.RequestException as e:
+                sleep_time = min(2**attempt, max_backoff)
+                self.logger.warning(
+                    f"[Retry {attempt}/{retries}] Request failed: {type(e).__name__}. " f"Retrying in {sleep_time}s..."
+                )
+                if attempt < retries:
+                    time.sleep(sleep_time)
+            except Exception as e:
+                self.logger.error(f"[Error {attempt}/{retries}] Unexpected error fetching URL: {e}")
+                if attempt < retries:
+                    sleep_time = min(2**attempt, max_backoff)
+                    time.sleep(sleep_time)
 
-        self.logger.fatal(f"Failed to fetch {url} after {retries} retries")
+        self.logger.error(f"[FAIL] Giving up after {retries} retries")
+        raise RuntimeError(f"Failed to fetch URL after {retries} retries")
 
     def _get_course_urls_with_search_filter(self, search_text: str, course_type: int) -> list[tuple[str, str]]:
         """Extract course URLs from search results for a given search filter."""
@@ -380,14 +408,15 @@ class LSFCrawler:
             return None
 
         persons = []
-        for row in persons_table:
-            if len(row_entrys := row.xpath(".//td")) == 0:
-                continue
-            person_raw = row_entrys[0].text_content().strip()
+        for table in persons_table:
+            for row in table.xpath(".//tr"):
+                if len(row_entrys := row.xpath(".//td")) == 0:
+                    continue
+                person_raw = row_entrys[0].text_content().strip()
 
-            if person_raw == "keine öffentliche Person":
-                continue
-            persons.append(Person.from_str(self._clean_and_normalize_string(person_raw)))
+                if person_raw == "keine öffentliche Person":
+                    continue
+                persons.append(Person.from_str(self._clean_and_normalize_string(person_raw)))
 
         return persons if len(persons) > 0 else None
 
@@ -735,39 +764,72 @@ class LSFCrawler:
         for table in session_table:
             column_headers = [th.text_content().strip() for th in table.xpath(".//tr[1]/th")]
             table_caption = c[0] if (c := table.xpath(".//caption/text()")) else None
-            table_rows = []
 
             for table_row in table.xpath(".//tr[position()>1]"):
-                cells = [self._clean_and_normalize_string(td.text_content()) for td in table_row.xpath("td")]
-                row_data = dict(zip(column_headers, cells))
-                table_rows.append(row_data)
+                cells = table_row.xpath("td")
+                row_data = {
+                    header: self._clean_and_normalize_string(cell.text_content())
+                    for header, cell in zip(column_headers, cells)
+                }
 
-            sessions += [
-                CourseSession(
-                    caption=table_caption,
-                    weekday=self._parse_weekday(row["Tag"]),
-                    starting_time=self._extract_start_time(row["Zeit"]),
-                    ending_time=self._extract_end_time(row["Zeit"]),
-                    timing_type=self._extract_time_type(row["Zeit"]),
-                    rhythm=row["Rhythmus"] or None,
-                    duration_start=self._parse_duration_start(row["Dauer"]),
-                    duration_end=self._parse_duration_end(row["Dauer"]),
-                    room=self._clean_room_name(row["Raum"]),
-                    lecturer=row["Lehrperson"] or None,
-                    remark=row["Bemerkung"] or None,
-                    cancelled_dates=row["fällt aus am"] or None,
+                # Extract room_id and building_id from the floor plan link in the Raum column
+                raum_index = column_headers.index("Raum") if "Raum" in column_headers else None
+                room_id = None
+                building_id = None
+                if raum_index is not None and raum_index < len(cells):
+                    room_id, building_id = self._extract_room_and_building_from_cell(cells[raum_index])
+
+                sessions.append(
+                    CourseSession(
+                        caption=table_caption,
+                        weekday=self._parse_weekday(row_data["Tag"]),
+                        starting_time=self._extract_start_time(row_data["Zeit"]),
+                        ending_time=self._extract_end_time(row_data["Zeit"]),
+                        timing_type=self._extract_time_type(row_data["Zeit"]),
+                        rhythm=row_data["Rhythmus"] or None,
+                        duration_start=self._parse_duration_start(row_data["Dauer"]),
+                        duration_end=self._parse_duration_end(row_data["Dauer"]),
+                        room_id=room_id,
+                        building_id=building_id,
+                        lecturer=row_data["Lehrperson"] or None,
+                        remark=row_data["Bemerkung"] or None,
+                        cancelled_dates=row_data["fällt aus am"] or None,
+                    )
                 )
-                for row in table_rows
-            ]
 
         return sessions
 
-    @staticmethod
-    def _clean_room_name(room: str) -> Optional[str]:
-        """Clean and normalize room names, removing 'Geschossplan' suffix."""
-        if room == "":
-            return None
-        return re.sub(r"\s+Geschossplan", "", room)
+    def _extract_room_and_building_from_cell(self, cell_element) -> tuple[Optional[str], Optional[str]]:
+        """Extract room ID and building ID from the floor plan (Geschossplan) link.
+
+        The floor plan URL format is:
+        http://www.uni-muenchen.de/raumfinder/index.html#/part/bt1507/map?room=150701108_
+
+        Returns a tuple of (room_id, building_id):
+        - room_id: e.g., '150701108_'
+        - building_id: e.g., 'bt1507'
+        """
+        # Look for raumfinder link containing the room parameter
+        room_links = cell_element.xpath(".//a[contains(@href, 'raumfinder')]/@href")
+
+        if not room_links:
+            return None, None
+
+        href = room_links[0]
+
+        # Extract room parameter from URL (format: ...?room=150701108_)
+        room_id = None
+        room_match = re.search(r"[?&]room=([^&]+)", href)
+        if room_match:
+            room_id = room_match.group(1)
+
+        # Extract building_id from URL (format: .../part/bt1507/map...)
+        building_id = None
+        building_match = re.search(r"/part/(bt\d+)/", href)
+        if building_match:
+            building_id = building_match.group(1)
+
+        return room_id, building_id
 
     @staticmethod
     def _extract_times(time_str: str) -> list[str]:
@@ -891,6 +953,10 @@ class LSFParallelCrawler(LSFCrawler):
     def __iter__(self) -> Iterator[Course]:
         if self._course_urls == []:
             self._course_urls = self._crawl_course_urls_in_parallel()
+            self.logger.info(f"Starting parallel crawl of {len(self._course_urls)} courses with {self.workers} workers")
+
+        completed_count = 0
+        failed_count = 0
 
         with ThreadPoolExecutor(max_workers=self.workers) as executor:
             future_to_url = {
@@ -904,10 +970,16 @@ class LSFParallelCrawler(LSFCrawler):
             for future in as_completed(future_to_url):
                 try:
                     course = future.result()
+                    completed_count += 1
                     yield course
                 except Exception as e:
-                    title, _ = future_to_url[future]
-                    self.logger.error(f"Course {title} generated an exception: {e}")
+                    failed_count += 1
+                    title, url = future_to_url[future]
+                    self.logger.error(
+                        f"Course '{title}' failed (completed: {completed_count}, failed: {failed_count}): {e}"
+                    )
+
+        self.logger.info(f"Parallel crawl finished. Completed: {completed_count}, Failed: {failed_count}")
 
     def __len__(self):
         return len(self._course_urls)

@@ -5,11 +5,11 @@ from shared.src.core.database import Base
 
 
 class RoomTable(Base):
-    __tablename__ = "rooms"
+    __tablename__ = "roomfinder_rooms"
 
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    floor_id = Column(String, ForeignKey("floors.id"), nullable=False)
+    floor_id = Column(String, ForeignKey("roomfinder_floors.id"), nullable=False)
     pos_x = Column(Integer, nullable=False)
     pos_y = Column(Integer, nullable=False)
 

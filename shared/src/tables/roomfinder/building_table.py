@@ -6,11 +6,11 @@ from shared.src.tables.location_table import LocationTable
 
 
 class BuildingTable(Base):
-    __tablename__ = "buildings"
+    __tablename__ = "roomfinder_buildings"
 
     building_part_id = Column(String, primary_key=True)
     building_id = Column(String)
-    street_id = Column(String, ForeignKey("streets.id"), nullable=False)
+    street_id = Column(String, ForeignKey("roomfinder_streets.id"), nullable=False)
     title = Column(String, nullable=False)
     aliases = Column(ARRAY(String), default=[])
 
@@ -21,9 +21,9 @@ class BuildingTable(Base):
 
 
 class BuildingLocationTable(LocationTable):
-    __tablename__ = "building_locations"
+    __tablename__ = "roomfinder_building_locations"
 
-    building_id = Column(String, ForeignKey("buildings.building_part_id"), primary_key=True)
+    building_id = Column(String, ForeignKey("roomfinder_buildings.building_part_id"), primary_key=True)
 
     # Relationship
     building = relationship("BuildingTable", back_populates="location")

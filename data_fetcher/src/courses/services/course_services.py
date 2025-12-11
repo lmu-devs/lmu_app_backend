@@ -25,7 +25,9 @@ class CourseFetcher:
         courses_crawler = LSFParallelCrawler(year, semester)
         batch_courses: list[Course] = []
         batch_size = 100
+        total_committed = 0
         ids = {id_tuple[0] for id_tuple in db.query(CourseTable.publish_id).all()}
+        self.logger.info(f"Found {len(ids)} existing courses in database")
 
         for index, course in enumerate(courses_crawler):
             self.logger.info(
@@ -36,12 +38,30 @@ class CourseFetcher:
             batch_courses.append(course)
             if len(batch_courses) >= batch_size:
                 self._insert_course_batch(db, batch_courses, ids)
-                db.commit()
+                self.logger.info(f"Committing batch of {len(batch_courses)} courses...")
+                try:
+                    db.commit()
+                    total_committed += len(batch_courses)
+                    self.logger.info(f"✓ Batch committed successfully. Total committed: {total_committed}")
+                except Exception as e:
+                    self.logger.error(f"✗ Failed to commit batch: {e}")
+                    db.rollback()
+                    raise
                 batch_courses = []
 
         if batch_courses:
             self._insert_course_batch(db, batch_courses, ids)
-            db.commit()
+            self.logger.info(f"Committing final batch of {len(batch_courses)} courses...")
+            try:
+                db.commit()
+                total_committed += len(batch_courses)
+                self.logger.info(f"✓ Final batch committed successfully. Total committed: {total_committed}")
+            except Exception as e:
+                self.logger.error(f"✗ Failed to commit final batch: {e}")
+                db.rollback()
+                raise
+
+        self.logger.info(f"=== Course import complete. Total courses committed: {total_committed} ===")
 
     def _insert_course_batch(self, db: Session, batch: List[Course], publish_ids: set[int]):
         for index, course in enumerate(batch):

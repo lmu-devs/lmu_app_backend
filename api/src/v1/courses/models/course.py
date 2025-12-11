@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, RootModel
 
 from shared.src.enums.courses_enums import CourseStartTypeEnum
 from shared.src.enums.weekday_enum import WeekdayEnum
+from shared.src.models.location_model import Location
 
 
 class Person(BaseModel):
@@ -59,10 +60,27 @@ class Session(BaseModel):
     rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]
-    room: Optional[str]
+    room_id: Optional[str]
+    room_name: Optional[str]
+    building_id: Optional[str]
+    location: Optional[Location]
     lecturer: Optional[str]
     remark: Optional[str]
     cancelled_dates: Optional[str]
+
+    @classmethod
+    def from_table(
+        cls,
+        session_row: dict,
+        room_name: Optional[str] = None,
+        location: Optional[Location] = None,
+    ) -> "Session":
+        """Create a Session from a database row with optional room/location data."""
+        return cls(
+            **session_row,
+            room_name=room_name,
+            location=location,
+        )
 
 
 class Material(BaseModel):

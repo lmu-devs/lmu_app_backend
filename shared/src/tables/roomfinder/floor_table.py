@@ -5,10 +5,10 @@ from shared.src.core.database import Base
 
 
 class FloorTable(Base):
-    __tablename__ = "floors"
+    __tablename__ = "roomfinder_floors"
 
     id = Column(String, primary_key=True)
-    building_part_id = Column(String, ForeignKey("buildings.building_part_id"), nullable=False)
+    building_part_id = Column(String, ForeignKey("roomfinder_buildings.building_part_id"), nullable=False)
     level = Column(String, nullable=False)
     name = Column(String, nullable=False)
     map_uri = Column(String, nullable=False)
