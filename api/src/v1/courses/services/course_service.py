@@ -4,7 +4,9 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.src.v1.courses.models.semesters import SemesterModel, SemestersModel
 from shared.src.core.settings import get_settings
+from shared.src.enums.courses_enums import SemesterEnum
 from shared.src.enums.faculty_enums import LanguageEnum
 from shared.src.models.location_model import Location
 from shared.src.services.directus_service import DirectusService
@@ -137,16 +139,15 @@ class CourseService:
 
         return "\n\n".join(markdown_parts)
 
-    async def get_courses_from_faculty_db(self, session: AsyncSession, faculty_id: int, year: int, semester_id: int):
+    async def get_courses_from_faculty_db(
+        self,
+        session: AsyncSession,
+        faculty_id: int,
+        year: int,
+        semester_type: SemesterEnum,
+    ):
         """Get all classes from a specific faculty, semester and year."""
         faculty_title = await self.get_faculty_from_id(faculty_id, LanguageEnum.GERMAN)
-        year_suffix = year % 2000
-        semester_prefix = "SoSe" if semester_id == 1 else "WiSe"
-        semester_text = (
-            f"{semester_prefix} 20{year_suffix}"
-            if semester_id == 1
-            else f"{semester_prefix} {year_suffix}{year_suffix + 1}"
-        )
         stmt = (
             select(
                 CourseTable.publish_id,
@@ -154,7 +155,6 @@ class CourseService:
                 CourseBaseInfoTable.sws,
                 CourseBaseInfoTable.type,
                 CourseBaseInfoTable.language,
-                CourseBaseInfoTable.semester,
                 CourseAssociatedProgramTable.degree,
             )
             .join(
@@ -169,7 +169,11 @@ class CourseService:
                 CourseBaseInfoTable,
                 CourseBaseInfoTable.course_publish_id == CourseTable.publish_id,
             )
-            .where((CourseTreePathTable.path[2] == faculty_title) & (CourseBaseInfoTable.semester == semester_text))
+            .where(
+                (CourseTreePathTable.path[2] == faculty_title)
+                & (CourseBaseInfoTable.year == year)
+                & (CourseBaseInfoTable.semester_type == semester_type)
+            )
         ).distinct()
         result = await session.execute(stmt)
         rows = result.mappings().all()
@@ -192,3 +196,16 @@ class CourseService:
             raise ValueError(f"No faculty found with ID {faculty_id} in language {language.value}")
 
         return faculties[0]["title"]
+
+    async def get_available_semesters_db(self, session: AsyncSession) -> SemestersModel:
+        """Get all available semesters."""
+        stmt = select(CourseBaseInfoTable.year, CourseBaseInfoTable.semester_type).distinct()
+        result = await session.execute(stmt)
+        rows = result.all()
+        return SemestersModel(
+            semesters=[
+                SemesterModel(year=row.year, semester_type=row.semester_type)
+                for row in rows
+                if row.year is not None and row.semester_type is not None
+            ]
+        )

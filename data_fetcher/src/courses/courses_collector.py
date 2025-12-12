@@ -1,10 +1,11 @@
-from data_fetcher.src.core.base_collector import ScheduledCollector
-from data_fetcher.src.courses.services.course_services import CourseFetcher
-from shared.src.enums.courses_enums import SemesterTypeEnum
-from shared.src.core.logging import get_course_logger
+import datetime
 
 import schedule
-import datetime
+
+from data_fetcher.src.core.base_collector import ScheduledCollector
+from data_fetcher.src.courses.services.course_services import CourseFetcher
+from shared.src.core.logging import get_course_logger
+from shared.src.enums.courses_enums import SemesterEnum
 
 
 class CoursesCollector(ScheduledCollector):
@@ -19,14 +20,10 @@ class CoursesCollector(ScheduledCollector):
         date = datetime.datetime.now()
         self.logger.info(f"Collecting summer and winter semester for {date.year}")
 
-        self.course_fetcher.store_courses_streaming_upsert(
-            db, date.year, SemesterTypeEnum.SUMMER_SEMESTER
-        )
+        self.course_fetcher.store_courses_streaming_upsert(db, date.year, SemesterEnum.SUMMER)
         self.logger.info(f"Summer semester collected in {date.year}")
 
-        self.course_fetcher.store_courses_streaming_upsert(
-            db, date.year, SemesterTypeEnum.WINTER_SEMESTER
-        )
+        self.course_fetcher.store_courses_streaming_upsert(db, date.year, SemesterEnum.WINTER)
         self.logger.info(f"Winter semester collected in {date.year}")
 
 

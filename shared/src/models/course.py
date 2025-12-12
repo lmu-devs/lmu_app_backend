@@ -6,7 +6,7 @@ from typing import Any, List, Optional, Tuple
 
 from pydantic import BaseModel, Field
 
-from shared.src.enums.courses_enums import CourseStartTypeEnum
+from shared.src.enums.courses_enums import CourseStartEnum, SemesterEnum
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.tables.courses.course_tables import (
     CourseAdditionInformationTable,
@@ -98,10 +98,11 @@ class AssociatedProgram(BaseModel):
 
 class CourseBaseInfo(BaseModel):
     institutions: Optional[list[Institution]]
+    year: Optional[int] = None
+    semester_type: Optional[SemesterEnum] = None
     type: Optional[str] = Field(alias="Veranstaltungsart", default=None)
     course_id: Optional[str] = Field(alias="Veranstaltungsnummer", default=None)
     cycle: Optional[str] = Field(alias="Rhythmus", default=None)
-    semester: Optional[str] = Field(alias="Semester", default=None)
     sws: Optional[float] = Field(alias="SWS", default=None)
     max_participants: Optional[int] = Field(alias="Max. Teilnehmer/-innen", default=None)
     in_person_type: Optional[str] = Field(alias="Veranstaltungstyp", default=None)
@@ -115,7 +116,8 @@ class CourseBaseInfo(BaseModel):
             type=self.type,
             course_id=self.course_id,
             cycle=self.cycle,
-            semester=self.semester,
+            year=self.year,
+            semester_type=self.semester_type,
             sws=self.sws,
             max_participants=self.max_participants,
             in_person_type=self.in_person_type,
@@ -131,7 +133,7 @@ class CourseSession(BaseModel):
     weekday: Optional[WeekdayEnum]
     starting_time: Optional[time]
     ending_time: Optional[time]
-    timing_type: Optional[CourseStartTypeEnum]
+    timing_type: Optional[CourseStartEnum]
     rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]

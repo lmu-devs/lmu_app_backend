@@ -3,7 +3,7 @@ from typing import List
 from sqlalchemy.orm.session import Session
 
 from shared.src.core.logging import get_course_logger
-from shared.src.enums.courses_enums import SemesterTypeEnum
+from shared.src.enums.courses_enums import SemesterEnum
 from shared.src.models.course import Course
 from shared.src.services.directus_service import DirectusService
 from shared.src.tables.courses.course_tables import CourseTable
@@ -20,7 +20,7 @@ class CourseFetcher:
         self.workers: int = 5
         self.logger = get_course_logger(__name__)
 
-    def store_courses_streaming_upsert(self, db: Session, year: int, semester: SemesterTypeEnum):
+    def store_courses_streaming_upsert(self, db: Session, year: int, semester: SemesterEnum):
         """Store courses using streaming + upsert for maximum efficiency."""
         courses_crawler = LSFParallelCrawler(year, semester)
         batch_courses: list[Course] = []

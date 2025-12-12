@@ -1,11 +1,11 @@
 from enum import Enum
 
 
-class CourseStartTypeEnum(str, Enum):
+class CourseStartEnum(str, Enum):
     SINE_TEMPORE = "SINE_TEMPORE"
     CUM_TEMPORE = "CUM_TEMPORE"
 
 
-class SemesterTypeEnum(str, Enum):
-    SUMMER_SEMESTER = "SOSE"
-    WINTER_SEMESTER = "WISE"
+class SemesterEnum(str, Enum):
+    SUMMER = "SUMMER"
+    WINTER = "WINTER"

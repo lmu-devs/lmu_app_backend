@@ -16,7 +16,7 @@ import requests
 from lxml import html
 
 from shared.src.core.logging import get_course_logger
-from shared.src.enums.courses_enums import CourseStartTypeEnum, SemesterTypeEnum
+from shared.src.enums.courses_enums import CourseStartEnum, SemesterEnum
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.models.course import (
     AdditionInformation,
@@ -75,8 +75,8 @@ class LSFCrawler:
             "Cache-Control": "max-age=0",
         }
 
-    def build_set_session_semester_url(self, year: int, semester_type: SemesterTypeEnum) -> str:
-        semester_text = "Sommersemester" if semester_type == SemesterTypeEnum.SUMMER_SEMESTER else "Wintersemester"
+    def build_set_session_semester_url(self, year: int, semester_type: SemesterEnum) -> str:
+        semester_text = "Sommersemester" if semester_type == SemesterEnum.SUMMER else "Wintersemester"
         term_id = 1 if semester_type.value == "SOSE" else 2
         semester_text_year = f"{year}" if term_id == 1 else f"{year}%2F{year + 1}"
         semester_id = f"{year}{term_id}"
@@ -87,19 +87,19 @@ class LSFCrawler:
             + f"&purge=n&getglobal=semester&text={semester_text}+{semester_text_year}"
         )
 
-    def crawl_all_courses(self, year: int, semester_type: SemesterTypeEnum) -> list[Course]:
+    def crawl_all_courses(self, year: int, semester_type: SemesterEnum) -> list[Course]:
         """Crawl all courses for a given year and semester type sequentially."""
         self.set_crawling_parameters(year, semester_type)
         course_urls = self._crawl_all_course_urls_sequentially()
         return self._crawl_all_courses_sequentially(course_urls)
 
-    def crawl_all_courses_parallel(self, year: int, semester_type: SemesterTypeEnum) -> list[Course]:
+    def crawl_all_courses_parallel(self, year: int, semester_type: SemesterEnum) -> list[Course]:
         """Crawl all courses for a given year and semester type in parallel."""
         self.set_crawling_parameters(year, semester_type)
         course_urls = self._crawl_course_urls_in_parallel()
         return self._crawl_all_courses_in_parallel(course_urls)
 
-    def set_crawling_parameters(self, year: int, semester_type: SemesterTypeEnum) -> None:
+    def set_crawling_parameters(self, year: int, semester_type: SemesterEnum) -> None:
         """Set the year and semester type for the crawling session."""
         self.year = year
         self.semester_type = semester_type
@@ -122,7 +122,7 @@ class LSFCrawler:
 
         return course_urls
 
-    def crawl_all_course_urls_sequentially(self, year: int, semester_type: SemesterTypeEnum) -> list[tuple[str, str]]:
+    def crawl_all_course_urls_sequentially(self, year: int, semester_type: SemesterEnum) -> list[tuple[str, str]]:
         """Crawl all course URLs sequentially."""
         course_urls = []
         self.logger.info("Getting course type ids...")
@@ -397,6 +397,8 @@ class LSFCrawler:
         """Extract basic course information including persons and institutions."""
         base_info_dict: dict[str, Any] = {
             "institutions": self._extract_associated_institutions_from_course_page(response_bytes),
+            "year": self.year,
+            "semester_type": self.semester_type,
         }
         return CourseBaseInfo(**(base_info_dict | self._extract_basic_course_data_from_html(response_bytes)))
 
@@ -862,12 +864,12 @@ class LSFCrawler:
         return dt.strptime(start, "%d.%m.%Y").date()
 
     @staticmethod
-    def _extract_time_type(time: str) -> Optional[CourseStartTypeEnum]:
+    def _extract_time_type(time: str) -> Optional[CourseStartEnum]:
         """Extract the type of course start from a time string."""
         if "s.t." in time:
-            return CourseStartTypeEnum.SINE_TEMPORE
+            return CourseStartEnum.SINE_TEMPORE
         if "c.t." in time:
-            return CourseStartTypeEnum.CUM_TEMPORE
+            return CourseStartEnum.CUM_TEMPORE
         return None
 
     @staticmethod
@@ -928,7 +930,7 @@ class LSFCrawler:
 
 
 class LSFSequentialCrawler(LSFCrawler):
-    def __init__(self, year: int, semester_type: SemesterTypeEnum):
+    def __init__(self, year: int, semester_type: SemesterEnum):
         super().__init__()
         self.set_crawling_parameters(year, semester_type)
         self._course_urls: list[tuple[str, str]] = []
@@ -945,7 +947,7 @@ class LSFSequentialCrawler(LSFCrawler):
 
 
 class LSFParallelCrawler(LSFCrawler):
-    def __init__(self, year: int, semester_type: SemesterTypeEnum):
+    def __init__(self, year: int, semester_type: SemesterEnum):
         super().__init__()
         self.set_crawling_parameters(year, semester_type)
         self._course_urls: list[tuple[str, str]] = []
@@ -987,7 +989,7 @@ class LSFParallelCrawler(LSFCrawler):
 
 def main() -> None:
     crawler = LSFCrawler()
-    print([l.to_dict() for l in crawler.crawl_all_courses_parallel(2025, SemesterTypeEnum.SUMMER_SEMESTER)])
+    print([l.to_dict() for l in crawler.crawl_all_courses_parallel(2025, SemesterEnum.SUSE)])
 
 
 if __name__ == "__main__":

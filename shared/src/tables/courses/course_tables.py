@@ -17,7 +17,7 @@ from sqlalchemy.orm import relationship
 
 from shared.src.core.database import Base
 from shared.src.enums import WeekdayEnum
-from shared.src.enums.courses_enums import CourseStartTypeEnum
+from shared.src.enums.courses_enums import CourseStartEnum, SemesterEnum
 
 CASCADE_OPTION = "all, delete-orphan"
 
@@ -106,7 +106,8 @@ class CourseBaseInfoTable(Base, BaseTable):
     type = Column(String(500), nullable=True)
     course_id = Column(String(500), nullable=True)
     cycle = Column(String(500), nullable=True)
-    semester = Column(String(500), nullable=True)
+    year = Column(Integer, nullable=True)
+    semester_type = Column(Enum(SemesterEnum, native_enum=False), nullable=True)
     sws = Column(Float, nullable=True)
     max_participants = Column(Integer, nullable=True)
     in_person_type = Column(String(500), nullable=True)
@@ -126,7 +127,7 @@ class CourseSessionTable(Base, BaseTable):
     weekday = Column(Enum(WeekdayEnum, native_enum=False), nullable=True)
     starting_time = Column(Time, nullable=True)
     ending_time = Column(Time, nullable=True)
-    timing_type = Column(Enum(CourseStartTypeEnum, native_enum=False), nullable=True)
+    timing_type = Column(Enum(CourseStartEnum, native_enum=False), nullable=True)
     rhythm = Column(String(255), nullable=True)
     duration_start = Column(Date, nullable=True)
     duration_end = Column(Date, nullable=True)

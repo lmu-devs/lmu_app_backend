@@ -4,7 +4,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, RootModel
 
-from shared.src.enums.courses_enums import CourseStartTypeEnum
+from shared.src.enums.courses_enums import CourseStartEnum, SemesterEnum
 from shared.src.enums.weekday_enum import WeekdayEnum
 from shared.src.models.location_model import Location
 
@@ -41,7 +41,8 @@ class CourseBaseInfo(BaseModel):
     class_type: Optional[str]
     class_id: Optional[str]
     class_cycle: Optional[str]
-    semester: Optional[str]
+    year: Optional[int]
+    semester_type: Optional[SemesterEnum]
     sws: Optional[float]
     max_participants: Optional[int]
     in_person_type: Optional[str]
@@ -56,7 +57,7 @@ class Session(BaseModel):
     weekday: Optional[WeekdayEnum]
     starting_time: Optional[time]
     ending_time: Optional[time]
-    timing_type: Optional[CourseStartTypeEnum]
+    timing_type: Optional[CourseStartEnum]
     rhythm: Optional[str]
     duration_start: Optional[Date]
     duration_end: Optional[Date]

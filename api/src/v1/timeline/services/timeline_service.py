@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from shared.src.models import Timeframe
 
 from ..models.event_model import Event, EventTypeEnum
-from ..models.semester_model import Semester, SemesterTypeEnum
+from ..models.semester_model import Semester, SemesterEnum
 from ..models.timeline_model import Timeline
 
 
@@ -141,26 +141,26 @@ class TimelineService:
         return [
             Semester(
                 timeframe=Timeframe(start=datetime(2025, 4, 1), end=datetime(2025, 9, 30)),
-                type=SemesterTypeEnum.SUMMER,
+                type=SemesterEnum.SUMMER,
             ),
             Semester(
                 timeframe=Timeframe(start=datetime(2025, 10, 1), end=datetime(2026, 3, 31)),
-                type=SemesterTypeEnum.WINTER,
+                type=SemesterEnum.WINTER,
             ),
             Semester(
                 timeframe=Timeframe(start=datetime(2026, 4, 1), end=datetime(2026, 9, 30)),
-                type=SemesterTypeEnum.SUMMER,
+                type=SemesterEnum.SUMMER,
             ),
             Semester(
                 timeframe=Timeframe(start=datetime(2026, 10, 1), end=datetime(2027, 3, 31)),
-                type=SemesterTypeEnum.WINTER,
+                type=SemesterEnum.WINTER,
             ),
             Semester(
                 timeframe=Timeframe(start=datetime(2027, 4, 1), end=datetime(2027, 9, 30)),
-                type=SemesterTypeEnum.SUMMER,
+                type=SemesterEnum.SUMMER,
             ),
             Semester(
                 timeframe=Timeframe(start=datetime(2027, 10, 1), end=datetime(2028, 3, 31)),
-                type=SemesterTypeEnum.WINTER,
+                type=SemesterEnum.WINTER,
             ),
         ]
