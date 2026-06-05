@@ -1,11 +1,13 @@
 from pydantic import BaseModel
 
+from api.src.v2.core.models.image_model import Image
+
 
 class Club(BaseModel):
     id: str
     university_id: str | None = None
     type: str
-    logo_url: str | None = None
+    image: Image | None = None
     title: str
     description: str
     content: str | None = None

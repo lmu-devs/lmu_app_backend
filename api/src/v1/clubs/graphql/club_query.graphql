@@ -5,8 +5,9 @@ query clubs($languageCode: String!) {
             id
         }
         type
-        logo {
-            filename_download
+        image: logo {
+            title
+            id
         }
         url
         email

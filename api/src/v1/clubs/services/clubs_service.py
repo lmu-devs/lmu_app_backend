@@ -1,8 +1,8 @@
-import uuid
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from api.src.v1.core.flatten_response_util import flatten_response
+from api.src.v2.core.transform_images_response_utils import transform_images_response
 from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
@@ -27,10 +27,8 @@ class ClubService:
                 variables={"languageCode": language.value},
             )
 
-            # Flatten the response
-            flattened_response = flatten_response(response)
-
-            print(flattened_response)
+            transformed_response = transform_images_response(response)
+            flattened_response = flatten_response(transformed_response)
 
             return [Club(**club) for club in flattened_response["student_clubs"]]
 
