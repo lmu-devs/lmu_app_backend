@@ -14,11 +14,16 @@ query clubs($languageCode: String!) {
         instagram_url
         linkedin_url
         category
+        founding_year
+        location {
+            address
+            latitude
+            longitude
+        }
         translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
             title
             description
             content
         }
     }
-
 }
