@@ -17,5 +17,5 @@ class Club(BaseModel):
     instagram_url: str | None = None
     linkedin_url: str | None = None
     category: str
-    location: Location
+    location: Location | None = None 
     founding_year: int

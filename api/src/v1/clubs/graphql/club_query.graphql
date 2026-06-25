@@ -15,11 +15,8 @@ query clubs($languageCode: String!) {
         linkedin_url
         category
         founding_year
-        location {
-            address
-            latitude
-            longitude
-        }
+        address
+        location
         translations(filter: { languages_code: { code: { _eq: $languageCode } } }) {
             title
             description

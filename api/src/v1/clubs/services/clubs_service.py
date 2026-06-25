@@ -3,6 +3,7 @@ from typing import List
 
 from api.src.v1.core.flatten_response_util import flatten_response
 from api.src.v2.core.transform_images_response_utils import transform_images_response
+from api.src.v2.core.utils.directus_mappers import map_directus_location
 from shared.src.core.settings import get_settings
 from shared.src.enums.language_enums import LanguageEnum
 from shared.src.services.directus_service import DirectusService
@@ -30,7 +31,21 @@ class ClubService:
             transformed_response = transform_images_response(response)
             flattened_response = flatten_response(transformed_response)
 
-            return [Club(**club) for club in flattened_response["student_clubs"]]
+            clubs = []
+            for club in flattened_response["student_clubs"]:
+                universities = club.pop("univerities", None)
+                if isinstance(universities, list) and universities:
+                    club["university_id"] = universities[0].get("id")
+                elif isinstance(universities, dict):
+                    club["university_id"] = universities.get("id")
+
+                address = club.pop("address", None)
+                raw_location = club.pop("location", None)
+                club["location"] = map_directus_location(address, raw_location)
+
+                clubs.append(Club(**club))
+
+            return clubs
 
         except Exception as e:
             raise e
