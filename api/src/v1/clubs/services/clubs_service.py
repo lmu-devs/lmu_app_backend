@@ -61,14 +61,18 @@ class ClubService:
 
             categories = []
             for cat in raw_categories:
-                categories.append(
-                    ClubCategory(
-                        id=cat.get("id"),
-                        title=cat.get("title", ""), 
-                        emoji=cat.get("emoji", ""),
-                        club_ids=category_to_club_ids.get(cat.get("id"), [])
+                cat_id = cat.get("id")
+                club_ids_for_cat = category_to_club_ids.get(cat_id, [])
+                
+                if len(club_ids_for_cat) > 0:
+                    categories.append(
+                        ClubCategory(
+                            id=cat_id,
+                            title=cat.get("title", ""), 
+                            emoji=cat.get("emoji", ""),
+                            club_ids=club_ids_for_cat
+                        )
                     )
-                )
 
             return ClubsResponse(
                 club_categories=categories,
