@@ -73,6 +73,8 @@ class ClubService:
                             club_ids=club_ids_for_cat
                         )
                     )
+            
+            categories.sort(key=lambda category: category.title.lower())
 
             return ClubsResponse(
                 club_categories=categories,
