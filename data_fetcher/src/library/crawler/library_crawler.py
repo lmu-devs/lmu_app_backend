@@ -47,10 +47,9 @@ class LibraryCrawler:
             provider="openai",
             model="gpt-4o-mini",
         )
-        # Set a more descriptive user agent
         self.session.headers.update(
             {
-                "User-Agent": "MunichLibraryFetcher/1.0 (https://github.com/lmu-devs/lmu_app_backend; admin@lmu-devs.com)"  # Replace with actual info
+                "User-Agent": "MunichLibraryFetcher/1.0 (https://github.com/lmu-devs/lmu_app_backend; admin@lmu-devs.com)"
             }
         )
         self.geocoding_service = GeocodingService(user_agent="MunichLibraryCrawler/1.0 (admin@lmu-devs.com)")
@@ -59,7 +58,7 @@ class LibraryCrawler:
         """Fetch a page and return its BeautifulSoup object."""
         try:
             response = self.session.get(url, timeout=15)
-            response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+            response.raise_for_status()
             if "html" not in response.headers.get("Content-Type", "").lower():
                 logger.warning(f"Non-HTML content type received from {url}")
                 return None
@@ -72,7 +71,6 @@ class LibraryCrawler:
         """Extract email addresses from text."""
         if not text:
             return []
-        # Improved regex to avoid matching things like "javascript:"
         email_pattern = r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"
         return re.findall(email_pattern, text)
 
@@ -151,11 +149,9 @@ class LibraryCrawler:
         if not content_elements:
             return Equipments()
 
-        # Process each element to properly handle links before converting to markdown
         processed_elements = []
         for elem in content_elements:
             if isinstance(elem, Tag):
-                # Find all links and convert them to absolute URLs
                 for link in elem.find_all("a", href=True):
                     if not link["href"].startswith(("http://", "https://")):
                         link["href"] = urljoin(self.BASE_URL, link["href"])
@@ -184,14 +180,11 @@ class LibraryCrawler:
         current_element = section_tag.next_sibling
         while current_element:
             if isinstance(current_element, Tag):
-                # Stop if we hit the next heading of the same or higher level
                 if current_element.name in stop_tags:
                     break
-                # Keep relevant tags like paragraphs, lists, divs
                 if current_element.name in ["p", "ul", "ol", "div", "dl", "table"]:
                     content.append(current_element)
             elif isinstance(current_element, str) and current_element.strip():
-                # Keep non-empty text nodes
                 content.append(current_element.strip())
             current_element = current_element.next_sibling
         return content
@@ -201,22 +194,18 @@ class LibraryCrawler:
         items = []
         for elem in content_elements:
             if isinstance(elem, Tag):
-                # Extract text from lists (ul, ol)
                 if elem.name in ["ul", "ol"]:
-                    for li in elem.find_all("li", recursive=False):  # Only direct children
+                    for li in elem.find_all("li", recursive=False):
                         text = li.get_text(strip=True)
                         if text:
                             items.append(text)
-                # Extract text from paragraphs if not empty
                 elif elem.name == "p":
                     text = elem.get_text(strip=True)
                     if text:
                         items.append(text)
-                # Could add handling for other tags like 'dl', 'table' if needed
             elif isinstance(elem, str) and elem.strip():
-                # Append non-empty strings directly
                 items.append(elem)
-        return items  # Returns list of non-empty strings
+        return items
 
     def _parse_transportation_section(self, content_elements: List[Union[Tag, str]]) -> Optional[str]:
         """Extract transportation info, usually found in <p> tags."""
@@ -224,11 +213,9 @@ class LibraryCrawler:
         for elem in content_elements:
             if isinstance(elem, Tag) and elem.name == "p":
                 text = elem.get_text(strip=True)
-                # Add checks to filter out irrelevant paragraphs if necessary
                 if text and not any(kw in text.lower() for kw in ["lageplan", "lmu raumfinder"]):
                     transport_text.append(text)
             elif isinstance(elem, str) and elem.strip():
-                # Include relevant text nodes too
                 if not any(kw in elem.lower() for kw in ["lageplan", "lmu raumfinder"]):
                     transport_text.append(elem)
 
@@ -252,12 +239,10 @@ class LibraryCrawler:
         for elem in content_elements:
             if isinstance(elem, Tag):
                 if elem.name == "p":
-                    # Check for reservation link
                     link = elem.find("a", href=True)
                     if link and "reservierung" in link.get_text().lower():
                         reservation_url = link["href"]
 
-                    # Get text content
                     text = elem.get_text(strip=True)
                     if text and not any(kw in text.lower() for kw in ["leseplatzreservierung", "reservierung"]):
                         access_text.append(text)
@@ -283,9 +268,7 @@ class LibraryCrawler:
         if not content_container:
             return hashlib.sha256("empty".encode()).hexdigest()
 
-        # Get all text content from the page, normalized
         content = content_container.get_text(separator=" ", strip=True)
-        # Normalize whitespace and convert to lowercase for stable hashing
         content = " ".join(content.lower().split())
 
         return hashlib.sha256(content.encode()).hexdigest()
@@ -293,10 +276,8 @@ class LibraryCrawler:
     def _get_location(self, content_div: Tag) -> Optional[Location]:
         """Clean and structure location information into Location model."""
 
-        # Extract contact info from content div
         contact_div = content_div.find("div", {"class": "bd-kontakt"})
         if contact_div:
-            # Address
             address_elem = contact_div.find("address", {"class": "g-address"})
             if address_elem:
                 address = address_elem.get_text(separator="\n").strip()
@@ -308,7 +289,6 @@ class LibraryCrawler:
         """Clean and structure contact information into ContactInfo model."""
         contact = Contact()
 
-        # Extract contact info from content div
         contact_div = content_div.find("div", {"class": "bd-kontakt"})
         if contact_div:
             # Phone
@@ -341,7 +321,6 @@ class LibraryCrawler:
             else:
                 emails = self._extract_emails(contact_div.get_text())
 
-            # Clean and validate emails
             valid_emails = []
             for email in emails:
                 found_emails = self._extract_emails(email)
@@ -363,17 +342,13 @@ class LibraryCrawler:
 
         for elem in content_elements:
             if isinstance(elem, Tag):
-                # Handle paragraphs and list items
                 if elem.name in ["p", "ul", "ol"]:
-                    # For lists, process each list item
                     if elem.name in ["ul", "ol"]:
                         for li in elem.find_all("li"):
-                            # Check for links in list item
                             links = li.find_all("a", href=True)
                             if links:
                                 for link in links:
                                     href = link["href"]
-                                    # Make URL absolute if it's relative
                                     if not href.startswith(("http://", "https://")):
                                         href = urljoin(self.BASE_URL, href)
                                     text = link.get_text(strip=True)
@@ -383,24 +358,20 @@ class LibraryCrawler:
                                         )
 
                             else:
-                                # Get plain text from list item
                                 text = li.get_text(strip=True)
                                 if text:
                                     services.append(TextWithLink(title=text))
-                    # For paragraphs, process as before
                     else:
                         links = elem.find_all("a", href=True)
                         if links:
                             for link in links:
                                 href = link["href"]
-                                # Make URL absolute if it's relative
                                 if not href.startswith(("http://", "https://")):
                                     href = urljoin(self.BASE_URL, href)
                                 text = link.get_text(strip=True)
                                 if text:
                                     services.append(TextWithLink(title=text, url=href))
                         else:
-                            # If no links found, get the plain text content
                             text = elem.get_text(strip=True)
                             if text:
                                 services.append(TextWithLink(title=text))
@@ -414,28 +385,25 @@ class LibraryCrawler:
 
     def get_library(self, library: Dict[str, Any]) -> Library:
         """Parse detailed information from a library's individual page."""
-        # Extract library ID from URL
         library_url: str = library["url"]
         library_name: str = library["name"]
         location_numbers: List[str] = library["location_numbers"]
         library_id: str = self._set_library_id(library_url)
         name: str = library_name.replace("Fachbibliothek ", "").strip()
 
-        # Find the main content area (adjust selectors if needed)
         content_div = self.current_soup.find("div", {"class": "content content-einrichtung"}) or self.current_soup.find(
             "div", id="content"
         )
         if not content_div:
             logger.warning(f"Could not find main content div for {name}: {library_url}")
             return Library(
-                id=library_id,  # Add ID here
+                id=library_id,
                 title=name,
                 location_number=location_numbers,
                 url=library_url,
                 hash=self.current_hash,
             )
 
-        # --- Initialize data ---
         areas: Areas = []
         contact: Contact = self._get_contact(content_div)
         location: Location | None = self._get_location(content_div)
@@ -447,14 +415,11 @@ class LibraryCrawler:
         # transportation: str | None = None
         # search_hints: List[Link] | None = None
 
-        # --- Extract Opening Hours ---
         opening_hours_div = content_div.find("div", {"class": "oeffnungszeiten"})
         if opening_hours_div:
-            # Convert opening hours to clean markdown text
             text_content = html_to_markdown(opening_hours_div)
             areas = self._generate_areas(text_content)
 
-        # # --- Extract Transportation ---
         # transport_header = content_div.find(
         #     ["h2", "h3"], string=re.compile(r"Verkehrsanbindung", re.IGNORECASE)
         # )
@@ -462,19 +427,16 @@ class LibraryCrawler:
         #     transport_content = self._extract_section_content(transport_header)
         #     transportation = self._parse_transportation_section(transport_content)
 
-        # --- Extract Access Regulation ---
         access_header = content_div.find(["h2", "h3"], string=re.compile(r"Zugangsregelung", re.IGNORECASE))
         if access_header:
             access_content = self._extract_section_content(access_header)
             access_regulation, reservation_url = self._parse_access_regulation_section(access_content)
 
-        # --- Extract Services ---
         service_header = content_div.find(["h2", "h3"], string=re.compile(r"Service", re.IGNORECASE))
         if service_header:
             service_content = self._extract_section_content(service_header)
             services = self._parse_service_section(service_content)
 
-        # --- Extract Equipment ---
         equipment_header = content_div.find(["h2", "h3"], string=re.compile(r"Ausstattung", re.IGNORECASE))
         if equipment_header:
             equipment_content = self._extract_section_content(equipment_header)
@@ -482,13 +444,11 @@ class LibraryCrawler:
         else:
             print("NO EQUIPMENT HEADER")
 
-        # --- Extract Subject Areas (Sammelgebiete) ---
         subject_header = content_div.find(["h2", "h3"], string=re.compile(r"Sammelgebiete", re.IGNORECASE))
         if subject_header:
             subject_content = self._extract_section_content(subject_header)
             subject_areas.extend(self._extract_list_items(subject_content))
 
-        # # --- Extract Search Hints ---
         # search_header = content_div.find(
         #     ["h2", "h3"], string=re.compile(r"Fachspezifische Suchtipps", re.IGNORECASE)
         # )
@@ -496,11 +456,8 @@ class LibraryCrawler:
         #     search_content = self._extract_section_content(search_header)
         #     search_hints = self._extract_search_hints(search_content)
 
-        # --- Consolidate and Clean ---
-        # Remove duplicates and empty strings
         subject_areas = sorted(list(set(s for s in subject_areas if s))) or None
 
-        # --- Create Library Model ---
         try:
             library = Library(
                 id=library_id,
@@ -522,7 +479,6 @@ class LibraryCrawler:
             return library
         except Exception as e:
             logger.error(f"Failed to instantiate Library model for {name} ({library_url}): {e}")
-            # Return minimal object on model error
             return Library(
                 id=library_id,
                 title=name,
@@ -546,7 +502,7 @@ class LibraryCrawler:
         for table in tables:
             for row in table.find_all("tr"):
                 cells = row.find_all("td")
-                if len(cells) >= 2:  # Need at least name and number columns
+                if len(cells) >= 2: 
                     name_cell, number_cell = cells[0], cells[1]
                     link = name_cell.find("a")
 
@@ -554,20 +510,15 @@ class LibraryCrawler:
                         name = link.get_text(strip=True)
                         href = link["href"]
 
-                        # Skip anchors or javascript links
                         if href.startswith("#") or href.startswith("javascript:"):
                             continue
 
-                        # Construct absolute URL
-                        # Handles cases like /path/page.html and relative/page.html
-                        url = urljoin(self.LIBRARIES_URL, href)  # Use LIBRARIES_URL as base
+                        url = urljoin(self.LIBRARIES_URL, href)
 
-                        # Skip if already processed
                         if url in processed_urls:
                             continue
                         processed_urls.add(url)
 
-                        # Extract location numbers cleanly
                         location_numbers = [
                             num.strip()
                             for num in number_cell.get_text(separator=",").split(",")
@@ -600,14 +551,12 @@ class LibraryCrawler:
         return True
 
 
-# --- Main execution block ---
 def save_data_to_file(data: Dict, filename: str = "libraries.json"):
     """Save the final crawled data structure to a JSON file."""
     path = Path(filename)
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open("w", encoding="utf-8") as f:
-            # Use Pydantic's json handling via model_dump for consistency
             json.dump(data, f, ensure_ascii=False, indent=2)
         logger.info(f"Data saved to {filename}")
     except TypeError as e:
@@ -632,11 +581,10 @@ if __name__ == "__main__":
 
     if libraries_data:
         logger.info(f"Successfully crawled {len(libraries_data)} library entries.")
-        # Prepare final data structure for saving
         output_data = {
             "libraries": [lib.model_dump(mode="json", exclude_none=True) for lib in libraries_data],
         }
-        save_data_to_file(output_data, "libraries.json")  # Save in the current directory or specify a path
+        save_data_to_file(output_data, "libraries.json")
         logger.info("Output saved to libraries.json")
     else:
         logger.error("Crawling returned no library data. File not saved.")
